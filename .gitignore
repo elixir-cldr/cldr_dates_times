@@ -1,0 +1,16 @@
+/_build
+/cover
+/deps
+/doc
+/references
+*.snapshot
+erl_crash.dump
+*.ez
+*.tar
+.DS_Store
+
+# The xml downloaded from Unicode
+/downloads
+
+# Ignore the generated json files
+/data
