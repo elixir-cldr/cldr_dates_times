@@ -1,4 +1,19 @@
 defmodule Cldr.DateTime.Formatter do
+  @moduledoc """
+  Functions the implement the formatting for the format
+  symbols.
+
+  For the differt formats for an hour, the following table
+  applies:
+
+  +---------+-------+---------+------+------------+-------+
+	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  |   h	    |  12	  | 1...11	|  12	 |   1...11   |  12   |
+  |   H	    |   0	  | 1...11	|  12	 |  13...23   |   0   |
+  |   K	    |   0	  | 1...11	|   0	 |   1...11   |   0   |
+  |   k	    |  24	  | 1...11	|  12	 |  13...23   |  24   |
+  +---------+-------+---------+------+------------+-------+
+  """
   alias Cldr.DateTime.{Format, Compiler, Timezone}
   alias Cldr.Calendar, as: Kalendar
   alias Cldr.Math
@@ -734,7 +749,7 @@ defmodule Cldr.DateTime.Formatter do
   defp period_type(4), do: :wide
   defp period_type(5), do: :narrow
 
-  defp am_or_pm(%{hour: hour, minute: _minute}, _variants) when hour < 12 do
+  defp am_or_pm(%{hour: hour, minute: _minute}, _variants) when hour < 12 or rem(hour, 24) == 0 do
     :am
   end
 
@@ -746,14 +761,25 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `h`) as a number in the
   range 1..12.
 
-  The hour is calculated as the supplied :hour plus 1 then modulo 12.
+  +--------+--------+---------+------+-----------+-------+
+  | Symbol | Midn.  | Morning | Noon | Afternoon | Midn. |
+  |   h    |  12    | 1...11  |  12  |  1...11   |  12   |
+  +--------+--------+---------+------+-----------+-------+
   """
   @spec hour_1_12(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def hour_1_12(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def hour_1_12(%{hour: hour}, n, _locale, _options) do
+  def hour_1_12(%{hour: hour}, n, _locale, _options) when hour in [0, 12, 24] do
+    12
+    |> pad(n)
+  end
+
+  def hour_1_12(%{hour: hour}, n, _locale, _options) when hour in 1..11 do
     hour
-    |> add(1)
-    |> rem(12)
+    |> pad(n)
+  end
+
+  def hour_1_12(%{hour: hour}, n, _locale, _options) when hour in 13..23 do
+    (hour - 12)
     |> pad(n)
   end
 
@@ -765,13 +791,26 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `K`) as a number in the
   range 0..11.
 
-  The hour is calculated as the supplied :hour modulo 12.
+  +--------+--------+---------+------+-----------+-------+
+  | Symbol | Midn.  | Morning | Noon | Afternoon | Midn. |
+  |   K    |   0    | 1...11  |   0  |  1...11   |   0   |
+  +--------+--------+---------+------+-----------+-------+
+
   """
   @spec hour_0_11(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def hour_0_11(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def hour_0_11(%{hour: hour}, n, _locale, _options) do
+  def hour_0_11(%{hour: hour}, n, _locale, _options) when hour in [0, 12, 24] do
+    0
+    |> pad(n)
+  end
+
+  def hour_0_11(%{hour: hour}, n, _locale, _options) when hour in 1..11 do
     hour
-    |> rem(12)
+    |> pad(n)
+  end
+
+  def hour_0_11(%{hour: hour}, n, _locale, _options) when hour in 13..23 do
+    (hour - 12)
     |> pad(n)
   end
 
@@ -782,13 +821,22 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the formatting of the `:hour` (format symbol `k`) as a number in the
   range 1..24.
+
+  +--------+--------+---------+------+-----------+-------+
+  | Symbol | Midn.  | Morning | Noon | Afternoon | Midn. |
+  |   k    |  24    | 1...11  |  12  |  13...23  |  24   |
+  +--------+--------+---------+------+-----------+-------+
+
   """
   @spec hour_1_24(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def hour_1_24(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def hour_1_24(%{hour: hour}, n, _locale, _options) do
+  def hour_1_24(%{hour: hour}, n, _locale, _options) when hour in [0, 24] do
+    24
+    |> pad(n)
+  end
+
+  def hour_1_24(%{hour: hour}, n, _locale, _options) when hour in 1..11 or hour in 13..23 do
     hour
-    |> add(1)
-    |> rem(24)
     |> pad(n)
   end
 
@@ -797,25 +845,34 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the formatting of the `:hour` (format symbol `h`) as a number
+  Returns the formatting of the `:hour` (format symbol `H`) as a number
   in the range 0..23 as a string (this is the Elixir normal range
   for an hour).
+
+  +--------+--------+---------+------+-----------+-------+
+  | Symbol | Midn.  | Morning | Noon | Afternoon | Midn. |
+  |   H    |   0    | 1...11  |  12  |  13...23  |   0   |
+  +--------+--------+---------+------+-----------+-------+
   """
   @spec hour_0_23(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def hour_0_23(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def hour_0_23(%{hour: hour}, n, _locale, _options) do
-    hour
-    |> rem(24)
+  def hour_0_23(%{hour: hour}, n, _locale, _options) when hour in [0, 24] do
+    0
     |> pad(n)
+  end
+
+  def hour_0_23(%{hour: hour}, n, _locale, _options) when hour in 1..23 do
+    hour
+    |> pad(n)
+  end
+
+  def hour_0_23(time, _n, _locale, _options) do
+    error_return(time, "H", [:hour])
   end
   defdelegate hour(time, n, locale, options), to: __MODULE__, as: :hour_0_23
   defdelegate hour(time, n, locale), to: __MODULE__, as: :hour_0_23
   defdelegate hour(time, n), to: __MODULE__, as: :hour_0_23
   defdelegate hour(time), to: __MODULE__, as: :hour_0_23
-
-  def hour_0_23(time, _n, _locale, _options) do
-    error_return(time, "h", [:hour])
-  end
 
   @doc """
   Returns the `:minute` (format symbol `m`) as number in string
@@ -845,6 +902,58 @@ defmodule Cldr.DateTime.Formatter do
 
   def second(time, _n, _locale, _options) do
     error_return(time, "s", [:second])
+  end
+
+  @doc """
+  Returns the `:second` (format symbol `S`) as a freactional number in string
+  format.
+  """
+  @spec fractional_second(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  def fractional_second(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
+  # Note that TR35 says we should truncate the number of decimal digits
+  # but we are rounding
+  @microseconds 1_000_000
+  def fractional_second(%{second: second, microsecond: {fraction, resolution}}, n, _locale, _options) do
+    rounding = min(resolution, n)
+    ((second  * 1.0) + fraction / @microseconds)
+    |> Float.round(rounding)
+  end
+
+  def fractional_second(%{second: second}, n, _locale, _options) do
+    second
+    |> pad(n)
+  end
+
+  def fractional_second(time, _n, _locale, _options) do
+    error_return(time, "S", [:second])
+  end
+
+  @doc """
+  Returns a `time` (format symbol `A`) as milliseconds in string
+  format.
+  """
+  @milliseconds 1_000
+  @spec millisecond(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  def millisecond(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+  def millisecond(%{hour: hour, minute: minute, second: second,
+                    microsecond: {fraction, _resolution}}, n, _locale, _options) do
+    ((rem(hour, 24) * @milliseconds * 60 * 60) +
+    (minute * @milliseconds * 60) +
+    (second * @milliseconds) +
+    div(fraction, @milliseconds))
+    |> pad(n)
+  end
+
+  def millisecond(%{hour: hour, minute: minute, second: second}, n, _locale, _options) do
+    ((rem(hour, 24) * @milliseconds * 60 * 60) +
+    (minute * @milliseconds * 60) +
+    (second * @milliseconds))
+    |> pad(n)
+  end
+
+  def millisecond(time, _n, _locale, _options) do
+    error_return(time, "A", [:hour, :minute, :second])
   end
 
   @doc """
@@ -1033,11 +1142,7 @@ defmodule Cldr.DateTime.Formatter do
   defp number_of_digits(n) when n < 10_000_000_000, do: 10
   defp number_of_digits(n), do: Enum.count(Integer.digits(n))
 
-  defp add(x, n) do
-    x + n
-  end
-
-  def error_return(map, symbol, requirements) do
+  defp error_return(map, symbol, requirements) do
     {:error, "The format symbol '#{symbol}' requires at least #{inspect requirements}.  Found: #{inspect map}"}
   end
 end

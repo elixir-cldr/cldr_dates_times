@@ -41,6 +41,7 @@ Minute              = m
 
 Second              = s
 FractionalSecond    = S
+Millisecond         = A
 
 ShortZone           = z
 BasicZone           = Z
@@ -98,6 +99,7 @@ Rules.
 {Minute}+                : {token,{minute,TokenLine,count(TokenChars)}}.
 {Second}+                : {token,{second,TokenLine,count(TokenChars)}}.
 {FractionalSecond}+      : {token,{fractional_second,TokenLine,count(TokenChars)}}.
+{Millisecond}+           : {token,{millisecond,TokenLine,count(TokenChars)}}.
 
 {ShortZone}+             : {token,{zone_short,TokenLine,count(TokenChars)}}.
 {BasicZone}+             : {token,{zone_basic,TokenLine,count(TokenChars)}}.

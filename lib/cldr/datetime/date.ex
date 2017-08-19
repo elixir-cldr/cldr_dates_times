@@ -86,7 +86,7 @@ defmodule Cldr.Date do
     {:ok, format_string}
   end
 
-  def error_return(map, requirements) do
+  defp error_return(map, requirements) do
     {:error, "Invalid date. Date is a map that requires at least #{inspect requirements} fields. " <>
              "Found: #{inspect map}"}
   end

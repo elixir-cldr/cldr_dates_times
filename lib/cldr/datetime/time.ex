@@ -71,7 +71,7 @@ defmodule Cldr.Time do
     {:ok, format_string}
   end
 
-  def error_return(map, requirements) do
+  defp error_return(map, requirements) do
     {:error, "Invalid time. Time is a map that requires at least #{inspect requirements} fields. " <>
              "Found: #{inspect map}"}
   end
