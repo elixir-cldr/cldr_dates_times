@@ -151,7 +151,7 @@ defmodule Cldr.DateTime.Relative do
 
     relative
     |> abs
-    |> Cldr.Number.to_string(locale: locale)
+    |> Cldr.Number.to_string!(locale: locale)
     |> Cldr.Substitution.substitute(rule)
     |> Enum.join
   end

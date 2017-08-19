@@ -1,6 +1,9 @@
 defmodule Cldr.Calendar do
   alias Cldr.Calendar.Conversion
+  alias Cldr.Locale
   require Cldr
+
+  @default_calendar :gregorian
 
   # Default territory is "World"
   @default_territory :"001"
@@ -257,6 +260,21 @@ defmodule Cldr.Calendar do
   def calendar_error(calendar_name) do
     {Cldr.UnknownCalendarError, "The calendar #{inspect calendar_name} is not known."}
   end
+
+  @configured_calendars Application.get_env(:ex_cldr, :calendars) || [@default_calendar]
+  @known_calendars "root"
+      |> Cldr.Config.get_locale
+      |> Map.get(:dates)
+      |> Map.get(:calendars)
+      |> Map.keys
+      |> MapSet.new
+      |> MapSet.intersection(MapSet.new(@configured_calendars))
+      |> MapSet.to_list
+
+  def known_calendars do
+    @known_calendars
+  end
+
   #
   # Data storage functions
   #
@@ -267,7 +285,11 @@ defmodule Cldr.Calendar do
       |> Cldr.Config.get_locale
       |> Map.get(:dates)
 
-    calendars = Map.get(date_data, :calendars) |> Map.keys
+    calendars =
+      date_data
+      |> Map.get(:calendars)
+      |> Map.take(@known_calendars)
+      |> Map.keys
 
     for calendar <- calendars do
       def era(unquote(locale), unquote(calendar)) do
@@ -286,6 +308,16 @@ defmodule Cldr.Calendar do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :days])))
       end
     end
+
+    def era(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
+    def period(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
+    def month(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
+    def day(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
   end
+
+  def era(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+  def period(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+  def month(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+  def day(locale, _calendar), do: {:error, Locale.locale_error(locale)}
 end
 
