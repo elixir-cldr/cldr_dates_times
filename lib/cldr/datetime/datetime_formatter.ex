@@ -6,13 +6,12 @@ defmodule Cldr.DateTime.Formatter do
   For the differt formats for an hour, the following table
   applies:
 
-  +---------+-------+---------+------+------------+-------+
 	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   h	    |  12	  | 1...11	|  12	 |   1...11   |  12   |
-  |   H	    |   0	  | 1...11	|  12	 |  13...23   |   0   |
   |   K	    |   0	  | 1...11	|   0	 |   1...11   |   0   |
+  |   H	    |   0	  | 1...11	|  12	 |  13...23   |   0   |
   |   k	    |  24	  | 1...11	|  12	 |  13...23   |  24   |
-  +---------+-------+---------+------+------------+-------+
   """
   alias Cldr.DateTime.{Format, Compiler, Timezone}
   alias Cldr.Calendar, as: Kalendar
@@ -831,10 +830,9 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `h`) as a number in the
   range 1..12.
 
-  +--------+--------+---------+------+-----------+-------+
-  | Symbol | Midn.  | Morning | Noon | Afternoon | Midn. |
-  |   h    |  12    | 1...11  |  12  |  1...11   |  12   |
-  +--------+--------+---------+------+-----------+-------+
+	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | :----:  | :---: | :-----: | :--: | :--------: | :---: |
+  |   h     |  12    | 1...11  |  12  |  1...11   |  12   |
   """
   @spec hour_1_12(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def hour_1_12(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -861,10 +859,9 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `K`) as a number in the
   range 0..11.
 
-  +--------+--------+---------+------+-----------+-------+
-  | Symbol | Midn.  | Morning | Noon | Afternoon | Midn. |
-  |   K    |   0    | 1...11  |   0  |  1...11   |   0   |
-  +--------+--------+---------+------+-----------+-------+
+	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | :----:  | :---: | :-----: | :--: | :--------: | :---: |
+  |   K     |   0   | 1...11  |   0  |  1...11    |   0   |
 
   """
   @spec hour_0_11(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
@@ -892,10 +889,9 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `k`) as a number in the
   range 1..24.
 
-  +--------+--------+---------+------+-----------+-------+
-  | Symbol | Midn.  | Morning | Noon | Afternoon | Midn. |
-  |   k    |  24    | 1...11  |  12  |  13...23  |  24   |
-  +--------+--------+---------+------+-----------+-------+
+	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | :----:  | :---: | :-----: | :--: | :--------: | :---: |
+  |   k     |  24   | 1...11  |  12  |  13...23   |  24   |
 
   """
   @spec hour_1_24(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
@@ -919,10 +915,9 @@ defmodule Cldr.DateTime.Formatter do
   in the range 0..23 as a string (this is the Elixir normal range
   for an hour).
 
-  +--------+--------+---------+------+-----------+-------+
-  | Symbol | Midn.  | Morning | Noon | Afternoon | Midn. |
-  |   H    |   0    | 1...11  |  12  |  13...23  |   0   |
-  +--------+--------+---------+------+-----------+-------+
+	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | :----:  | :---: | :-----: | :--: | :--------: | :---: |
+  |   H     |   0   | 1...11  |  12  |  13...23   |   0   |
   """
   @spec hour_0_23(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def hour_0_23(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
