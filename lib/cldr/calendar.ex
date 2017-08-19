@@ -300,6 +300,10 @@ defmodule Cldr.Calendar do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :day_periods])))
       end
 
+      def quarter(unquote(locale), unquote(calendar)) do
+        unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :quarters])))
+      end
+
       def month(unquote(locale), unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :months])))
       end
@@ -311,12 +315,14 @@ defmodule Cldr.Calendar do
 
     def era(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
     def period(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
+    def quarter(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
     def month(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
     def day(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
   end
 
   def era(locale, _calendar), do: {:error, Locale.locale_error(locale)}
   def period(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+  def quarter(locale, _calendar), do: {:error, Locale.locale_error(locale)}
   def month(locale, _calendar), do: {:error, Locale.locale_error(locale)}
   def day(locale, _calendar), do: {:error, Locale.locale_error(locale)}
 end

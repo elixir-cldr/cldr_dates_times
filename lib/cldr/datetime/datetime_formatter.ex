@@ -405,6 +405,76 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
+  Returns the `quarter` (format symbol `Q`) of a date
+  for given locale. The `q` format returns the quarter
+  as a simple integer.
+
+  The specific return string is determined by
+  how many `Q`s are in the format.
+  """
+  @spec quarter(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  def quarter(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+  def quarter(%{month: month}, 1, _locale, _options) when month in 1..3,   do: 1
+  def quarter(%{month: month}, 1, _locale, _options) when month in 4..6,   do: 2
+  def quarter(%{month: month}, 1, _locale, _options) when month in 7..9,   do: 3
+  def quarter(%{month: month}, 1, _locale, _options) when month in 10..12, do: 4
+
+  def quarter(%{month: _month} = date, 2, locale, options) do
+    quarter(date, 1, locale, options)
+    |> pad(2)
+  end
+
+  def quarter(%{month: _month, calendar: calendar} = date, 3, locale, options) do
+    quarter(date, 1, locale, options)
+    |> get_quarter(locale, calendar, :format, :abbreviated)
+  end
+
+  def quarter(%{month: _month, calendar: calendar} = date, 4, locale, options) do
+    quarter(date, 1, locale, options)
+    |> get_quarter(locale, calendar, :format, :wide)
+  end
+
+  def quarter(%{month: _month, calendar: calendar} = date, 5, locale, options) do
+    quarter(date, 1, locale, options)
+    |> get_quarter(locale, calendar, :format, :narrow)
+  end
+
+  def quarter(date, _n, _locale, _options) do
+    error_return(date, "Q", [:month])
+  end
+
+  @doc """
+  Returns the standalone `quarter` (format symbol `a`) of a date
+  for given locale.
+
+  The specific return string is determined by
+  how many `q`s are in the format.
+  """
+  @spec standalone_quarter(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  def standalone_quarter(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+  def standalone_quarter(date, 1, locale, options), do: quarter(date, 1, locale, options)
+  def standalone_quarter(date, 2, locale, options), do: quarter(date, 2, locale, options)
+
+  def standalone_quarter(%{month: _month, calendar: calendar} = date, 3, locale, options) do
+    quarter(date, 1, locale, options)
+    |> get_quarter(locale, calendar, :stand_alone, :abbreviated)
+  end
+
+  def standalone_quarter(%{month: _month, calendar: calendar} = date, 4, locale, options) do
+    quarter(date, 1, locale, options)
+    |> get_quarter(locale, calendar, :stand_alone, :wide)
+  end
+
+  def standalone_quarter(%{month: _month, calendar: calendar} = date, 5, locale, options) do
+    quarter(date, 1, locale, options)
+    |> get_quarter(locale, calendar, :stand_alone, :narrow)
+  end
+
+  def standalone_quarter(date, _n, _locale, _options) do
+    error_return(date, "q", [:month])
+  end
+
+  @doc """
   Returns the `month` (format symbol `M`) of a date
   for given locale. The `M` format returns the month
   as a simple integer.
@@ -1073,6 +1143,14 @@ defmodule Cldr.DateTime.Formatter do
 
     locale
     |> Cldr.Calendar.month(cldr_calendar)
+    |> get_in([type, style, month])
+  end
+
+  defp get_quarter(month, locale, calendar, type, style) do
+    {:ok, cldr_calendar} = type_from_calendar(calendar)
+
+    locale
+    |> Cldr.Calendar.quarter(cldr_calendar)
     |> get_in([type, style, month])
   end
 
