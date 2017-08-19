@@ -828,11 +828,39 @@ defmodule Cldr.DateTime.Formatter do
 
   @doc """
   Returns the formatting of the `:hour` (format symbol `h`) as a number in the
-  range 1..12.
+  range 1..12 as a string.
+
+  * `time` is a `Time` struct or any map that contains at least the key `:second`
+
+  * `n` is the number of digits to which `:hour` is padded
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `hour_1_12/4`
+
+  The representation of the `hour` is made in accordance with the following
+  table:
 
 	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   h     |  12    | 1...11  |  12  |  1...11   |  12   |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 0}
+      "12"
+
+      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 12}
+      "12"
+
+      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 24}
+      "12"
+
+      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 11}
+      "11"
+
+      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 23}
+      "11"
+
   """
   @spec hour_1_12(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def hour_1_12(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -857,11 +885,41 @@ defmodule Cldr.DateTime.Formatter do
 
   @doc """
   Returns the formatting of the `:hour` (format symbol `K`) as a number in the
-  range 0..11.
+  range 0..11 as a string.
+
+  * `time` is a `Time` struct or any map that contains at least the key `:second`
+
+  * `n` is the number of digits to which `:hour` is padded
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `hour_0_11/4`
+
+  The representation of the `hour` is made in accordance with the following
+  table:
 
 	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   K     |   0   | 1...11  |   0  |  1...11    |   0   |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 0}
+      "0"
+
+      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 12}
+      "0"
+
+      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 24}
+      "0"
+
+      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 23}
+      "11"
+
+      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 11}
+      "11"
+
+      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 9}
+      "9"
 
   """
   @spec hour_0_11(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
@@ -887,11 +945,38 @@ defmodule Cldr.DateTime.Formatter do
 
   @doc """
   Returns the formatting of the `:hour` (format symbol `k`) as a number in the
-  range 1..24.
+  range 1..24 as a string.
+
+  * `time` is a `Time` struct or any map that contains at least the key `:second`
+
+  * `n` is the number of digits to which `:hour` is padded
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `hour_1_24/4`
+
+  The representation of the `hour` is made in accordance with the following
+  table:
 
 	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   k     |  24   | 1...11  |  12  |  13...23   |  24   |
+
+  ## Examples
+
+      iex(4)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 0}
+      "24"
+
+      iex(5)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 12}
+      "12"
+
+      iex(6)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 13}
+      "13"
+
+      iex(7)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 9}
+      "9"
+
+      iex(8)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 24}
+      "24"
 
   """
   @spec hour_1_24(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
@@ -901,7 +986,7 @@ defmodule Cldr.DateTime.Formatter do
     |> pad(n)
   end
 
-  def hour_1_24(%{hour: hour}, n, _locale, _options) when hour in 1..11 or hour in 13..23 do
+  def hour_1_24(%{hour: hour}, n, _locale, _options) when hour in 1..23 do
     hour
     |> pad(n)
   end
@@ -912,12 +997,38 @@ defmodule Cldr.DateTime.Formatter do
 
   @doc """
   Returns the formatting of the `:hour` (format symbol `H`) as a number
-  in the range 0..23 as a string (this is the Elixir normal range
-  for an hour).
+  in the range 0..23 as a string.
+
+  * `time` is a `Time` struct or any map that contains at least the key `:second`
+
+  * `n` is the number of digits to which `:hour` is padded
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `hour_0_23/4`
+
+  The representation of the `hour` is made in accordance with the following
+  table:
 
 	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   H     |   0   | 1...11  |  12  |  13...23   |   0   |
+
+ ## Examples:
+
+      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 10}
+      "10"
+
+      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 13}
+      "13"
+
+      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 21}
+      "21"
+
+      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 24}
+      "0"
+
+      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 0}
+      "0"
   """
   @spec hour_0_23(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def hour_0_23(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -940,12 +1051,36 @@ defmodule Cldr.DateTime.Formatter do
   defdelegate hour(time), to: __MODULE__, as: :hour_0_23
 
   @doc """
-  Returns the `:minute` (format symbol `m`) as number in string
-  format.
+  Returns the `:minute` of a `time` or `datetime` (format symbol `m`) as number
+  in string format.  The number of `m`'s in the format determines the formatting.
+
+  * `time` is a `Time` struct or any map that contains at least the key `:second`
+
+  * `n` is the number of digits to which `:hour` is padded
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `second/4`
+
+  | Symbol | Results    | Description                                           |
+  | :----  | :--------- | :---------------------------------------------------- |
+  | m      | 3, 10      | Minimim digits of minutes                             |
+  | mm     | "03", "12" | Number of minutes zero-padded to 2 digits             |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.minute %{minute: 3}, 1
+      3
+
+      iex> Cldr.DateTime.Formatter.minute %{minute: 3}, 2
+      "03"
   """
-  @spec minute(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec minute(Map.t, non_neg_integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def minute(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def minute(%{minute: minute}, n, _locale, _options) do
+  def minute(%{minute: minute}, 1, _locale, _options) do
+    minute
+  end
+
+  def minute(%{minute: minute}, 2 = n, _locale, _options) do
     minute
     |> pad(n)
   end
@@ -955,8 +1090,28 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the `:second` (format symbol `s`) as number in string
-  format.
+  Returns the `:second` of a `time` or `datetime` (format symbol `s`) as number
+  in string format.  The number of `s`'s in the format determines the formatting.
+
+  * `time` is a `Time` struct or any map that contains at least the key `:second`
+
+  * `n` is the number of digits to which `:hour` is padded
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `second/4`
+
+  | Symbol | Results    | Description                                           |
+  | :----  | :--------- | :---------------------------------------------------- |
+  | s      | 3, 48      | Minimim digits of seconds                             |
+  | ss     | "03", "48" | Number of seconds zero-padded to 2 digits             |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.second %{second: 23}, 1
+      "23"
+
+      iex> Cldr.DateTime.Formatter.second %{second: 4}, 2
+      "04"
   """
   @spec second(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def second(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -970,8 +1125,34 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the `:second` (format symbol `S`) as a freactional number in string
-  format.
+  Returns the `:second` of a `time` or `datetime` (format symbol `S`) as float
+  in string format. The seconds are calculate to include microseconds if they
+  are available.  The number of `S`'s in the format determines the formatting.
+
+  * `time` is a `Time` struct or any map that contains at least the key `:second`
+  with and optional `:microsecond` key of the format used by `Time`
+
+  * `n` is the number of fractional digits to which the float number of seconds
+  is rounded
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `fractional_second/4`
+
+  | Symbol | Results    | Description                                           |
+  | :----  | :--------- | :---------------------------------------------------- |
+  | S      | 3, 48      | Minimim digits of seconds                             |
+  | SS     | "03", "48" | Number of seconds zero-padded to 2 digits             |
+
+  ## Examples
+
+      iex(29)> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 1
+      "4.0"
+
+      iex(27)> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 3
+      "4.002"
+
+      iex(30)> Cldr.DateTime.Formatter.fractional_second %{second: 4}, 1
+      "4"
   """
   @spec fractional_second(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def fractional_second(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -983,6 +1164,7 @@ defmodule Cldr.DateTime.Formatter do
     rounding = min(resolution, n)
     ((second  * 1.0) + fraction / @microseconds)
     |> Float.round(rounding)
+    |> to_string
   end
 
   def fractional_second(%{second: second}, n, _locale, _options) do
@@ -1192,12 +1374,12 @@ defmodule Cldr.DateTime.Formatter do
     if padding <= 0 do
       Integer.to_string(integer)
     else
-      [List.duplicate(?0, padding), Integer.to_string(integer)]
+      :erlang.iolist_to_binary([List.duplicate(?0, padding), Integer.to_string(integer)])
     end
   end
 
   defp pad(integer, n) when integer < 0 do
-    [?-, pad(abs(integer), n)]
+    :erlang.iolist_to_binary([?-, pad(abs(integer), n)])
   end
 
   # This should be more performant than doing
