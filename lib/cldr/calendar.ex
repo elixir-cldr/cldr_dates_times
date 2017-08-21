@@ -96,87 +96,6 @@ defmodule Cldr.Calendar do
     calendar.day_of_week(year, month, day)
   end
 
-  defdelegate new_year(date), to: __MODULE__, as: :first_day_of_year
-  def first_day_of_year(%{year: _year} = date) do
-    date
-    |> Map.put(:month, 1)
-    |> Map.put(:day, 1)
-  end
-
-  def last_day_of_year(%{year: _year} = date) do
-    date
-    |> Map.put(:month, 12)
-    |> Map.put(:day, 31)
-  end
-
-  @doc """
-  Returns the date of the first day of the first week of the year that includes
-  the provided `date`.
-
-  This conforms with the ISO standard definition of when the first week of the year
-  begins:
-
-  * If 1 January is on a Monday, Tuesday, Wednesday or Thursday, it is in week 01.
-  * If 1 January is on a Friday, it is part of week 53 of the previous year;
-  * If on a Saturday, it is part of week 52 (or 53 if the previous Gregorian year was a leap year)
-  * If on a Sunday, it is part of week 52 of the previous year.
-  """
-  def first_week_of_year(%{year: year, calendar: calendar} = date) do
-    first_week_starts = first_week_of_year(year, calendar)
-
-    if Date.diff(date, first_week_starts) >= 365 do
-      first_week_of_year(year + 1)
-    else
-      first_week_starts
-    end
-  end
-
-  def first_week_of_year(year, calendar \\ Calendar.ISO) when is_integer(year) do
-    new_year = new_year(%{year: year, month: 1, day: 1, calendar: calendar})
-    {days, _fraction} = iso_days_from_date(new_year)
-    case day_of_week(new_year) do
-      day when day in 1..4 ->
-        date_from_iso_days({days - day + 1, {0, 1}}, calendar)
-      day when day in 5..7 ->
-        date_from_iso_days({days - day + 1 + 7, {0, 1}}, calendar)
-    end
-  end
-
-  @doc """
-  Returns the date of the first day of the first week of the year that includes
-  the provided `date`.
-
-  This conforms with the ISO standard definition of when the first week of the year
-  begins:
-
-  * If 31 December is on a Monday, Tuesday or Wednesday, it is in week 01 of the next year.
-  * If it is on a Thursday, it is in week 53 of the year just ending;
-  * If on a Friday it is in week 52 (or 53 if the year just ending is a leap year);
-  * If on a Saturday or Sunday, it is in week 52 of the year just ending.
-  """
-  def last_week_of_year(%{year: year, calendar: calendar} = date) do
-    last_week = last_week_of_year(year, calendar)
-
-    # Its possible that the last week of year finishes before the
-    # date provided so we need to see if thats the case and then get the
-    # last week of the next year
-    {last_week_starts, _fraction} = iso_days_from_date(last_week)
-    last_week_ends = last_week_starts + 6
-    days = iso_days_from_date(date)
-
-    if days > last_week_ends do
-      last_week_of_year(year + 1, calendar)
-    else
-      last_week
-    end
-  end
-
-  def last_week_of_year(year, calendar \\ Calendar.ISO) when is_integer(year) do
-    first_week_of_next_year = first_week_of_year(year + 1)
-    {days, _fraction} = iso_days_from_date(first_week_of_next_year)
-    date_from_iso_days({days - 7, {0, 1}}, calendar)
-  end
-
   @doc """
   Returns the date that is the first day of the `n`th week of
   the given `date`
@@ -186,50 +105,27 @@ defmodule Cldr.Calendar do
   end
 
   def nth_week_of_year(year, n, calendar \\ Calendar.ISO) do
-    first_week = first_week_of_year(year)
+    first_week = calendar.first_week_of_year(year)
     {first_week_starts, _fraction} = iso_days_from_date(first_week)
 
     date_from_iso_days({first_week_starts + ((n - 1) * 7), {0, 1}}, calendar)
   end
 
-  @doc """
-  Returns the week of the year for the given date.
-
-  Note that for some calendars (like `Calendar.ISO`), the first week
-  of the year may not be the week that includes January 1st therefore
-  for some dates near the start or end of the year, the week number
-  may refer to a date in the following or previous year.
-
-  ## Examples
-
-  """
-  def week_of_year(%{year: year, month: _month, day: _day, calendar: _calendar} = date) do
-    week = div(day_of_year(date) - day_of_week(date) + 10, 7)
-    cond do
-      week >= 1 and week < 53 -> week
-      week < 1 -> week_of_year(last_week_of_year(year - 1))
-      week > week_of_year(last_week_of_year(year - 1)) -> 1
-    end
+  def previous_day(%{calendar: _calendar} = date) do
+    add(date, -1)
   end
 
-  @doc """
-  Returns the number of weeks in a year
-
-  ## Examples
-
-      iex> Cldr.Calendar.weeks_in_year 2008
-      52
-      iex> Cldr.Calendar.weeks_in_year 2009
-      53
-      iex> Cldr.Calendar.weeks_in_year 2017
-      52
-  """
-  def weeks_in_year(%{year: year}) do
-    if leap_mod(year) == 4 or leap_mod(year - 1) == 3, do: 53, else: 52
+  def next_day(%{calendar: _calendar} = date) do
+    add(date, 1)
   end
 
-  def weeks_in_year(year, calendar \\ Calendar.ISO) do
-    weeks_in_year(%{year: year, month: 1, day: 1, calendar: calendar})
+  def add(%{calendar: calendar} = date, n) do
+    {days, fraction} = iso_days_from_date(date)
+    date_from_iso_days({days + n, fraction}, calendar)
+  end
+
+  def sub(%{calendar: _calendar} = date, n) do
+    add(date, n * -1)
   end
 
   @doc """
@@ -243,13 +139,9 @@ defmodule Cldr.Calendar do
     |> Map.put(:day, 1)
   end
 
-  defp leap_mod(year) do
-    rem(year + div(year, 4) - div(year, 100) + div(year, 400), 7)
-  end
-
-  def year(%{calendar: Calendar.ISO} = date) do
+  def year(%{calendar: calendar} = date) do
     date
-    |> last_week_of_year
+    |> calendar.last_week_of_year
     |> Map.get(:year)
   end
 

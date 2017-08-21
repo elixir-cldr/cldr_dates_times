@@ -34,7 +34,8 @@ defmodule CldrDatesTimes.Mixfile do
   defp deps do
     [
       {:ex_cldr, "~> 0.5.0"},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:stream_data, ">= 0.1.1", only: :test}
     ]
   end
 

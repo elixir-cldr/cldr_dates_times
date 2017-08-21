@@ -36,9 +36,10 @@ defmodule Cldr.DateTime.Formatter do
           if error_list = format_errors(formatted) do
             {:error, Enum.join(error_list, "; ")}
           else
-            formatted = formatted
-            |> Enum.join
-            |> transliterate(locale, number_system)
+            formatted =
+              formatted
+              |> Enum.join
+              |> transliterate(locale, number_system)
 
             {:ok, formatted}
           end
@@ -221,17 +222,58 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the `year` (format symbol `y`) of a date
   as an integer. The `y` format returns the year
-  as a simple integer.
+  as a simple integer in string format.
 
-  Calendar year (numeric). In most cases the length
-  of the `y` field specifies the minimum number of
-  digits to display, zero-padded as necessary; more
-  digits will be displayed if needed to show the full
-  year.
+  The format `yy` is a special case which requests just
+  the two low-order digits of the year, zero-padded
+  as necessary. For most use cases, `y` or `yy` should
+  be adequate.
 
-  However, `yy` requests just the two low-order digits
-  of the year, zero-padded as necessary. For most use
-  cases, `y` or `yy` should be adequate.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:month` and `:calendar`
+
+  * `n` in an integer between 1 and 5 that determines the format of
+  the year
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `year/4`
+
+  The representation of the quarter is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format                 |
+  | :--------  | :-------------- | :---------------------------|
+  | y          | 7               | Minimum necessary digits    |
+  | yy         | "17"            | Least significant 2 digits  |
+  | yyy        | "017", "2017"   | Padded to at least 3 digits |
+  | yyyy       | "2017"          | Padded to at least 4 digits |
+  | yyyyy      | "02017"         | Padded to at least 5 digits |
+
+  In most cases the length of the `y` field specifies
+  the minimum number of   digits to display, zero-padded
+  as necessary; more digits will be displayed if needed
+  to show the full year.
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.year %{year: 2017, calendar: Calendar.ISO}, 1
+      2017
+
+      iex> Cldr.DateTime.Formatter.year %{year: 2017, calendar: Calendar.ISO}, 2
+      "17"
+
+      iex> Cldr.DateTime.Formatter.year %{year: 2017, calendar: Calendar.ISO}, 3
+      "2017"
+
+      iex> Cldr.DateTime.Formatter.year %{year: 2017, calendar: Calendar.ISO}, 4
+      "2017"
+
+      iex> Cldr.DateTime.Formatter.year %{year: 2017, calendar: Calendar.ISO}, 5
+      "02017"
+
   """
   @spec year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -258,6 +300,29 @@ defmodule Cldr.DateTime.Formatter do
   based calendars in which the year transition occurs
   on a week boundary.
 
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:month` and `:calendar`
+
+  * `n` in an integer between 1 and 5 that determines the format of
+  the year
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `weeK_aligned_year/4`
+
+  The representation of the quarter is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format                 |
+  | :--------  | :-------------- | :---------------------------|
+  | Y          | 7               | Minimum necessary digits    |
+  | YY         | "17"            | Least significant 2 digits  |
+  | YYY        | "017", "2017"   | Padded to at least 3 digits |
+  | YYYY       | "2017"          | Padded to at least 4 digits |
+  | YYYYY      | "02017"         | Padded to at least 5 digits |
+
   The result may differ from calendar year ‘y’ near
   a year transition. This numeric year designation
   is used in conjunction with pattern character ‘w’
@@ -269,18 +334,43 @@ defmodule Cldr.DateTime.Formatter do
   `y`; that is, `yy` specifies use of the two low-order
   year digits, while any other field length specifies a
   minimum number of digits to display.
+
+  ## Examples
+
+      iex(12)> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
+      ...> calendar: Calendar.ISO}, 1
+      "2018"
+
+      iex(13)> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
+      ...> calendar: Calendar.ISO}, 2
+      "18"
+
+      iex(14)> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
+      ...> calendar: Calendar.ISO}, 3
+      "2018"
+
+      iex(15)> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
+      ...> calendar: Calendar.ISO}, 4
+      "2018"
+
+      iex(16)> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
+      ...> calendar: Calendar.ISO}, 5
+      "02018"
+
   """
   @spec week_aligned_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def week_aligned_year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date, 2 = n, _locale, _options) do
+  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date,
+                          2 = n, _locale, _options) do
     date
-    |> Kalendar.last_week_of_year
+    |> Kalendar.ISOWeek.last_week_of_year
     |> Map.get(:year)
     |> rem(100)
     |> pad(n)
   end
 
-  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: calendar} = date, 2 = n, _locale, _options) do
+  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: calendar} = date, 2 =
+                        n, _locale, _options) do
     date
     |> calendar.last_week_of_year
     |> Map.get(:year)
@@ -288,14 +378,16 @@ defmodule Cldr.DateTime.Formatter do
     |> pad(n)
   end
 
-  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date, n, _locale, _options) do
+  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date,
+                        n, _locale, _options) do
     date
-    |> Kalendar.last_week_of_year
+    |> Kalendar.ISOWeek.last_week_of_year
     |> Map.get(:year)
     |> pad(n)
   end
 
-  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: calendar} = date, n, _locale, _options) do
+  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: calendar} = date,
+                        n, _locale, _options) do
     date
     |> calendar.last_week_of_year
     |> Map.get(:year)
@@ -308,6 +400,10 @@ defmodule Cldr.DateTime.Formatter do
 
   @doc """
   Returns the Extended year (format symbol `u`).
+
+  **NOTE: This current implementation always returns
+  the year provided in the supplied date.  This means
+  `u` returns the same result as the format `y`.**
 
   This is a single number designating the year of this
   calendar system, encompassing all supra-year fields.
@@ -341,6 +437,10 @@ defmodule Cldr.DateTime.Formatter do
   Returns the cyclic year (format symbol `U`) name for
   non-gregorian calendars.
 
+  **NOTE: In the current implementation, the cyclic year is
+  always returned as the current year of the
+  supplied date**
+
   Cyclic year name. Calendars such as the Chinese lunar
   calendar (and related calendars) and the Hindu calendars
   use 60-year cycles of year names. If the calendar does
@@ -349,7 +449,7 @@ defmodule Cldr.DateTime.Formatter do
   cyclic name data is provided, then numeric formatting
   is used (behaves like format symbol `y`).
 
-  Currently the data only provides abbreviated names,
+  Currently the CLDR data only provides abbreviated names,
   which will be used for all requested name widths.
   """
   @spec cyclic_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
@@ -366,8 +466,24 @@ defmodule Cldr.DateTime.Formatter do
   Returns the related gregorian year (format symbol `r`)
   of a date for given locale.
 
-  The specific return string is determined by
-  how many `r`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:month` and `:calendar`
+
+  * `n` in an integer between 1 and 5 that determines the format of
+  the quarter
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `quarter/4`
+
+  The representation of the related year is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | r+         | 2017            |                 |
 
   This corresponds to the extended Gregorian year
   in which the calendar’s year begins. Related
@@ -376,13 +492,16 @@ defmodule Cldr.DateTime.Formatter do
   e.g. “2012(平成24)年1月15日” — or in the Chinese
   calendar — e.g. “2012壬辰年腊月初四”. The related
   Gregorian year is usually displayed using the
-  "latn" numbering system, regardless of what
+  ":latn" numbering system, regardless of what
   numbering systems may be used for other parts
-  of the formatted date. If the calendar’s year
-  is linked to the solar year (perhaps using leap
-  months), then for that calendar the ‘r’ year
-  will always be at a fixed offset from the ‘u’
-  year. For the Gregorian calendar, the ‘r’ year
+  of the formatted date.
+
+  If the calendar’s year is linked to the solar
+  year (perhaps using leap months), then for that
+  calendar the ‘r’ year will always be at a fixed
+  offset from the ‘u’ year.
+
+  For the Gregorian calendar, the ‘r’ year
   is the same as the ‘u’ year. For ‘r’, all field
   lengths specify a minimum number of digits; there
   is no special interpretation for “rr”.
@@ -405,11 +524,53 @@ defmodule Cldr.DateTime.Formatter do
 
   @doc """
   Returns the `quarter` (format symbol `Q`) of a date
-  for given locale. The `q` format returns the quarter
-  as a simple integer.
+  for given locale.
 
-  The specific return string is determined by
-  how many `Q`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:month` and `:calendar`
+
+  * `n` in an integer between 1 and 5 that determines the format of
+  the quarter
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `quarter/4`
+
+  The representation of the quarter is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | Q          | 2               | Single digit    |
+  | QQ         | "02"            | Two digits      |
+  | QQQ        | "Q2"            | Abbreviated     |
+  | QQQQ       | "2nd quarter"   | Wide            |
+  | QQQQQ      | "2"             | Narrow          |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 1
+      2
+
+      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 2
+      "02"
+
+      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 3
+      "Q2"
+
+      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 4
+      "2nd quarter"
+
+      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 5
+      "2"
+
   """
   @spec quarter(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def quarter(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -446,8 +607,51 @@ defmodule Cldr.DateTime.Formatter do
   Returns the standalone `quarter` (format symbol `a`) of a date
   for given locale.
 
-  The specific return string is determined by
-  how many `q`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:month` and `:calendar`
+
+  * `n` in an integer between 1 and 5 that determines the format of
+  the quarter
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `standalone_quarter/4`
+
+  The representation of the quarter is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | q          | 2               | Single digit    |
+  | qq         | "02"            | Two digits      |
+  | qqq        | "Q2"            | Abbreviated     |
+  | qqqq       | "2nd quarter"   | Wide            |
+  | qqqqq      | "2"             | Narrow          |
+
+  ## Examples
+
+      iex(1)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 1
+      2
+
+      iex(2)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 2
+      "02"
+
+      iex(3)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 3
+      "Q2"
+
+      iex(4)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 4
+      "2nd quarter"
+
+      iex(5)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      ...> calendar: Calendar.ISO}, 5
+      "2"
+
   """
   @spec standalone_quarter(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def standalone_quarter(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -475,11 +679,48 @@ defmodule Cldr.DateTime.Formatter do
 
   @doc """
   Returns the `month` (format symbol `M`) of a date
-  for given locale. The `M` format returns the month
-  as a simple integer.
+  for given locale.
 
-  The specific return string is determined by
-  how many `M`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:month` and `:calendar`
+
+  * `n` in an integer between 1 and 5 that determines the format of
+  the month
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `month/4`
+
+  The representation of the month is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | M          | 9               | Single digit    |
+  | MM         | "09"            | Two digits      |
+  | MMM        | "Sep"           | Abbreviated     |
+  | MMMM       | "September"     | Wide            |
+  | MMMMM      | "S"             | Narrow          |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}
+      9
+
+      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}, 2
+      "09"
+
+      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}, 3
+      "Sep"
+
+      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}, 4
+      "September"
+
+      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}, 5
+      "S"
+
   """
   @spec month(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def month(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -511,8 +752,46 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `month` (symbol `L`) in standalone format which is
   intended to formatted without an accompanying day (`d`).
 
-  The specific return string is determined by
-  how many `L`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:month` and `:calendar`
+
+  * `n` in an integer between 1 and 5 that determines the format of
+  the month
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `standalone_month/4`
+
+  The representation of the standalone month is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | L          | 9               | Single digit    |
+  | LL         | "09"            | Two digits      |
+  | LLL        | "Sep"           | Abbreviated     |
+  | LLLL       | "September"     | Wide            |
+  | LLLLL      | "S"             | Narrow          |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}
+      9
+
+      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}, 2
+      "09"
+
+      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}, 3
+      "Sep"
+
+      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}, 4
+      "September"
+
+      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}, 5
+      "S"
+
   """
   @spec standalone_month(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def standalone_month(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -543,11 +822,20 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the week of the year (symbol `w`) as an integer.
 
-  The specific return string is determined by
-  how many `w`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:year`, `:month`, `:day` and `:calendar`
+
+  * `n` in an integer between 1 and 2 that determines the format of
+  the week of the year
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `week_of_year/4`
 
   Note that determining the week of the year is influenced
-  by several factors:
+  by two factors:
 
   1. The calendar in use.  For example the ISO calendar (which
   is the default calendar in Elixir) follows the ISO standard
@@ -557,12 +845,23 @@ defmodule Cldr.DateTime.Formatter do
   2. The territory in use.  For example, in the US the first
   week of the year is the week containing January 1st whereas
   many territories follow the ISO standard.
+
+  The representation of the day of the year is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | w          | 2, 22           |                 |
+  | ww         | 02, 22          |                 |
+
+  ## Examples
+
   """
   @spec week_of_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def week_of_year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
   def week_of_year(%{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date, n, _locale, _options) do
     date
-    |> Kalendar.week_of_year
+    |> Kalendar.ISOWeek.week_of_year
     |> pad(n)
   end
 
@@ -577,8 +876,28 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the week of the month (format symbol `W`) as an integer
-  for a given `date`
+  Returns the week of the month (format symbol `W`) as an integer.
+
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:year`, `:month`, `:day` and `:calendar`
+
+  * `n` in an integer between that should be 1
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `week_of_month/4`
+
+  The representation of the week of the month is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | W          | 2               |                 |
+
+  ## Examples
+
   """
   @spec week_of_month(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def week_of_month(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -598,8 +917,36 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the day of the month (symbol `M`) as an integer.
 
-  The specific return string is determined by
-  how many `M`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:year`, `:month`, `:day` and `:calendar`
+
+  * `n` in an integer between 1 and 2 that determines the format of
+  the day of month
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `day_of_month/4`
+
+  The representation of the day of the month is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | M          | 2, 22           |                 |
+  | MM         | 02, 22          |                 |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.day_of_month %{year: 2017, month: 1, day: 4,
+      ...> calendar: Calendar.ISO}, 1
+      4
+
+      iex> Cldr.DateTime.Formatter.day_of_month %{year: 2017, month: 1, day: 4,
+      ...> calendar: Calendar.ISO}, 2
+      "04"
+
   """
   @spec day_of_month(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def day_of_month(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -616,10 +963,44 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the day of the year (symbol `D`) as an integer.
+  Returns the day of the year (symbol `D`) as an integer in string
+  format.
 
-  The specific return string is determined by
-  how many `D`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:year`, `:month`, `:day` and `:calendar`
+
+  * `n` in an integer between 1 and 3 that determines the format of
+  the day of year
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `day_of_year/4`
+
+  The representation of the day of the year is made in accordance with
+  the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | D          | 3, 33, 333      |                 |
+  | DD         | 03, 33, 333     |                 |
+  | DDD        | 003, 033, 333   |                 |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.day_of_year %{year: 2017, month: 1, day: 15,
+      ...> calendar: Calendar.ISO}, 1
+      "14"
+
+      iex> Cldr.DateTime.Formatter.day_of_year %{year: 2017, month: 1, day: 15,
+      ...> calendar: Calendar.ISO}, 2
+      "14"
+
+      iex> Cldr.DateTime.Formatter.day_of_year %{year: 2017, month: 1, day: 15,
+      ...> calendar: Calendar.ISO}, 3
+      "014"
+
   """
   @spec day_of_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def day_of_year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -636,8 +1017,54 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the weekday name (format  symbol `E`) as an string.
 
-  The specific return string is determined by
-  how many `E`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:year`, `:month`, `:day` and `:calendar`
+
+  * `n` in an integer between 1 and 6 that determines the format of
+  the day of week
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `day_name/4`
+
+  The representation of the day name is made in accordance with
+  the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | E, EE, EEE | "Tue"           | Abbreviated     |
+  | EEEE       | "Tuesday"       | Wide            |
+  | EEEEE      | "T"             | Narrow          |
+  | EEEEEE     | "Tu"            | Short           |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 6
+      "Tu"
+
+      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 5
+      "T"
+
+      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 4
+      "Tuesday"
+
+      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 3
+      "Tue"
+
+      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 2
+      "Tue"
+
+      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 1
+      "Tue"
+
   """
   @spec day_name(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def day_name(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -662,14 +1089,63 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the local day of week (format symbol `e`)
-  number/name.
+  Returns the local day of week (format symbol `e`) as a
+  number or name.
 
-  Same as E except that it adds a numeric value that
-  will depend on the local starting day of the week.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:year`, `:month`, `:day` and `:calendar`
 
-  Note that for 3 or more `e`s the return string is
-  same as that for symbol `E`.
+  * `n` in an integer between 1 and 6 that determines the format of
+  the day of week
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `day_of_week/4`
+
+  Returns the same as format symbol `E` except that it adds a
+  numeric value that will depend on the local starting day
+  of the week.
+
+  The representation of the time period is made in accordance with
+  the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | e          | 2               | Single digit    |
+  | ee         | "02"            | Two digits      |
+  | eee        | "Tue"           | Abbreviated     |
+  | eeee       | "Tuesday"       | Wide            |
+  | eeeee      | "T"             | Narrow          |
+  | eeeeee     | "Tu"            | Short           |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 3
+      "Tue"
+
+      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 4
+      "Tuesday"
+
+      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 5
+      "T"
+
+      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 6
+      "Tu"
+
+      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 1
+      "2"
+
+      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
+      ...> calendar: Calendar.ISO}, 2
+      "02"
+
   """
   @spec day_of_week(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def day_of_week(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -688,7 +1164,8 @@ defmodule Cldr.DateTime.Formatter do
     |> pad(n)
   end
 
-  def day_of_week(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, n, locale, options) when n > 3 do
+  def day_of_week(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, n, locale, options)
+  when n >= 3 do
     day_name(date, n, locale, options)
   end
 
@@ -697,12 +1174,53 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the Stand-Alone local day (format symbol `c`)
+  Returns the stand-alone local day (format symbol `c`)
   of week number/name.
 
-  This is the same as `weekday_number/4` except that
-  it is intended for use without the associated `d`
-  format symbol.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:year`, `:month`, `:day` and `:calendar`
+
+  * `n` in an integer between 1 and 6 that determines the format of
+  the day of week
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `standalone_day_of_week/4`
+
+  This is the same as `weekday_number/4` except that it is intended
+  for use without the associated `d` format symbol.
+
+  The representation of the time period is made in accordance with
+  the following table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | c, cc      | 2               | Single digit    |
+  | ccc        | "Tue"           | Abbreviated     |
+  | cccc       | "Tuesday"       | Wide            |
+  | ccccc      | "T"             | Narrow          |
+  | cccccc     | "Tu"            | Short           |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.standalone_day_of_week %{year: 2017, month: 8,
+      ...> day: 15, calendar: Calendar.ISO}, 3
+      "Tue"
+
+      iex> Cldr.DateTime.Formatter.standalone_day_of_week %{year: 2017, month: 8,
+      ...> day: 15, calendar: Calendar.ISO}, 4
+      "Tuesday"
+
+      iex> Cldr.DateTime.Formatter.standalone_day_of_week %{year: 2017, month: 8,
+      ...> day: 15, calendar: Calendar.ISO}, 5
+      "T"
+
+      iex> Cldr.DateTime.Formatter.standalone_day_of_week %{year: 2017, month: 8,
+      ...> day: 15, calendar: Calendar.ISO}, 6
+      "Tu"
+
   """
   @spec standalone_day_of_week(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def standalone_day_of_week(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -734,9 +1252,44 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns a localised version of `am` or `pm` (format symbol `a`).
 
+  * `time` is a `Time` struct or any map that contains at least the
+  key `:second`
+
+  * `n` in an integer between 1 and 5 that determines the format of the
+  time period
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `period_am_pm/4`
+
   May be upper or lowercase depending on the locale and other options.
   The wide form may be the same as the short form if the “real”
   long form (eg ante meridiem) is not customarily used.
+
+  The representation of the time period is made in accordance with the following
+  table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | a, aa, aaa | "am."           | Abbreviated     |
+  | aaaa       | "am."           | Wide            |
+  | aaaaa      | "am"            | Narrow          |
+
+  ## Examples
+
+      iex(15)> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}
+      "AM"
+
+      iex(16)> Cldr.DateTime.Formatter.period_am_pm %{hour: 3, minute: 0}
+      "AM"
+
+      iex(17)> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}
+      "PM"
+
+      iex(18)> Cldr.DateTime.Formatter.period_am_pm %{hour: 21, minute: 0}
+      "PM"
   """
   @spec period_am_pm(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def period_am_pm(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -760,6 +1313,18 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the time period as either
   `noon`, `midnight` or `am`/`pm` (format symbol 'b').
 
+  * `time` is a `Time` struct or any map that contains at least the
+  key `:second`
+
+  * `n` in an integer between 1 and 5 that determines the format of the
+  time period
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `period_noon_midnight/4`
+
   If the langauge doesn't support "noon" or "midnight" then
   `am`/`pm` is used for all time periods.
 
@@ -767,6 +1332,29 @@ defmodule Cldr.DateTime.Formatter do
   If the locale doesn't the notion of a unique `noon == 12:00`,
   then the PM form may be substituted. Similarly for `midnight == 00:00`
   and the AM form.
+
+  The representation of the time period is made in accordance with the following
+  table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | b, bb, bbb | "mid."          | Abbreviated     |
+  | bbbb       | "midnight"      | Wide            |
+  | bbbbb      | "md"            | Narrow          |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 12, minute: 0}
+      "noon"
+
+      iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 0, minute: 0}
+      "midnight"
+
+      iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 11, minute: 0}
+      "AM"
+
+      iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 16, minute: 0}
+      "PM"
   """
   @spec period_noon_midnight(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def period_noon_midnight(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -796,8 +1384,41 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the time period as a string, for
   example `at night` (format symbol `B`).
 
-  May be upper or lowercase depending on the locale and other options.
-  Often there is only one width that is customarily used.
+  * `time` is a `Time` struct or any map that contains at least the
+  key `:second`
+
+  * `n` in an integer between 1 and 5 that determines the format of the
+  time period
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `period_flex/4`
+
+  The time period may be upper or lowercase depending on the locale and
+  other options.  Often there is only one width that is customarily used.
+
+  The representation of the time period is made in accordance with the following
+  table:
+
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | B, BB, BBB | "at night"      | Abbreviated     |
+  | BBBB       | "at night"      | Wide            |
+  | BBBBB      | "at night"      | Narrow          |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.period_flex %{hour: 11, minute: 5, second: 23}
+      "in the morning"
+
+      iex> Cldr.DateTime.Formatter.period_flex %{hour: 16, minute: 5, second: 23}
+      "in the afternoon"
+
+      iex> Cldr.DateTime.Formatter.period_flex %{hour: 23, minute: 5, second: 23}
+      "at night"
+
   """
   @spec period_flex(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def period_flex(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -833,6 +1454,9 @@ defmodule Cldr.DateTime.Formatter do
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
   * `n` is the number of digits to which `:hour` is padded
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
   `hour_1_12/4`
@@ -890,6 +1514,9 @@ defmodule Cldr.DateTime.Formatter do
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
   * `n` is the number of digits to which `:hour` is padded
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
   `hour_0_11/4`
@@ -951,6 +1578,9 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of digits to which `:hour` is padded
 
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
   * `options` is a `Keyword` list of options.  There are no options used in
   `hour_1_24/4`
 
@@ -1002,6 +1632,9 @@ defmodule Cldr.DateTime.Formatter do
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
   * `n` is the number of digits to which `:hour` is padded
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
   `hour_0_23/4`
@@ -1058,6 +1691,9 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of digits to which `:hour` is padded
 
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
   * `options` is a `Keyword` list of options.  There are no options used in
   `second/4`
 
@@ -1097,6 +1733,9 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of digits to which `:hour` is padded
 
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
   * `options` is a `Keyword` list of options.  There are no options used in
   `second/4`
 
@@ -1134,6 +1773,9 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of fractional digits to which the float number of seconds
   is rounded
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
   `fractional_second/4`
