@@ -92,6 +92,10 @@ defmodule Cldr.Calendar.ISOWeek do
     |> add(6)
   end
 
+  def year(date, calendar \\ Calendar.ISO) do
+    %Date.Range{first: first_day_of_year(date), last: last_day_of_year(date)}
+  end
+
   @doc """
   Returns the week of the year for the given date.
 

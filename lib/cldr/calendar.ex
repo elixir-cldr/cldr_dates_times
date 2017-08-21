@@ -100,15 +100,16 @@ defmodule Cldr.Calendar do
   Returns the date that is the first day of the `n`th week of
   the given `date`
   """
-  def nth_week_of_year(%{year: year, calendar: calendar}, n) do
-    nth_week_of_year(year, n, calendar)
+  def nth_week_of_year(%{year: _year, calendar: calendar} = date, n) do
+    date
+    |> calendar.first_day_of_year
+    |> add(7 * n)
   end
 
   def nth_week_of_year(year, n, calendar \\ Calendar.ISO) do
-    first_week = calendar.first_week_of_year(year)
-    {first_week_starts, _fraction} = iso_days_from_date(first_week)
-
-    date_from_iso_days({first_week_starts + ((n - 1) * 7), {0, 1}}, calendar)
+    year
+    |> calendar.first_day_of_year
+    |> add(7 * n)
   end
 
   def previous_day(%{calendar: _calendar} = date) do
@@ -140,9 +141,7 @@ defmodule Cldr.Calendar do
   end
 
   def year(%{calendar: calendar} = date) do
-    date
-    |> calendar.last_week_of_year
-    |> Map.get(:year)
+    %Date.Range{first: calendar.first_day_of_year(date), last: calendar.last_day_of_year(date)}
   end
 
   def iso_days_to_float({days, {numerator, denominator}}) do

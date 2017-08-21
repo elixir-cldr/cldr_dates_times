@@ -20,12 +20,12 @@ defmodule Cldr.DatesTimes.Test do
 
     test "that #{year} abuts the next year #{year + 1}" do
       assert Cldr.Calendar.next_day(Cldr.Calendar.ISOWeek.last_day_of_year(unquote(Macro.escape(year)))) ==
-       Cldr.Calendar.ISOWeek.first_day_of_year(unquote(Macro.escape(year) + 1))
+       Cldr.Calendar.ISOWeek.first_day_of_year(unquote(Macro.escape(year)) + 1)
     end
   end
 
   import PropertyTest
-  property "that a date fits within the start and end dates for that year" do
+  property "check that a date fits within the start and end dates for that year" do
     check all  day   <- StreamData.int(1..28),
                month <- StreamData.int(1..12),
                year  <- StreamData.int(1..3000),
