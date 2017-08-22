@@ -1,10 +1,111 @@
 defmodule Cldr.DateTime.Formatter do
-  @moduledoc """
-  Functions the implement the formatting for the format
-  symbols.
+  alias Cldr.Locale
 
-  For the differt formats for an hour, the following table
-  applies:
+  @moduledoc """
+  Functions the implement the formatting for each the format
+  symbols.  Each format symbol is an ASCII character in the
+  range `a-zA-z`.  Although not all characters are used as
+  format symbols, all characters are reserved for that use
+  requiring that literals be enclosed in single quote
+  characters, for example `'a literal'`.
+
+  Variations of each format are defined by repeating the
+  format symbol one or more times.  CLDR typically defines
+  an `:abbreviated`, `:wide` and `:narrow` format that is
+  reprented by a sequence of 3, 4 or 5 format symbols but
+  this can vary depending on the format symbol.
+
+  The [CLDR standard](http://unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
+  defines a wide range of format symbols.  Most - but not
+  all - of these symbols are supported in `Cldr`.  The supported
+  symbols are described below.
+
+  ## Format Symbol Table
+
+  | Element                | Symbol     | Example         | Cldr Format                        |
+  | :--------------------  | :--------  | :-------------- | :--------------------------------- |
+  | Era                    | G, GG, GGG | "AD"            | Abbreviated                        |
+  |                        | GGGG       | "Anno Domini"   | Wide                               |
+  |                        | GGGGG      | "A"             | Narrow                             |
+  | Year                   | y          | 7               | Minimum necessary digits           |
+  |                        | yy         | "17"            | Least significant 2 digits         |
+  |                        | yyy        | "017", "2017"   | Padded to at least 3 digits        |
+  |                        | yyyy       | "2017"          | Padded to at least 4 digits        |
+  |                        | yyyyy      | "02017"         | Padded to at least 5 digits        |
+  | ISOWeek Year           | Y          | 7               | Minimum necessary digits           |
+  |                        | YY         | "17"            | Least significant 2 digits         |
+  |                        | YYY        | "017", "2017"   | Padded to at least 3 digits        |
+  |                        | YYYY       | "2017"          | Padded to at least 4 digits        |
+  |                        | YYYYY      | "02017"         | Padded to at least 5 digits        |
+  | Related Gregorian Year | r, rr, rr+ | 2017            | Minimum necessary digits           |
+  | Quarter                | Q          | 2               | Single digit                       |
+  |                        | QQ         | "02"            | Two digits                         |
+  |                        | QQQ        | "Q2"            | Abbreviated                        |
+  |                        | QQQQ       | "2nd quarter"   | Wide                               |
+  |                        | QQQQQ      | "2"             | Narrow                             |
+  | Standalone Quarter     | q          | 2               | Single digit                       |
+  |                        | qq         | "02"            | Two digits                         |
+  |                        | qqq        | "Q2"            | Abbreviated                        |
+  |                        | qqqq       | "2nd quarter"   | Wide                               |
+  |                        | qqqqq      | "2"             | Narrow                             |
+  | Month                  | M          | 9               | Single digit                       |
+  |                        | MM         | "09"            | Two digits                         |
+  |                        | MMM        | "Sep"           | Abbreviated                        |
+  |                        | MMMM       | "September"     | Wide                               |
+  |                        | MMMMM      | "S"             | Narrow                             |
+  | Standalone Month       | L          | 9               | Single digit                       |
+  |                        | LL         | "09"            | Two digits                         |
+  |                        | LLL        | "Sep"           | Abbreviated                        |
+  |                        | LLLL       | "September"     | Wide                               |
+  |                        | LLLLL      | "S"             | Narrow                             |
+  | Week of Year           | w          | 2, 22           | Single digit                       |
+  |                        | ww         | 02, 22          | Two digits, zero padded            |
+  | Week of Month          | W          | 2               | Single digit                       |
+  | Day of Year            | D          | 3, 33, 333      | Minimum necessary digits           |
+  |                        | DD         | 03, 33, 333     | Minimum of 2 digits, zero padded   |
+  |                        | DDD        | 003, 033, 333   | Minimum of 3 digits, zero padded   |
+  | Day of Month           | d          | 2, 22           | Minimum necessary digits           |
+  |                        | dd         | 02, 22          | Two digits, zero padded            |
+  | Day of Week            | E, EE, EEE | "Tue"           | Abbreviated                        |
+  |                        | EEEE       | "Tuesday"       | Wide                               |
+  |                        | EEEEE      | "T"             | Narrow                             |
+  |                        | EEEEEE     | "Tu"            | Short                              |
+  |                        | e          | 2               | Single digit                       |
+  |                        | ee         | "02"            | Two digits                         |
+  |                        | eee        | "Tue"           | Abbreviated                        |
+  |                        | eeee       | "Tuesday"       | Wide                               |
+  |                        | eeeee      | "T"             | Narrow                             |
+  |                        | eeeeee     | "Tu"            | Short                              |
+  | Standalone Day of Week | c, cc      | 2               | Single digit                       |
+  |                        | ccc        | "Tue"           | Abbreviated                        |
+  |                        | cccc       | "Tuesday"       | Wide                               |
+  |                        | ccccc      | "T"             | Narrow                             |
+  |                        | cccccc     | "Tu"            | Short                              |
+  | AM or PM               | a, aa, aaa | "am."           | Abbreviated                        |
+  |                        | aaaa       | "am."           | Wide                               |
+  |                        | aaaaa      | "am"            | Narrow                             |
+  | Noon, Mid, AM, PM      | b, bb, bbb | "mid."          | Abbreviated                        |
+  |                        | bbbb       | "midnight"      | Wide                               |
+  |                        | bbbbb      | "md"            | Narrow                             |
+  | Flexible time period   | B, BB, BBB | "at night"      | Abbreviated                        |
+  |                        | BBBB       | "at night"      | Wide                               |
+  |                        | BBBBB      | "at night"      | Narrow                             |
+  | Hour                   | h, K, H, k |                 | See the table below                |
+  | Minute                 | m          | 3, 10           | Minimim digits of minutes          |
+  |                        | mm         | "03", "12"      | Two digits, zero padded            |
+  | Second                 | s          | 3, 48           | Minimim digits of seconds          |
+  |                        | ss         | "03", "48"      | Two digits, zero padded            |
+  | Fractional Seconds     | S          | 3, 48           | Minimim digits of seconds          |
+  |                        | SS         | "03", "48"      | Two digits, zero padded            |
+  | Millseconds            | A          | 3, 48           | Minimim digits of seconds          |
+  |                        | AA         | "03", "48"      | Two digits, zero padded            |
+
+  ## Formatting symbols for hour of day
+
+  The hour of day can be formatted differently depending whether
+  a 12- or 24-hour day is being represented and depending on the
+  way in which midnight and noon are represented.  The following
+  table illustrates the differences:
 
 	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
@@ -12,6 +113,10 @@ defmodule Cldr.DateTime.Formatter do
   |   K	    |   0	  | 1...11	|   0	 |   1...11   |   0   |
   |   H	    |   0	  | 1...11	|  12	 |  13...23   |   0   |
   |   k	    |  24	  | 1...11	|  12	 |  13...23   |  24   |
+
+  ## Formatting symbols for time zones
+
+
   """
   alias Cldr.DateTime.{Format, Compiler, Timezone}
   alias Cldr.Calendar, as: Kalendar
@@ -22,6 +127,9 @@ defmodule Cldr.DateTime.Formatter do
   def default_calendar do
     @default_calendar
   end
+
+  @spec format(Date.t | Time.t | DateTime.t, String.t, Locale.t, Keyword.t) :: String.t
+  def format(date, format, locale \\ Cldr.get_current_locale(), options \\ [])
 
   # Insert generated functions for each locale and format here which
   # means that the lexing is done at compile time not runtime
@@ -104,6 +212,21 @@ defmodule Cldr.DateTime.Formatter do
   to localise a time into a textual representation of "am",
   "pm", "noon", "midnight", "evening", "morning" and so on
   as defined in the CLDR day period rules.
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.time_period_for ~T[06:05:54.515228], "en"
+      :morning1
+
+      iex> Cldr.DateTime.Formatter.time_period_for ~T[13:05:54.515228], "en"
+      :afternoon1
+
+      iex> Cldr.DateTime.Formatter.time_period_for ~T[21:05:54.515228], "en"
+      :night1
+
+      iex> Cldr.DateTime.Formatter.time_period_for ~T[21:05:54.515228], "fr"
+      :evening1
+
   """
   @spec time_period_for(Map.t, binary) :: atom
   def time_period_for(time, language)
@@ -111,6 +234,18 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns a boolean indicating is a given language defines the
   notion of "noon" and "midnight"
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.language_has_noon_and_midnight? "fr"
+      true
+
+      iex> Cldr.DateTime.Formatter.language_has_noon_and_midnight? "en"
+      true
+
+      iex> Cldr.DateTime.Formatter.language_has_noon_and_midnight? "af"
+      false
+
   """
   @spec language_has_noon_and_midnight?(binary) :: boolean
   def language_has_noon_and_midnight?(language)
@@ -198,8 +333,29 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `era` (format symbol `G`) of a date
   for given locale.
 
-  The specific return string is determined by
-  how many `G`s are in the format.
+  * `date` is a `Date` struct or any map that contains at least the
+  keys `:month` and `:calendar`
+
+  * `n` in an integer between 1 and 5 that determines the format of
+  the year
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options
+  used in `era/4`
+
+  The representation of the era is made in accordance
+  with the following table:
+
+  | Symbol     | Example         | Cldr Format                 |
+  | :--------  | :-------------- | :---------------------------|
+  | G, GG, GGG | "AD"            | Abbreviated                 |
+  | GGGG       | "Anno Domini    | Wide                        |
+  | GGGGG      | "A"             | Narrow                      |
+
+  ## Examples
+
   """
   @spec era(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def era(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -312,7 +468,7 @@ defmodule Cldr.DateTime.Formatter do
   * `options` is a `Keyword` list of options.  There are no options
   used in `weeK_aligned_year/4`
 
-  The representation of the quarter is made in accordance
+  The representation of the year is made in accordance
   with the following table:
 
   | Symbol     | Example         | Cldr Format                 |
@@ -915,7 +1071,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the day of the month (symbol `M`) as an integer.
+  Returns the day of the month (symbol `d`) as an integer.
 
   * `date` is a `Date` struct or any map that contains at least the
   keys `:year`, `:month`, `:day` and `:calendar`
@@ -934,8 +1090,8 @@ defmodule Cldr.DateTime.Formatter do
 
   | Symbol     | Example         | Cldr Format     |
   | :--------  | :-------------- | :-------------- |
-  | M          | 2, 22           |                 |
-  | MM         | 02, 22          |                 |
+  | d          | 2, 22           |                 |
+  | dd         | 02, 22          |                 |
 
   ## Examples
 
@@ -959,7 +1115,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   def day_of_month(date, _n, _locale, _options) do
-    error_return(date, "M", [:day])
+    error_return(date, "d", [:day])
   end
 
   @doc """
@@ -1687,15 +1843,15 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `:minute` of a `time` or `datetime` (format symbol `m`) as number
   in string format.  The number of `m`'s in the format determines the formatting.
 
-  * `time` is a `Time` struct or any map that contains at least the key `:second`
+  * `time` is a `Time` struct or any map that contains at least the key `:minute`
 
-  * `n` is the number of digits to which `:hour` is padded
+  * `n` is the number of digits to which `:minute` is padded
 
   * `locale` is any locale returned by `Cldr.known_locales/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `second/4`
+  `minute/4`
 
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
