@@ -1,9 +1,23 @@
 defmodule Cldr.Time do
+  @moduledoc """
+  Provide an API for the localization and formatting of a `Time`
+  struct or any map with the keys `:hour`, `:minute`,
+  `:second` and optionlly `:microsecond`.
+
+  CLDR provides standard format strings for `Time` which
+  are reresented by the names `:short`, `:medium`, `:long`
+  and `:full`.  This allows for locale-independent
+  formatting since each locale may define the underlying
+  format string as appropriate.
+  """
+
   alias Cldr.DateTime.{Format, Formatter}
 
   @doc """
   Formats a time according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+
+  Returns either `{:ok, formatted_time}` or `{:error, reason}`.
 
   * `time` is a `%DateTime{}` or `%NaiveDateTime{}` struct or any map that contains the keys
   `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
@@ -15,6 +29,21 @@ defmodule Cldr.Time do
 
   ## Examples
 
+      iex> Cldr.Time.to_string ~T[07:35:13.215217]
+      {:ok, "7:35:13 AM"}
+
+      iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :short
+      {:ok, "7:35 AM"}
+
+      iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :medium, locale: "fr"
+      {:ok, "07:35:13"}
+
+      iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :medium
+      {:ok, "7:35:13 AM"}
+
+      iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
+      iex> Cldr.Time.to_string datetime, format: :long
+      {:ok, "11:59:59 PM UTC"}
 
   """
   @format_types [:short, :medium, :long, :full]
@@ -40,6 +69,39 @@ defmodule Cldr.Time do
     error_return(time, [:hour, :minute, :second])
   end
 
+  @doc """
+  Formats a time according to a format string
+  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
+
+  Returns either the formatted time or raises an exception.
+
+  * `time` is a `%DateTime{}` or `%NaiveDateTime{}` struct or any map that contains the keys
+  `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
+
+  * `options` is a keyword list of options for formatting.  The valid options are:
+    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.  The default is `:medium`
+    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
+    * `number_system:` a number system into which the formatted date digits should be transliterated
+
+  ## Examples
+
+      iex> Cldr.Time.to_string! ~T[07:35:13.215217]
+      "7:35:13 AM"
+
+      iex> Cldr.Time.to_string! ~T[07:35:13.215217], format: :short
+      "7:35 AM"
+
+      iex> Cldr.Time.to_string! ~T[07:35:13.215217], format: :medium, locale: "fr"
+      "07:35:13"
+
+      iex> Cldr.Time.to_string! ~T[07:35:13.215217], format: :medium
+      "7:35:13 AM"
+
+      iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
+      iex> Cldr.Time.to_string! datetime, format: :long
+      "11:59:59 PM UTC"
+
+  """
   def to_string!(time, options \\ [])
   def to_string!(time, options) do
     case to_string(time, options) do

@@ -92,7 +92,7 @@ defmodule Cldr.Calendar.ISOWeek do
     |> add(6)
   end
 
-  def year(date, calendar \\ Calendar.ISO) do
+  def year(date, _calendar \\ Calendar.ISO) do
     %Date.Range{first: first_day_of_year(date), last: last_day_of_year(date)}
   end
 

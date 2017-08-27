@@ -1,57 +1,148 @@
 defmodule Cldr.DateTime.Format do
+  @moduledoc """
+  Manages the Date, TIme and DateTime formats
+  defined by CLDR.
+
+  The functions in `Cldr.DateTime.Format` are
+  primarily concerned with encapsulating the
+  data from CLDR in functions that are used
+  during the formatting process.
+  """
+
   alias Cldr.Calendar, as: Kalendar
   alias Cldr.DateTime.Formatter
   alias Cldr.Locale
 
   @standard_formats [:short, :medium, :long, :full]
+  @type standard_formats :: %{full: String.t, long: String.t, medium: String.t, short: String.t}
+  @type formats :: Map.t
+  @type calendar :: atom
 
+  @doc """
+  Returns a list of all formats defined
+  for the configured locales.
+  """
   def format_list do
     known_formats(&all_date_formats/1) ++
     known_formats(&all_time_formats/1) ++
     known_formats(&all_date_time_formats/1)
   end
 
-  def known_formats(list) do
-    Cldr.known_locales()
-    |> Enum.map(&(list.(&1)))
-    |> List.flatten
-    |> Enum.uniq
-  end
+  @doc """
+  Returns a list of calendars defined for a given locale.
 
-  def all_date_formats(locale) do
-    all_formats_for(locale, &date_formats/2)
-  end
+  * `locale` is any locale returned by `Cldr.known_locales/0`
 
-  def all_time_formats(locale) do
-    all_formats_for(locale, &time_formats/2)
-  end
+  ## Example
 
-  def all_date_time_formats(locale) do
-    all_formats_for(locale, &date_time_formats/2) ++
-    all_formats_for(locale, &date_time_available_formats/2)
-  end
+      iex> Cldr.DateTime.Format.calendars_for "en"
+      [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
+       :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
+       :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]
 
-  defp all_formats_for(locale, type_function) do
-    Enum.map(calendars_for_locale(locale), fn calendar ->
-      locale
-      |> type_function.(calendar)
-      |> Map.values
-    end)
-    |> List.flatten
-    |> Enum.uniq
-  end
+  """
+  @spec calendars_for(Locale.t) :: [calendar, ...]
+  def calendars_for(locale \\ Cldr.get_current_locale())
 
-  def calendars_for_locale(locale \\ Cldr.get_current_locale())
+  @doc """
+  Returns a map of the standard date formats for a given locale and calendar.
+
+  * `locale` is any locale returned by `Cldr.known_locales/0`
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+  The default is `:gregorian`
+
+  ## Examples:
+
+      iex> Cldr.DateTime.Format.date_formats "en"
+      %{full: "EEEE, MMMM d, y", long: "MMMM d, y", medium: "MMM d, y",
+        short: "M/d/yy"}
+
+      iex> Cldr.DateTime.Format.date_formats "en", :buddhist
+      %{full: "EEEE, MMMM d, y G", long: "MMMM d, y G", medium: "MMM d, y G",
+        short: "M/d/y GGGGG"}
+
+  """
+  @spec date_formats(Locale.t, calendar) :: standard_formats
   def date_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
+
+  @doc """
+  Returns a map of the standard time formats for a given locale and calendar.
+
+  * `locale` is any locale returned by `Cldr.known_locales/0`
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+  The default is `:gregorian`
+
+  ## Examples:
+
+      iex> Cldr.DateTime.Format.time_formats "en"
+      %{full: "h:mm:ss a zzzz", long: "h:mm:ss a z", medium: "h:mm:ss a",
+        short: "h:mm a"}
+
+      iex> Cldr.DateTime.Format.time_formats "en", :buddhist
+      %{full: "h:mm:ss a zzzz", long: "h:mm:ss a z", medium: "h:mm:ss a",
+        short: "h:mm a"}
+
+  """
+  @spec time_formats(Locale.t, calendar) :: standard_formats
   def time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
+
+  @doc """
+  Returns a map of the standard datetime formats for a given locale and calendar.
+
+  * `locale` is any locale returned by `Cldr.known_locales/0`
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+  The default is `:gregorian`
+
+  ## Examples:
+
+      iex> Cldr.DateTime.Format.date_time_formats "en"
+      %{full: "{1} 'at' {0}", long: "{1} 'at' {0}", medium: "{1}, {0}",
+        short: "{1}, {0}"}
+
+      iex> Cldr.DateTime.Format.date_time_formats "en", :buddhist
+      %{full: "{1} 'at' {0}", long: "{1} 'at' {0}", medium: "{1}, {0}",
+        short: "{1}, {0}"}
+
+  """
+  @spec date_time_formats(Locale.t, calendar) :: standard_formats
   def date_time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
+
+  @doc """
+  Returns a map of the available non-standard datetime formats for a
+  given locale and calendar.
+
+  * `locale` is any locale returned by `Cldr.known_locales/0`
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+  The default is `:gregorian`
+
+  ## Examples:
+
+      iex> Cldr.DateTime.Format.date_time_available_formats "en"
+      %{m_ed: "E, M/d", md: "M/d", gy_mm_md: "MMM d, y G", ehm: "E h:mm a",
+        y_m: "M/y", mm_md: "MMM d", y_mmmm: "MMMM y",
+        mmmm_w_count_one: "'week' W 'of' MMMM", y_mmm: "MMM y", y_qqq: "QQQ y",
+        y_mm_md: "MMM d, y", hms: "h:mm:ss a", y_mmm_ed: "E, MMM d, y",
+        ehms: "E h:mm:ss a", hmsv: "h:mm:ss a v", yw_count_one: "'week' w 'of' y",
+        gy: "y G", m: "L", mmm_md: "MMMM d", y_qqqq: "QQQQ y", hmv: "h:mm a v",
+        mmm_ed: "E, MMM d", y_m_ed: "E, M/d/y", e_hm: "E HH:mm", h: "h a",
+        e_hms: "E HH:mm:ss", hm: "h:mm a", gy_mmm_ed: "E, MMM d, y G",
+        mmmm_w_count_other: "'week' W 'of' MMMM", mmm: "LLL", e: "ccc", ms: "mm:ss",
+        yw_count_other: "'week' w 'of' y", ed: "d E", d: "d", y: "y", y_md: "M/d/y",
+        gy_mmm: "MMM y G"}
+
+  """
+  @spec date_time_available_formats(Locale.t, calendar) :: formats
   def date_time_available_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
 
   for locale <- Cldr.Config.known_locales() do
     locale_data = Cldr.Config.get_locale(locale)
     calendars = Cldr.Config.calendars_for_locale(locale_data)
 
-    def calendars_for_locale(unquote(locale)), do: unquote(calendars)
+    def calendars_for(unquote(locale)), do: unquote(calendars)
 
     for calendar <- Cldr.Config.calendars_for_locale(locale_data) do
       calendar_data =
@@ -98,6 +189,22 @@ defmodule Cldr.DateTime.Format do
   def date_time_available_formats(locale, _calendar),
     do: {:error, Locale.locale_error(locale)}
 
+  @doc """
+  Returns a list of the date_time format types that are
+  available in all locales.
+
+  The format types returned by `common_date_time_format_names`
+  are guaranteed to be available in all known locales,
+
+  ## Example:
+
+      iex> Cldr.DateTime.Format.common_date_time_format_names
+      [:m_ed, :md, :gy_mm_md, :ehm, :y_m, :mm_md, :y_mmmm, :y_mmm, :y_qqq, :y_mm_md,
+       :hms, :y_mmm_ed, :ehms, :hmsv, :gy, :m, :mmm_md, :y_qqqq, :hmv, :mmm_ed,
+       :y_m_ed, :e_hm, :h, :e_hms, :hm, :gy_mmm_ed, :mmmm_w_count_other, :mmm, :e,
+       :ms, :yw_count_other, :ed, :d, :y, :y_md, :gy_mmm]
+
+  """
   def common_date_time_format_names do
     Cldr.known_locales
     |> Enum.map(&date_time_available_formats/1)
@@ -105,6 +212,36 @@ defmodule Cldr.DateTime.Format do
     |> Enum.map(&MapSet.new/1)
     |> intersect_mapsets
     |> MapSet.to_list
+  end
+
+  defp known_formats(list) do
+    Cldr.known_locales()
+    |> Enum.map(&(list.(&1)))
+    |> List.flatten
+    |> Enum.uniq
+  end
+
+  defp all_date_formats(locale) do
+    all_formats_for(locale, &date_formats/2)
+  end
+
+  defp all_time_formats(locale) do
+    all_formats_for(locale, &time_formats/2)
+  end
+
+  defp all_date_time_formats(locale) do
+    all_formats_for(locale, &date_time_formats/2) ++
+    all_formats_for(locale, &date_time_available_formats/2)
+  end
+
+  defp all_formats_for(locale, type_function) do
+    Enum.map(calendars_for(locale), fn calendar ->
+      locale
+      |> type_function.(calendar)
+      |> Map.values
+    end)
+    |> List.flatten
+    |> Enum.uniq
   end
 
   defp intersect_mapsets([a, b | []]) do

@@ -1,6 +1,4 @@
 defmodule Cldr.DateTime.Formatter do
-  alias Cldr.Locale
-
   @moduledoc """
   Functions the implement the formatting for each the format
   symbols.  Each format symbol is an ASCII character in the
@@ -38,6 +36,10 @@ defmodule Cldr.DateTime.Formatter do
   |                        | YYYY       | "2017"          | Padded to at least 4 digits        |
   |                        | YYYYY      | "02017"         | Padded to at least 5 digits        |
   | Related Gregorian Year | r, rr, rr+ | 2017            | Minimum necessary digits           |
+  | Cyclic Year            | U, UU, UUU | "甲子"           | Abbreviated                        |
+  |                        | UUUU       | "甲子" (for now) | Wide                               |
+  |                        | UUUUU      | "甲子" (for now) | Narrow                             |
+  | Extended Year          | u+         | 4601            | Minimim necessary digits           |
   | Quarter                | Q          | 2               | Single digit                       |
   |                        | QQ         | "02"            | Two digits                         |
   |                        | QQQ        | "Q2"            | Abbreviated                        |
@@ -95,10 +97,9 @@ defmodule Cldr.DateTime.Formatter do
   |                        | mm         | "03", "12"      | Two digits, zero padded            |
   | Second                 | s          | 3, 48           | Minimim digits of seconds          |
   |                        | ss         | "03", "48"      | Two digits, zero padded            |
-  | Fractional Seconds     | S          | 3, 48           | Minimim digits of seconds          |
+  | Fractional Seconds     | S          | 3, 48           | Minimim digits of fractional seconds |
   |                        | SS         | "03", "48"      | Two digits, zero padded            |
-  | Millseconds            | A          | 3, 48           | Minimim digits of seconds          |
-  |                        | AA         | "03", "48"      | Two digits, zero padded            |
+  | Millseconds            | A+         | "27313215"      | Minimim digits of milliseconds     |
 
   ## Formatting symbols for hour of day
 
@@ -120,6 +121,7 @@ defmodule Cldr.DateTime.Formatter do
   """
   alias Cldr.DateTime.{Format, Compiler, Timezone}
   alias Cldr.Calendar, as: Kalendar
+  alias Cldr.Locale
   alias Cldr.Math
 
   @default_calendar :gregorian
@@ -561,6 +563,10 @@ defmodule Cldr.DateTime.Formatter do
   the year provided in the supplied date.  This means
   `u` returns the same result as the format `y`.**
 
+  | Symbol     | Example         | Cldr Format               |
+  | :--------  | :-------------- | :------------------------ |
+  | u+         | 4601            | Minimim necessary digits  |
+
   This is a single number designating the year of this
   calendar system, encompassing all supra-year fields.
 
@@ -594,10 +600,17 @@ defmodule Cldr.DateTime.Formatter do
   non-gregorian calendars.
 
   **NOTE: In the current implementation, the cyclic year is
-  always returned as the current year of the
-  supplied date**
+  delegated to `Cldr.DateTime.Formatter.year/3`
+  (format symbol `y`) and does not return a localed
+  cyclic year.**
 
-  Cyclic year name. Calendars such as the Chinese lunar
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | U, UU, UUU | "甲子"           | Abbreviated     |
+  | UUUU       | "甲子" (for now) | Wide            |
+  | UUUUU      | "甲子" (for now) | Narrow          |
+
+  Calendars such as the Chinese lunar
   calendar (and related calendars) and the Hindu calendars
   use 60-year cycles of year names. If the calendar does
   not provide cyclic year name data, or if the year value
@@ -1938,19 +1951,21 @@ defmodule Cldr.DateTime.Formatter do
 
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
-  | S      | 3, 48      | Minimim digits of seconds                             |
-  | SS     | "03", "48" | Number of seconds zero-padded to 2 digits             |
+  | S      | "4.0"      | Minimim digits of fractional seconds                  |
+  | SS     | "4.00"     | Number of seconds zero-padded to 2 fractional digits  |
+  | SSS    | "4.002"    | Number of seconds zero-padded to 3 fractional digits  |
 
   ## Examples
 
-      iex(29)> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 1
+      iex> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 1
       "4.0"
 
-      iex(27)> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 3
+      iex> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 3
       "4.002"
 
-      iex(30)> Cldr.DateTime.Formatter.fractional_second %{second: 4}, 1
+      iex> Cldr.DateTime.Formatter.fractional_second %{second: 4}, 1
       "4"
+
   """
   @spec fractional_second(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def fractional_second(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -1977,6 +1992,28 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns a `time` (format symbol `A`) as milliseconds in string
   format.
+
+  * `time` is a `Time` struct or any map that contains at least the key
+  `:hour`, `:minute`, `:seconds` and optional `:microsecond` key of
+  the format used by `Time`
+
+  * `n` is the number of digits to which `:milliseconds` is padded
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `fractional_second/4`
+
+  | Symbol | Results    | Description                      |
+  | :----  | :--------- | :------------------------------- |
+  | A      | "27313215" | Minimim digits of milliseconds   |
+
+  ## Example
+
+      iex> Cldr.DateTime.Formatter.millisecond ~T[07:35:13.215217]
+      "27313215"
+
   """
   @milliseconds 1_000
   @spec millisecond(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
