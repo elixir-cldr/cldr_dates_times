@@ -1,6 +1,6 @@
 defmodule Cldr.Date do
   @moduledoc """
-  Provide an API for the localization and formatting of a `Date`
+  Provides an API for the localization and formatting of a `Date`
   struct or any map with the keys `:year`, `:month`,
   `:day` and `:calendar`.
 

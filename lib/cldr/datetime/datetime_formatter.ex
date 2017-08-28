@@ -1,7 +1,9 @@
 defmodule Cldr.DateTime.Formatter do
   @moduledoc """
-  Functions the implement the formatting for each the format
-  symbols.  Each format symbol is an ASCII character in the
+  Functions that implement the formatting for each specific
+  format symbol.
+
+  Each format symbol is an ASCII character in the
   range `a-zA-z`.  Although not all characters are used as
   format symbols, all characters are reserved for that use
   requiring that literals be enclosed in single quote

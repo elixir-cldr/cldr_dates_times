@@ -1,7 +1,8 @@
 defmodule Cldr.DateTime.Relative do
   @moduledoc """
   Functions to support the string formatting of relative time/datetime numbers.
-  This allows for the formatting of numbers (as integers, floats, Dates or DateTimes)
+
+  This module provides formatting of numbers (as integers, floats, Dates or DateTimes)
   as "ago" or "in" with an appropriate time unit.  For example, "2 days ago" or
   "in 10 seconds"
   """

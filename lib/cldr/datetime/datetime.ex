@@ -1,6 +1,6 @@
 defmodule Cldr.DateTime do
   @moduledoc """
-  Provide an API for the localization and formatting of a `DateTime`
+  Provides an API for the localization and formatting of a `DateTime`
   struct or any map with the keys `:year`, `:month`,
   `:day`, `:calendar`, `:hour`, `:minute`, `:second` and optionally `:microsecond`.
 

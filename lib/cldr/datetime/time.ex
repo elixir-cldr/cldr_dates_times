@@ -1,6 +1,6 @@
 defmodule Cldr.Time do
   @moduledoc """
-  Provide an API for the localization and formatting of a `Time`
+  Provides an API for the localization and formatting of a `Time`
   struct or any map with the keys `:hour`, `:minute`,
   `:second` and optionlly `:microsecond`.
 

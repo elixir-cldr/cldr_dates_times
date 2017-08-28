@@ -1,22 +1,19 @@
 defmodule Cldr.DateTime.Compiler do
   @moduledoc """
-  Tokenizes and parses Date, Time and DateTime format strings.
+  Tokenizes and parses `Date`, `Time` and `DateTime` format strings.
 
-  During compilation, all the date, time and datetime format
+  During compilation, each of the date, time and datetime format
   strings defined in CLDR are compiled into a list of
-  function bodies that are then grated to the function head
-  `Cldr.DateTime.Formatter.format/3`.
-
-  Those formats are pattern matched at runtime to the relevent
-  function definition giving good performance for the formats
-  so defined.
+  function bodies that are then grafted onto the function head
+  `Cldr.DateTime.Formatter.format/3`.  As a result these compiled
+  formats execute with good performance.
 
   For formats not defined in CLDR (ie a user defined format),
-  the tokenizing and parsing is performance, the list of function
+  the tokenizing and parsing is performed, then list of function
   bodies is created and then `Cldr.DateTime.Formatter.format/3`
-  recurses over the list, invoking each function and then
+  recurses over the list, invoking each function and
   collecting the results.  This process is significantly slower
-  hence CLDR defined formats are preferred.
+  than that of the precompiled formats.
 
   User defined formats can also be precompiled by configuring
   them under the key `:precompile_datetime_formats`.  For example:
@@ -60,10 +57,10 @@ defmodule Cldr.DateTime.Compiler do
   is to be formatted.  See `Cldr.DateTime.Formatter` for the list
   of supported format symbols.
 
-  The return is a list of function bodies which are grafted onto
+  Returns is a list of function bodies which are grafted onto
   a function head in `Cldr.DateTime.Formatter` at compile time
   to produce a series of functions that process a given format
-  efficiently.
+  string efficiently.
   """
   @spec compile(String.t) :: {:ok, List.t} | {:error, String.t}
   def compile(format_string)
