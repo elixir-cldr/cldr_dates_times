@@ -19,8 +19,7 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp description do
     """
-    Dates, Times and DateTimes formatting functions for Common Locale Data Repository (CLDR).
-    (ex_cldr)[https://hex.pm/packages/ex_cldr] is a dependency.
+    Dates, Times and DateTimes localization and formatting functions for the Common Locale Data Repository (CLDR).
     """
   end
 
