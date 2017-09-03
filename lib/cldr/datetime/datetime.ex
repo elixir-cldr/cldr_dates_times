@@ -44,7 +44,7 @@ defmodule Cldr.DateTime do
       iex> Cldr.DateTime.to_string datetime, format: :long
       {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
       iex> Cldr.DateTime.to_string datetime, format: :full
-      {:ok, "Saturday, January 1, 2000 at 11:59:59 PM UTC"}
+      {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
       iex> Cldr.DateTime.to_string datetime, format: :full, locale: "fr"
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
   """
@@ -93,7 +93,7 @@ defmodule Cldr.DateTime do
       iex> Cldr.DateTime.to_string! datetime, format: :long
       "January 1, 2000 at 11:59:59 PM UTC"
       iex> Cldr.DateTime.to_string! datetime, format: :full
-      "Saturday, January 1, 2000 at 11:59:59 PM UTC"
+      "Saturday, January 1, 2000 at 11:59:59 PM GMT"
       iex> Cldr.DateTime.to_string! datetime, format: :full, locale: "fr"
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
