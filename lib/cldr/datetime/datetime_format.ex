@@ -10,7 +10,6 @@ defmodule Cldr.DateTime.Format do
   """
 
   alias Cldr.Calendar, as: Kalendar
-  alias Cldr.DateTime.Formatter
   alias Cldr.Locale
 
   @standard_formats [:short, :medium, :long, :full]
@@ -64,7 +63,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_formats(Locale.t, calendar) :: standard_formats
-  def date_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
+  def date_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar)
 
   @doc """
   Returns a map of the standard time formats for a given locale and calendar.
@@ -86,7 +85,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec time_formats(Locale.t, calendar) :: standard_formats
-  def time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
+  def time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar)
 
   @doc """
   Returns a map of the standard datetime formats for a given locale and calendar.
@@ -108,7 +107,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_time_formats(Locale.t, calendar) :: standard_formats
-  def date_time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
+  def date_time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar)
 
   @doc """
   Returns a map of the available non-standard datetime formats for a
@@ -136,7 +135,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_time_available_formats(Locale.t, calendar) :: formats
-  def date_time_available_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
+  def date_time_available_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar)
 
   @doc """
   Returns the postive and negative hour format

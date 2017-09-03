@@ -146,24 +146,6 @@ defmodule Cldr.DateTime.Formatter do
   alias Cldr.Locale
   alias Cldr.Math
 
-  @default_calendar :gregorian
-
-  @doc """
-  Returns the default CLDR calendar name.
-
-  Note this is not the same as the default calendar
-  `Calendar.ISO` supported by Elixir.
-
-  ## Example
-
-      iex> Cldr.DateTime.Formatter.default_calendar
-      :gregorian
-
-  """
-  def default_calendar do
-    @default_calendar
-  end
-
   @doc """
   Returns the formatted and localised date, time or datetime
   for a given `Date`, `Time`, `DateTime` or struct with the
@@ -1223,15 +1205,15 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.day_of_year %{year: 2017, month: 1, day: 15,
       ...> calendar: Calendar.ISO}, 1
-      "14"
+      "15"
 
       iex> Cldr.DateTime.Formatter.day_of_year %{year: 2017, month: 1, day: 15,
       ...> calendar: Calendar.ISO}, 2
-      "14"
+      "15"
 
       iex> Cldr.DateTime.Formatter.day_of_year %{year: 2017, month: 1, day: 15,
       ...> calendar: Calendar.ISO}, 3
-      "014"
+      "015"
 
   """
   @spec day_of_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
@@ -2769,7 +2751,7 @@ defmodule Cldr.DateTime.Formatter do
     if :cldr_calendar in functions_exported(calendar) do
       {:ok, calendar.cldr_calendar}
     else
-      {:ok, @default_calendar}
+      {:ok, Kalendar.default_calendar}
     end
   end
 
