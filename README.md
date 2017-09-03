@@ -1,10 +1,10 @@
-# Elixir Cldr: Dates, Times and DateTimes
+# Cldr Date, Time and DateTime Localization and Formatting
 ![Build Status](http://sweatbox.noexpectations.com.au:8080/buildStatus/icon?job=cldr_dates_times)
 ![Deps Status](https://beta.hexfaktor.org/badge/all/github/kipcole9/cldr_dates_times.svg)
 [![Hex pm](http://img.shields.io/hexpm/v/ex_cldr_dates_times.svg?style=flat)](https://hex.pm/packages/ex_cldr_dates_times)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/kipcole9/cldr_dates_times/blob/master/LICENSE)
 
-## Introduction & Getting Started
+## Introduction and Getting Started
 
 `ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
 

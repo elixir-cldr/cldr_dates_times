@@ -1,3 +1,5 @@
+# Changelog
+
 ## Changelog for Cldr_Dates_Times v0.1.0 September 4th, 2017
 
 ### Enhancements
@@ -12,7 +14,7 @@ Although largely complete (with respect to the CLDR data), there are some known 
 
 * *Week of month*  The week of the mornth is returned for format symbole `W`.  Currently it considers weeks of the month to start on the first day of the month which is inconsistent with the ISOWeek standard and different from the `week_of_year` calculation.
 
-* *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `DateTime` struct is use to format timezone data.
+* *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V`, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `DateTime` struct is use to format timezone data.
 
 * *First day of week is always Monday*  All formatting is done with Monday as the first day of the week.  In several territories this is not a reasonable assumption.  CLDR provides data to support a different starting day for the week.  This will be implemented before version 1.0
 

@@ -34,8 +34,7 @@ defmodule CldrDatesTimes.Mixfile do
     [
       source_ref: "v#{@version}",
       main: "README",
-      extra_section: "GUIDES",
-      extras: ["README.md"]
+      extras: ["README.md", "CHANGELOG.md"]
     ]
   end
 
