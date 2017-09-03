@@ -1,9 +1,27 @@
 defmodule Cldr.Date do
+  @moduledoc """
+  Provides an API for the localization and formatting of a `Date`
+  struct or any map with the keys `:year`, `:month`,
+  `:day` and `:calendar`.
+
+  `Cldr.Date` provides support for the built-in calendar
+  `Calendar.ISO`.  Use of other calendars may not produce
+  the expected results.
+
+  CLDR provides standard format strings for `Date` which
+  are reresented by the names `:short`, `:medium`, `:long`
+  and `:full`.  This allows for locale-independent
+  formatting since each locale may define the underlying
+  format string as appropriate.
+  """
+
   alias Cldr.DateTime.{Formatter, Format}
 
   @doc """
   Formats a date according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+
+  Returns either `{:ok, formatted_string}` or `{:error, reason}`.
 
   * `date` is a `%Date{}` struct or any map that contains the keys
   `year`, `month`, `day` and `calendar`
@@ -57,6 +75,41 @@ defmodule Cldr.Date do
     error_return(date, [:year, :month, :day, :calendar])
   end
 
+  @doc """
+  Formats a date according to a format string
+  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+
+  Returns either the `formatted_date` or raises an exception.
+
+  * `date` is a `%Date{}` struct or any map that contains the keys
+  `year`, `month`, `day` and `calendar`
+
+  * `options` is a keyword list of options for formatting.  The valid options are:
+    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.  The default is `:medium`
+    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
+    * `number_system:` a number system into which the formatted date digits should be transliterated
+
+  ## Examples
+
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :medium
+      "Jul 10, 2017"
+
+      iex> Cldr.Date.to_string! ~D[2017-07-10]
+      "Jul 10, 2017"
+
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :full
+      "Monday, July 10, 2017"
+
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :short
+      "7/10/17"
+
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :short, locale: "fr"
+      "10/07/2017"
+
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :long, locale: "af"
+      "10 Julie 2017"
+
+  """
   def to_string!(date, options \\ [])
   def to_string!(date, options) do
     case to_string(date, options) do

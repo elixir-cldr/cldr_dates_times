@@ -1,6 +1,9 @@
 defmodule Cldr.DateTime.Timezone do
 
-  # Timezone offset is in seconds
+  @doc """
+  Converts the time zone offset of a `Time` or `DateTime` into
+  seconds.
+  """
   def time_from_zone_offset(%{utc_offset: utc_offset, std_offset: std_offset}) do
     offset = utc_offset + std_offset
 

@@ -1,14 +1,37 @@
 defmodule Cldr.DateTime.Compiler do
   @moduledoc """
-  Tokenizes and parses Date and DateTime format strings
+  Tokenizes and parses `Date`, `Time` and `DateTime` format strings.
+
+  During compilation, each of the date, time and datetime format
+  strings defined in CLDR are compiled into a list of
+  function bodies that are then grafted onto the function head
+  `Cldr.DateTime.Formatter.format/3`.  As a result these compiled
+  formats execute with good performance.
+
+  For formats not defined in CLDR (ie a user defined format),
+  the tokenizing and parsing is performed, then list of function
+  bodies is created and then `Cldr.DateTime.Formatter.format/3`
+  recurses over the list, invoking each function and
+  collecting the results.  This process is significantly slower
+  than that of the precompiled formats.
+
+  User defined formats can also be precompiled by configuring
+  them under the key `:precompile_datetime_formats`.  For example:
+
+      config :ex_cldr,
+        precompile_datetime_formats: ["yy/dd", "hhh:mmm:sss"]
+
   """
 
   alias Cldr.DateTime.Formatter
 
   @doc """
-  Scan a number format definition
+  Scan a number format definition and return
+  the tokens of a date/time/datetime format
+  string.
 
-  Using a leex lexer, tokenize a rule definition
+  This function is designed to produce output
+  that is fed into `Cldr.DateTime.Compiler.compile/1`.
 
   ## Example
 
@@ -30,9 +53,18 @@ defmodule Cldr.DateTime.Compiler do
   @doc """
   Parse a number format definition
 
-  Using a yecc lexer, parse a datetime format definition into list of
-  elements we can then interpret to format a date or datetime.
+  * `format_string` is a string defining how a date/time/datetime
+  is to be formatted.  See `Cldr.DateTime.Formatter` for the list
+  of supported format symbols.
+
+  Returns is a list of function bodies which are grafted onto
+  a function head in `Cldr.DateTime.Formatter` at compile time
+  to produce a series of functions that process a given format
+  string efficiently.
   """
+  @spec compile(String.t) :: {:ok, List.t} | {:error, String.t}
+  def compile(format_string)
+
   def compile("") do
     {:error, "empty format string cannot be compiled"}
   end

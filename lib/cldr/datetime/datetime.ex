@@ -1,10 +1,34 @@
 defmodule Cldr.DateTime do
+  @moduledoc """
+  Provides an API for the localization and formatting of a `DateTime`
+  struct or any map with the keys `:year`, `:month`,
+  `:day`, `:calendar`, `:hour`, `:minute`, `:second` and optionally `:microsecond`.
+
+  `Cldr.DateTime` provides support for the built-in calendar
+  `Calendar.ISO`.  Use of other calendars may not produce
+  the expected results.
+
+  CLDR provides standard format strings for `DateTime` which
+  are reresented by the names `:short`, `:medium`, `:long`
+  and `:full`.  This allows for locale-independent
+  formatting since each locale may define the underlying
+  format string as appropriate.
+  """
+
+  require Cldr
+  alias Cldr.DateTime.{Format, Formatter}
+
+  @format_types [:short, :medium, :long, :full]
+
   @doc """
-  Formats a datetime according to a format string
+  Formats a DateTime according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
 
+  Returns `{:ok, formatted_datetime}` or `{:error, reason}`.
+
   * `datetime` is a `%DateTime{}` `or %NaiveDateTime{}`struct or any map that contains the keys
-  `year`, `month`, `day`, `calendar`. `hour`, `minute` and `second` with optional `microsecond`.
+  `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
+  `:microsecond`.
 
   * `options` is a keyword list of options for formatting.  The valid options are:
 
@@ -14,14 +38,18 @@ defmodule Cldr.DateTime do
 
   ## Examples
 
+      iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
+      iex> Cldr.DateTime.to_string datetime
+      {:ok, "Jan 1, 2000, 11:59:59 PM"}
+      iex> Cldr.DateTime.to_string datetime, format: :long
+      {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
+      iex> Cldr.DateTime.to_string datetime, format: :full
+      {:ok, "Saturday, January 1, 2000 at 11:59:59 PM UTC"}
+      iex> Cldr.DateTime.to_string datetime, format: :full, locale: "fr"
+      {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
   """
 
-  require Cldr
-  alias Cldr.DateTime.{Format, Formatter}
-
-  @format_types [:short, :medium, :long, :full]
-
-  def to_string(datetime, options \\ [])
+  def to_string(date, options \\ [])
   def to_string(%{year: _year, month: _month, day: _day, hour: _hour, minute: _minute,
       second: _second, calendar: calendar} = datetime, options) do
     default_options = [format: :medium, locale: Cldr.get_current_locale()]
@@ -42,6 +70,34 @@ defmodule Cldr.DateTime do
     error_return(datetime, [:year, :month, :day, :hour, :minute, :second, :calendar])
   end
 
+  @doc """
+  Formats a DateTime according to a format string
+  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+
+  Returns `formatted_datetime` or raises an exception.
+
+  * `datetime` is a `%DateTime{}` `or %NaiveDateTime{}`struct or any map that contains the keys
+  `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
+  `:microsecond`.
+
+  * `options` is a keyword list of options for formatting.  The valid options are:
+    * `format:` `:short` | `:medium` | `:long` | `:full`. any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.  The default is `:medium`
+    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
+    * `number_system:` a number system into which the formatted date digits should be transliterated
+
+  ## Examples
+
+      iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
+      iex> Cldr.DateTime.to_string! datetime
+      "Jan 1, 2000, 11:59:59 PM"
+      iex> Cldr.DateTime.to_string! datetime, format: :long
+      "January 1, 2000 at 11:59:59 PM UTC"
+      iex> Cldr.DateTime.to_string! datetime, format: :full
+      "Saturday, January 1, 2000 at 11:59:59 PM UTC"
+      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: "fr"
+      "samedi 1 janvier 2000 à 23:59:59 UTC"
+
+  """
   def to_string!(date_time, options \\ [])
   def to_string!(date_time, options) do
     case to_string(date_time, options) do

@@ -1,9 +1,9 @@
 defmodule Cldr.DateTime.Formatter do
-  alias Cldr.Locale
-
   @moduledoc """
-  Functions the implement the formatting for each the format
-  symbols.  Each format symbol is an ASCII character in the
+  Functions that implement the formatting for each specific
+  format symbol.
+
+  Each format symbol is an ASCII character in the
   range `a-zA-z`.  Although not all characters are used as
   format symbols, all characters are reserved for that use
   requiring that literals be enclosed in single quote
@@ -38,6 +38,10 @@ defmodule Cldr.DateTime.Formatter do
   |                        | YYYY       | "2017"          | Padded to at least 4 digits        |
   |                        | YYYYY      | "02017"         | Padded to at least 5 digits        |
   | Related Gregorian Year | r, rr, rr+ | 2017            | Minimum necessary digits           |
+  | Cyclic Year            | U, UU, UUU | "甲子"           | Abbreviated                        |
+  |                        | UUUU       | "甲子" (for now) | Wide                               |
+  |                        | UUUUU      | "甲子" (for now) | Narrow                             |
+  | Extended Year          | u+         | 4601            | Minimim necessary digits           |
   | Quarter                | Q          | 2               | Single digit                       |
   |                        | QQ         | "02"            | Two digits                         |
   |                        | QQQ        | "Q2"            | Abbreviated                        |
@@ -95,9 +99,9 @@ defmodule Cldr.DateTime.Formatter do
   |                        | mm         | "03", "12"      | Two digits, zero padded            |
   | Second                 | s          | 3, 48           | Minimim digits of seconds          |
   |                        | ss         | "03", "48"      | Two digits, zero padded            |
-  | Fractional Seconds     | S          | 3, 48           | Minimim digits of seconds          |
+  | Fractional Seconds     | S          | 3, 48           | Minimim digits of fractional seconds |
   |                        | SS         | "03", "48"      | Two digits, zero padded            |
-  | Millseconds            | A+         | 3, 48           | Minimim digits of seconds          |
+  | Millseconds            | A+         | 4000, 63241     | Minimim digits of milliseconds since midnight |
   | Generic non-location TZ | v         | "Etc/UTC"       | `:time_zone` key, unlocalised      |
   |                         | vvvv      | "unk"           | Generic timezone name.  Currently returns only "unk" |
   | Specific non-location TZ | z..zzz   | "UTC"           | `:zone_abbr` key, unlocalised      |
@@ -139,6 +143,7 @@ defmodule Cldr.DateTime.Formatter do
   """
   alias Cldr.DateTime.{Format, Compiler, Timezone}
   alias Cldr.Calendar, as: Kalendar
+  alias Cldr.Locale
   alias Cldr.Math
 
   @default_calendar :gregorian
@@ -621,6 +626,10 @@ defmodule Cldr.DateTime.Formatter do
   the year provided in the supplied date.  This means
   `u` returns the same result as the format `y`.**
 
+  | Symbol     | Example         | Cldr Format               |
+  | :--------  | :-------------- | :------------------------ |
+  | u+         | 4601            | Minimim necessary digits  |
+
   This is a single number designating the year of this
   calendar system, encompassing all supra-year fields.
 
@@ -654,10 +663,17 @@ defmodule Cldr.DateTime.Formatter do
   non-gregorian calendars.
 
   **NOTE: In the current implementation, the cyclic year is
-  always returned as the current year of the
-  supplied date**
+  delegated to `Cldr.DateTime.Formatter.year/3`
+  (format symbol `y`) and does not return a localed
+  cyclic year.**
 
-  Cyclic year name. Calendars such as the Chinese lunar
+  | Symbol     | Example         | Cldr Format     |
+  | :--------  | :-------------- | :-------------- |
+  | U, UU, UUU | "甲子"           | Abbreviated     |
+  | UUUU       | "甲子" (for now) | Wide            |
+  | UUUUU      | "甲子" (for now) | Narrow          |
+
+  Calendars such as the Chinese lunar
   calendar (and related calendars) and the Hindu calendars
   use 60-year cycles of year names. If the calendar does
   not provide cyclic year name data, or if the year value
@@ -1998,8 +2014,9 @@ defmodule Cldr.DateTime.Formatter do
 
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
-  | S      | 3, 48      | Minimim digits of seconds                             |
-  | SS     | "03", "48" | Number of seconds zero-padded to 2 digits             |
+  | S      | "4.0"      | Minimim digits of fractional seconds                  |
+  | SS     | "4.00"     | Number of seconds zero-padded to 2 fractional digits  |
+  | SSS    | "4.002"    | Number of seconds zero-padded to 3 fractional digits  |
 
   ## Examples
 
@@ -2011,6 +2028,7 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.fractional_second %{second: 4}, 1
       "4"
+
   """
   @spec fractional_second(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def fractional_second(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -2064,6 +2082,9 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.millisecond %{hour: 10, minute: 10, second: 4}, 1
       "36604000"
+
+      iex> Cldr.DateTime.Formatter.millisecond ~T[07:35:13.215217]
+      "27313215"
 
   """
   @milliseconds 1_000
