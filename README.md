@@ -34,7 +34,7 @@ iex> h Cldr.DateTime.Relative.to_string
 ```
 ## Documentation
 
-Primary documentation is available at https://hexdocs.pm/ex_cldr/5_datetime_formats
+Primary documentation is available on [as part of the ex_cldr documentation on hex](https://hexdocs.pm/ex_cldr/5_datetime_formats.html)
 
 ## Formats strings
 
@@ -147,14 +147,14 @@ Primary documentation is available at https://hexdocs.pm/ex_cldr/5_datetime_form
   | GMT Format              | O         | "+0100"         | Short localised GMT format        |
   |                         | OOOO      | "+010059"       | Long localised GMT format         |
 
-  ## Formatting symbols for hour of day
+## Formatting symbols for hour of day
 
   The hour of day can be formatted differently depending whether
   a 12- or 24-hour day is being represented and depending on the
   way in which midnight and noon are represented.  The following
   table illustrates the differences:
 
-	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   h	    |  12	  | 1...11	|  12	 |   1...11   |  12   |
   |   K	    |   0	  | 1...11	|   0	 |   1...11   |   0   |
@@ -167,9 +167,9 @@ Although largely complete (with respect to the CLDR data), there are some known 
 
 * *Week of year*  The week of year is returned for the format symbol `w`.  Currently it considers weeks of the year to be those defined for the `ISOWeek` calendar.  This means that January 1st may not be the start of the first week of the year and December 31st may not be the last day of the last week of the year.
 
-* *Week of month*  The week of the mornth is returned for format symbole `W`.  Currently it considers weeks of the month to start on the first day of the month which is inconsistent with the ISOWeek standard and different from the `week_of_year` calculation.
+* *Week of month*  The week of the mornth is returned for format symbol `W`.  Currently it considers weeks of the month to start on the first day of the month which is inconsistent with the ISOWeek standard and different from the `week_of_year` calculation.
 
-* *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `DateTime` struct is use to format timezone data.
+* *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V`, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `DateTime` struct is used to format timezone data.
 
 * *First day of week is always Monday*  All formatting is done with Monday as the first day of the week.  In several territories this is not a reasonable assumption.  CLDR provides data to support a different starting day for the week.  This will be implemented before version 1.0
 

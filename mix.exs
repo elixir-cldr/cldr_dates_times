@@ -6,9 +6,10 @@ defmodule CldrDatesTimes.Mixfile do
   def project do
     [
       app: :ex_cldr_dates_times,
+      version: @version,
       name: "Cldr_Dates_Times",
       source_url: "https://github.com/kipcole9/cldr_dates_times",
-      version: @version,
+      docs: docs(),
       elixir: "~> 1.5",
       description: description(),
       package: package(),
@@ -26,6 +27,15 @@ defmodule CldrDatesTimes.Mixfile do
   def application do
     [
       extra_applications: [:logger]
+    ]
+  end
+
+  def docs do
+    [
+      source_ref: "v#{@version}",
+      main: "README",
+      extra_section: "GUIDES",
+      extras: ["README.md"]
     ]
   end
 

@@ -2,12 +2,12 @@ defmodule Cldr.Calendar do
   @moduledoc """
   Calendar support functions for formatting dates, times and datetimes.
 
-  `Cldr` defines formats for several calendars, returned by
-  `Cldr.Calendar.known_calendars/0'.
+  `Cldr` defines formats for several calendars, the names of which
+  are returned by `Cldr.Calendar.known_calendars/0`.
 
-  Currently this implementation only
-  support the `:gregorian` calendar which aligns with the proleptic
-  Gregorian calendar defined by Elixir' `Calendar.ISO`
+  Currently this implementation only supports the `:gregorian`
+  calendar which aligns with the proleptic Gregorian calendar
+  defined by Elixir, `Calendar.ISO`.
 
   This module will be extacted in the future to become part of
   a separate calendrical module.
@@ -107,7 +107,7 @@ defmodule Cldr.Calendar do
   end
 
   @doc """
-  Returns the namaes of the calendars defined in CLDR.
+  Returns the names of the calendars defined in CLDR.
 
   ## Example
 
@@ -402,6 +402,15 @@ defmodule Cldr.Calendar do
       |> MapSet.intersection(MapSet.new(@configured_calendars))
       |> MapSet.to_list
 
+  @doc """
+  Returns a list of the known calendars in CLDR
+
+  ## Example
+
+      iex> Cldr.Calendar.known_calendars
+      [:gregorian]
+
+  """
   def known_calendars do
     @known_calendars
   end
@@ -409,6 +418,20 @@ defmodule Cldr.Calendar do
   #
   # Data storage functions
   #
+  @doc false
+  def era(locale, calendar)
+
+  @doc false
+  def period(locale, calendar)
+
+  @doc false
+  def quarter(locale, calendar)
+
+  @doc false
+  def month(locale, calendar)
+
+  @doc false
+  def day(locale, calendar)
 
   for locale <- Cldr.known_locales() do
     date_data =
