@@ -33,7 +33,8 @@ defmodule CldrDatesTimes.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_cldr, "~> 0.5.2"},
+      # {:ex_cldr, "~> 0.6.1"},
+      {:ex_cldr, path: "../cldr"},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:stream_data, ">= 0.1.1", only: :test}
     ]

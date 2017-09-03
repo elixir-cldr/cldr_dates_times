@@ -46,12 +46,20 @@ defmodule Cldr.DateTime.Format do
   def time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
   def date_time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
   def date_time_available_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
+  def hour_format(locale \\ Cldr.get_current_locale())
+  def gmt_format(locale \\ Cldr.get_current_locale())
+  def gmt_zero_format(locale \\ Cldr.get_current_locale())
 
   for locale <- Cldr.Config.known_locales() do
     locale_data = Cldr.Config.get_locale(locale)
     calendars = Cldr.Config.calendars_for_locale(locale_data)
 
     def calendars_for_locale(unquote(locale)), do: unquote(calendars)
+    def gmt_format(unquote(locale)), do: unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_format]))
+    def gmt_zero_format(unquote(locale)), do: unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))
+
+    hour_formats = String.split(get_in(locale_data, [:dates, :time_zone_names, :hour_format]), ";")
+    def hour_format(unquote(locale)), do: unquote(hour_formats)
 
     for calendar <- Cldr.Config.calendars_for_locale(locale_data) do
       calendar_data =
