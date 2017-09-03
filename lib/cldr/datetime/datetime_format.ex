@@ -137,19 +137,62 @@ defmodule Cldr.DateTime.Format do
   """
   @spec date_time_available_formats(Locale.t, calendar) :: formats
   def date_time_available_formats(locale \\ Cldr.get_current_locale(), calendar \\ Formatter.default_calendar)
+
+  @doc """
+  Returns the postive and negative hour format
+  for a timezone offset for a given locale.
+
+  * `locale` is any locale returned by `Cldr.known_locales/0`
+
+  ## Example
+
+      iex> Cldr.DateTime.Format.hour_format "en"
+      {"+HH:mm", "-HH:mm"}
+
+  """
+  @spec hour_format(Locale.t) :: {String.t, String.t}
   def hour_format(locale \\ Cldr.get_current_locale())
+
+  @doc """
+  Returns the GMT offset format list for a
+  for a timezone offset for a given locale.
+
+  * `locale` is any locale returned by `Cldr.known_locales/0`
+
+  ## Example
+
+      iex(2)> Cldr.DateTime.Format.gmt_format "en"
+      ["GMT", 0]
+
+  """
+  @spec gmt_format(Locale.t) :: [non_neg_integer | String.t, ...]
   def gmt_format(locale \\ Cldr.get_current_locale())
+
+  @doc """
+  Returns the GMT format string for a
+  for a timezone with an offset of zero for
+  a given locale.
+
+  * `locale` is any locale returned by `Cldr.known_locales/0`
+
+  ## Example
+
+      iex(3)> Cldr.DateTime.Format.gmt_zero_format "en"
+      "GMT"
+
+  """
+  @spec gmt_zero_format(Locale.t) :: String.t
   def gmt_zero_format(locale \\ Cldr.get_current_locale())
 
   for locale <- Cldr.Config.known_locales() do
     locale_data = Cldr.Config.get_locale(locale)
     calendars = Cldr.Config.calendars_for_locale(locale_data)
 
-    def calendars_for_locale(unquote(locale)), do: unquote(calendars)
+    def calendars_for(unquote(locale)), do: unquote(calendars)
     def gmt_format(unquote(locale)), do: unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_format]))
     def gmt_zero_format(unquote(locale)), do: unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))
 
-    hour_formats = String.split(get_in(locale_data, [:dates, :time_zone_names, :hour_format]), ";")
+    hour_formats = List.to_tuple(String.split(get_in(locale_data, [:dates, :time_zone_names, :hour_format]), ";"))
     def hour_format(unquote(locale)), do: unquote(hour_formats)
 
     for calendar <- Cldr.Config.calendars_for_locale(locale_data) do

@@ -2602,7 +2602,7 @@ defmodule Cldr.DateTime.Formatter do
   for locale <- Cldr.known_locales do
     gmt_format = Cldr.DateTime.Format.gmt_format(locale)
     gmt_zero_format = Cldr.DateTime.Format.gmt_zero_format(locale)
-    [pos_format, neg_format] = Cldr.DateTime.Format.hour_format(locale)
+    {pos_format, neg_format} = Cldr.DateTime.Format.hour_format(locale)
     {:ok, pos_transforms} = Compiler.compile(pos_format)
     {:ok, neg_transforms} = Compiler.compile(neg_format)
 
