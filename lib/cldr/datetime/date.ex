@@ -142,7 +142,7 @@ defmodule Cldr.Date do
   end
 
   defp error_return(map, requirements) do
-    {:error, "Invalid date. Date is a map that requires at least #{inspect requirements} fields. " <>
-             "Found: #{inspect map}"}
+    {:error, {ArgumentError, "Invalid date. Date is a map that requires at least #{inspect requirements} fields. " <>
+             "Found: #{inspect map}"}}
   end
 end

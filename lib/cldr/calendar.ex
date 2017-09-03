@@ -25,7 +25,7 @@ defmodule Cldr.Calendar do
 
   ## Example
 
-      iex> Cldr.DateTime.Formatter.default_calendar
+      iex> Cldr.Calendar.default_calendar
       :gregorian
 
   """
@@ -58,6 +58,7 @@ defmodule Cldr.Calendar do
           FO: 4, UM: 1, SK: 4, AX: 4, LU: 4, FR: 4, IE: 4, HU: 4, FJ: 4, MC: 4, GF: 4,
           NO: 4, DK: 4, DE: 4, LI: 4, PL: 4, VA: 4, MQ: 4}, weekend_end: nil,
         weekend_start: nil}
+
   """
   @week_data Cldr.Config.week_data
   def week_data do
@@ -98,6 +99,7 @@ defmodule Cldr.Calendar do
         ethiopic_amete_alem: %{eras: [{0, %{end: -2006036}}]},
         gregorian: %{calendar_system: "solar",
           eras: [{0, %{end: 0}}, {1, %{start: 1}}]}, ...
+
   """
   @calendar_data Cldr.Config.calendar_data
   def calendars do

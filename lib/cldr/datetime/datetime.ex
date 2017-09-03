@@ -143,8 +143,8 @@ defmodule Cldr.DateTime do
     {:ok, format_string}
   end
 
-  def error_return(map, requirements) do
-    {:error, "Invalid date_time. Date_time is a map that requires at least #{inspect requirements} fields. " <>
-             "Found: #{inspect map}"}
+  defp error_return(map, requirements) do
+    {:error, {ArgumentError, "Invalid date_time. Date_time is a map that requires at least #{inspect requirements} fields. " <>
+             "Found: #{inspect map}"}}
   end
 end
