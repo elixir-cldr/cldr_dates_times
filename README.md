@@ -36,7 +36,7 @@ iex> h Cldr.DateTime.Relative.to_string
 
 Primary documentation is available on [as part of the ex_cldr documentation on hex](https://hexdocs.pm/ex_cldr/5_datetime_formats.html)
 
-## Formats strings
+## Format strings
 
   The [CLDR standard](http://unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
   defines a wide range of format symbols.  Most - but not
