@@ -1,4 +1,4 @@
-# Elixir Cldr: Dates, Times & DateTimes
+# Elixir Cldr: Dates, Times and DateTimes
 ![Build Status](http://sweatbox.noexpectations.com.au:8080/buildStatus/icon?job=cldr_dates_times)
 ![Deps Status](https://beta.hexfaktor.org/badge/all/github/kipcole9/cldr_dates_times.svg)
 [![Hex pm](http://img.shields.io/hexpm/v/ex_cldr_dates_times.svg?style=flat)](https://hex.pm/packages/ex_cldr_dates_times)
@@ -7,7 +7,7 @@
 
 ## Introduction & Getting Started
 
-`ex_cldr_dates_times` is an addon library for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
+`ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
 
 The primary api is `Cldr.Date.to_string/2`, `Cldr.Time.to_string/2` and `Cldr.DateTime.to_string/2`.  The following examples demonstrate:
 
@@ -32,6 +32,22 @@ iex> h Cldr.DateTime.to_string
 ## Documentation
 
 Primary documentation is available at https://hexdocs.pm/ex_cldr/1_getting_started.html#localizing-dates-datetimes
+
+## Known restrictions and limitations
+
+There are a few limitations and deviations from the standard
+
+* Week of year
+
+* Week of month
+
+* Timezones
+
+* First day of week is always Monday
+
+* Only calendar is Gregorian (Calendar.ISO)
+
+* Variants (for example, in era)
 
 ## Installation
 

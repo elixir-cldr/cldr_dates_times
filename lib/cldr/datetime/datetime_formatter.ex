@@ -97,8 +97,30 @@ defmodule Cldr.DateTime.Formatter do
   |                        | ss         | "03", "48"      | Two digits, zero padded            |
   | Fractional Seconds     | S          | 3, 48           | Minimim digits of seconds          |
   |                        | SS         | "03", "48"      | Two digits, zero padded            |
-  | Millseconds            | A          | 3, 48           | Minimim digits of seconds          |
-  |                        | AA         | "03", "48"      | Two digits, zero padded            |
+  | Millseconds            | A+         | 3, 48           | Minimim digits of seconds          |
+  | Generic non-location TZ | v         | "Etc/UTC"       | `:time_zone` key, unlocalised      |
+  |                         | vvvv      | "unk"           | Generic timezone name.  Currently returns only "unk" |
+  | Specific non-location TZ | z..zzz   | "UTC"           | `:zone_abbr` key, unlocalised      |
+  |                         | zzzz      | "GMT"           | Delegates to `zone_gmt/4`          |
+  | Timezone ID             | V         | "unk"           | `:zone_abbr` key, unlocalised      |
+  |                         | VV        | "Etc/UTC        | Delegates to `zone_gmt/4`          |
+  |                         | VVV       | "Unknown City"  | Exemplar city.  Not supported.     |
+  |                         | VVVV      | "GMT"           | Delegates to `zone_gmt/4           |
+  | ISO8601 Format          | Z..ZZZ    | "+0100"         | ISO8601 Basic Format with hours and minutes |
+  |                         | ZZZZ      | "+01:00"        | Delegates to `zone_gmt/4           |
+  |                         | ZZZZZ     | "+01:00:10"     | ISO8601 Extended format with optional seconds |
+  | ISO8601 plus Z          | X         | "+01"           | ISO8601 Basic Format with hours and optional minutes or "Z" |
+  |                         | XX        | "+0100"         | ISO8601 Basic Format with hours and minutes or "Z"          |
+  |                         | XXX       | "+0100"         | ISO8601 Basic Format with hours and minutes, optional seconds or "Z" |
+  |                         | XXXX      | "+010059"       | ISO8601 Basic Format with hours and minutes, optional seconds or "Z" |
+  |                         | XXXXX     | "+01:00:10"     | ISO8601 Extended Format with hours and minutes, optional seconds or "Z" |
+  | ISO8601 minus Z         | x         | "+0100"         | ISO8601 Basic Format with hours and optional minutes |
+  |                         | xx        | "-0800"         | ISO8601 Basic Format with hours and minutes          |
+  |                         | xxx       | "+01:00"        | ISO8601 Extended Format with hours and minutes       |
+  |                         | xxxx      | "+010059"       | ISO8601 Basic Format with hours and minutes, optional seconds     |
+  |                         | xxxxx     | "+01:00:10"     | ISO8601 Extended Format with hours and minutes, optional seconds  |
+  | GMT Format              | O         | "+0100"         | Short localised GMT format        |
+  |                         | OOOO      | "+010059"       | Long localised GMT format         |
 
   ## Formatting symbols for hour of day
 
@@ -114,9 +136,6 @@ defmodule Cldr.DateTime.Formatter do
   |   H	    |   0	  | 1...11	|  12	 |  13...23   |   0   |
   |   k	    |  24	  | 1...11	|  12	 |  13...23   |  24   |
 
-  ## Formatting symbols for time zones
-
-
   """
   alias Cldr.DateTime.{Format, Compiler, Timezone}
   alias Cldr.Calendar, as: Kalendar
@@ -124,10 +143,49 @@ defmodule Cldr.DateTime.Formatter do
 
   @default_calendar :gregorian
 
+  @doc """
+  Returns the default CLDR calendar name.
+
+  Note this is not the same as the default calendar
+  `Calendar.ISO` supported by Elixir.
+
+  ## Example
+
+      iex> Cldr.DateTime.Formatter.default_calendar
+      :gregorian
+
+  """
   def default_calendar do
     @default_calendar
   end
 
+  @doc """
+  Returns the formatted and localised date, time or datetime
+  for a given `Date`, `Time`, `DateTime` or struct with the
+  appropriate fields.
+
+  * `date` is a `Date`, `Time`, `DateTime` or other struct that
+  contains the required date and time fields.
+
+  * `format` is a valid format string, for example `yy/MM/dd hh:MM`
+
+  * `locale` is any locale returned by `Cldr.known_locales/0`
+
+  * `options` is a keyword list of options.  The valid options are:
+
+    * `:number_system`.  The resulting formatted and localised date/time
+    string will be transliterated into this number system. Number system
+    is anything returned from `Cldr.Number.System.number_systems_for/1`
+
+  *NOTE* This function is called by `Cldr.Date/to_string/2, `Cldr.Time.to_string/2`
+  and `Cldr.DateTime.to_string/2` which is the preferred API.
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.format %{year: 2017, month: 9, day: 3, hour: 10, minute: 23}, "yy/MM/dd hh:MM", "en"
+      {:ok, "17/09/03 10:09"}
+
+  """
   @spec format(Date.t | Time.t | DateTime.t, String.t, Locale.t, Keyword.t) :: String.t
   def format(date, format, locale \\ Cldr.get_current_locale(), options \\ [])
 
@@ -1945,13 +2003,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex(29)> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 1
+      iex> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 1
       "4.0"
 
-      iex(27)> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 3
+      iex> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 3
       "4.002"
 
-      iex(30)> Cldr.DateTime.Formatter.fractional_second %{second: 4}, 1
+      iex> Cldr.DateTime.Formatter.fractional_second %{second: 4}, 1
       "4"
   """
   @spec fractional_second(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
@@ -1977,8 +2035,36 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns a `time` (format symbol `A`) as milliseconds in string
-  format.
+  Returns the `time` (format symbol `A`) as millisenconds since
+  midnight.
+
+  * `time` is a `Time` struct or any map that contains at least the key `:second`
+  with and optional `:microsecond` key of the format used by `Time`
+
+  * `n` is the number of fractional digits to which the float number of seconds
+  is rounded
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `millisecond/4`
+
+  | Symbol | Results    | Description                                             |
+  | :----  | :--------- | :------------------------------------------------------ |
+  | A+     | "4000"     | Minimum necessary digits of milliseconds since midnight |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.millisecond %{hour: 0, minute: 0, second: 4, microsecond: {2000, 3}}, 1
+      "4002"
+
+      iex> Cldr.DateTime.Formatter.millisecond %{hour: 0, minute: 0, second: 4}, 1
+      "4000"
+
+      iex> Cldr.DateTime.Formatter.millisecond %{hour: 10, minute: 10, second: 4}, 1
+      "36604000"
+
   """
   @milliseconds 1_000
   @spec millisecond(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
@@ -2004,29 +2090,93 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the `:time_zone` (format symbol `v`) part of a `DateTime` or `Time`
+  Returns the generic non-location format of a timezone (format symbol `v`)
+  from a `DateTime` or `Time`.
+
+  Since Elixir does not provide full time zone support, we return here only
+  the `:time_zone` element of the provided `DateTime` or other struct without
+  any localization.
+
+  * `time` is a `Time` struct or any map that contains at least the key `:time_zone`
+  key of the format used by `Time`
+
+  * `n` is the generic non-location timezone format and is either `1` (the
+  default) or `4`
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `zone_generic/4`
+
+  | Symbol | Results    | Description                                             |
+  | :----  | :--------- | :------------------------------------------------------ |
+  | v      | "Etc/UTC"  | `:time_zone` key, unlocalised                           |
+  | vvvv   | "unk"      | Generic timezone name.  Currently returns only "unk"    |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 4
+      "GMT"
+
+      iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 1
+      "Etc/UTC"
   """
   @spec zone_generic(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def zone_generic(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def zone_generic(%{time_zone: time_zone}, 1, _locale, _options) do
+  def zone_generic(%{time_zone: time_zone, utc_offset: _, std_offset: _}, 1, _locale, _options) do
     time_zone
   end
 
-  def zone_generic(%{time_zone: _time_zone} = time, 4, locale, options) do
+  def zone_generic(%{time_zone: _time_zone, utc_offset: _, std_offset: _} = time, 4, locale, options) do
     zone_id(time, 4, locale, options)
   end
 
   def zone_generic(time, _n, _locale, _options) do
-    error_return(time, "v", [:time_zone])
+    error_return(time, "v", [:time_zone, :utc_offset, :std_offset])
   end
 
   @doc """
-  Returns the `:time_zone` (format symbol `z`) part of a `DateTime` or `Time`
+  Returns the specific non-location format of a timezone (format symbol `z`)
+  from a `DateTime` or `Time`.
+
+  Since Elixir does not provide full time zone support, we return here only
+  the `:time_zone` element of the provided `DateTime` or other struct without
+  any localization.
+
+  * `time` is a `Time` struct or any map that contains at least the `:zone_abbr`,
+  `:utc_offset` and `:std_offset` keys of the format used by `Time`
+
+  * `n` is the specific non-location timezone format and is in the range `1..4`
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `zone_short/4`
+
+  | Symbol | Results    | Description                                             |
+  | :----  | :--------- | :------------------------------------------------------ |
+  | z..zzz | "UTC"      | `:zone_abbr` key, unlocalised                           |
+  | zzzz   | "GMT"      | Delegates to `zone_gmt/4`                               |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.zone_short %{zone_abbr: "UTC", utc_offset: 0, std_offset: 0}, 1
+      "UTC"
+
+      iex> Cldr.DateTime.Formatter.zone_short %{zone_abbr: "UTC", utc_offset: 0, std_offset: 0}, 4
+      "GMT"
+
   """
   @spec zone_generic(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def zone_short(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def zone_short(%{zone_abbr: zone_abbr}, _n, _locale, _options) do
+  def zone_short(%{zone_abbr: zone_abbr}, n, _locale, _options) when n in 1..3 do
     zone_abbr
+  end
+
+  def zone_short(%{zone_abbr: _zone_abbr} = time, 4 = n, locale, options) do
+    zone_gmt(time, n, locale, options)
   end
 
   def zone_short(time, _n, _locale, _options) do
@@ -2034,12 +2184,45 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the `:time_zone` (format symbol `V`) part of a `DateTime` or `Time`
+  Returns the time zone ID (format symbol `V`) part of a `DateTime` or `Time`
 
-  For now the short timezone name and the exemplar city and generic location
+  For now the short timezone name, exemplar city and generic location
   formats are not supported and therefore return the fallbacks defined in CLDR.
+
+  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  and `:std_offset` keys of the format used by `Time`
+
+  * `n` is the specific non-location timezone format and is in the range `1..4`
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `zone_id/4`
+
+  | Symbol | Results        | Description                                             |
+  | :----  | :------------- | :------------------------------------------------------ |
+  | V      | "unk"          | `:zone_abbr` key, unlocalised                           |
+  | VV     | "Etc/UTC       | Delegates to `zone_gmt/4`                               |
+  | VVV    | "Unknown City" | Examplar city.  Not supported.                          |
+  | VVVV   | "GMT"          | Delegates to `zone_gmt/4                                |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 1
+      "unk"
+
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 2
+      "Etc/UTC"
+
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 3
+      "Unknown City"
+
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 4
+      "GMT"
+
   """
-  @spec zone_generic(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec zone_id(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def zone_id(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
   def zone_id(%{time_zone: _time_zone}, 1, _locale, _options) do
     "unk"
@@ -2067,6 +2250,38 @@ defmodule Cldr.DateTime.Formatter do
   The ISO8601 basic format with hours, minutes and optional seconds fields.
   The format is equivalent to RFC 822 zone format (when optional seconds field
   is absent). This is equivalent to the "xxxx" specifier.
+
+  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  and `:std_offset` keys of the format used by `Time`
+
+  * `n` is the specific non-location timezone format and is in the range `1..4`
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `zone_basic/4`
+
+  | Symbol | Results        | Description                                             |
+  | :----  | :------------- | :------------------------------------------------------ |
+  | Z..ZZZ | "+0100"        | ISO8601 Basic Format with hours and minutes             |
+  | ZZZZ   | "+01:00"       | Delegates to `zone_gmt/4                                |
+  | ZZZZZ  | "+01:00:10"    | ISO8601 Extended format with optional seconds           |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC", utc_offset: 3600, std_offset: 0}, 1
+      "+0100"
+
+      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 4
+      "GMT+01:00"
+
+      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 5
+      "Z"
+
+      iex(79)> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 5
+      "+01:00:10"
+
   """
   @spec zone_basic(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def zone_basic(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -2075,9 +2290,8 @@ defmodule Cldr.DateTime.Formatter do
     iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
   end
 
-  def zone_basic(%{utc_offset: _offset, std_offset: _std_offset} = time, 4, _locale, _options) do
-    {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
-    iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :long)
+  def zone_basic(%{utc_offset: _offset, std_offset: _std_offset} = time, 4 = n, locale, options) do
+    zone_gmt(time, n, locale, options)
   end
 
   def zone_basic(%{utc_offset: _offset, std_offset: _std_offset} = time, 5, _locale, _options) do
@@ -2094,10 +2308,69 @@ defmodule Cldr.DateTime.Formatter do
 
   This is the ISO8601 format with hours, minutes and optional seconds fields with
   "Z" as the identifier if the timezone offset is 0.
+
+  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  and `:std_offset` keys of the format used by `Time`
+
+  * `n` is the specific non-location timezone format and is in the range `1..4`
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `zone_iso_z/4`
+
+  | Symbol | Results        | Description                                                              |
+  | :----  | :------------- | :----------------------------------------------------------------------- |
+  | X      | "+01"          | ISO8601 Basic Format with hours and optional minutes or "Z"              |
+  | XX     | "+0100"        | ISO8601 Basic Format with hours and minutes or "Z"                       |
+  | XXX    | "+0100"        | ISO8601 Basic Format with hours and minutes, optional seconds or "Z"     |
+  | XXXX   | "+010059"      | ISO8601 Basic Format with hours and minutes, optional seconds or "Z"     |
+  | XXXXX  | "+01:00:10"    | ISO8601 Extended Format with hours and minutes, optional seconds or "Z"  |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 1
+      "+01"
+
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 2
+      "+0100"
+
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 3
+      "+01:00:10"
+
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 4
+      "+010010"
+
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 5
+      "+01:00:10"
+
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 5
+      "Z"
+
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 4
+      "Z"
+
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 3
+      "Z"
+
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 2
+      "Z"
+
   """
   @spec zone_iso_z(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def zone_iso_z(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def zone_iso_z(%{utc_offset: _offset, std_offset: _std_offset} = time, n, _locale, _options) when n in 1..2 do
+  def zone_iso_z(%{utc_offset: _offset, std_offset: _std_offset} = time, 1, _locale, _options) do
+    case Timezone.time_from_zone_offset(time) do
+      {0, 0, _} ->
+        "Z"
+      {hours, minutes, seconds} ->
+        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+        |> String.replace(~r/00\Z/, "")
+    end
+  end
+
+  def zone_iso_z(%{utc_offset: _offset, std_offset: _std_offset} = time, 2, _locale, _options) do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
@@ -2130,10 +2403,8 @@ defmodule Cldr.DateTime.Formatter do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
-      {hours, minutes, 0 = seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
       {hours, minutes, seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended) <> pad(seconds, 2)
+        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
     end
   end
 
@@ -2146,17 +2417,80 @@ defmodule Cldr.DateTime.Formatter do
 
   This is the ISO8601 format with hours, minutes and optional seconds fields but
   with no "Z" as the identifier if the timezone offset is 0.
+
+  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  and `:std_offset` keys of the format used by `Time`
+
+  * `n` is the specific non-location timezone format and is in the range `1..4`
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `zone_iso/4`
+
+  | Symbol | Results        | Description                                                       |
+  | :----  | :------------- | :---------------------------------------------------------------- |
+  | x      | "+0100"        | ISO8601 Basic Format with hours and optional minutes              |
+  | xx     | "-0800"        | ISO8601 Basic Format with hours and minutes                       |
+  | xxx    | "+01:00"       | ISO8601 Extended Format with hours and minutes                    |
+  | xxxx   | "+010059"      | ISO8601 Basic Format with hours and minutes, optional seconds     |
+  | xxxxx  | "+01:00:10"    | ISO8601 Extended Format with hours and minutes, optional seconds  |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 1
+      "+01"
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 2
+      "+0100"
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 3
+      "+01:00"
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 4
+      "+010010"
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 5
+      "+01:00:10"
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 5
+      "+00:00"
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 4
+      "+0000"
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 3
+      "+00:00"
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 2
+      "+0000"
+
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 1
+      "+00"
+
   """
+  @iso_utc_offset_hours_minutes "+00:00"
   @spec zone_iso_z(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def zone_iso(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def zone_iso(%{utc_offset: _offset, std_offset: _std_offset} = time, n, _locale, _options) when n in 1..2 do
+  def zone_iso(%{utc_offset: _offset, std_offset: _std_offset} = time, 1, _locale, _options) do
+    {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
+    iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+    |> String.replace(~r/00\Z/, "")
+  end
+
+  def zone_iso(%{utc_offset: _offset, std_offset: _std_offset} = time, 2, _locale, _options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
     iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
   end
 
   def zone_iso(%{utc_offset: _offset, std_offset: _std_offset} = time, 3, _locale, _options) do
-    {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
-    iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
+    case Timezone.time_from_zone_offset(time) do
+      {0, 0, _} ->
+        @iso_utc_offset_hours_minutes
+      {hours, minutes, _seconds} ->
+        iso8601_tz_format(%{hour: hours, minute: minutes, second: 0}, format: :extended)
+    end
   end
 
   def zone_iso(%{utc_offset: _offset, std_offset: _std_offset} = time, 4, _locale, _options) do
@@ -2170,10 +2504,10 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_iso(%{utc_offset: _offset, std_offset: _std_offset} = time, 5, _locale, _options) do
     case Timezone.time_from_zone_offset(time) do
-      {hours, minutes, 0 = seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
+      {0, 0, 0} ->
+        @iso_utc_offset_hours_minutes
       {hours, minutes, seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended) <> pad(seconds, 2)
+        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
     end
   end
 
@@ -2184,7 +2518,33 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the short localised GMT offset (format symbol `O`) part of a
   `DateTime` or `Time`.
+
+  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  and `:std_offset` keys of the format used by `Time`
+
+  * `n` is the specific non-location timezone format and is in the range `1..4`
+
+  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  determines the localisation of the format
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+  `zone_gmt/4`
+
+  | Symbol | Results        | Description                                                     |
+  | :----  | :------------- | :-------------------------------------------------------------- |
+  | O      | "GMT+1"        | Short localised GMT format                                      |
+  | OOOO   | "GMT+01:00"    | Long localised GMT format                                       |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.zone_gmt %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 1
+      "GMT+1"
+
+      iex> Cldr.DateTime.Formatter.zone_gmt %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 4
+      "GMT+01:00"
+
   """
+  def zone_gmt(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
   def zone_gmt(%{utc_offset: _offset, std_offset: _std_offset} = time, 1, locale, _options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
     gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :short)
@@ -2201,8 +2561,15 @@ defmodule Cldr.DateTime.Formatter do
 
   @doc """
   Returns a literal.
+
+  ## Example
+
+      iex> Cldr.DateTime.Formatter.literal %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, "A literal"
+      "A literal"
+
   """
   @spec literal(any, binary, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  def literal(date, binary, locale \\ Cldr.get_current_locale, options \\ [])
   def literal(_date, binary, _locale, _options) do
     binary
   end
@@ -2213,7 +2580,7 @@ defmodule Cldr.DateTime.Formatter do
   defp gmt_tz_format(locale, offset, options \\ [])
   for locale <- Cldr.known_locales do
     gmt_format = Cldr.DateTime.Format.gmt_format(locale)
-    gmt_zero_format = Cldr.DateTime.Format.gmt_format(locale)
+    gmt_zero_format = Cldr.DateTime.Format.gmt_zero_format(locale)
     [pos_format, neg_format] = Cldr.DateTime.Format.hour_format(locale)
     {:ok, pos_transforms} = Compiler.compile(pos_format)
     {:ok, neg_transforms} = Compiler.compile(neg_format)
@@ -2282,16 +2649,28 @@ defmodule Cldr.DateTime.Formatter do
     "Z"
   end
 
-  defp iso8601_tz_format_type(%{hour: hour, minute: minute}, :basic) do
-    sign(hour) <> hour(hour, 2) <> minute(minute, 2)
+  defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :basic) do
+    sign(hour) <> hour(time, 2) <> minute(time, 2)
   end
 
-  defp iso8601_tz_format_type(%{hour: hour, minute: _minute}, :short) do
-    sign(hour) <> hour(hour, 2)
+  defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :short) do
+    sign(hour) <> hour(time, 2)
   end
 
-  defp iso8601_tz_format_type(%{hour: hour, minute: minute}, :extended) do
-    sign(hour) <> hour(hour, 2) <> ":" <> minute(minute, 2)
+  defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :long) do
+    sign(hour) <> hour(time, 2) <> ":" <> minute(time, 2)
+  end
+
+  defp iso8601_tz_format_type(%{hour: hour, minute: _minute, second: 0} = time, :extended) do
+    sign(hour) <> hour(time, 2) <> ":" <> minute(time, 2)
+  end
+
+  defp iso8601_tz_format_type(%{hour: hour, minute: _minute, second: _second} = time, :extended) do
+    sign(hour) <> hour(time, 2) <> ":" <> minute(time, 2) <> ":" <> second(time, 2)
+  end
+
+  defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :extended) do
+    sign(hour) <> hour(time, 2) <> ":" <> minute(time, 2)
   end
 
   defp sign(number) when number >= 0, do: "+"

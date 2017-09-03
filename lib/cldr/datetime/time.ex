@@ -9,6 +9,7 @@ defmodule Cldr.Time do
   `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
 
   * `options` is a keyword list of options for formatting.  The valid options are:
+
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.  The default is `:medium`
     * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
     * `number_system:` a number system into which the formatted date digits should be transliterated

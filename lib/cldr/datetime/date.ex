@@ -9,6 +9,7 @@ defmodule Cldr.Date do
   `year`, `month`, `day` and `calendar`
 
   * `options` is a keyword list of options for formatting.  The valid options are:
+
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.  The default is `:medium`
     * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
     * `number_system:` a number system into which the formatted date digits should be transliterated
@@ -32,6 +33,7 @@ defmodule Cldr.Date do
 
       iex> Cldr.Date.to_string ~D[2017-07-10], format: :long, locale: "af"
       {:ok, "10 Julie 2017"}
+
   """
   @format_types [:short, :medium, :long, :full]
 

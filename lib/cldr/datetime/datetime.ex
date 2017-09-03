@@ -7,6 +7,7 @@ defmodule Cldr.DateTime do
   `year`, `month`, `day`, `calendar`. `hour`, `minute` and `second` with optional `microsecond`.
 
   * `options` is a keyword list of options for formatting.  The valid options are:
+
     * `format:` `:short` | `:medium` | `:long` | `:full`. any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.  The default is `:medium`
     * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
     * `number_system:` a number system into which the formatted date digits should be transliterated
@@ -20,7 +21,7 @@ defmodule Cldr.DateTime do
 
   @format_types [:short, :medium, :long, :full]
 
-  def to_string(date, options \\ [])
+  def to_string(datetime, options \\ [])
   def to_string(%{year: _year, month: _month, day: _day, hour: _hour, minute: _minute,
       second: _second, calendar: calendar} = datetime, options) do
     default_options = [format: :medium, locale: Cldr.get_current_locale()]
