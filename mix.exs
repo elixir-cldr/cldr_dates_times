@@ -29,7 +29,6 @@ defmodule CldrDatesTimes.Mixfile do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:ex_cldr, "~> 0.6.1"},
