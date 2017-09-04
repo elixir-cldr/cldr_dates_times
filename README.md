@@ -20,7 +20,7 @@ iex> Cldr.Time.to_string Time.utc_now
 iex> Cldr.DateTime.to_string DateTime.utc_now
 {:ok, "Aug 18, 2017, 11:39:08 AM"}
 
-iex> Cldr.DateTime.Relative.to_string(1, unit: :day, format: :narrow)
+iex> Cldr.DateTime.Relative.to_string 1, unit: :day, format: :narrow
 {:ok, "tomorrow"}
 ```
 
