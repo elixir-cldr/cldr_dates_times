@@ -1,4 +1,4 @@
-# Cldr Date, Time and DateTime Localization and Formatting
+# Date and Time Localization and Formatting
 ![Build Status](http://sweatbox.noexpectations.com.au:8080/buildStatus/icon?job=cldr_dates_times)
 ![Deps Status](https://beta.hexfaktor.org/badge/all/github/kipcole9/cldr_dates_times.svg)
 [![Hex pm](http://img.shields.io/hexpm/v/ex_cldr_dates_times.svg?style=flat)](https://hex.pm/packages/ex_cldr_dates_times)
@@ -39,9 +39,8 @@ Primary documentation is available on [as part of the ex_cldr documentation on h
 ## Format strings
 
   The [CLDR standard](http://unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
-  defines a wide range of format symbols.  Most - but not
-  all - of these symbols are supported in `Cldr`.  The supported
-  symbols are described below.
+  defines a wide range of format symbols.  Most - but not all - of these symbols are supported in
+  `Cldr`.  The supported  symbols are described below.  Note the [known restrictions and limitations](#known-restrictions-and-limitations).
 
   | Element                | Symbol     | Example         | Cldr Format                        |
   | :--------------------  | :--------  | :-------------- | :--------------------------------- |
