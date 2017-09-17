@@ -1,5 +1,11 @@
 # Changelog
 
+## Cldr_Dates_Times v0.1.1 September 18th, 2017
+
+### Enhancements
+
+* Updated to `ex_cldr` version 0.7.0 and add new package `ex_cldr_numbers` which has now been extracted into its own package.
+
 ## Cldr_Dates_Times v0.1.0 September 4th, 2017
 
 ### Enhancements
