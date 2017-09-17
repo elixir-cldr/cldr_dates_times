@@ -1,13 +1,13 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
 
   def project do
     [
       app: :ex_cldr_dates_times,
       version: @version,
-      name: "Cldr_Dates_Times",
+      name: "Cldr Dates Times",
       source_url: "https://github.com/kipcole9/cldr_dates_times",
       docs: docs(),
       elixir: "~> 1.5",
@@ -40,7 +40,7 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, "~> 0.6.1"},
+      {:ex_cldr, "~> 0.7.0"},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:stream_data, ">= 0.1.1", only: :test}
     ]
