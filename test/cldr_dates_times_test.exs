@@ -1,5 +1,6 @@
 defmodule Cldr.DatesTimes.Test do
   use ExUnit.Case, async: true
+  use ExUnitProperties
 
   for year <- 0001..3000 do
     starts = Cldr.Calendar.ISOWeek.first_day_of_year(year)
@@ -24,11 +25,10 @@ defmodule Cldr.DatesTimes.Test do
     end
   end
 
-  import PropertyTest
   property "check that a date fits within the start and end dates for that year" do
-    check all  day   <- StreamData.int(1..28),
-               month <- StreamData.int(1..12),
-               year  <- StreamData.int(1..3000),
+    check all  day   <- StreamData.integer(1..28),
+               month <- StreamData.integer(1..12),
+               year  <- StreamData.integer(1..3000),
                max_runs: 1_000
     do
       {:ok, date} = Date.new(year, month, day)

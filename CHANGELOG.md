@@ -1,5 +1,11 @@
 # Changelog
 
+## Cldr_Dates_Times v0.1.3 September __th, 2017
+
+### Enhancements
+
+* Reflect that `Cldr.territory_from_locale/1` is now `Cldr.region_from_locale/1`
+
 ## Cldr_Dates_Times v0.1.1 September 18th, 2017
 
 ### Enhancements
