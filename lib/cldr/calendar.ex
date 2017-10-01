@@ -36,7 +36,7 @@ defmodule Cldr.Calendar do
   end
 
   # Default territory is "World"
-  @default_territory :"001"
+  @default_region Cldr.default_region |> String.to_atom
 
   @doc """
   Returns the CLDR data that defines the structure
@@ -67,6 +67,26 @@ defmodule Cldr.Calendar do
   end
 
   @doc """
+  Returns the first day of a week for a locale as an ordinal number
+  in then range one to seven with one representing Monday and seven
+  representing Sunday.
+
+  ## Example
+
+      iex> Cldr.Calendar.first_day_of_week Cldr.Locale.new("en")
+      7
+
+      iex> Cldr.Calendar.first_day_of_week Cldr.Locale.new("en-GB")
+      1
+
+  """
+  def first_day_of_week(locale) do
+    (get_in(week_data(), [:first_day, region_from_locale(locale)]) ||
+     get_in(week_data(), [:first_day, @default_region]))
+    |> day_ordinal
+  end
+
+  @doc """
   Returns the minimum days required in a week for it
   to be considered week one of a year.
 
@@ -79,8 +99,8 @@ defmodule Cldr.Calendar do
       4
 
   """
-  def minumim_days_in_week_one(territory \\ @default_territory) do
-    get_in(week_data(), [:min_days, territory])
+  def minumim_days_in_week_one(region \\ @default_region) do
+    get_in(week_data(), [:min_days, region])
   end
 
   @doc """
@@ -355,6 +375,32 @@ defmodule Cldr.Calendar do
   def sub(%{calendar: _calendar} = date, n) do
     add(date, n * -1)
   end
+
+  defp region_from_locale(locale) do
+    try do
+      String.to_existing_atom(locale.region)
+    catch
+      _, _ -> String.to_existing_atom(Cldr.default_region)
+    end
+  end
+
+  # erlang/elixir standard is that Monday -> 1
+  def day_key(1), do: :mon
+  def day_key(2), do: :tue
+  def day_key(3), do: :wed
+  def day_key(4), do: :thu
+  def day_key(5), do: :fri
+  def day_key(6), do: :sat
+  def day_key(7), do: :sun
+
+  def day_ordinal("mon"), do: 1
+  def day_ordinal("tue"), do: 2
+  def day_ordinal("wed"), do: 3
+  def day_ordinal("thu"), do: 4
+  def day_ordinal("fri"), do: 5
+  def day_ordinal("sat"), do: 6
+  def day_ordinal("sun"), do: 7
+  def day_ordinal(_), do: nil
 
   @doc """
   Returns the first day of the month.

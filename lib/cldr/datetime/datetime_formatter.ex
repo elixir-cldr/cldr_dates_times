@@ -1370,12 +1370,9 @@ defmodule Cldr.DateTime.Formatter do
     calendar_day_of_week = calendar.day_of_week(year, month, day)
 
     # Locale start of week can be Monday == 1 through Sunday == 7
-    week_starts_on =
-      Kalendar.week_data
-      |> get_in([:first_day, String.to_existing_atom(locale.region)])
-      |> day_ordinal
+    locale_week_starts_on = Kalendar.first_day_of_week(locale)
 
-    Math.amod(calendar_day_of_week - week_starts_on + 1, 7)
+    Math.amod(calendar_day_of_week - locale_week_starts_on + 1, 7)
     |> trunc
     |> pad(n)
   end
@@ -2725,29 +2722,12 @@ defmodule Cldr.DateTime.Formatter do
 
   defp get_day(%{year: year, month: month, day: day, calendar: calendar}, locale, type, style) do
     {:ok, cldr_calendar} = type_from_calendar(calendar)
-    day_of_week = day_key(calendar.day_of_week(year, month, day))
+    day_of_week = Kalendar.day_key(calendar.day_of_week(year, month, day))
 
     locale
     |> Cldr.Calendar.day(cldr_calendar)
     |> get_in([type, style, day_of_week])
   end
-
-  # erlang/elixir standard is that Monday -> 1
-  defp day_key(1), do: :mon
-  defp day_key(2), do: :tue
-  defp day_key(3), do: :wed
-  defp day_key(4), do: :thu
-  defp day_key(5), do: :fri
-  defp day_key(6), do: :sat
-  defp day_key(7), do: :sun
-
-  defp day_ordinal("mon"), do: 1
-  defp day_ordinal("tue"), do: 2
-  defp day_ordinal("wed"), do: 3
-  defp day_ordinal("thu"), do: 4
-  defp day_ordinal("fri"), do: 5
-  defp day_ordinal("sat"), do: 6
-  defp day_ordinal("sun"), do: 7
 
   def type_from_calendar(calendar) do
     if :cldr_calendar in functions_exported(calendar) do
