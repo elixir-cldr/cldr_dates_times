@@ -16,6 +16,7 @@ defmodule Cldr.Date do
   """
 
   alias Cldr.DateTime.{Formatter, Format}
+  alias Cldr.LanguageTag
 
   @doc """
   Formats a date according to a format string
@@ -34,16 +35,16 @@ defmodule Cldr.Date do
 
   ## Examples
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], format: :medium
+      iex> Cldr.Date.to_string ~D[2017-07-10], format: :medium, locale: Cldr.Locale.new("en")
       {:ok, "Jul 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10]
+      iex> Cldr.Date.to_string ~D[2017-07-10], locale: Cldr.Locale.new("en")
       {:ok, "Jul 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], format: :full
+      iex> Cldr.Date.to_string ~D[2017-07-10], format: :full, locale: Cldr.Locale.new("en")
       {:ok, "Monday, July 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], format: :short
+      iex> Cldr.Date.to_string ~D[2017-07-10], format: :short, locale: Cldr.Locale.new("en")
       {:ok, "7/10/17"}
 
       iex> Cldr.Date.to_string ~D[2017-07-10], format: :short, locale: "fr"
@@ -57,13 +58,13 @@ defmodule Cldr.Date do
 
   def to_string(date, options \\ [])
   def to_string(%{year: _year, month: _month, day: _day, calendar: calendar} = date, options) do
-    default_options = [format: :medium, locale: Cldr.get_current_locale()]
-    options = Keyword.merge(default_options, options)
+    options = Keyword.merge(default_options(), options)
 
-    with {:ok, locale} <- Cldr.valid_locale?(options[:locale]),
-         {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
-         {:ok, format_string} <- format_string_from_format(options[:format], locale, cldr_calendar),
-         {:ok, formatted} <- Formatter.format(date, format_string, locale, options)
+    with \
+      {:ok, locale} <- Cldr.validate_locale(options[:locale]),
+      {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
+      {:ok, format_string} <- format_string_from_format(options[:format], locale, cldr_calendar),
+      {:ok, formatted} <- Formatter.format(date, format_string, locale, options)
     do
       {:ok, formatted}
     else
@@ -73,6 +74,10 @@ defmodule Cldr.Date do
 
   def to_string(date, _options) do
     error_return(date, [:year, :month, :day, :calendar])
+  end
+
+  defp default_options do
+    [format: :medium, locale: Cldr.get_current_locale()]
   end
 
   @doc """
@@ -91,16 +96,16 @@ defmodule Cldr.Date do
 
   ## Examples
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :medium
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :medium, locale: Cldr.Locale.new("en")
       "Jul 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10]
+      iex> Cldr.Date.to_string! ~D[2017-07-10], locale: Cldr.Locale.new("en")
       "Jul 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :full
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :full, locale: Cldr.Locale.new("en")
       "Monday, July 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :short
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :short, locale: Cldr.Locale.new("en")
       "7/10/17"
 
       iex> Cldr.Date.to_string! ~D[2017-07-10], format: :short, locale: "fr"
@@ -118,9 +123,10 @@ defmodule Cldr.Date do
     end
   end
 
-  defp format_string_from_format(format, locale, calendar) when format in @format_types do
+  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
+  when format in @format_types do
     format_string =
-      locale
+      locale_name
       |> Format.date_formats(calendar)
       |> Map.get(format)
 

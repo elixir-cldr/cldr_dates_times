@@ -6,7 +6,7 @@ defmodule Cldr.DateTime.Relative do
   as "ago" or "in" with an appropriate time unit.  For example, "2 days ago" or
   "in 10 seconds"
   """
-  @default_options [locale: Cldr.get_current_locale(), format: :default]
+  alias Cldr.LanguageTag
 
   @second 1
   @minute 60
@@ -51,7 +51,7 @@ defmodule Cldr.DateTime.Relative do
 
   When `options[:unit]` is not specified, `Cldr.DateTime.Relative.to_string/2` attempts to identify
   the appropriate unit based upon the magnitude of `relative`.  For example, given a parameter
-  of less than `60`, then `to_string/2` will assume `:seconds` as the unit.  See `unit_from_seconds/1`.
+  of less than `60`, then `to_string/2` will assume `:seconds` as the unit.  See `unit_from_relative_time/1`.
 
   ## Examples
 
@@ -88,7 +88,7 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(310, format: :narrow, locale: "fr")
       {:ok, "+5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string 2, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string 2, unit: :wed, format: :short, locale: "en"
       {:ok, "in 2 Wed."}
 
       iex> Cldr.DateTime.Relative.to_string 1, unit: :wed, format: :short
@@ -109,17 +109,63 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], unit: :ziggeraut)
       {:error, {Cldr.UnknownTimeUnit,
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
+
   """
   @spec to_string(integer | float | Date.t | DateTime.t, []) :: binary
   def to_string(relative, options \\ []) do
-    options = Keyword.merge(@default_options, options)
-    unit = Keyword.get(options, :unit)
+    options = Keyword.merge(default_options(), options)
     locale = Keyword.get(options, :locale)
-    options = Keyword.delete(options, :unit)
-    case to_string(relative, unit, locale, options) do
+    {unit, options} = Keyword.pop(options, :unit)
+
+    with \
+      {:ok, locale} <- Cldr.validate_locale(locale),
+      {:ok, unit} <- validate_unit(unit),
+      {relative, unit} = define_unit_and_relative_time(relative, unit, options[:relative_to]),
+      string <- to_string(relative, unit, locale, options)
+    do
+      {:ok, string}
+    else
       {:error, reason} -> {:error, reason}
-      string -> {:ok, string}
     end
+  end
+
+  defp default_options do
+    [locale: Cldr.get_current_locale(), format: :default]
+  end
+
+  def define_unit_and_relative_time(relative, nil, nil) when is_number(relative) do
+    unit = unit_from_relative_time(relative)
+    relative = scale_relative(relative, unit)
+    {relative, unit}
+  end
+
+  def define_unit_and_relative_time(%{year: _, month: _, day: _, hour: _, minute: _, second: _,
+                   calendar: Calendar.ISO} = relative, unit, relative_to) do
+    now = (relative_to || DateTime.utc_now) |> DateTime.to_unix
+    then = DateTime.to_unix(relative)
+    relative_time = then - now
+    define_unit_and_relative_time(relative_time, unit, nil)
+  end
+
+  def define_unit_and_relative_time(%{year: _, month: _, day: _, calendar: Calendar.ISO} = relative, unit, relative_to) do
+    today =
+      (relative_to || Date.utc_today)
+      |> Date.to_erl
+      |> :calendar.date_to_gregorian_days
+      |> Kernel.*(@day)
+
+    then =
+      relative
+      |> Date.to_erl
+      |> :calendar.date_to_gregorian_days
+      |> Kernel.*(@day)
+
+    relative_time = then - today
+    define_unit_and_relative_time(relative_time, unit, nil)
+  end
+
+  def define_unit_and_relative_time(relative_time, unit, _relative_to) do
+    {relative_time, unit}
   end
 
   @doc """
@@ -149,28 +195,18 @@ defmodule Cldr.DateTime.Relative do
     end
   end
 
-  defp to_string(relative, nil, locale, options)
-  when is_integer(relative) and relative in [-1, 0, +1] do
-    unit = unit_from_seconds(relative)
-
-    binary = to_string(relative, unit, locale, options)
-    if is_nil(binary) do
-      to_string(relative * 1.0, unit, locale, options)
-    else
-      binary
-    end
-  end
-
   defp to_string(relative, unit, locale, options)
   when is_integer(relative) and relative in [-1, 0, +1] do
-    locale
-    |> get_locale()
-    |> get_in([unit, options[:format], :relative_ordinal])
-    |> Enum.at(relative + 1)
+    result =
+      locale
+      |> get_locale()
+      |> get_in([unit, options[:format], :relative_ordinal])
+      |> Enum.at(relative + 1)
+
+    if is_nil(result), do: to_string(relative / 1, unit, locale, options), else: result
   end
 
-  defp to_string(relative, unit, locale, options)
-  when is_number(relative) and unit in @unit_keys do
+  defp to_string(relative, unit, locale, options) when is_number(relative)  do
     direction = if relative > 0, do: :relative_future, else: :relative_past
 
     rules =
@@ -187,45 +223,14 @@ defmodule Cldr.DateTime.Relative do
     |> Enum.join
   end
 
-  defp to_string(%{year: _, month: _, day: _, hour: _, minute: _, second: _,
-                   calendar: Calendar.ISO} = relative, unit, locale, options) do
-    now = (options[:relative_to] || DateTime.utc_now) |> DateTime.to_unix
-    then = DateTime.to_unix(relative)
-    seconds = then - now
-    do_to_string(seconds, unit, locale, options)
-  end
-
-  defp to_string(%{year: _, month: _, day: _, calendar: Calendar.ISO} = relative, unit, locale, options) do
-    today = (options[:relative_to] || Date.utc_today)
-    |> Date.to_erl
-    |> :calendar.date_to_gregorian_days
-    |> Kernel.*(@day)
-
-    then = relative
-    |> Date.to_erl
-    |> :calendar.date_to_gregorian_days
-    |> Kernel.*(@day)
-
-    seconds = then - today
-    do_to_string(seconds, unit, locale, options)
-  end
-
   defp to_string(span, unit, locale, options) do
     do_to_string(span, unit, locale, options)
   end
 
-  defp do_to_string(seconds, nil, locale, options) do
-    do_to_string(seconds, unit_from_seconds(seconds), locale, options)
-  end
-
-  defp do_to_string(seconds, unit, locale, options) when unit in @unit_keys do
+  defp do_to_string(seconds, unit, locale, options) do
     seconds
-    |> calculate_unit(unit)
+    |> scale_relative(unit)
     |> to_string(unit, locale, options)
-  end
-
-  defp do_to_string(_, unit, _, _) do
-    {:error, time_unit_error(unit)}
   end
 
   defp time_unit_error(unit) do
@@ -238,27 +243,27 @@ defmodule Cldr.DateTime.Relative do
 
   ## Examples
 
-      iex> Cldr.DateTime.Relative.unit_from_seconds(1234)
+      iex> Cldr.DateTime.Relative.unit_from_relative_time(1234)
       :minute
 
-      iex> Cldr.DateTime.Relative.unit_from_seconds(12345)
+      iex> Cldr.DateTime.Relative.unit_from_relative_time(12345)
       :hour
 
-      iex> Cldr.DateTime.Relative.unit_from_seconds(123456)
+      iex> Cldr.DateTime.Relative.unit_from_relative_time(123456)
       :day
 
-      iex> Cldr.DateTime.Relative.unit_from_seconds(1234567)
+      iex> Cldr.DateTime.Relative.unit_from_relative_time(1234567)
       :week
 
-      iex> Cldr.DateTime.Relative.unit_from_seconds(12345678)
+      iex> Cldr.DateTime.Relative.unit_from_relative_time(12345678)
       :month
 
-      iex> Cldr.DateTime.Relative.unit_from_seconds(123456789)
+      iex> Cldr.DateTime.Relative.unit_from_relative_time(123456789)
       :year
 
   """
-  def unit_from_seconds(seconds) do
-    case abs(seconds) do
+  def unit_from_relative_time(time) when is_number(time) do
+    case abs(time) do
       i when i < @minute  -> :second
       i when i < @hour    -> :minute
       i when i < @day     -> :hour
@@ -269,23 +274,27 @@ defmodule Cldr.DateTime.Relative do
     end
   end
 
+  def unit_from_relative_time(time) do
+    time
+  end
+
   @doc """
   Calculates the time span in the given `unit` from the time given in seconds.
 
   ## Examples
 
-      iex> Cldr.DateTime.Relative.calculate_unit(1234, :second)
+      iex> Cldr.DateTime.Relative.scale_relative(1234, :second)
       1234
 
-      iex> Cldr.DateTime.Relative.calculate_unit(1234, :minute)
+      iex> Cldr.DateTime.Relative.scale_relative(1234, :minute)
       21
 
-      iex> Cldr.DateTime.Relative.calculate_unit(1234, :hour)
+      iex> Cldr.DateTime.Relative.scale_relative(1234, :hour)
       0
 
   """
-  def calculate_unit(seconds, unit) do
-    (seconds / @unit[unit])
+  def scale_relative(time, unit) when is_number(time) and is_atom(unit) do
+    (time / @unit[unit])
     |> Float.round
     |> trunc
   end
@@ -304,14 +313,22 @@ defmodule Cldr.DateTime.Relative do
     @unit_keys
   end
 
-  for locale <- Cldr.Config.known_locales() do
+  def validate_unit(unit) when unit in @unit_keys or is_nil(unit) do
+    {:ok, unit}
+  end
+
+  def validate_unit(unit) do
+    {:error, time_unit_error(unit)}
+  end
+
+  for locale_name <- Cldr.Config.known_locales() do
     locale_data =
-      locale
+      locale_name
       |> Cldr.Config.get_locale
       |> Map.get(:date_fields)
       |> Map.take(@unit_keys)
 
-    defp get_locale(unquote(locale)), do: unquote(Macro.escape(locale_data))
+    defp get_locale(%LanguageTag{cldr_locale_name: unquote(locale_name)}), do: unquote(Macro.escape(locale_data))
   end
 end
 

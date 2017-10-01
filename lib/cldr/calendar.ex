@@ -12,6 +12,7 @@ defmodule Cldr.Calendar do
   This module will be extacted in the future to become part of
   a separate calendrical module.
   """
+  alias Cldr.LanguageTag
   alias Cldr.Calendar.Conversion
   alias Cldr.Calendar.ISOWeek
   alias Cldr.Locale
@@ -433,9 +434,9 @@ defmodule Cldr.Calendar do
   @doc false
   def day(locale, calendar)
 
-  for locale <- Cldr.known_locales() do
+  for locale_name <- Cldr.known_locales() do
     date_data =
-      locale
+      locale_name
       |> Cldr.Config.get_locale
       |> Map.get(:dates)
 
@@ -446,32 +447,32 @@ defmodule Cldr.Calendar do
       |> Map.keys
 
     for calendar <- calendars do
-      def era(unquote(locale), unquote(calendar)) do
+      def era(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :eras])))
       end
 
-      def period(unquote(locale), unquote(calendar)) do
+      def period(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :day_periods])))
       end
 
-      def quarter(unquote(locale), unquote(calendar)) do
+      def quarter(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :quarters])))
       end
 
-      def month(unquote(locale), unquote(calendar)) do
+      def month(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :months])))
       end
 
-      def day(unquote(locale), unquote(calendar)) do
+      def day(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :days])))
       end
     end
 
-    def era(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
-    def period(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
-    def quarter(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
-    def month(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
-    def day(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
+    def era(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def period(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def quarter(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def month(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def day(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
   end
 
   def era(locale, _calendar), do: {:error, Locale.locale_error(locale)}

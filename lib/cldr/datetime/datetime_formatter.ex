@@ -142,6 +142,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   alias Cldr.DateTime.{Format, Compiler, Timezone}
+  alias Cldr.LanguageTag
   alias Cldr.Calendar, as: Kalendar
   alias Cldr.Locale
   alias Cldr.Math
@@ -1365,16 +1366,16 @@ defmodule Cldr.DateTime.Formatter do
   def day_of_week(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
   def day_of_week(%{year: year, month: month, day: day, calendar: calendar}, n, locale, _options)
   when n in 1..2 do
-    iso_day_of_week = calendar.day_of_week(year, month, day)
-    territory = Cldr.region_from_locale(locale)
+    # Calendar day is based upon Monday == 1
+    calendar_day_of_week = calendar.day_of_week(year, month, day)
 
-    week_starts_on = get_in(Kalendar.week_data, [:first_day, String.to_existing_atom(territory)])
-    locale_day_of_week = day_ordinal(week_starts_on)
+    # Locale start of week can be Monday == 1 through Sunday == 7
+    week_starts_on =
+      Kalendar.week_data
+      |> get_in([:first_day, String.to_existing_atom(locale.region)])
+      |> day_ordinal
 
-    # FIXME
-    # Now we have to convert the iso_day_of_week into
-    # the day of the week the locale uses
-    Math.amod(iso_day_of_week + locale_day_of_week - 1, 7)
+    Math.amod(calendar_day_of_week - week_starts_on + 1, 7)
     |> trunc
     |> pad(n)
   end
@@ -1576,11 +1577,10 @@ defmodule Cldr.DateTime.Formatter do
   def period_noon_midnight(%{hour: hour, minute: minute} = time, n, locale, options)
   when (rem(hour, 12) == 0 or rem(hour, 24) == 0) and minute == 0 do
     calendar = Map.get(time, :calendar, options[:calendar] || Calendar.ISO)
-    language = Cldr.language_from_locale(locale)
     type = period_type(n)
 
-    if language_has_noon_and_midnight?(language) do
-      time_period = time_period_for(time, language)
+    if language_has_noon_and_midnight?(locale.language) do
+      time_period = time_period_for(time, locale.language)
       get_period(locale, calendar, :format, type, time_period, options)
     else
       period_am_pm(time, n, locale, options)
@@ -1639,8 +1639,7 @@ defmodule Cldr.DateTime.Formatter do
   def period_flex(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
   def period_flex(%{hour: _hour, minute: _minute} = time, n, locale, options) do
     calendar = Map.get(time, :calendar, options[:calendar] || Calendar.ISO)
-    language = Cldr.language_from_locale(locale)
-    time_period = time_period_for(time, language)
+    time_period = time_period_for(time, locale.language)
     type = period_type(n)
 
     get_period(locale, calendar, :format, type, time_period, options)
@@ -2582,25 +2581,27 @@ defmodule Cldr.DateTime.Formatter do
 
   # Compile the formats used for timezones GMT format
   defp gmt_tz_format(locale, offset, options \\ [])
-  for locale <- Cldr.known_locales do
-    gmt_format = Cldr.DateTime.Format.gmt_format(locale)
-    gmt_zero_format = Cldr.DateTime.Format.gmt_zero_format(locale)
-    {pos_format, neg_format} = Cldr.DateTime.Format.hour_format(locale)
+  for locale_name <- Cldr.known_locales do
+    gmt_format = Cldr.DateTime.Format.gmt_format(locale_name)
+    gmt_zero_format = Cldr.DateTime.Format.gmt_zero_format(locale_name)
+    {pos_format, neg_format} = Cldr.DateTime.Format.hour_format(locale_name)
     {:ok, pos_transforms} = Compiler.compile(pos_format)
     {:ok, neg_transforms} = Compiler.compile(neg_format)
 
-    defp gmt_tz_format(unquote(locale), %{hour: 0, minute: 0}, _options) do
+    defp gmt_tz_format(%LanguageTag{cldr_locale_name: unquote(locale_name)}, %{hour: 0, minute: 0}, _options) do
       unquote(gmt_zero_format)
     end
 
-    defp gmt_tz_format(unquote(locale) = locale, %{hour: hour, minute: _minute} = date, options) when hour >= 0 do
+    defp gmt_tz_format(%LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
+          %{hour: hour, minute: _minute} = date, options) when hour >= 0 do
       unquote(pos_transforms)
       |> gmt_format_type(options[:format] || :long)
       |> Cldr.Substitution.substitute(unquote(gmt_format))
       |> Enum.join
     end
 
-    defp gmt_tz_format(unquote(locale) = locale, %{hour: _hour, minute: _minute} = date, options) do
+    defp gmt_tz_format(%LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
+          %{hour: _hour, minute: _minute} = date, options) do
       unquote(neg_transforms)
       |> gmt_format_type(options[:format] || :long)
       |> Cldr.Substitution.substitute(unquote(gmt_format))
