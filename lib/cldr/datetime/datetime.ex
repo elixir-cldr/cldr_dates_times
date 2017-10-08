@@ -17,6 +17,7 @@ defmodule Cldr.DateTime do
 
   require Cldr
   alias Cldr.DateTime.{Format, Formatter}
+  alias Cldr.LanguageTag
 
   @format_types [:short, :medium, :long, :full]
 
@@ -39,26 +40,26 @@ defmodule Cldr.DateTime do
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.DateTime.to_string datetime
+      iex> Cldr.DateTime.to_string datetime, locale: Cldr.Locale.new("en")
       {:ok, "Jan 1, 2000, 11:59:59 PM"}
-      iex> Cldr.DateTime.to_string datetime, format: :long
+      iex> Cldr.DateTime.to_string datetime, format: :long, locale: Cldr.Locale.new("en")
       {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
-      iex> Cldr.DateTime.to_string datetime, format: :full
+      iex> Cldr.DateTime.to_string datetime, format: :full, locale: Cldr.Locale.new("en")
       {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
-      iex> Cldr.DateTime.to_string datetime, format: :full, locale: "fr"
+      iex> Cldr.DateTime.to_string datetime, format: :full, locale: Cldr.Locale.new("fr")
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
-  """
 
+  """
   def to_string(date, options \\ [])
   def to_string(%{year: _year, month: _month, day: _day, hour: _hour, minute: _minute,
       second: _second, calendar: calendar} = datetime, options) do
-    default_options = [format: :medium, locale: Cldr.get_current_locale()]
-    options = Keyword.merge(default_options, options)
+    options = Keyword.merge(default_options(), options)
 
-    with {:ok, locale} <- Cldr.valid_locale?(options[:locale]),
-         {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
-         {:ok, format_string} <- format_string_from_format(options[:format], locale, cldr_calendar),
-         {:ok, formatted} <- Formatter.format(datetime, format_string, locale, options)
+    with \
+      {:ok, locale} <- Cldr.validate_locale(options[:locale]),
+      {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
+      {:ok, format_string} <- format_string_from_format(options[:format], locale, cldr_calendar),
+      {:ok, formatted} <- Formatter.format(datetime, format_string, locale, options)
     do
       {:ok, formatted}
     else
@@ -68,6 +69,10 @@ defmodule Cldr.DateTime do
 
   def to_string(datetime, _options) do
     error_return(datetime, [:year, :month, :day, :hour, :minute, :second, :calendar])
+  end
+
+  defp default_options do
+    [format: :medium, locale: Cldr.get_current_locale()]
   end
 
   @doc """
@@ -88,13 +93,13 @@ defmodule Cldr.DateTime do
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.DateTime.to_string! datetime
+      iex> Cldr.DateTime.to_string! datetime, locale: Cldr.Locale.new("en")
       "Jan 1, 2000, 11:59:59 PM"
-      iex> Cldr.DateTime.to_string! datetime, format: :long
+      iex> Cldr.DateTime.to_string! datetime, format: :long, locale: Cldr.Locale.new("en")
       "January 1, 2000 at 11:59:59 PM UTC"
-      iex> Cldr.DateTime.to_string! datetime, format: :full
+      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: Cldr.Locale.new("en")
       "Saturday, January 1, 2000 at 11:59:59 PM GMT"
-      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: "fr"
+      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: Cldr.Locale.new("fr")
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
   """
@@ -107,9 +112,10 @@ defmodule Cldr.DateTime do
   end
 
   # Standard format
-  defp format_string_from_format(format, locale, calendar) when format in @format_types do
+  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
+  when format in @format_types do
     format_string =
-      locale
+      locale_name
       |> Format.date_time_formats(calendar)
       |> Map.get(format)
 
@@ -117,9 +123,9 @@ defmodule Cldr.DateTime do
   end
 
   # Look up for the format in :available_formats
-  defp format_string_from_format(format, locale, calendar) when is_atom(format) do
+  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar) when is_atom(format) do
     format_string =
-      locale
+      locale_name
       |> Format.date_time_available_formats(calendar)
       |> Map.get(format)
 

@@ -12,6 +12,7 @@ defmodule Cldr.Calendar do
   This module will be extacted in the future to become part of
   a separate calendrical module.
   """
+  alias Cldr.LanguageTag
   alias Cldr.Calendar.Conversion
   alias Cldr.Calendar.ISOWeek
   alias Cldr.Locale
@@ -35,7 +36,7 @@ defmodule Cldr.Calendar do
   end
 
   # Default territory is "World"
-  @default_territory :"001"
+  @default_region Cldr.default_region |> String.to_atom
 
   @doc """
   Returns the CLDR data that defines the structure
@@ -66,6 +67,26 @@ defmodule Cldr.Calendar do
   end
 
   @doc """
+  Returns the first day of a week for a locale as an ordinal number
+  in then range one to seven with one representing Monday and seven
+  representing Sunday.
+
+  ## Example
+
+      iex> Cldr.Calendar.first_day_of_week Cldr.Locale.new("en")
+      7
+
+      iex> Cldr.Calendar.first_day_of_week Cldr.Locale.new("en-GB")
+      1
+
+  """
+  def first_day_of_week(locale) do
+    (get_in(week_data(), [:first_day, region_from_locale(locale)]) ||
+     get_in(week_data(), [:first_day, @default_region]))
+    |> day_ordinal
+  end
+
+  @doc """
   Returns the minimum days required in a week for it
   to be considered week one of a year.
 
@@ -78,8 +99,8 @@ defmodule Cldr.Calendar do
       4
 
   """
-  def minumim_days_in_week_one(territory \\ @default_territory) do
-    get_in(week_data(), [:min_days, territory])
+  def minumim_days_in_week_one(region \\ @default_region) do
+    get_in(week_data(), [:min_days, region])
   end
 
   @doc """
@@ -355,6 +376,32 @@ defmodule Cldr.Calendar do
     add(date, n * -1)
   end
 
+  defp region_from_locale(locale) do
+    try do
+      String.to_existing_atom(locale.region)
+    catch
+      _, _ -> String.to_existing_atom(Cldr.default_region)
+    end
+  end
+
+  # erlang/elixir standard is that Monday -> 1
+  def day_key(1), do: :mon
+  def day_key(2), do: :tue
+  def day_key(3), do: :wed
+  def day_key(4), do: :thu
+  def day_key(5), do: :fri
+  def day_key(6), do: :sat
+  def day_key(7), do: :sun
+
+  def day_ordinal("mon"), do: 1
+  def day_ordinal("tue"), do: 2
+  def day_ordinal("wed"), do: 3
+  def day_ordinal("thu"), do: 4
+  def day_ordinal("fri"), do: 5
+  def day_ordinal("sat"), do: 6
+  def day_ordinal("sun"), do: 7
+  def day_ordinal(_), do: nil
+
   @doc """
   Returns the first day of the month.
 
@@ -433,9 +480,9 @@ defmodule Cldr.Calendar do
   @doc false
   def day(locale, calendar)
 
-  for locale <- Cldr.known_locales() do
+  for locale_name <- Cldr.known_locales() do
     date_data =
-      locale
+      locale_name
       |> Cldr.Config.get_locale
       |> Map.get(:dates)
 
@@ -446,32 +493,32 @@ defmodule Cldr.Calendar do
       |> Map.keys
 
     for calendar <- calendars do
-      def era(unquote(locale), unquote(calendar)) do
+      def era(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :eras])))
       end
 
-      def period(unquote(locale), unquote(calendar)) do
+      def period(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :day_periods])))
       end
 
-      def quarter(unquote(locale), unquote(calendar)) do
+      def quarter(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :quarters])))
       end
 
-      def month(unquote(locale), unquote(calendar)) do
+      def month(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :months])))
       end
 
-      def day(unquote(locale), unquote(calendar)) do
+      def day(%LanguageTag{cldr_locale_name: unquote(locale_name)}, unquote(calendar)) do
         unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :days])))
       end
     end
 
-    def era(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
-    def period(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
-    def quarter(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
-    def month(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
-    def day(unquote(locale), calendar), do: {:error, calendar_error(calendar)}
+    def era(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def period(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def quarter(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def month(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def day(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
   end
 
   def era(locale, _calendar), do: {:error, Locale.locale_error(locale)}

@@ -40,9 +40,10 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, "~> 0.6.1"},
-      {:ex_doc, ">= 0.0.0", only: :dev},
-      {:stream_data, ">= 0.1.1", only: :test}
+      {:ex_cldr, path: "../cldr", override: true},
+      {:ex_cldr_numbers, path: "../cldr_numbers"},
+      {:ex_doc, ">= 0.0.0", optional: true, only: :dev},
+      {:stream_data, ">= 0.3.0", only: :test}
     ]
   end
 

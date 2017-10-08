@@ -12,6 +12,7 @@ defmodule Cldr.Time do
   """
 
   alias Cldr.DateTime.{Format, Formatter}
+  alias Cldr.LanguageTag
 
   @doc """
   Formats a time according to a format string
@@ -51,14 +52,14 @@ defmodule Cldr.Time do
 
   def to_string(time, options \\ [])
   def to_string(%{hour: _hour, minute: _minute} = time, options) do
-    default_options = [format: :medium, locale: Cldr.get_current_locale()]
-    options = Keyword.merge(default_options, options)
+    options = Keyword.merge(default_options(), options)
     calendar = Map.get(time, :calendar) || Calendar.ISO
 
-    with {:ok, locale} <- Cldr.valid_locale?(options[:locale]),
-         {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
-         {:ok, format_string} <- format_string_from_format(options[:format], locale, cldr_calendar),
-         {:ok, formatted} <- Formatter.format(time, format_string, locale, options)
+    with \
+      {:ok, locale} <- Cldr.validate_locale(options[:locale]),
+      {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
+      {:ok, format_string} <- format_string_from_format(options[:format], locale, cldr_calendar),
+      {:ok, formatted} <- Formatter.format(time, format_string, locale, options)
     do
       {:ok, formatted}
     else
@@ -68,6 +69,10 @@ defmodule Cldr.Time do
 
   def to_string(time, _options) do
     error_return(time, [:hour, :minute, :second])
+  end
+
+  defp default_options do
+    [format: :medium, locale: Cldr.get_current_locale()]
   end
 
   @doc """
@@ -111,9 +116,10 @@ defmodule Cldr.Time do
     end
   end
 
-  defp format_string_from_format(format, locale, calendar) when format in @format_types do
+  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
+  when format in @format_types do
     format_string =
-      locale
+      locale_name
       |> Format.time_formats(calendar)
       |> Map.get(format)
 
