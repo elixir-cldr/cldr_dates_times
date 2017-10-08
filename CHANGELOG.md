@@ -1,5 +1,11 @@
 # Changelog
 
+## Cldr_Dates_Times v0.1.2 October 8th, 2017
+
+### Bug Fixes
+
+* Add `src` directory to the hex package definition
+
 ## Cldr_Dates_Times v0.1.1 September 18th, 2017
 
 ### Enhancements

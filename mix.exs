@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "0.1.1"
+  @version "0.1.2"
 
   def project do
     [
@@ -53,7 +53,7 @@ defmodule CldrDatesTimes.Mixfile do
       licenses: ["Apache 2.0"],
       links: links(),
       files: [
-        "lib", "config", "mix.exs", "README*", "CHANGELOG*", "LICENSE*"
+        "lib", "config", "src", "mix.exs", "README*", "CHANGELOG*", "LICENSE*"
       ]
     ]
   end
