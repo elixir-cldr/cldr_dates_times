@@ -2,7 +2,7 @@ defmodule Cldr.DatesTimes.Test do
   use ExUnit.Case, async: true
   use ExUnitProperties
 
-  for year <- 0001..3000 do
+  for year <- 0001..2100 do
     starts = Cldr.Calendar.ISOWeek.first_day_of_year(year)
     ends = Cldr.Calendar.ISOWeek.last_day_of_year(year)
 

@@ -1,8 +1,10 @@
 # Changelog
 
-## Cldr_Dates_Times v0.1.3 September __th, 2017
+## Cldr_Dates_Times v0.3.0 Octoebr 25th, 2017
 
 ### Enhancements
+
+* Update to `ex_cldr` version 0.8.1
 
 * Reflect that `Cldr.territory_from_locale/1` is now `Cldr.region_from_locale/1`
 
