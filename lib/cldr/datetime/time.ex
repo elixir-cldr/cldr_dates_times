@@ -112,6 +112,9 @@ defmodule Cldr.Time do
       iex> Cldr.Time.to_string! ~T[07:35:13.215217], format: :short
       "7:35 AM"
 
+      iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :short, period: :variant
+      {:ok, "7:35 am"}
+
       iex> Cldr.Time.to_string! ~T[07:35:13.215217], format: :medium, locale: "fr"
       "07:35:13"
 
