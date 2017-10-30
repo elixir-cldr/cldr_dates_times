@@ -21,16 +21,21 @@ defmodule Cldr.Time do
   Returns either `{:ok, formatted_time}` or `{:error, reason}`.
 
   * `time` is a `%DateTime{}` or `%NaiveDateTime{}` struct or any map that contains the keys
-  `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
+    `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
 
   * `options` is a keyword list of options for formatting.  The valid options are:
 
-    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.  The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
-    * `number_system:` a number system into which the formatted date digits should be transliterated
-    * `era: nil | :variant` will use a variant for the era is one is available in the locale
-    * `period: nil | :variant` will use a variant for the time period and flexible time period if
-      one is available in the locale
+    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
+       The default is `:medium`
+    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `
+      Cldr.get_current_locale()`
+    * `number_system:` a number system into which the formatted date digits should
+      be transliterated
+    * `era: :variant` will use a variant for the era is one is available in the locale.
+      In the "en" locale, for example, `era: :variant` will return "BCE" instead of "BC".
+    * `period: :variant` will use a variant for the time period and flexible time period if
+      one is available in the locale.  For example, in the "en" locale `period: :variant` will
+      return "pm" instead of "PM"
 
   ## Examples
 
