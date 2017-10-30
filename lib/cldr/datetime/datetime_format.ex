@@ -194,7 +194,7 @@ defmodule Cldr.DateTime.Format do
     hour_formats = List.to_tuple(String.split(get_in(locale_data, [:dates, :time_zone_names, :hour_format]), ";"))
     def hour_format(unquote(locale)), do: unquote(hour_formats)
 
-    for calendar <- Cldr.Config.calendars_for_locale(locale_data) do
+    for calendar <- calendars do
       calendar_data =
         locale_data
         |> Map.get(:dates)

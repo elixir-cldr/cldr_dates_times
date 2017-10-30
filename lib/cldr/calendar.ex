@@ -380,7 +380,7 @@ defmodule Cldr.Calendar do
     try do
       String.to_existing_atom(locale.region)
     catch
-      _, _ -> String.to_existing_atom(Cldr.default_region)
+      _, _ -> @default_region
     end
   end
 
