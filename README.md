@@ -184,7 +184,7 @@ Add `ex_cldr_dates_time` as a dependency to your `mix` project:
 
     defp deps do
       [
-        {:ex_cldr_dates_times, "~> 0.1.1"}
+        {:ex_cldr_dates_times, "~> 0.2.1"}
       ]
     end
 
@@ -192,5 +192,3 @@ then retrieve `ex_cldr_dates_times` from [hex](https://hex.pm/packages/ex_cldr_d
 
     mix deps.get
     mix deps.compile
-
-

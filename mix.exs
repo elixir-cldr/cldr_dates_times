@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.2.1"
 
   def project do
     [
@@ -40,7 +40,7 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, "~> 0.8.1"},
+      {:ex_cldr, "~> 0.8.2"},
       {:ex_cldr_numbers, "~> 0.2.0"},
       {:ex_doc, ">= 0.18.1", optional: true, only: :dev},
       {:stream_data, ">= 0.3.0", only: :test}
