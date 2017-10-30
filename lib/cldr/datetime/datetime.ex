@@ -28,8 +28,8 @@ defmodule Cldr.DateTime do
   Returns `{:ok, formatted_datetime}` or `{:error, reason}`.
 
   * `datetime` is a `%DateTime{}` `or %NaiveDateTime{}`struct or any map that contains the keys
-  `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
-  `:microsecond`.
+    `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
+    `:microsecond`.
 
   * `options` is a keyword list of options for formatting.  The valid options are:
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
