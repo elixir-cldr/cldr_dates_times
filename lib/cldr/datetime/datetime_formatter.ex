@@ -414,26 +414,26 @@ defmodule Cldr.DateTime.Formatter do
       "CE"
 
       iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO},
-      ...> 4, "fr", alt: :variant
-      "de l’ère commune"
-
-      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO},
       ...> 4, "fr"
       "après Jésus-Christ"
+
+      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO},
+      ...> 4, "fr", alt: :variant
+      "de l’ère commune"
 
   """
   @spec era(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def era(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
   def era(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, n, locale, options) when n in 1..3 do
-    get_era(date, :era_abbr, locale, options)
+    get_era(date, :era_abbr, locale, options[:alt])
   end
 
   def era(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 4, locale, options) do
-    get_era(date, :era_names, locale, options)
+    get_era(date, :era_names, locale, options[:alt])
   end
 
   def era(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 5, locale, options) do
-    get_era(date, :era_narrow, locale, options)
+    get_era(date, :era_narrow, locale, options[:alt])
   end
 
   def era(date, _n, _locale, _options) do
@@ -1509,17 +1509,27 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex(15)> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}
       "AM"
 
-      iex(16)> Cldr.DateTime.Formatter.period_am_pm %{hour: 3, minute: 0}
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 3, minute: 0}
       "AM"
 
-      iex(17)> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}
       "PM"
 
-      iex(18)> Cldr.DateTime.Formatter.period_am_pm %{hour: 21, minute: 0}
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 21, minute: 0}
       "PM"
+
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}, 1, "en", alt: :variant
+      "am"
+
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}, 1, "en", alt: :variant
+      "pm"
+
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}, 1, "fr", alt: :variant
+      "PM"
+
   """
   @spec period_am_pm(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def period_am_pm(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -1527,8 +1537,8 @@ defmodule Cldr.DateTime.Formatter do
     calendar = Map.get(time, :calendar, options[:calendar] || Calendar.ISO)
     type = period_type(n)
 
-    key = am_or_pm(time, options[:variant])
-    get_period(locale, calendar, :format, type, key, options)
+    key = am_or_pm(time, options)
+    get_period(locale, calendar, :format, type, key, options[:alt])
   end
 
   def period_am_pm(time, _n, _locale, _options) do
@@ -1585,6 +1595,11 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 16, minute: 0}
       "PM"
+
+      iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 16, minute: 0}, 1, "en",
+      ...> alt: :variant
+      "pm"
+
   """
   @spec period_noon_midnight(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def period_noon_midnight(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -1595,7 +1610,7 @@ defmodule Cldr.DateTime.Formatter do
 
     if language_has_noon_and_midnight?(locale.language) do
       time_period = time_period_for(time, locale.language)
-      get_period(locale, calendar, :format, type, time_period, options)
+      get_period(locale, calendar, :format, type, time_period, options[:alt])
     else
       period_am_pm(time, n, locale, options)
     end
@@ -1656,7 +1671,7 @@ defmodule Cldr.DateTime.Formatter do
     time_period = time_period_for(time, locale.language)
     type = period_type(n)
 
-    get_period(locale, calendar, :format, type, time_period, options)
+    get_period(locale, calendar, :format, type, time_period, options[:alt])
   end
 
   def period_flex(time, _n, _locale, _options) do
@@ -2695,13 +2710,27 @@ defmodule Cldr.DateTime.Formatter do
   defp sign(number) when number >= 0, do: "+"
   defp sign(_number), do: "-"
 
-  defp get_era(%{calendar: calendar} = date, type, locale, options) do
+  defp get_era(%{calendar: calendar} = date, type, locale, nil) do
     {:ok, cldr_calendar} = type_from_calendar(calendar)
-    variant = options[:alt]
 
     locale
     |> Cldr.Calendar.era(cldr_calendar)
-    |> get_in([type, era_key(date, cldr_calendar, variant)])
+    |> get_in([type, era_key(date, cldr_calendar, nil)])
+  end
+
+  defp get_era(%{calendar: calendar} = date, type, locale, :variant) do
+    {:ok, cldr_calendar} = type_from_calendar(calendar)
+
+    era =
+      locale
+      |> Cldr.Calendar.era(cldr_calendar)
+      |> get_in([type, era_key(date, cldr_calendar, :variant)])
+
+    if era do
+      era
+    else
+      get_era(date, type, locale, nil)
+    end
   end
 
   defp era_key(date, calendar, variant) do
@@ -2713,12 +2742,27 @@ defmodule Cldr.DateTime.Formatter do
     end
   end
 
-  defp get_period(locale, calendar, type, style, key, _options) do
+  defp get_period(locale, calendar, type, style, key, nil) do
     {:ok, cldr_calendar} = type_from_calendar(calendar)
 
     locale
     |> Cldr.Calendar.period(cldr_calendar)
     |> get_in([type, style, key])
+  end
+
+  defp get_period(locale, calendar, type, style, key, :variant) do
+    {:ok, cldr_calendar} = type_from_calendar(calendar)
+
+    period =
+      locale
+      |> Cldr.Calendar.period(cldr_calendar)
+      |> get_in([type, style, :"#{key}_alt_variant"])
+
+    if period do
+      period
+    else
+      get_period(locale, calendar, type, style, key, nil)
+    end
   end
 
   defp get_month(month, locale, calendar, type, style) do
