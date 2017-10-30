@@ -390,8 +390,10 @@ defmodule Cldr.DateTime.Formatter do
   * `locale` is any locale returned by `Cldr.known_locales/0` which
   determines the localisation of the format
 
-  * `options` is a `Keyword` list of options.  There are no options
-  used in `era/4`
+  * `options` is a `Keyword` list of options.  The only applicable
+    option is `:alt` with a value of either `nil` (the default) or
+    `:variant` which will return the variant form of an era if
+    available.
 
   The representation of the era is made in accordance
   with the following table:
@@ -403,6 +405,21 @@ defmodule Cldr.DateTime.Formatter do
   | GGGGG      | "A"             | Narrow                      |
 
   ## Examples
+
+      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO}, 1
+      "AD"
+
+      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO}, 1,
+      ...> "en", alt: :variant
+      "CE"
+
+      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO},
+      ...> 4, "fr", alt: :variant
+      "de l’ère commune"
+
+      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO},
+      ...> 4, "fr"
+      "après Jésus-Christ"
 
   """
   @spec era(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
@@ -2680,17 +2697,17 @@ defmodule Cldr.DateTime.Formatter do
 
   defp get_era(%{calendar: calendar} = date, type, locale, options) do
     {:ok, cldr_calendar} = type_from_calendar(calendar)
-    variant? = options[:variant]
+    variant = options[:alt]
 
     locale
     |> Cldr.Calendar.era(cldr_calendar)
-    |> get_in([type, era_key(date, cldr_calendar, variant?)])
+    |> get_in([type, era_key(date, cldr_calendar, variant)])
   end
 
-  defp era_key(date, calendar, variant?) do
+  defp era_key(date, calendar, variant) do
     index = Kalendar.era_number_from_date(date, calendar)
-    if variant? do
-      :"#{index}_alt_variant"
+    if variant do
+      :"#{index}_alt_#{variant}"
     else
       index
     end
