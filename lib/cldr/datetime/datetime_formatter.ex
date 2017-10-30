@@ -170,7 +170,8 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.format %{year: 2017, month: 9, day: 3, hour: 10, minute: 23}, "yy/MM/dd hh:MM", "en"
+      iex> Cldr.DateTime.Formatter.format %{year: 2017, month: 9, day: 3, hour: 10, minute: 23},
+      ...> "yy/MM/dd hh:MM", "en"
       {:ok, "17/09/03 10:09"}
 
   """
@@ -391,9 +392,9 @@ defmodule Cldr.DateTime.Formatter do
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  The only applicable
-    option is `:alt` with a value of either `nil` (the default) or
-    `:variant` which will return the variant form of an era if
-    available.
+    option is `:era` with a value of either `nil` (the default) or
+    `:variant` which will return the variant form of an era if one
+    is available.
 
   The representation of the era is made in accordance
   with the following table:
@@ -410,7 +411,7 @@ defmodule Cldr.DateTime.Formatter do
       "AD"
 
       iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO}, 1,
-      ...> "en", alt: :variant
+      ...> "en", era: :variant
       "CE"
 
       iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO},
@@ -418,22 +419,23 @@ defmodule Cldr.DateTime.Formatter do
       "après Jésus-Christ"
 
       iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO},
-      ...> 4, "fr", alt: :variant
+      ...> 4, "fr", era: :variant
       "de l’ère commune"
 
   """
   @spec era(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @era_variant :era
   def era(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
   def era(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, n, locale, options) when n in 1..3 do
-    get_era(date, :era_abbr, locale, options[:alt])
+    get_era(date, :era_abbr, locale, options[@era_variant])
   end
 
   def era(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 4, locale, options) do
-    get_era(date, :era_names, locale, options[:alt])
+    get_era(date, :era_names, locale, options[@era_variant])
   end
 
   def era(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 5, locale, options) do
-    get_era(date, :era_narrow, locale, options[:alt])
+    get_era(date, :era_narrow, locale, options[@era_variant])
   end
 
   def era(date, _n, _locale, _options) do
@@ -1483,16 +1485,17 @@ defmodule Cldr.DateTime.Formatter do
   Returns a localised version of `am` or `pm` (format symbol `a`).
 
   * `time` is a `Time` struct or any map that contains at least the
-  key `:second`
+    key `:second`
 
   * `n` in an integer between 1 and 5 that determines the format of the
-  time period
+    time period
 
   * `locale` is any locale returned by `Cldr.known_locales/0` which
-  determines the localisation of the format
+    determines the localisation of the format
 
-  * `options` is a `Keyword` list of options.  There are no options used in
-  `period_am_pm/4`
+  * `options` is a `Keyword` list of options.  The available option is
+    `period: :variant` which will use a veriant of localised "am" or
+    "pm" if one is available
 
   May be upper or lowercase depending on the locale and other options.
   The wide form may be the same as the short form if the “real”
@@ -1521,24 +1524,25 @@ defmodule Cldr.DateTime.Formatter do
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 21, minute: 0}
       "PM"
 
-      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}, 1, "en", alt: :variant
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}, 1, "en", period: :variant
       "am"
 
-      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}, 1, "en", alt: :variant
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}, 1, "en", period: :variant
       "pm"
 
-      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}, 1, "fr", alt: :variant
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}, 1, "fr", period: :variant
       "PM"
 
   """
   @spec period_am_pm(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @period_variant :period
   def period_am_pm(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
   def period_am_pm(%{hour: _hour} = time, n, locale, options)  do
     calendar = Map.get(time, :calendar, options[:calendar] || Calendar.ISO)
     type = period_type(n)
 
     key = am_or_pm(time, options)
-    get_period(locale, calendar, :format, type, key, options[:alt])
+    get_period(locale, calendar, :format, type, key, options[@period_variant])
   end
 
   def period_am_pm(time, _n, _locale, _options) do
@@ -1554,16 +1558,17 @@ defmodule Cldr.DateTime.Formatter do
   `noon`, `midnight` or `am`/`pm` (format symbol 'b').
 
   * `time` is a `Time` struct or any map that contains at least the
-  key `:second`
+    key `:second`
 
   * `n` in an integer between 1 and 5 that determines the format of the
-  time period
+    time period
 
   * `locale` is any locale returned by `Cldr.known_locales/0` which
-  determines the localisation of the format
+    determines the localisation of the format
 
-  * `options` is a `Keyword` list of options.  There are no options used in
-  `period_noon_midnight/4`
+  * `options` is a `Keyword` list of options.  The available option is
+    `period: :variant` which will use a veriant of localised "noon" and
+    "midnight" if one is available
 
   If the langauge doesn't support "noon" or "midnight" then
   `am`/`pm` is used for all time periods.
@@ -1597,7 +1602,7 @@ defmodule Cldr.DateTime.Formatter do
       "PM"
 
       iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 16, minute: 0}, 1, "en",
-      ...> alt: :variant
+      ...> period: :variant
       "pm"
 
   """
@@ -1610,7 +1615,7 @@ defmodule Cldr.DateTime.Formatter do
 
     if language_has_noon_and_midnight?(locale.language) do
       time_period = time_period_for(time, locale.language)
-      get_period(locale, calendar, :format, type, time_period, options[:alt])
+      get_period(locale, calendar, :format, type, time_period, options[@period_variant])
     else
       period_am_pm(time, n, locale, options)
     end
@@ -1629,16 +1634,17 @@ defmodule Cldr.DateTime.Formatter do
   example `at night` (format symbol `B`).
 
   * `time` is a `Time` struct or any map that contains at least the
-  key `:second`
+    key `:second`
 
   * `n` in an integer between 1 and 5 that determines the format of the
-  time period
+    time period
 
   * `locale` is any locale returned by `Cldr.known_locales/0` which
-  determines the localisation of the format
+    determines the localisation of the format
 
-  * `options` is a `Keyword` list of options.  There are no options used in
-  `period_flex/4`
+  * `options` is a `Keyword` list of options.  The available option is
+    `period: :variant` which will use a veriant of localised flexible time
+    period names if one is available
 
   The time period may be upper or lowercase depending on the locale and
   other options.  Often there is only one width that is customarily used.
@@ -1671,7 +1677,7 @@ defmodule Cldr.DateTime.Formatter do
     time_period = time_period_for(time, locale.language)
     type = period_type(n)
 
-    get_period(locale, calendar, :format, type, time_period, options[:alt])
+    get_period(locale, calendar, :format, type, time_period, options[@period_variant])
   end
 
   def period_flex(time, _n, _locale, _options) do

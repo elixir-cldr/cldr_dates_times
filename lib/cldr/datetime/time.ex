@@ -28,6 +28,9 @@ defmodule Cldr.Time do
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.  The default is `:medium`
     * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
     * `number_system:` a number system into which the formatted date digits should be transliterated
+    * `era: nil | :variant` will use a variant for the era is one is available in the locale
+    * `period: nil | :variant` will use a variant for the time period and flexible time period if
+      one is available in the locale
 
   ## Examples
 
