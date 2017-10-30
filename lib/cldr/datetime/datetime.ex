@@ -32,10 +32,18 @@ defmodule Cldr.DateTime do
   `:microsecond`.
 
   * `options` is a keyword list of options for formatting.  The valid options are:
-
-    * `format:` `:short` | `:medium` | `:long` | `:full`. any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.  The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
-    * `number_system:` a number system into which the formatted date digits should be transliterated
+    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
+      any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.
+      The default is `:medium`
+    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `
+      Cldr.get_current_locale()`
+    * `number_system:` a number system into which the formatted date digits should
+      be transliterated
+    * `era: :variant` will use a variant for the era is one is available in the locale.
+      In the "en" for example, the locale `era: :variant` will return "BCE" instead of "BC".
+    * `period: :variant` will use a variant for the time period and flexible time period if
+      one is available in the locale.  For example, in the "en" locale `period: :variant` will
+      return "pm" instead of "PM"
 
   ## Examples
 
