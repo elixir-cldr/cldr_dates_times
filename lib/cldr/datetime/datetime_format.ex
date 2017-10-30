@@ -11,6 +11,7 @@ defmodule Cldr.DateTime.Format do
 
   alias Cldr.Calendar, as: Kalendar
   alias Cldr.Locale
+  alias Cldr.LanguageTag
 
   @standard_formats [:short, :medium, :long, :full]
   @type standard_formats :: %{full: String.t, long: String.t, medium: String.t, short: String.t}
@@ -40,8 +41,11 @@ defmodule Cldr.DateTime.Format do
        :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]
 
   """
-  @spec calendars_for(Locale.t) :: [calendar, ...]
+  @spec calendars_for(Locale.name | LanguageTag.t) :: [calendar, ...]
   def calendars_for(locale \\ Cldr.get_current_locale())
+  def calendars_for(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+    calendars_for(cldr_locale_name)
+  end
 
   @doc """
   Returns a map of the standard date formats for a given locale and calendar.
@@ -62,8 +66,11 @@ defmodule Cldr.DateTime.Format do
         short: "M/d/y GGGGG"}
 
   """
-  @spec date_formats(Locale.t, calendar) :: standard_formats
+  @spec date_formats(Locale.name | LanguageTag.t, calendar) :: standard_formats
   def date_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar)
+  def date_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
+    date_formats(cldr_locale_name, calendar)
+  end
 
   @doc """
   Returns a map of the standard time formats for a given locale and calendar.
@@ -84,8 +91,11 @@ defmodule Cldr.DateTime.Format do
         short: "h:mm a"}
 
   """
-  @spec time_formats(Locale.t, calendar) :: standard_formats
+  @spec time_formats(Locale.name | LanguageTag, calendar) :: standard_formats
   def time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar)
+  def time_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
+    time_formats(cldr_locale_name, calendar)
+  end
 
   @doc """
   Returns a map of the standard datetime formats for a given locale and calendar.
@@ -106,8 +116,11 @@ defmodule Cldr.DateTime.Format do
         short: "{1}, {0}"}
 
   """
-  @spec date_time_formats(Locale.t, calendar) :: standard_formats
+  @spec date_time_formats(Locale.name | LanguageTag, calendar) :: standard_formats
   def date_time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar)
+  def date_time_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
+    date_time_formats(cldr_locale_name, calendar)
+  end
 
   @doc """
   Returns a map of the available non-standard datetime formats for a
@@ -134,8 +147,11 @@ defmodule Cldr.DateTime.Format do
         gy_mmm: "MMM y G"}
 
   """
-  @spec date_time_available_formats(Locale.t, calendar) :: formats
+  @spec date_time_available_formats(Locale.name | LanguageTag, calendar) :: formats
   def date_time_available_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar)
+  def date_time_available_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
+    date_time_available_formats(cldr_locale_name, calendar)
+  end
 
   @doc """
   Returns the postive and negative hour format
@@ -149,8 +165,11 @@ defmodule Cldr.DateTime.Format do
       {"+HH:mm", "-HH:mm"}
 
   """
-  @spec hour_format(Locale.t) :: {String.t, String.t}
+  @spec hour_format(Locale.name | LanguageTag) :: {String.t, String.t}
   def hour_format(locale \\ Cldr.get_current_locale())
+  def hour_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+    hour_format(cldr_locale_name)
+  end
 
   @doc """
   Returns the GMT offset format list for a
@@ -164,8 +183,11 @@ defmodule Cldr.DateTime.Format do
       ["GMT", 0]
 
   """
-  @spec gmt_format(Locale.t) :: [non_neg_integer | String.t, ...]
+  @spec gmt_format(Locale.name | LanguageTag) :: [non_neg_integer | String.t, ...]
   def gmt_format(locale \\ Cldr.get_current_locale())
+  def gmt_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+    gmt_format(cldr_locale_name)
+  end
 
   @doc """
   Returns the GMT format string for a
@@ -180,8 +202,11 @@ defmodule Cldr.DateTime.Format do
       "GMT"
 
   """
-  @spec gmt_zero_format(Locale.t) :: String.t
+  @spec gmt_zero_format(Locale.name | LanguageTag) :: String.t
   def gmt_zero_format(locale \\ Cldr.get_current_locale())
+  def gmt_zero_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+    gmt_zero_format(cldr_locale_name)
+  end
 
   for locale <- Cldr.Config.known_locales() do
     locale_data = Cldr.Config.get_locale(locale)
