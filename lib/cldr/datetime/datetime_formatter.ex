@@ -303,7 +303,7 @@ defmodule Cldr.DateTime.Formatter do
   # is appropriate for a given time value.  Note that we sort the time
   # periods such that the "at" periods come before the "from"/"before"
   # periods so that the functions are defined in the right order.
-  for {language, periods} <- Cldr.Config.day_periods() do
+  for {language, periods} <- Cldr.Config.day_period_info() do
     for {period, times} <- Enum.sort(periods, fn {_k, v}, _p2 -> !!Map.get(v, "at") end) do
       case times do
         %{"at" => [h, m]} ->

@@ -44,7 +44,7 @@ defmodule Cldr.Calendar do
 
   ## Example
 
-      Cldr.Calendar.week_data
+      Cldr.Calendar.week_info
       %{first_day: %{IN: "sun", SM: "mon", MN: "mon", MZ: "sun", CR: "mon", AT: "mon",
           LA: "sun", EE: "mon", NL: "mon", PT: "mon", PH: "sun", BG: "mon", LT: "mon",
           ES: "mon", OM: "sat", SY: "sat", US: "sun", EC: "mon", SG: "sun", DM: "sun",
@@ -61,9 +61,9 @@ defmodule Cldr.Calendar do
         weekend_start: nil}
 
   """
-  @week_data Cldr.Config.week_data
-  def week_data do
-    @week_data
+  @week_info Cldr.Config.week_info
+  def week_info do
+    @week_info
   end
 
   @doc """
@@ -81,8 +81,8 @@ defmodule Cldr.Calendar do
 
   """
   def first_day_of_week(locale) do
-    (get_in(week_data(), [:first_day, region_from_locale(locale)]) ||
-     get_in(week_data(), [:first_day, @default_region]))
+    (get_in(week_info(), [:first_day, region_from_locale(locale)]) ||
+     get_in(week_info(), [:first_day, @default_region]))
     |> day_ordinal
   end
 
@@ -100,7 +100,7 @@ defmodule Cldr.Calendar do
 
   """
   def minumim_days_in_week_one(region \\ @default_region) do
-    get_in(week_data(), [:min_days, region])
+    get_in(week_info(), [:min_days, region])
   end
 
   @doc """
@@ -122,9 +122,9 @@ defmodule Cldr.Calendar do
           eras: [{0, %{end: 0}}, {1, %{start: 1}}]}, ...
 
   """
-  @calendar_data Cldr.Config.calendar_data
+  @calendar_info Cldr.Config.calendar_info
   def calendars do
-    @calendar_data
+    @calendar_info
   end
 
   @doc """
@@ -180,7 +180,7 @@ defmodule Cldr.Calendar do
   """
   def era_from_iso_days(iso_days, calendar)
 
-  for {calendar, content} <- @calendar_data do
+  for {calendar, content} <- @calendar_info do
     Enum.each content[:eras], fn
       {era, %{start: start, end: finish}} ->
         def era_from_iso_days(iso_days, unquote(calendar))
