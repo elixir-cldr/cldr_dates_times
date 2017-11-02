@@ -8,6 +8,6 @@ config :ex_cldr,
   precompile_transliterations: [{:latn, :arab}, {:arab, :thai}, {:arab, :latn}]
 
 config :ex_unit,
-  case_load_timeout: 220_000,
+  module_load_timeout: 220_000,
   timeout: 120_000
 
