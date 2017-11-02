@@ -1,10 +1,10 @@
 # Changelog
 
-## Cldr_Dates_Times v0.2.2 November 1st, 2017
+## Cldr_Dates_Times v0.3.0 November 2nd, 2017
 
 ### Enhancements
 
-* Update to `ex_cldr` 0.9.0
+* Update to [ex_cldr](https://hex.pm/packages/ex_cldr) version 0.10.0 which incorporates CLDR data version 32 released on November 1st, 2017.  For further information on the changes in CLDR 32 release consult the [release notes](http://cldr.unicode.org/index/downloads/cldr-32).
 
 ## Cldr_Dates_Times v0.2.1 October 30th, 2017
 
