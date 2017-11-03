@@ -1,5 +1,11 @@
 # Changelog
 
+## Cldr_Dates_Times v0.3.1 November 3rd, 2017
+
+### Enhancements
+
+* Update to [ex_cldr](https://hex.pm/packages/ex_cldr) version 0.11.0 in which the term `territory` is preferred over `region`
+
 ## Cldr_Dates_Times v0.3.0 November 2nd, 2017
 
 ### Enhancements

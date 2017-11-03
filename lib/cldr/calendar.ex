@@ -36,7 +36,7 @@ defmodule Cldr.Calendar do
   end
 
   # Default territory is "World"
-  @default_region Cldr.default_region |> String.to_atom
+  @default_territory Cldr.default_territory
 
   @doc """
   Returns the CLDR data that defines the structure
@@ -81,8 +81,8 @@ defmodule Cldr.Calendar do
 
   """
   def first_day_of_week(locale) do
-    (get_in(week_info(), [:first_day, region_from_locale(locale)]) ||
-     get_in(week_info(), [:first_day, @default_region]))
+    (get_in(week_info(), [:first_day, territory_from_locale(locale)]) ||
+     get_in(week_info(), [:first_day, @default_territory]))
     |> day_ordinal
   end
 
@@ -99,8 +99,8 @@ defmodule Cldr.Calendar do
       4
 
   """
-  def minumim_days_in_week_one(region \\ @default_region) do
-    get_in(week_info(), [:min_days, region])
+  def minumim_days_in_week_one(territory \\ @default_territory) do
+    get_in(week_info(), [:min_days, territory])
   end
 
   @doc """
@@ -376,11 +376,11 @@ defmodule Cldr.Calendar do
     add(date, n * -1)
   end
 
-  defp region_from_locale(locale) do
+  defp territory_from_locale(locale) do
     try do
-      String.to_existing_atom(locale.region)
+      String.to_existing_atom(locale.territory)
     catch
-      _, _ -> @default_region
+      _, _ -> @default_territory
     end
   end
 
