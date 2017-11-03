@@ -9,5 +9,6 @@ config :ex_cldr,
 
 config :ex_unit,
   module_load_timeout: 220_000,
-  timeout: 120_000
+  case_load_timeout: 220_000,
+  timeout: 220_000
 
