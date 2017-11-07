@@ -18,6 +18,8 @@ defmodule Cldr.Calendar do
   alias Cldr.Locale
   require Cldr
 
+  defdelegate known_calendars, to: Cldr
+
   @doc """
   Returns the default CLDR calendar name.
 
@@ -71,24 +73,33 @@ defmodule Cldr.Calendar do
   in then range one to seven with one representing Monday and seven
   representing Sunday.
 
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct returned by `Cldr.Locale.new!/1`
+
   ## Example
 
-      iex> Cldr.Calendar.first_day_of_week Cldr.Locale.new("en")
+      iex> Cldr.Calendar.first_day_of_week "en"
       7
 
-      iex> Cldr.Calendar.first_day_of_week Cldr.Locale.new("en-GB")
+      iex> Cldr.Calendar.first_day_of_week "en-GB"
       1
 
   """
   def first_day_of_week(locale) do
-    (get_in(week_info(), [:first_day, territory_from_locale(locale)]) ||
-     get_in(week_info(), [:first_day, @default_territory]))
-    |> day_ordinal
+    with {:ok, locale} <- Cldr.validate_locale(locale) do
+      (get_in(week_info(), [:first_day, territory_from_locale(locale)]) ||
+       get_in(week_info(), [:first_day, @default_territory]))
+       |> day_ordinal
+    else
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc """
   Returns the minimum days required in a week for it
   to be considered week one of a year.
+
+  * `territory` is any territory code returned by `Cldr.known_territories/0`
 
   ## Examples
 
@@ -100,7 +111,11 @@ defmodule Cldr.Calendar do
 
   """
   def minumim_days_in_week_one(territory \\ @default_territory) do
-    get_in(week_info(), [:min_days, territory])
+    with {:ok, territory} <- Cldr.validate_territory(territory) do
+      get_in(week_info(), [:min_days, territory])
+    else
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc """
@@ -125,22 +140,6 @@ defmodule Cldr.Calendar do
   @calendar_info Cldr.Config.calendar_info
   def calendars do
     @calendar_info
-  end
-
-  @doc """
-  Returns the names of the calendars defined in CLDR.
-
-  ## Example
-
-      iex> Cldr.Calendar.available_calendars
-      [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
-       :gregorian, :hebrew, :indian, :islamic, :islamic_civil, :islamic_rgsa,
-       :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]
-
-  """
-  def available_calendars do
-    calendars()
-    |> Map.keys
   end
 
   @doc """
@@ -238,6 +237,9 @@ defmodule Cldr.Calendar do
   Returns the ordinal day of the year for a given
   date.
 
+  * `date` is a `Date` or any other struct that contains the
+  keys `:year`, `:month`, `;day` and `:calendar`
+
   ## Example
 
       iex> Cldr.Calendar.day_of_year ~D[2017-01-01]
@@ -250,6 +252,7 @@ defmodule Cldr.Calendar do
       365
 
   """
+  @spec day_of_year(Date.t) :: 1..366
   def day_of_year(%{year: year, month: _month, day: _day, calendar: calendar} = date) do
     {days, _fraction} = iso_days_from_date(date)
     {new_year, _fraction} = iso_days_from_date(%{year: year, month: 1, day: 1, calendar: calendar})
@@ -261,6 +264,9 @@ defmodule Cldr.Calendar do
   the first day is Monday and the result is in
   the range `1` (for Monday) to `7` (for Sunday)
 
+  * `date` is a `Date` or any other struct that contains the
+  keys `:year`, `:month`, `;day` and `:calendar`
+
   ## Examples
 
       iex> Cldr.Calendar.day_of_week ~D[2017-09-03]
@@ -270,6 +276,7 @@ defmodule Cldr.Calendar do
       5
 
   """
+  @spec day_of_week(Date.t) :: 1..7
   def day_of_week(%{year: year, month: month, day: day, calendar: calendar}) do
     calendar.day_of_week(year, month, day)
   end
@@ -439,29 +446,6 @@ defmodule Cldr.Calendar do
     {Cldr.UnknownCalendarError, "The calendar #{inspect calendar_name} is not known."}
   end
 
-  @configured_calendars Application.get_env(:ex_cldr, :calendars) || [@default_calendar]
-  @known_calendars "root"
-      |> Cldr.Config.get_locale
-      |> Map.get(:dates)
-      |> Map.get(:calendars)
-      |> Map.keys
-      |> MapSet.new
-      |> MapSet.intersection(MapSet.new(@configured_calendars))
-      |> MapSet.to_list
-
-  @doc """
-  Returns a list of the known calendars in CLDR
-
-  ## Example
-
-      iex> Cldr.Calendar.known_calendars
-      [:gregorian]
-
-  """
-  def known_calendars do
-    @known_calendars
-  end
-
   #
   # Data storage functions
   #
@@ -495,7 +479,7 @@ defmodule Cldr.Calendar do
     day(cldr_locale_name, calendar)
   end
 
-  for locale_name <- Cldr.known_locales() do
+  for locale_name <- Cldr.known_locale_names() do
     date_data =
       locale_name
       |> Cldr.Config.get_locale
@@ -504,7 +488,7 @@ defmodule Cldr.Calendar do
     calendars =
       date_data
       |> Map.get(:calendars)
-      |> Map.take(@known_calendars)
+      |> Map.take(Cldr.known_calendars)
       |> Map.keys
 
     for calendar <- calendars do

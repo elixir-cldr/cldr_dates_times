@@ -321,7 +321,7 @@ defmodule Cldr.DateTime.Relative do
     {:error, time_unit_error(unit)}
   end
 
-  for locale_name <- Cldr.Config.known_locales() do
+  for locale_name <- Cldr.known_locale_names() do
     locale_data =
       locale_name
       |> Cldr.Config.get_locale

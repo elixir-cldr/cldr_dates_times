@@ -30,21 +30,21 @@ defmodule Cldr.Date do
   * `options` is a keyword list of options for formatting.  The valid options are:
 
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.  The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
+    * `locale:` any locale returned by `Cldr.known_locale_names()`.  The default is `Cldr.get_current_locale()`
     * `number_system:` a number system into which the formatted date digits should be transliterated
 
   ## Examples
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], format: :medium, locale: Cldr.Locale.new("en")
+      iex> Cldr.Date.to_string ~D[2017-07-10], format: :medium, locale: Cldr.Locale.new!("en")
       {:ok, "Jul 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], locale: Cldr.Locale.new("en")
+      iex> Cldr.Date.to_string ~D[2017-07-10], locale: Cldr.Locale.new!("en")
       {:ok, "Jul 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], format: :full, locale: Cldr.Locale.new("en")
+      iex> Cldr.Date.to_string ~D[2017-07-10], format: :full, locale: Cldr.Locale.new!("en")
       {:ok, "Monday, July 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], format: :short, locale: Cldr.Locale.new("en")
+      iex> Cldr.Date.to_string ~D[2017-07-10], format: :short, locale: Cldr.Locale.new!("en")
       {:ok, "7/10/17"}
 
       iex> Cldr.Date.to_string ~D[2017-07-10], format: :short, locale: "fr"
@@ -91,21 +91,21 @@ defmodule Cldr.Date do
 
   * `options` is a keyword list of options for formatting.  The valid options are:
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.  The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `Cldr.get_current_locale()`
+    * `locale:` any locale returned by `Cldr.known_locale_names()`.  The default is `Cldr.get_current_locale()`
     * `number_system:` a number system into which the formatted date digits should be transliterated
 
   ## Examples
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :medium, locale: Cldr.Locale.new("en")
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :medium, locale: Cldr.Locale.new!("en")
       "Jul 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], locale: Cldr.Locale.new("en")
+      iex> Cldr.Date.to_string! ~D[2017-07-10], locale: Cldr.Locale.new!("en")
       "Jul 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :full, locale: Cldr.Locale.new("en")
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :full, locale: Cldr.Locale.new!("en")
       "Monday, July 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :short, locale: Cldr.Locale.new("en")
+      iex> Cldr.Date.to_string! ~D[2017-07-10], format: :short, locale: Cldr.Locale.new!("en")
       "7/10/17"
 
       iex> Cldr.Date.to_string! ~D[2017-07-10], format: :short, locale: "fr"

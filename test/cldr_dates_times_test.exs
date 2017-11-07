@@ -41,7 +41,7 @@ defmodule Cldr.DatesTimes.Test do
   test "that locales whose start of week is not Monday produce the correct day of week" do
     date = %{year: 2017, month: 8, day: 15,  calendar: Calendar.ISO}
     assert Cldr.DateTime.Formatter.day_of_week(date, 1) == "2"
-    assert Cldr.DateTime.Formatter.day_of_week(date, 1, Cldr.Locale.new("en")) == "3"
-    assert Cldr.DateTime.Formatter.day_of_week(date, 1, Cldr.Locale.new("en-150")) == "2"
+    assert Cldr.DateTime.Formatter.day_of_week(date, 1, Cldr.Locale.new!("en")) == "3"
+    assert Cldr.DateTime.Formatter.day_of_week(date, 1, Cldr.Locale.new!("en-150")) == "2"
   end
 end

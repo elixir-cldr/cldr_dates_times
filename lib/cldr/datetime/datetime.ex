@@ -35,7 +35,7 @@ defmodule Cldr.DateTime do
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
       any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.
       The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `
+    * `locale:` any locale returned by `Cldr.known_locale_names()`.  The default is `
       Cldr.get_current_locale()`
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
@@ -48,13 +48,13 @@ defmodule Cldr.DateTime do
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.DateTime.to_string datetime, locale: Cldr.Locale.new("en")
+      iex> Cldr.DateTime.to_string datetime, locale: Cldr.Locale.new!("en")
       {:ok, "Jan 1, 2000, 11:59:59 PM"}
-      iex> Cldr.DateTime.to_string datetime, format: :long, locale: Cldr.Locale.new("en")
+      iex> Cldr.DateTime.to_string datetime, format: :long, locale: Cldr.Locale.new!("en")
       {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
-      iex> Cldr.DateTime.to_string datetime, format: :full, locale: Cldr.Locale.new("en")
+      iex> Cldr.DateTime.to_string datetime, format: :full, locale: Cldr.Locale.new!("en")
       {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
-      iex> Cldr.DateTime.to_string datetime, format: :full, locale: Cldr.Locale.new("fr")
+      iex> Cldr.DateTime.to_string datetime, format: :full, locale: Cldr.Locale.new!("fr")
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
   """
@@ -97,7 +97,7 @@ defmodule Cldr.DateTime do
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
       any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.
       The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locales()`.  The default is `
+    * `locale:` any locale returned by `Cldr.known_locale_names()`.  The default is `
       Cldr.get_current_locale()`
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
@@ -110,13 +110,13 @@ defmodule Cldr.DateTime do
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.DateTime.to_string! datetime, locale: Cldr.Locale.new("en")
+      iex> Cldr.DateTime.to_string! datetime, locale: Cldr.Locale.new!("en")
       "Jan 1, 2000, 11:59:59 PM"
-      iex> Cldr.DateTime.to_string! datetime, format: :long, locale: Cldr.Locale.new("en")
+      iex> Cldr.DateTime.to_string! datetime, format: :long, locale: Cldr.Locale.new!("en")
       "January 1, 2000 at 11:59:59 PM UTC"
-      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: Cldr.Locale.new("en")
+      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: Cldr.Locale.new!("en")
       "Saturday, January 1, 2000 at 11:59:59 PM GMT"
-      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: Cldr.Locale.new("fr")
+      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: Cldr.Locale.new!("fr")
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
   """

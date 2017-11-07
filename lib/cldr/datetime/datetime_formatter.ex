@@ -157,7 +157,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `format` is a valid format string, for example `yy/MM/dd hh:MM`
 
-  * `locale` is any locale returned by `Cldr.known_locales/0`
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
 
   * `options` is a keyword list of options.  The valid options are:
 
@@ -388,7 +388,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of
   the year
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  The only applicable
@@ -458,7 +458,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of
   the year
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -529,7 +529,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of
   the year
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -706,7 +706,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of
   the quarter
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -766,7 +766,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of
   the quarter
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -847,7 +847,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of
   the quarter
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -921,7 +921,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of
   the month
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -992,7 +992,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of
   the month
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -1062,7 +1062,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 2 that determines the format of
   the week of the year
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -1117,7 +1117,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` in an integer between that should be 1
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -1157,7 +1157,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 2 that determines the format of
   the day of month
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -1206,7 +1206,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 3 that determines the format of
   the day of year
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -1257,7 +1257,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 6 that determines the format of
   the day of week
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -1332,7 +1332,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 6 that determines the format of
   the day of week
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -1415,7 +1415,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 6 that determines the format of
   the day of week
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options
@@ -1490,7 +1490,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of the
     time period
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
     determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  The available option is
@@ -1563,7 +1563,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of the
     time period
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
     determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  The available option is
@@ -1639,7 +1639,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` in an integer between 1 and 5 that determines the format of the
     time period
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
     determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  The available option is
@@ -1704,7 +1704,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -1764,7 +1764,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -1827,7 +1827,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -1882,7 +1882,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -1940,7 +1940,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of digits to which `:minute` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -1982,7 +1982,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2023,7 +2023,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the number of fractional digits to which the float number of seconds
   is rounded
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2079,7 +2079,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the number of fractional digits to which the float number of seconds
   is rounded
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2141,7 +2141,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the generic non-location timezone format and is either `1` (the
   default) or `4`
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2187,7 +2187,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2232,7 +2232,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2294,7 +2294,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2352,7 +2352,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2461,7 +2461,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2562,7 +2562,7 @@ defmodule Cldr.DateTime.Formatter do
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locales/0` which
+  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
   determines the localisation of the format
 
   * `options` is a `Keyword` list of options.  There are no options used in
@@ -2616,7 +2616,7 @@ defmodule Cldr.DateTime.Formatter do
 
   # Compile the formats used for timezones GMT format
   defp gmt_tz_format(locale, offset, options \\ [])
-  for locale_name <- Cldr.known_locales do
+  for locale_name <- Cldr.known_locale_names do
     gmt_format = Cldr.DateTime.Format.gmt_format(locale_name)
     gmt_zero_format = Cldr.DateTime.Format.gmt_zero_format(locale_name)
     {pos_format, neg_format} = Cldr.DateTime.Format.hour_format(locale_name)
