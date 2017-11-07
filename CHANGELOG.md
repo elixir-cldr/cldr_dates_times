@@ -1,5 +1,11 @@
 # Changelog
 
+## Cldr_Dates_Times v0.3.2 November 8th, 2017
+
+### Enhancements
+
+* Update to [ex_cldr](https://hex.pm/packages/ex_cldr) version 0.12.0
+
 ## Cldr_Dates_Times v0.3.1 November 3rd, 2017
 
 ### Enhancements
