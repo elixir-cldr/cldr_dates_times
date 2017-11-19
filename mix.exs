@@ -34,14 +34,14 @@ defmodule CldrDatesTimes.Mixfile do
     [
       source_ref: "v#{@version}",
       main: "readme",
-      extras: ["README.md", "CHANGELOG.md"]
+      extras: ["README.md", "CHANGELOG.md", "LICENSE.md"]
     ]
   end
 
   defp deps do
     [
-      {:ex_cldr, "~> 0.13"},
-      {:ex_cldr_numbers, "~> 0.3"},
+      {:ex_cldr, "~> 1.0.0-rc or ~> 1.0"},
+      {:ex_cldr_numbers, "~> 1.0.0-rc or ~> 1.0"},
       {:ex_doc, ">= 0.18.1", optional: true, only: :dev},
       {:stream_data, ">= 0.3.0", only: :test}
     ]

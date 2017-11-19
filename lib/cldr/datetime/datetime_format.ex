@@ -23,9 +23,10 @@ defmodule Cldr.DateTime.Format do
   for the configured locales.
   """
   def format_list do
-    known_formats(&all_date_formats/1) ++
+    (known_formats(&all_date_formats/1) ++
     known_formats(&all_time_formats/1) ++
-    known_formats(&all_date_time_formats/1)
+    known_formats(&all_date_time_formats/1))
+    |> Enum.uniq
   end
 
   @doc """
