@@ -18,6 +18,12 @@ defmodule Cldr.Date do
   alias Cldr.DateTime.{Formatter, Format}
   alias Cldr.LanguageTag
 
+  @format_types [:short, :medium, :long, :full]
+
+  defmodule Formats do
+    defstruct Module.get_attribute(Cldr.Date, :format_types)
+  end
+
   @doc """
   Formats a date according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
@@ -54,7 +60,6 @@ defmodule Cldr.Date do
       {:ok, "10 Julie 2017"}
 
   """
-  @format_types [:short, :medium, :long, :full]
 
   def to_string(date, options \\ [])
   def to_string(%{year: _year, month: _month, day: _day, calendar: calendar} = date, options) do
@@ -84,15 +89,24 @@ defmodule Cldr.Date do
   Formats a date according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
 
-  Returns either the `formatted_date` or raises an exception.
+  ## Options
 
   * `date` is a `%Date{}` struct or any map that contains the keys
-  `year`, `month`, `day` and `calendar`
+    `year`, `month`, `day` and `calendar`
 
   * `options` is a keyword list of options for formatting.  The valid options are:
-    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.  The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locale_names()`.  The default is `Cldr.get_current_locale()`
-    * `number_system:` a number system into which the formatted date digits should be transliterated
+    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
+      The default is `:medium`
+    * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_current_locale/0`
+    * `number_system:` a number system into which the formatted date digits should
+      be transliterated
+
+  ## Returns
+
+  * `formatted_date` or
+
+  * raises an exception.
 
   ## Examples
 
@@ -125,12 +139,9 @@ defmodule Cldr.Date do
 
   defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
   when format in @format_types do
-    format_string =
-      locale_name
-      |> Format.date_formats(calendar)
-      |> Map.get(format)
-
-    {:ok, format_string}
+    with {:ok, date_formats} <- Format.date_formats(locale_name, calendar) do
+      {:ok, Map.get(date_formats, format)}
+    end
   end
 
   defp format_string_from_format(%{number_system: number_system, format: format}, locale, calendar) do

@@ -152,12 +152,15 @@ defmodule Cldr.DateTime.Formatter do
   for a given `Date`, `Time`, `DateTime` or struct with the
   appropriate fields.
 
+  ## Options
+
   * `date` is a `Date`, `Time`, `DateTime` or other struct that
   contains the required date and time fields.
 
   * `format` is a valid format string, for example `yy/MM/dd hh:MM`
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a keyword list of options.  The valid options are:
 
@@ -175,7 +178,7 @@ defmodule Cldr.DateTime.Formatter do
       {:ok, "17/09/03 10:09"}
 
   """
-  @spec format(Date.t | Time.t | DateTime.t, String.t, Locale.t, Keyword.t) :: String.t
+  @spec format(Date.t | Time.t | DateTime.t, String.t, LanguageTag.t | Locale.t, Keyword.t) :: String.t
   def format(date, format, locale \\ Cldr.get_current_locale(), options \\ [])
 
   # Insert generated functions for each locale and format here which
@@ -257,6 +260,14 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the time period for a given time of day.
 
+  ## Options
+
+  * `time` is any `Time.t` or a map with at least `:hour`,
+    `:minute` and `:second` keys
+
+  * `language` is a binary representation of a valid and
+    configured language in `Cldr`
+
   The time period is a locale-specific key that is used
   to localise a time into a textual representation of "am",
   "pm", "noon", "midnight", "evening", "morning" and so on
@@ -277,12 +288,17 @@ defmodule Cldr.DateTime.Formatter do
       :evening1
 
   """
-  @spec time_period_for(Map.t, binary) :: atom
+  @spec time_period_for(Time.t | Map.t, binary) :: atom
   def time_period_for(time, language)
 
   @doc """
   Returns a boolean indicating is a given language defines the
   notion of "noon" and "midnight"
+
+  ## Options
+
+  * `language` is a binary representation of a valid and
+    configured language in `Cldr`
 
   ## Examples
 
@@ -382,19 +398,23 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `era` (format symbol `G`) of a date
   for given locale.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:month` and `:calendar`
+    keys `:month` and `:calendar`
 
   * `n` in an integer between 1 and 5 that determines the format of
-  the year
+    the year
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  The only applicable
     option is `:era` with a value of either `nil` (the default) or
     `:variant` which will return the variant form of an era if one
     is available.
+
+  ## Format Symbol
 
   The representation of the era is made in accordance
   with the following table:
@@ -452,17 +472,21 @@ defmodule Cldr.DateTime.Formatter do
   as necessary. For most use cases, `y` or `yy` should
   be adequate.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:month` and `:calendar`
+    keys `:month` and `:calendar`
 
   * `n` in an integer between 1 and 5 that determines the format of
-  the year
+    the year
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `year/4`
+    used in `year/4`
+
+  ## Format Symbol
 
   The representation of the quarter is made in accordance
   with the following table:
@@ -523,17 +547,21 @@ defmodule Cldr.DateTime.Formatter do
   based calendars in which the year transition occurs
   on a week boundary.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:month` and `:calendar`
+    keys `:month` and `:calendar`
 
   * `n` in an integer between 1 and 5 that determines the format of
-  the year
+    the year
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `weeK_aligned_year/4`
+    used in `weeK_aligned_year/4`
+
+  ## Format Symbol
 
   The representation of the year is made in accordance
   with the following table:
@@ -624,9 +652,25 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the Extended year (format symbol `u`).
 
+  ## Options
+
+  * `date` is a `Date` struct or any map that contains at least the
+    keys `:month` and `:calendar`
+
+  * `n` in an integer between 1 and 5 that determines the format of
+    the year
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
+
+  * `options` is a `Keyword` list of options.  There are no options
+    used in `weeK_aligned_year/4`
+
   **NOTE: This current implementation always returns
   the year provided in the supplied date.  This means
   `u` returns the same result as the format `y`.**
+
+  ## Format Symbol
 
   | Symbol     | Example         | Cldr Format               |
   | :--------  | :-------------- | :------------------------ |
@@ -669,6 +713,8 @@ defmodule Cldr.DateTime.Formatter do
   (format symbol `y`) and does not return a localed
   cyclic year.**
 
+  ## Format Symbol
+
   | Symbol     | Example         | Cldr Format     |
   | :--------  | :-------------- | :-------------- |
   | U, UU, UUU | "甲子"           | Abbreviated     |
@@ -700,17 +746,21 @@ defmodule Cldr.DateTime.Formatter do
   Returns the related gregorian year (format symbol `r`)
   of a date for given locale.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:month` and `:calendar`
+    keys `:month` and `:calendar`
 
   * `n` in an integer between 1 and 5 that determines the format of
-  the quarter
+    the quarter
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `quarter/4`
+    used in `quarter/4`
+
+  ## Format Symbol
 
   The representation of the related year is made in accordance
   with the following table:
@@ -760,17 +810,21 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `quarter` (format symbol `Q`) of a date
   for given locale.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:month` and `:calendar`
+    keys `:month` and `:calendar`
 
   * `n` in an integer between 1 and 5 that determines the format of
-  the quarter
+    the quarter
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `quarter/4`
+    used in `quarter/4`
+
+  ## Format Symbol
 
   The representation of the quarter is made in accordance
   with the following table:
@@ -841,17 +895,21 @@ defmodule Cldr.DateTime.Formatter do
   Returns the standalone `quarter` (format symbol `a`) of a date
   for given locale.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:month` and `:calendar`
+    keys `:month` and `:calendar`
 
   * `n` in an integer between 1 and 5 that determines the format of
-  the quarter
+    the quarter
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `standalone_quarter/4`
+    used in `standalone_quarter/4`
+
+  ## Format Symbol
 
   The representation of the quarter is made in accordance
   with the following table:
@@ -915,17 +973,21 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `month` (format symbol `M`) of a date
   for given locale.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:month` and `:calendar`
+    keys `:month` and `:calendar`
 
   * `n` in an integer between 1 and 5 that determines the format of
-  the month
+    the month
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `month/4`
+    used in `month/4`
+
+  ## Format Symbol
 
   The representation of the month is made in accordance
   with the following table:
@@ -986,17 +1048,21 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `month` (symbol `L`) in standalone format which is
   intended to formatted without an accompanying day (`d`).
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:month` and `:calendar`
+    keys `:month` and `:calendar`
 
   * `n` in an integer between 1 and 5 that determines the format of
-  the month
+    the month
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `standalone_month/4`
+    used in `standalone_month/4`
+
+  ## Format Symbol
 
   The representation of the standalone month is made in accordance
   with the following table:
@@ -1056,19 +1122,23 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the week of the year (symbol `w`) as an integer.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:year`, `:month`, `:day` and `:calendar`
+    keys `:year`, `:month`, `:day` and `:calendar`
 
   * `n` in an integer between 1 and 2 that determines the format of
-  the week of the year
+    the week of the year
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `week_of_year/4`
+    used in `week_of_year/4`
 
-  Note that determining the week of the year is influenced
+  ## Notes
+
+  Determining the week of the year is influenced
   by two factors:
 
   1. The calendar in use.  For example the ISO calendar (which
@@ -1079,6 +1149,8 @@ defmodule Cldr.DateTime.Formatter do
   2. The territory in use.  For example, in the US the first
   week of the year is the week containing January 1st whereas
   many territories follow the ISO standard.
+
+  ## Format Symbol
 
   The representation of the day of the year is made in accordance
   with the following table:
@@ -1112,16 +1184,21 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the week of the month (format symbol `W`) as an integer.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:year`, `:month`, `:day` and `:calendar`
+    keys `:year`, `:month`, `:day` and `:calendar`
 
-  * `n` in an integer between that should be 1
+  * `n` in an integer between that should be between 1 and 4 that
+    determines the format of the week of the month
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `week_of_month/4`
+    used in `week_of_month/4`
+
+  ## Format Symbol
 
   The representation of the week of the month is made in accordance
   with the following table:
@@ -1151,17 +1228,21 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the day of the month (symbol `d`) as an integer.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:year`, `:month`, `:day` and `:calendar`
+    keys `:year`, `:month`, `:day` and `:calendar`
 
   * `n` in an integer between 1 and 2 that determines the format of
-  the day of month
+    the day of month
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `day_of_month/4`
+    used in `day_of_month/4`
+
+  ## Format Symbol
 
   The representation of the day of the month is made in accordance
   with the following table:
@@ -1200,17 +1281,21 @@ defmodule Cldr.DateTime.Formatter do
   Returns the day of the year (symbol `D`) as an integer in string
   format.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:year`, `:month`, `:day` and `:calendar`
+    keys `:year`, `:month`, `:day` and `:calendar`
 
   * `n` in an integer between 1 and 3 that determines the format of
-  the day of year
+    the day of year
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `day_of_year/4`
+    used in `day_of_year/4`
+
+  ## Format Symbol
 
   The representation of the day of the year is made in accordance with
   the following table:
@@ -1251,17 +1336,21 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the weekday name (format  symbol `E`) as an string.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:year`, `:month`, `:day` and `:calendar`
+    keys `:year`, `:month`, `:day` and `:calendar`
 
   * `n` in an integer between 1 and 6 that determines the format of
-  the day of week
+    the day of week
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `day_name/4`
+    used in `day_name/4`
+
+  ## Format Symbol
 
   The representation of the day name is made in accordance with
   the following table:
@@ -1326,21 +1415,27 @@ defmodule Cldr.DateTime.Formatter do
   Returns the local day of week (format symbol `e`) as a
   number or name.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:year`, `:month`, `:day` and `:calendar`
+    keys `:year`, `:month`, `:day` and `:calendar`
 
   * `n` in an integer between 1 and 6 that determines the format of
-  the day of week
+    the day of week
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `day_of_week/4`
+    used in `day_of_week/4`
+
+  ## Notes
 
   Returns the same as format symbol `E` except that it adds a
   numeric value that will depend on the local starting day
   of the week.
+
+  ## Format Symbol
 
   The representation of the time period is made in accordance with
   the following table:
@@ -1409,20 +1504,26 @@ defmodule Cldr.DateTime.Formatter do
   Returns the stand-alone local day (format symbol `c`)
   of week number/name.
 
+  ## Options
+
   * `date` is a `Date` struct or any map that contains at least the
-  keys `:year`, `:month`, `:day` and `:calendar`
+    keys `:year`, `:month`, `:day` and `:calendar`
 
   * `n` in an integer between 1 and 6 that determines the format of
-  the day of week
+    the day of week
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-  used in `standalone_day_of_week/4`
+    used in `standalone_day_of_week/4`
+
+  ## Notes
 
   This is the same as `weekday_number/4` except that it is intended
   for use without the associated `d` format symbol.
+
+  ## Format Symbol
 
   The representation of the time period is made in accordance with
   the following table:
@@ -1484,22 +1585,28 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns a localised version of `am` or `pm` (format symbol `a`).
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the
     key `:second`
 
   * `n` in an integer between 1 and 5 that determines the format of the
     time period
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-    determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  The available option is
     `period: :variant` which will use a veriant of localised "am" or
     "pm" if one is available
 
+  ## Notes
+
   May be upper or lowercase depending on the locale and other options.
   The wide form may be the same as the short form if the “real”
   long form (eg ante meridiem) is not customarily used.
+
+  ## Format Symbol
 
   The representation of the time period is made in accordance with the following
   table:
@@ -1557,18 +1664,22 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the time period as either
   `noon`, `midnight` or `am`/`pm` (format symbol 'b').
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the
     key `:second`
 
   * `n` in an integer between 1 and 5 that determines the format of the
     time period
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-    determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  The available option is
     `period: :variant` which will use a veriant of localised "noon" and
     "midnight" if one is available
+
+  ## Notes
 
   If the langauge doesn't support "noon" or "midnight" then
   `am`/`pm` is used for all time periods.
@@ -1577,6 +1688,8 @@ defmodule Cldr.DateTime.Formatter do
   If the locale doesn't the notion of a unique `noon == 12:00`,
   then the PM form may be substituted. Similarly for `midnight == 00:00`
   and the AM form.
+
+  ## Format Symbol
 
   The representation of the time period is made in accordance with the following
   table:
@@ -1633,21 +1746,27 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the time period as a string, for
   example `at night` (format symbol `B`).
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the
     key `:second`
 
   * `n` in an integer between 1 and 5 that determines the format of the
     time period
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-    determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  The available option is
     `period: :variant` which will use a veriant of localised flexible time
     period names if one is available
 
+  ## Notes
+
   The time period may be upper or lowercase depending on the locale and
   other options.  Often there is only one width that is customarily used.
+
+  ## Format Symbol
 
   The representation of the time period is made in accordance with the following
   table:
@@ -1700,15 +1819,19 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `h`) as a number in the
   range 1..12 as a string.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `hour_1_12/4`
+    `hour_1_12/4`
+
+  ## Format Symbol
 
   The representation of the `hour` is made in accordance with the following
   table:
@@ -1760,15 +1883,19 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `K`) as a number in the
   range 0..11 as a string.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `hour_0_11/4`
+    `hour_0_11/4`
+
+  ## Format Symbol
 
   The representation of the `hour` is made in accordance with the following
   table:
@@ -1823,15 +1950,19 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `k`) as a number in the
   range 1..24 as a string.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `hour_1_24/4`
+    `hour_1_24/4`
+
+  ## Format Symbol
 
   The representation of the `hour` is made in accordance with the following
   table:
@@ -1878,15 +2009,19 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `H`) as a number
   in the range 0..23 as a string.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `hour_0_23/4`
+    `hour_0_23/4`
+
+  ## Format Symbol
 
   The representation of the `hour` is made in accordance with the following
   table:
@@ -1911,6 +2046,7 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 0}
       "0"
+
   """
   @spec hour_0_23(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def hour_0_23(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -1936,15 +2072,22 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `:minute` of a `time` or `datetime` (format symbol `m`) as number
   in string format.  The number of `m`'s in the format determines the formatting.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the key `:minute`
 
   * `n` is the number of digits to which `:minute` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `minute/4`
+    `minute/4`
+
+  ## Format Symbol
+
+  The representation of the `minute` is made in accordance with the following
+  table:
 
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
@@ -1958,6 +2101,7 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.minute %{minute: 3}, 2
       "03"
+
   """
   @spec minute(Map.t, non_neg_integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def minute(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -1978,15 +2122,22 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `:second` of a `time` or `datetime` (format symbol `s`) as number
   in string format.  The number of `s`'s in the format determines the formatting.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
   * `n` is the number of digits to which `:hour` is padded
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `second/4`
+    `second/4`
+
+  ## Format Symbol
+
+  The representation of the `second` is made in accordance with the following
+  table:
 
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
@@ -2017,17 +2168,24 @@ defmodule Cldr.DateTime.Formatter do
   in string format. The seconds are calculate to include microseconds if they
   are available.  The number of `S`'s in the format determines the formatting.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the key `:second`
-  with and optional `:microsecond` key of the format used by `Time`
+    with and optional `:microsecond` key of the format used by `Time`
 
   * `n` is the number of fractional digits to which the float number of seconds
-  is rounded
+    is rounded
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `fractional_second/4`
+    `fractional_second/4`
+
+  ## Format Symbol
+
+  The representation of the `second` is made in accordance with the following
+  table:
 
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
@@ -2073,17 +2231,24 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `time` (format symbol `A`) as millisenconds since
   midnight.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the key `:second`
-  with and optional `:microsecond` key of the format used by `Time`
+    with and optional `:microsecond` key of the format used by `Time`
 
   * `n` is the number of fractional digits to which the float number of seconds
-  is rounded
+    is rounded
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `millisecond/4`
+    `millisecond/4`
+
+  ## Format Symbol
+
+  The representation of the `milliseconds` is made in accordance with the following
+  table:
 
   | Symbol | Results    | Description                                             |
   | :----  | :--------- | :------------------------------------------------------ |
@@ -2135,17 +2300,24 @@ defmodule Cldr.DateTime.Formatter do
   the `:time_zone` element of the provided `DateTime` or other struct without
   any localization.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the key `:time_zone`
-  key of the format used by `Time`
+    key of the format used by `Time`
 
   * `n` is the generic non-location timezone format and is either `1` (the
-  default) or `4`
+    default) or `4`
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `zone_generic/4`
+    `zone_generic/4`
+
+  ## Format Symbol
+
+  The representation of the `timezone` is made in accordance with the following
+  table:
 
   | Symbol | Results    | Description                                             |
   | :----  | :--------- | :------------------------------------------------------ |
@@ -2159,6 +2331,7 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 1
       "Etc/UTC"
+
   """
   @spec zone_generic(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
   def zone_generic(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
@@ -2182,16 +2355,23 @@ defmodule Cldr.DateTime.Formatter do
   the `:time_zone` element of the provided `DateTime` or other struct without
   any localization.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the `:zone_abbr`,
   `:utc_offset` and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `zone_short/4`
+   `zone_short/4`
+
+  ## Format Symbol
+
+  The representation of the `timezone` is made in accordance with the following
+  table:
 
   | Symbol | Results    | Description                                             |
   | :----  | :--------- | :------------------------------------------------------ |
@@ -2227,16 +2407,23 @@ defmodule Cldr.DateTime.Formatter do
   For now the short timezone name, exemplar city and generic location
   formats are not supported and therefore return the fallbacks defined in CLDR.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
-  and `:std_offset` keys of the format used by `Time`
+    and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `zone_id/4`
+   `zone_id/4`
+
+  ## Format Symbol
+
+  The representation of the `timezone ID` is made in accordance with the following
+  table:
 
   | Symbol | Results        | Description                                             |
   | :----  | :------------- | :------------------------------------------------------ |
@@ -2289,16 +2476,23 @@ defmodule Cldr.DateTime.Formatter do
   The format is equivalent to RFC 822 zone format (when optional seconds field
   is absent). This is equivalent to the "xxxx" specifier.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
-  and `:std_offset` keys of the format used by `Time`
+    and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `zone_basic/4`
+    `zone_basic/4`
+
+  ## Format Symbol
+
+  The representation of the `timezone` is made in accordance with the following
+  table:
 
   | Symbol | Results        | Description                                             |
   | :----  | :------------- | :------------------------------------------------------ |
@@ -2347,16 +2541,23 @@ defmodule Cldr.DateTime.Formatter do
   This is the ISO8601 format with hours, minutes and optional seconds fields with
   "Z" as the identifier if the timezone offset is 0.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
-  and `:std_offset` keys of the format used by `Time`
+    and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `zone_iso_z/4`
+    `zone_iso_z/4`
+
+  ## Format Symbol
+
+  The representation of the `timezone offset` is made in accordance with the following
+  table:
 
   | Symbol | Results        | Description                                                              |
   | :----  | :------------- | :----------------------------------------------------------------------- |
@@ -2456,16 +2657,23 @@ defmodule Cldr.DateTime.Formatter do
   This is the ISO8601 format with hours, minutes and optional seconds fields but
   with no "Z" as the identifier if the timezone offset is 0.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
-  and `:std_offset` keys of the format used by `Time`
+    and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `zone_iso/4`
+    `zone_iso/4`
+
+  ## Format Symbol
+
+  The representation of the `timezone offset` is made in accordance with the following
+  table:
 
   | Symbol | Results        | Description                                                       |
   | :----  | :------------- | :---------------------------------------------------------------- |
@@ -2557,16 +2765,23 @@ defmodule Cldr.DateTime.Formatter do
   Returns the short localised GMT offset (format symbol `O`) part of a
   `DateTime` or `Time`.
 
+  ## Options
+
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
-  and `:std_offset` keys of the format used by `Time`
+    and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0` which
-  determines the localisation of the format
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-  `zone_gmt/4`
+    `zone_gmt/4`
+
+  ## Format Symbol
+
+  The representation of the `GMT offset` is made in accordance with the following
+  table:
 
   | Symbol | Results        | Description                                                     |
   | :----  | :------------- | :-------------------------------------------------------------- |
@@ -2616,10 +2831,11 @@ defmodule Cldr.DateTime.Formatter do
 
   # Compile the formats used for timezones GMT format
   defp gmt_tz_format(locale, offset, options \\ [])
+
   for locale_name <- Cldr.known_locale_names do
-    gmt_format = Cldr.DateTime.Format.gmt_format(locale_name)
-    gmt_zero_format = Cldr.DateTime.Format.gmt_zero_format(locale_name)
-    {pos_format, neg_format} = Cldr.DateTime.Format.hour_format(locale_name)
+    {:ok, gmt_format} = Cldr.DateTime.Format.gmt_format(locale_name)
+    {:ok, gmt_zero_format} = Cldr.DateTime.Format.gmt_zero_format(locale_name)
+    {:ok, {pos_format, neg_format}} = Cldr.DateTime.Format.hour_format(locale_name)
     {:ok, pos_transforms} = Compiler.compile(pos_format)
     {:ok, neg_transforms} = Compiler.compile(neg_format)
 

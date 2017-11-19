@@ -21,11 +21,15 @@ defmodule Cldr.DateTime do
 
   @format_types [:short, :medium, :long, :full]
 
+  defmodule Formats do
+    defstruct Module.get_attribute(Cldr.DateTime, :format_types)
+  end
+
   @doc """
   Formats a DateTime according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
 
-  Returns `{:ok, formatted_datetime}` or `{:error, reason}`.
+  ## Options
 
   * `datetime` is a `%DateTime{}` `or %NaiveDateTime{}`struct or any map that contains the keys
     `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
@@ -33,10 +37,10 @@ defmodule Cldr.DateTime do
 
   * `options` is a keyword list of options for formatting.  The valid options are:
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
-      any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.
+      any of the keys returned by `Cldr.DateTime.available_format_names`.
       The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locale_names()`.  The default is `
-      Cldr.get_current_locale()`
+    * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_current_locale/0`
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
     * `era: :variant` will use a variant for the era is one is available in the locale.
@@ -44,6 +48,12 @@ defmodule Cldr.DateTime do
     * `period: :variant` will use a variant for the time period and flexible time period if
       one is available in the locale.  For example, in the "en" locale `period: :variant` will
       return "pm" instead of "PM"
+
+  ## Returns
+
+  * `{:ok, formatted_datetime}` or
+
+  * `{:error, reason}`
 
   ## Examples
 
@@ -87,7 +97,7 @@ defmodule Cldr.DateTime do
   Formats a DateTime according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
 
-  Returns `formatted_datetime` or raises an exception.
+  ## Options
 
   * `datetime` is a `%DateTime{}` `or %NaiveDateTime{}`struct or any map that contains the keys
     `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
@@ -97,8 +107,8 @@ defmodule Cldr.DateTime do
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
       any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.
       The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locale_names()`.  The default is `
-      Cldr.get_current_locale()`
+    * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_current_locale/0`
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
     * `era: :variant` will use a variant for the era is one is available in the locale.
@@ -107,16 +117,22 @@ defmodule Cldr.DateTime do
       one is available in the locale.  For example, in the "en" locale `period: :variant` will
       return "pm" instead of "PM"
 
+  ## Returns
+
+  * `formatted_datetime` or
+
+  * raises an exception
+
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.DateTime.to_string! datetime, locale: Cldr.Locale.new!("en")
+      iex> Cldr.DateTime.to_string! datetime, locale: "en"
       "Jan 1, 2000, 11:59:59 PM"
-      iex> Cldr.DateTime.to_string! datetime, format: :long, locale: Cldr.Locale.new!("en")
+      iex> Cldr.DateTime.to_string! datetime, format: :long, locale: "en"
       "January 1, 2000 at 11:59:59 PM UTC"
-      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: Cldr.Locale.new!("en")
+      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: "en"
       "Saturday, January 1, 2000 at 11:59:59 PM GMT"
-      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: Cldr.Locale.new!("fr")
+      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: "fr"
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
   """
@@ -131,12 +147,9 @@ defmodule Cldr.DateTime do
   # Standard format
   defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
   when format in @format_types do
-    format_string =
-      locale_name
-      |> Format.date_time_formats(calendar)
-      |> Map.get(format)
-
-    {:ok, format_string}
+    with {:ok, formats} <- Format.date_time_formats(locale_name, calendar) do
+      {:ok, Map.get(formats, format)}
+    end
   end
 
   # Look up for the format in :available_formats

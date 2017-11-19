@@ -14,6 +14,12 @@ defmodule Cldr.Time do
   alias Cldr.DateTime.{Format, Formatter}
   alias Cldr.LanguageTag
 
+  @format_types [:short, :medium, :long, :full]
+
+  defmodule Formats do
+    defstruct Module.get_attribute(Cldr.Time, :format_types)
+  end
+
   @doc """
   Formats a time according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
@@ -55,7 +61,6 @@ defmodule Cldr.Time do
       {:ok, "11:59:59 PM UTC"}
 
   """
-  @format_types [:short, :medium, :long, :full]
 
   def to_string(time, options \\ [])
   def to_string(%{hour: _hour, minute: _minute} = time, options) do
@@ -86,16 +91,16 @@ defmodule Cldr.Time do
   Formats a time according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
-  Returns either the formatted time or raises an exception.
+  ## Options
 
   * `time` is a `%DateTime{}` or `%NaiveDateTime{}` struct or any map that contains the keys
-  `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
+    `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
 
   * `options` is a keyword list of options for formatting.  The valid options are:
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
        The default is `:medium`
-    * `locale:` any locale returned by `Cldr.known_locale_names()`.  The default is `
-      Cldr.get_current_locale()`
+    * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_current_locale/0`
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
     * `era: :variant` will use a variant for the era is one is available in the locale.
@@ -103,6 +108,12 @@ defmodule Cldr.Time do
     * `period: :variant` will use a variant for the time period and flexible time period if
       one is available in the locale.  For example, in the "en" locale `period: :variant` will
       return "pm" instead of "PM"
+
+  ## Returns
+
+  * `formatted time string` or
+
+  * raises an exception.
 
   ## Examples
 
@@ -136,12 +147,9 @@ defmodule Cldr.Time do
 
   defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
   when format in @format_types do
-    format_string =
-      locale_name
-      |> Format.time_formats(calendar)
-      |> Map.get(format)
-
-    {:ok, format_string}
+    with {:ok, formats} <- Format.time_formats(locale_name, calendar) do
+      {:ok, Map.get(formats, format)}
+    end
   end
 
   defp format_string_from_format(%{number_system: number_system, format: format}, locale, calendar) do

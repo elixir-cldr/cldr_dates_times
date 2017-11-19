@@ -14,6 +14,7 @@ defmodule Cldr.DateTime.Format do
   alias Cldr.LanguageTag
 
   @standard_formats [:short, :medium, :long, :full]
+
   @type standard_formats :: %{full: String.t, long: String.t, medium: String.t, short: String.t}
   @type formats :: Map.t
   @type calendar :: atom
@@ -26,20 +27,24 @@ defmodule Cldr.DateTime.Format do
     (known_formats(&all_date_formats/1) ++
     known_formats(&all_time_formats/1) ++
     known_formats(&all_date_time_formats/1))
+    |> Enum.reject(&is_atom/1)
     |> Enum.uniq
   end
 
   @doc """
   Returns a list of calendars defined for a given locale.
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+  ## Options
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   ## Example
 
       iex> Cldr.DateTime.Format.calendars_for "en"
-      [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
+      {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
        :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
-       :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]
+       :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
 
   """
   @spec calendars_for(Locale.name | LanguageTag.t) :: [calendar, ...]
@@ -59,12 +64,20 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_formats "en"
-      %{full: "EEEE, MMMM d, y", long: "MMMM d, y", medium: "MMM d, y",
-        short: "M/d/yy"}
+      {:ok, %Cldr.Date.Formats{
+        full: "EEEE, MMMM d, y",
+        long: "MMMM d, y",
+        medium: "MMM d, y",
+        short: "M/d/yy"
+      }}
 
       iex> Cldr.DateTime.Format.date_formats "en", :buddhist
-      %{full: "EEEE, MMMM d, y G", long: "MMMM d, y G", medium: "MMM d, y G",
-        short: "M/d/y GGGGG"}
+      {:ok, %Cldr.Date.Formats{
+        full: "EEEE, MMMM d, y G",
+        long: "MMMM d, y G",
+        medium: "MMM d, y G",
+        short: "M/d/y GGGGG"
+      }}
 
   """
   @spec date_formats(Locale.name | LanguageTag.t, calendar) :: standard_formats
@@ -84,12 +97,20 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.time_formats "en"
-      %{full: "h:mm:ss a zzzz", long: "h:mm:ss a z", medium: "h:mm:ss a",
-        short: "h:mm a"}
+      {:ok, %Cldr.Time.Formats{
+        full: "h:mm:ss a zzzz",
+        long: "h:mm:ss a z",
+        medium: "h:mm:ss a",
+        short: "h:mm a"
+      }}
 
       iex> Cldr.DateTime.Format.time_formats "en", :buddhist
-      %{full: "h:mm:ss a zzzz", long: "h:mm:ss a z", medium: "h:mm:ss a",
-        short: "h:mm a"}
+      {:ok, %Cldr.Time.Formats{
+        full: "h:mm:ss a zzzz",
+        long: "h:mm:ss a z",
+        medium: "h:mm:ss a",
+        short: "h:mm a"
+      }}
 
   """
   @spec time_formats(Locale.name | LanguageTag, calendar) :: standard_formats
@@ -109,12 +130,20 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_time_formats "en"
-      %{full: "{1} 'at' {0}", long: "{1} 'at' {0}", medium: "{1}, {0}",
-        short: "{1}, {0}"}
+      {:ok, %Cldr.DateTime.Formats{
+        full: "{1} 'at' {0}",
+        long: "{1} 'at' {0}",
+        medium: "{1}, {0}",
+        short: "{1}, {0}"
+      }}
 
       iex> Cldr.DateTime.Format.date_time_formats "en", :buddhist
-      %{full: "{1} 'at' {0}", long: "{1} 'at' {0}", medium: "{1}, {0}",
-        short: "{1}, {0}"}
+      {:ok, %Cldr.DateTime.Formats{
+        full: "{1} 'at' {0}",
+        long: "{1} 'at' {0}",
+        medium: "{1}, {0}",
+        short: "{1}, {0}"
+      }}
 
   """
   @spec date_time_formats(Locale.name | LanguageTag, calendar) :: standard_formats
@@ -135,17 +164,51 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_time_available_formats "en"
-      %{m_ed: "E, M/d", md: "M/d", gy_mm_md: "MMM d, y G", ehm: "E h:mm a",
-        y_m: "M/y", mm_md: "MMM d", y_mmmm: "MMMM y",
-        mmmm_w_count_one: "'week' W 'of' MMMM", y_mmm: "MMM y", y_qqq: "QQQ y",
-        y_mm_md: "MMM d, y", hms: "h:mm:ss a", y_mmm_ed: "E, MMM d, y",
-        ehms: "E h:mm:ss a", hmsv: "h:mm:ss a v", yw_count_one: "'week' w 'of' y",
-        gy: "y G", m: "L", mmm_md: "MMMM d", y_qqqq: "QQQQ y", hmv: "h:mm a v",
-        mmm_ed: "E, MMM d", y_m_ed: "E, M/d/y", e_hm: "E HH:mm", h: "h a",
-        e_hms: "E HH:mm:ss", hm: "h:mm a", gy_mmm_ed: "E, MMM d, y G",
-        mmmm_w_count_other: "'week' W 'of' MMMM", mmm: "LLL", e: "ccc", ms: "mm:ss",
-        yw_count_other: "'week' w 'of' y", ed: "d E", d: "d", y: "y", y_md: "M/d/y",
-        gy_mmm: "MMM y G"}
+      {:ok, %{
+        mmm: "LLL",
+        hmv: "h:mm a v",
+        y_m_ed: "E, M/d/y",
+        mmm_ed: "E, MMM d",
+        y_mm_md: "MMM d, y",
+        mmmm_w_count_one: "'week' W 'of' MMMM",
+        gy_mmm_ed: "E, MMM d, y G",
+        e_hms: "E HH:mm:ss",
+        ed: "d E",
+        gy_mmm: "MMM y G",
+        y_mmmm: "MMMM y",
+        hm: "h:mm a",
+        gy: "y G",
+        e: "ccc",
+        bhms: "h:mm:ss B",
+        hms: "h:mm:ss a",
+        m: "L",
+        y: "y",
+        m_ed: "E, M/d",
+        y_mmm: "MMM y",
+        hmsv: "h:mm:ss a v",
+        d: "d",
+        gy_mm_md: "MMM d, y G",
+        e_hm: "E HH:mm",
+        ehm: "E h:mm a",
+        y_m: "M/y",
+        ms: "mm:ss",
+        mmmm_w_count_other: "'week' W 'of' MMMM",
+        mm_md: "MMM d",
+        y_md: "M/d/y",
+        yw_count_one: "'week' w 'of' Y",
+        md: "M/d",
+        yw_count_other: "'week' w 'of' Y",
+        e_bhms: "E h:mm:ss B",
+        h: "h a",
+        bhm: "h:mm B",
+        e_bhm: "E h:mm B",
+        bh: "h B",
+        y_qqqq: "QQQQ y",
+        ehms: "E h:mm:ss a",
+        y_mmm_ed: "E, MMM d, y",
+        y_qqq: "QQQ y",
+        mmm_md: "MMMM d"
+      }}
 
   """
   @spec date_time_available_formats(Locale.name | LanguageTag, calendar) :: formats
@@ -163,7 +226,7 @@ defmodule Cldr.DateTime.Format do
   ## Example
 
       iex> Cldr.DateTime.Format.hour_format "en"
-      {"+HH:mm", "-HH:mm"}
+      {:ok, {"+HH:mm", "-HH:mm"}}
 
   """
   @spec hour_format(Locale.name | LanguageTag) :: {String.t, String.t}
@@ -180,8 +243,8 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex(2)> Cldr.DateTime.Format.gmt_format "en"
-      ["GMT", 0]
+      iex> Cldr.DateTime.Format.gmt_format "en"
+      {:ok, ["GMT", 0]}
 
   """
   @spec gmt_format(Locale.name | LanguageTag) :: [non_neg_integer | String.t, ...]
@@ -199,8 +262,8 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex(3)> Cldr.DateTime.Format.gmt_zero_format "en"
-      "GMT"
+      iex> Cldr.DateTime.Format.gmt_zero_format "en"
+      {:ok, "GMT"}
 
   """
   @spec gmt_zero_format(Locale.name | LanguageTag) :: String.t
@@ -213,12 +276,16 @@ defmodule Cldr.DateTime.Format do
     locale_data = Cldr.Config.get_locale(locale)
     calendars = Cldr.Config.calendars_for_locale(locale_data)
 
-    def calendars_for(unquote(locale)), do: unquote(calendars)
-    def gmt_format(unquote(locale)), do: unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_format]))
-    def gmt_zero_format(unquote(locale)), do: unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))
+    def calendars_for(unquote(locale)),
+      do: {:ok, unquote(calendars)}
+    def gmt_format(unquote(locale)),
+      do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_format]))}
+    def gmt_zero_format(unquote(locale)),
+      do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))}
 
     hour_formats = List.to_tuple(String.split(get_in(locale_data, [:dates, :time_zone_names, :hour_format]), ";"))
-    def hour_format(unquote(locale)), do: unquote(hour_formats)
+    def hour_format(unquote(locale)),
+      do: {:ok, unquote(hour_formats)}
 
     for calendar <- calendars do
       calendar_data =
@@ -226,23 +293,24 @@ defmodule Cldr.DateTime.Format do
         |> Map.get(:dates)
         |> get_in([:calendars, calendar])
 
+      formats = struct(Cldr.Date.Formats, Map.get(calendar_data, :date_formats))
       def date_formats(unquote(locale), unquote(calendar)) do
-        unquote(Macro.escape(Map.get(calendar_data, :date_formats)))
+        {:ok, unquote(Macro.escape(formats))}
       end
 
+      formats = struct(Cldr.Time.Formats, Map.get(calendar_data, :time_formats))
       def time_formats(unquote(locale), unquote(calendar)) do
-        unquote(Macro.escape(Map.get(calendar_data, :time_formats)))
+        {:ok, unquote(Macro.escape(formats))}
       end
 
+      formats = struct(Cldr.DateTime.Formats, Map.get(calendar_data, :date_time_formats) |> Map.take(@standard_formats))
       def date_time_formats(unquote(locale), unquote(calendar)) do
-        unquote(Macro.escape(
-          Map.get(calendar_data, :date_time_formats)
-          |> Map.take(@standard_formats)
-        ))
+        {:ok, unquote(Macro.escape(formats))}
       end
 
+      formats = get_in(calendar_data, [:date_time_formats, :available_formats])
       def date_time_available_formats(unquote(locale), unquote(calendar)) do
-        unquote(Macro.escape(get_in(calendar_data, [:date_time_formats, :available_formats])))
+        {:ok, unquote(Macro.escape(formats))}
       end
     end
 
@@ -256,14 +324,14 @@ defmodule Cldr.DateTime.Format do
       do: {:error, Kalendar.calendar_error(calendar)}
   end
 
-  def date_formats(locale, _calendar),
-    do: {:error, Locale.locale_error(locale)}
-  def time_formats(locale, _calendar),
-    do: {:error, Locale.locale_error(locale)}
-  def date_time_formats(locale, _calendar),
-    do: {:error, Locale.locale_error(locale)}
-  def date_time_available_formats(locale, _calendar),
-    do: {:error, Locale.locale_error(locale)}
+  def calendars_for(locale), do: {:error, Locale.locale_error(locale)}
+  def gmt_format(locale), do: {:error, Locale.locale_error(locale)}
+  def gmt_zero_format(locale), do: {:error, Locale.locale_error(locale)}
+  def hour_format(locale), do: {:error, Locale.locale_error(locale)}
+  def date_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+  def time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+  def date_time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+  def date_time_available_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
 
   @doc """
   Returns a list of the date_time format types that are
@@ -275,19 +343,22 @@ defmodule Cldr.DateTime.Format do
   ## Example:
 
       iex> Cldr.DateTime.Format.common_date_time_format_names
-      [:m_ed, :md, :gy_mm_md, :ehm, :y_m, :mm_md, :y_mmmm, :y_mmm, :y_qqq, :y_mm_md,
-       :hms, :y_mmm_ed, :ehms, :hmsv, :gy, :m, :mmm_md, :y_qqqq, :hmv, :mmm_ed,
-       :y_m_ed, :e_hm, :h, :e_hms, :hm, :gy_mmm_ed, :mmmm_w_count_other, :mmm, :e,
-       :ms, :yw_count_other, :ed, :d, :y, :y_md, :gy_mmm]
+      [:bh, :bhm, :bhms, :d, :e, :e_bhm, :e_bhms, :e_hm, :e_hms, :ed, :ehm, :ehms,
+       :gy, :gy_mm_md, :gy_mmm, :gy_mmm_ed, :h, :hm, :hms, :hmsv, :hmv, :m, :m_ed,
+       :md, :mm_md, :mmm, :mmm_ed, :mmm_md, :mmmm_w_count_other, :ms, :y, :y_m,
+       :y_m_ed, :y_md, :y_mm_md, :y_mmm, :y_mmm_ed, :y_mmmm, :y_qqq, :y_qqqq,
+       :yw_count_other]
 
   """
   def common_date_time_format_names do
     Cldr.known_locale_names
     |> Enum.map(&date_time_available_formats/1)
+    |> Enum.map(&elem(&1, 1))
     |> Enum.map(&Map.keys/1)
     |> Enum.map(&MapSet.new/1)
     |> intersect_mapsets
     |> MapSet.to_list
+    |> Enum.sort
   end
 
   defp known_formats(list) do
@@ -311,13 +382,14 @@ defmodule Cldr.DateTime.Format do
   end
 
   defp all_formats_for(locale, type_function) do
-    Enum.map(calendars_for(locale), fn calendar ->
-      locale
-      |> type_function.(calendar)
-      |> Map.values
-    end)
-    |> List.flatten
-    |> Enum.uniq
+    with {:ok, calendars} <- calendars_for(locale) do
+      Enum.map(calendars, fn calendar ->
+        {:ok, calendar_formats} = type_function.(locale, calendar)
+        Map.values(calendar_formats)
+      end)
+      |> List.flatten
+      |> Enum.uniq
+    end
   end
 
   defp intersect_mapsets([a, b | []]) do

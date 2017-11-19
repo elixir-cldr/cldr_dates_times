@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "0.3.3"
+  @version "1.0.0-rc.0"
 
   def project do
     [
@@ -20,7 +20,7 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp description do
     """
-    Dates, Times and DateTimes localization and formatting functions for the Common Locale Data Repository (CLDR).
+    Date, Time and DateTime localization and formatting functions for the Common Locale Data Repository (CLDR).
     """
   end
 
