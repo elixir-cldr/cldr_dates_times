@@ -1,4 +1,4 @@
--file("/usr/local/Cellar/erlang/20.0/lib/erlang/lib/parsetools-2.1.5/include/leexinc.hrl", 0).
+-file("/usr/local/Cellar/erlang/20.1.5/lib/erlang/lib/parsetools-2.1.5/include/leexinc.hrl", 0).
 %% The source of this file is part of leex distribution, as such it
 %% has the same Copyright as the other files in the leex
 %% distribution. The Copyright is defined in the accompanying file
@@ -22,7 +22,7 @@ unquote([_ | Tail]) ->
   [_ | Rev] = lists:reverse(Tail),
   lists:reverse(Rev).
 
--file("/usr/local/Cellar/erlang/20.0/lib/erlang/lib/parsetools-2.1.5/include/leexinc.hrl", 14).
+-file("/usr/local/Cellar/erlang/20.1.5/lib/erlang/lib/parsetools-2.1.5/include/leexinc.hrl", 14).
 
 format_error({illegal,S}) -> ["illegal characters ",io_lib:write_string(S)];
 format_error({user,S}) -> S.
@@ -847,7 +847,7 @@ yyaction_20(TokenChars, TokenLine) ->
 -compile({inline,yyaction_21/2}).
 -file("src/datetime_format_lexer.xrl", 89).
 yyaction_21(TokenChars, TokenLine) ->
-     { token, { period_noon_mid, TokenLine, count (TokenChars) } } .
+     { token, { period_noon_midnight, TokenLine, count (TokenChars) } } .
 
 -compile({inline,yyaction_22/2}).
 -file("src/datetime_format_lexer.xrl", 90).
@@ -944,4 +944,4 @@ yyaction_39(TokenLine) ->
 yyaction_40(TokenChars, TokenLine) ->
      { token, { literal, TokenLine, 'Elixir.List' : to_string (TokenChars) } } .
 
--file("/usr/local/Cellar/erlang/20.0/lib/erlang/lib/parsetools-2.1.5/include/leexinc.hrl", 309).
+-file("/usr/local/Cellar/erlang/20.1.5/lib/erlang/lib/parsetools-2.1.5/include/leexinc.hrl", 309).

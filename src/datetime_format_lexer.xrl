@@ -88,7 +88,7 @@ Rules.
 {StandAloneDayOfWeek}+   : {token,{standalone_day_of_week,TokenLine,count(TokenChars)}}.
 
 {Period_am_pm}+          : {token,{period_am_pm,TokenLine,count(TokenChars)}}.
-{Period_noon_mid}+       : {token,{period_noon_mid,TokenLine,count(TokenChars)}}.
+{Period_noon_mid}+       : {token,{period_noon_midnight,TokenLine,count(TokenChars)}}.
 {Period_flex}+           : {token,{period_flex,TokenLine,count(TokenChars)}}.
 
 {Hour_1_12}+             : {token,{hour_1_12,TokenLine,count(TokenChars)}}.

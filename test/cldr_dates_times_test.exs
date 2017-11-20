@@ -44,4 +44,14 @@ defmodule Cldr.DatesTimes.Test do
     assert Cldr.DateTime.Formatter.day_of_week(date, 1, Cldr.Locale.new!("en")) == "3"
     assert Cldr.DateTime.Formatter.day_of_week(date, 1, Cldr.Locale.new!("en-150")) == "2"
   end
+
+  test "that the bb format works as expected" do
+    assert Cldr.DateTime.to_string(%{year: 2018, month: 1, day: 1,
+            hour: 0, minute: 0, second: 0, calendar: Calendar.ISO},
+            format: "YYYY-MMM-dd KK:mm bb") == {:ok, "2019-Jan-01 00:00 midnight"}
+
+    assert Cldr.DateTime.to_string(%{year: 2018, month: 1, day: 1,
+            hour: 0, minute: 1, second: 0, calendar: Calendar.ISO},
+            format: "YYYY-MMM-dd KK:mm bb") == {:ok, "2019-Jan-01 00:01 AM"}
+  end
 end
