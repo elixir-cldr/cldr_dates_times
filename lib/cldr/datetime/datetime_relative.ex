@@ -133,13 +133,13 @@ defmodule Cldr.DateTime.Relative do
     [locale: Cldr.get_current_locale(), format: :default]
   end
 
-  def define_unit_and_relative_time(relative, nil, nil) when is_number(relative) do
+  defp define_unit_and_relative_time(relative, nil, nil) when is_number(relative) do
     unit = unit_from_relative_time(relative)
     relative = scale_relative(relative, unit)
     {relative, unit}
   end
 
-  def define_unit_and_relative_time(%{year: _, month: _, day: _, hour: _, minute: _, second: _,
+  defp define_unit_and_relative_time(%{year: _, month: _, day: _, hour: _, minute: _, second: _,
                    calendar: Calendar.ISO} = relative, unit, relative_to) do
     now = (relative_to || DateTime.utc_now) |> DateTime.to_unix
     then = DateTime.to_unix(relative)
@@ -147,7 +147,7 @@ defmodule Cldr.DateTime.Relative do
     define_unit_and_relative_time(relative_time, unit, nil)
   end
 
-  def define_unit_and_relative_time(%{year: _, month: _, day: _, calendar: Calendar.ISO} = relative, unit, relative_to) do
+  defp define_unit_and_relative_time(%{year: _, month: _, day: _, calendar: Calendar.ISO} = relative, unit, relative_to) do
     today =
       (relative_to || Date.utc_today)
       |> Date.to_erl
@@ -164,13 +164,15 @@ defmodule Cldr.DateTime.Relative do
     define_unit_and_relative_time(relative_time, unit, nil)
   end
 
-  def define_unit_and_relative_time(relative_time, unit, _relative_to) do
+  defp define_unit_and_relative_time(relative_time, unit, _relative_to) do
     {relative_time, unit}
   end
 
   @doc """
   Returns a `{:ok, string}` representing a relative time (ago, in) for a given
   number, Date or Datetime or raises an exception on error.
+
+  ## Options
 
   * `relative` is a number or Date/Datetime representing the time distance from `now` or from
   options[:relative_to]
@@ -329,17 +331,5 @@ defmodule Cldr.DateTime.Relative do
       |> Map.take(@unit_keys)
 
     defp get_locale(%LanguageTag{cldr_locale_name: unquote(locale_name)}), do: unquote(Macro.escape(locale_data))
-  end
-end
-
-defmodule Cldr.UnknownTimeUnit do
-  @moduledoc """
-  Exception raised when an attempt is made to use a time unit that is not known.
-  in `Cldr.DateTime.Relative`.
-  """
-  defexception [:message]
-
-  def exception(message) do
-    %__MODULE__{message: message}
   end
 end
