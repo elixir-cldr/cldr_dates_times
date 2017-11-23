@@ -7,7 +7,7 @@ defmodule CldrDatesTimes.Mixfile do
     [
       app: :ex_cldr_dates_times,
       version: @version,
-      name: "Cldr_Dates_Times",
+      name: "Cldr Dates & Times",
       source_url: "https://github.com/kipcole9/cldr_dates_times",
       docs: docs(),
       elixir: "~> 1.5",
@@ -34,7 +34,8 @@ defmodule CldrDatesTimes.Mixfile do
     [
       source_ref: "v#{@version}",
       main: "readme",
-      extras: ["README.md", "CHANGELOG.md", "LICENSE.md"]
+      extras: ["README.md", "CHANGELOG.md", "LICENSE.md"],
+      logo: "logo.png"
     ]
   end
 
