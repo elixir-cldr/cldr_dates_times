@@ -133,7 +133,7 @@ defmodule Cldr.DateTime.Formatter do
   way in which midnight and noon are represented.  The following
   table illustrates the differences:
 
-	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   h	    |  12	  | 1...11	|  12	 |   1...11   |  12   |
   |   K	    |   0	  | 1...11	|   0	 |   1...11   |   0   |
@@ -1836,7 +1836,7 @@ defmodule Cldr.DateTime.Formatter do
   The representation of the `hour` is made in accordance with the following
   table:
 
-	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   h     |  12    | 1...11  |  12  |  1...11   |  12   |
 
@@ -1900,7 +1900,7 @@ defmodule Cldr.DateTime.Formatter do
   The representation of the `hour` is made in accordance with the following
   table:
 
-	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   K     |   0   | 1...11  |   0  |  1...11    |   0   |
 
@@ -1967,7 +1967,7 @@ defmodule Cldr.DateTime.Formatter do
   The representation of the `hour` is made in accordance with the following
   table:
 
-	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   k     |  24   | 1...11  |  12  |  13...23   |  24   |
 
@@ -2026,11 +2026,11 @@ defmodule Cldr.DateTime.Formatter do
   The representation of the `hour` is made in accordance with the following
   table:
 
-	| Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
+  | Symbol  | Midn.	|	Morning	| Noon |	Afternoon	| Midn. |
   | :----:  | :---: | :-----: | :--: | :--------: | :---: |
   |   H     |   0   | 1...11  |  12  |  13...23   |   0   |
 
- ## Examples:
+  ## Examples:
 
       iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 10}
       "10"
