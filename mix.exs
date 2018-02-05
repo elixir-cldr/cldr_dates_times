@@ -44,7 +44,9 @@ defmodule CldrDatesTimes.Mixfile do
       {:ex_cldr, "~> 1.0"},
       {:ex_cldr_numbers, "~> 1.0"},
       {:ex_doc, "~> 0.18", optional: true, only: :dev},
-      {:stream_data, "~> 0.4", only: :test}
+      {:stream_data, "~> 0.4", only: :test},
+      {:poison, "~> 2.1 or ~> 3.0", optional: true},
+      {:jason, "~> 1.0", optional: true}
     ]
   end
 
@@ -62,7 +64,8 @@ defmodule CldrDatesTimes.Mixfile do
   def links do
     %{
       "GitHub"    => "https://github.com/kipcole9/cldr_dates_times",
-      "Changelog" => "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/CHANGELOG.md"
+      "Changelog" => "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/CHANGELOG.md",
+      "Readme"    => "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/README.md"
     }
   end
 
