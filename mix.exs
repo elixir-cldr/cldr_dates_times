@@ -14,7 +14,8 @@ defmodule CldrDatesTimes.Mixfile do
       description: description(),
       package: package(),
       start_permanent: Mix.env == :prod,
-      deps: deps()
+      deps: deps(),
+      compilers: Mix.compilers ++ [:cldr]
     ]
   end
 
@@ -46,7 +47,8 @@ defmodule CldrDatesTimes.Mixfile do
       {:ex_doc, "~> 0.18", optional: true, only: :dev},
       {:stream_data, "~> 0.4", only: :test},
       {:poison, "~> 2.1 or ~> 3.0", optional: true},
-      {:jason, "~> 1.0", optional: true}
+      {:jason, "~> 1.0", optional: true},
+      {:benchee, "~> 0.12", optional: true, only: :dev}
     ]
   end
 
