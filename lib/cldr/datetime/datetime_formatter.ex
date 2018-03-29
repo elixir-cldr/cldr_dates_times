@@ -152,7 +152,7 @@ defmodule Cldr.DateTime.Formatter do
   for a given `Date`, `Time`, `DateTime` or struct with the
   appropriate fields.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date`, `Time`, `DateTime` or other struct that
   contains the required date and time fields.
@@ -260,7 +260,7 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the time period for a given time of day.
 
-  ## Options
+  ## Arguments
 
   * `time` is any `Time.t` or a map with at least `:hour`,
     `:minute` and `:second` keys
@@ -295,7 +295,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns a boolean indicating is a given language defines the
   notion of "noon" and "midnight"
 
-  ## Options
+  ## Arguments
 
   * `language` is a binary representation of a valid and
     configured language in `Cldr`
@@ -398,7 +398,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `era` (format symbol `G`) of a date
   for given locale.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:month` and `:calendar`
@@ -472,7 +472,7 @@ defmodule Cldr.DateTime.Formatter do
   as necessary. For most use cases, `y` or `yy` should
   be adequate.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:month` and `:calendar`
@@ -547,7 +547,7 @@ defmodule Cldr.DateTime.Formatter do
   based calendars in which the year transition occurs
   on a week boundary.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:month` and `:calendar`
@@ -652,7 +652,7 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the Extended year (format symbol `u`).
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:month` and `:calendar`
@@ -746,7 +746,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the related gregorian year (format symbol `r`)
   of a date for given locale.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:month` and `:calendar`
@@ -810,7 +810,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `quarter` (format symbol `Q`) of a date
   for given locale.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:month` and `:calendar`
@@ -895,7 +895,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the standalone `quarter` (format symbol `a`) of a date
   for given locale.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:month` and `:calendar`
@@ -973,7 +973,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `month` (format symbol `M`) of a date
   for given locale.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:month` and `:calendar`
@@ -1048,7 +1048,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `month` (symbol `L`) in standalone format which is
   intended to formatted without an accompanying day (`d`).
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:month` and `:calendar`
@@ -1122,7 +1122,7 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the week of the year (symbol `w`) as an integer.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:year`, `:month`, `:day` and `:calendar`
@@ -1184,7 +1184,7 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the week of the month (format symbol `W`) as an integer.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:year`, `:month`, `:day` and `:calendar`
@@ -1228,7 +1228,7 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the day of the month (symbol `d`) as an integer.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:year`, `:month`, `:day` and `:calendar`
@@ -1281,7 +1281,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the day of the year (symbol `D`) as an integer in string
   format.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:year`, `:month`, `:day` and `:calendar`
@@ -1336,7 +1336,7 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns the weekday name (format  symbol `E`) as an string.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:year`, `:month`, `:day` and `:calendar`
@@ -1415,7 +1415,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the local day of week (format symbol `e`) as a
   number or name.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:year`, `:month`, `:day` and `:calendar`
@@ -1486,8 +1486,7 @@ defmodule Cldr.DateTime.Formatter do
     # Locale start of week can be Monday == 1 through Sunday == 7
     locale_week_starts_on = Kalendar.first_day_of_week(locale)
 
-    Math.amod(calendar_day_of_week - locale_week_starts_on + 1, 7)
-    |> trunc
+    convert_calendar_day_to_locale_day(calendar_day_of_week, locale_week_starts_on)
     |> pad(n)
   end
 
@@ -1500,11 +1499,16 @@ defmodule Cldr.DateTime.Formatter do
     error_return(date, "e", [:year, :month, :day, :calendar])
   end
 
+  defp convert_calendar_day_to_locale_day(calendar_day_of_week, locale_week_starts_on) do
+    Math.amod(calendar_day_of_week - locale_week_starts_on + 1, 7)
+    |> trunc
+  end
+
   @doc """
   Returns the stand-alone local day (format symbol `c`)
   of week number/name.
 
-  ## Options
+  ## Arguments
 
   * `date` is a `Date` struct or any map that contains at least the
     keys `:year`, `:month`, `:day` and `:calendar`
@@ -1585,7 +1589,7 @@ defmodule Cldr.DateTime.Formatter do
   @doc """
   Returns a localised version of `am` or `pm` (format symbol `a`).
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the
     key `:second`
@@ -1664,7 +1668,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the time period as either
   `noon`, `midnight` or `am`/`pm` (format symbol 'b').
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the
     key `:second`
@@ -1746,7 +1750,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the time period as a string, for
   example `at night` (format symbol `B`).
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the
     key `:second`
@@ -1819,7 +1823,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `h`) as a number in the
   range 1..12 as a string.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
@@ -1883,7 +1887,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `K`) as a number in the
   range 0..11 as a string.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
@@ -1950,7 +1954,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `k`) as a number in the
   range 1..24 as a string.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
@@ -2009,7 +2013,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the formatting of the `:hour` (format symbol `H`) as a number
   in the range 0..23 as a string.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
@@ -2072,7 +2076,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `:minute` of a `time` or `datetime` (format symbol `m`) as number
   in string format.  The number of `m`'s in the format determines the formatting.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the key `:minute`
 
@@ -2122,7 +2126,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `:second` of a `time` or `datetime` (format symbol `s`) as number
   in string format.  The number of `s`'s in the format determines the formatting.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the key `:second`
 
@@ -2168,7 +2172,7 @@ defmodule Cldr.DateTime.Formatter do
   in string format. The seconds are calculate to include microseconds if they
   are available.  The number of `S`'s in the format determines the formatting.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the key `:second`
     with and optional `:microsecond` key of the format used by `Time`
@@ -2231,7 +2235,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the `time` (format symbol `A`) as millisenconds since
   midnight.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the key `:second`
     with and optional `:microsecond` key of the format used by `Time`
@@ -2300,7 +2304,7 @@ defmodule Cldr.DateTime.Formatter do
   the `:time_zone` element of the provided `DateTime` or other struct without
   any localization.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the key `:time_zone`
     key of the format used by `Time`
@@ -2355,7 +2359,7 @@ defmodule Cldr.DateTime.Formatter do
   the `:time_zone` element of the provided `DateTime` or other struct without
   any localization.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the `:zone_abbr`,
   `:utc_offset` and `:std_offset` keys of the format used by `Time`
@@ -2407,7 +2411,7 @@ defmodule Cldr.DateTime.Formatter do
   For now the short timezone name, exemplar city and generic location
   formats are not supported and therefore return the fallbacks defined in CLDR.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
@@ -2476,7 +2480,7 @@ defmodule Cldr.DateTime.Formatter do
   The format is equivalent to RFC 822 zone format (when optional seconds field
   is absent). This is equivalent to the "xxxx" specifier.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
@@ -2541,7 +2545,7 @@ defmodule Cldr.DateTime.Formatter do
   This is the ISO8601 format with hours, minutes and optional seconds fields with
   "Z" as the identifier if the timezone offset is 0.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
@@ -2657,7 +2661,7 @@ defmodule Cldr.DateTime.Formatter do
   This is the ISO8601 format with hours, minutes and optional seconds fields but
   with no "Z" as the identifier if the timezone offset is 0.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
@@ -2765,7 +2769,7 @@ defmodule Cldr.DateTime.Formatter do
   Returns the short localised GMT offset (format symbol `O`) part of a
   `DateTime` or `Time`.
 
-  ## Options
+  ## Arguments
 
   * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
