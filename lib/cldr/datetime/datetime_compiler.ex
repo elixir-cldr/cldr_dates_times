@@ -33,12 +33,23 @@ defmodule Cldr.DateTime.Compiler do
   This function is designed to produce output
   that is fed into `Cldr.DateTime.Compiler.compile/1`.
 
+  ## Arguments
+
+  * `definition` is a date, datetime or time format
+    string
+
+  ## Returns
+
+  A list of 3-tuples which represent the tokens
+  of the format definition
+
   ## Example
 
       iex> Cldr.DateTime.Compiler.tokenize "yyyy/MM/dd"
       {:ok,
        [{:year, 1, 4}, {:literal, 1, "/"}, {:month, 1, 2}, {:literal, 1, "/"},
         {:day_of_month, 1, 2}], 1}
+
   """
   def tokenize(definition) when is_binary(definition) do
     definition
@@ -53,14 +64,19 @@ defmodule Cldr.DateTime.Compiler do
   @doc """
   Parse a number format definition
 
+  ## Arguments
+
   * `format_string` is a string defining how a date/time/datetime
   is to be formatted.  See `Cldr.DateTime.Formatter` for the list
   of supported format symbols.
 
-  Returns is a list of function bodies which are grafted onto
+  ## Returns
+
+  Returns a list of function bodies which are grafted onto
   a function head in `Cldr.DateTime.Formatter` at compile time
   to produce a series of functions that process a given format
   string efficiently.
+
   """
   @spec compile(String.t) :: {:ok, List.t} | {:error, String.t}
   def compile(format_string)

@@ -12,6 +12,7 @@ defmodule Cldr.DateTime.Format do
   alias Cldr.Calendar, as: Kalendar
   alias Cldr.Locale
   alias Cldr.LanguageTag
+  alias Cldr.Config
 
   @standard_formats [:short, :medium, :long, :full]
 
@@ -26,15 +27,20 @@ defmodule Cldr.DateTime.Format do
   def format_list do
     (known_formats(&all_date_formats/1) ++
     known_formats(&all_time_formats/1) ++
-    known_formats(&all_date_time_formats/1))
+    known_formats(&all_date_time_formats/1)) ++
+    configured_precompile_list()
     |> Enum.reject(&is_atom/1)
     |> Enum.uniq
+  end
+
+  def configured_precompile_list do
+    Application.get_env(Config.app_name, :precompile_datetime_formats, [])
   end
 
   @doc """
   Returns a list of calendars defined for a given locale.
 
-  ## Options
+  ## Arguments
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
@@ -56,10 +62,12 @@ defmodule Cldr.DateTime.Format do
   @doc """
   Returns a map of the standard date formats for a given locale and calendar.
 
+  ## Arguments
+
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
-  The default is `:gregorian`
+    The default is `:gregorian`
 
   ## Examples:
 
@@ -88,6 +96,8 @@ defmodule Cldr.DateTime.Format do
 
   @doc """
   Returns a map of the standard time formats for a given locale and calendar.
+
+  ## Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
 
@@ -122,6 +132,8 @@ defmodule Cldr.DateTime.Format do
   @doc """
   Returns a map of the standard datetime formats for a given locale and calendar.
 
+  ## Arguments
+
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
@@ -155,6 +167,8 @@ defmodule Cldr.DateTime.Format do
   @doc """
   Returns a map of the available non-standard datetime formats for a
   given locale and calendar.
+
+  ## Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
 
@@ -221,6 +235,8 @@ defmodule Cldr.DateTime.Format do
   Returns the postive and negative hour format
   for a timezone offset for a given locale.
 
+  ## Arguments
+
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
 
   ## Example
@@ -238,6 +254,8 @@ defmodule Cldr.DateTime.Format do
   @doc """
   Returns the GMT offset format list for a
   for a timezone offset for a given locale.
+
+  ## Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
 
@@ -257,6 +275,8 @@ defmodule Cldr.DateTime.Format do
   Returns the GMT format string for a
   for a timezone with an offset of zero for
   a given locale.
+
+  ## Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
 

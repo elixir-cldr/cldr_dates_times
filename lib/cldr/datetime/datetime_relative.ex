@@ -172,7 +172,7 @@ defmodule Cldr.DateTime.Relative do
   Returns a `{:ok, string}` representing a relative time (ago, in) for a given
   number, Date or Datetime or raises an exception on error.
 
-  ## Options
+  ## Arguments
 
   * `relative` is a number or Date/Datetime representing the time distance from `now` or from
   options[:relative_to]

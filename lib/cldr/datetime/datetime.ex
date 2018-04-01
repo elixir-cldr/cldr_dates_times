@@ -29,7 +29,7 @@ defmodule Cldr.DateTime do
   Formats a DateTime according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
 
-  ## Options
+  ## Arguments
 
   * `datetime` is a `%DateTime{}` `or %NaiveDateTime{}`struct or any map that contains the keys
     `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
@@ -97,7 +97,7 @@ defmodule Cldr.DateTime do
   Formats a DateTime according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
 
-  ## Options
+  ## Arguments
 
   * `datetime` is a `%DateTime{}` `or %NaiveDateTime{}`struct or any map that contains the keys
     `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
