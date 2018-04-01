@@ -6,6 +6,10 @@ This is the changelog for Cldr_Dates_Times v1.2.1 released on April 1st, 2018.  
 
 * Compiles the date_time formats configured under `config :ex_cldr, precompile_datetime_formats: ["..". ".."]` as advertised.  Previously this documented configuration key was being ignored
 
+## Enhancements
+
+* Update `ex_cldr` dependency to version 1.5.1 and `ex_cldr_numbers` version 1.4.1 in order to use `Cldr.Config.app_name()`
+
 # Changelog for Cldr_Dates_Times v1.2.0
 
 ### Enhancements
