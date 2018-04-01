@@ -1,6 +1,12 @@
-# Changelog for Cldr_Dates_Times v1.2.0
+# Changelog for Cldr_Dates_Times v1.2.1
 
-This is the changelog for Cldr_Dates_Times v1.2.0 released on March 29th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v1.2.1 released on April 1st, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+
+## Bug Fixes
+
+* Compiles the date_time formats configured under `config :ex_cldr, precompile_datetime_formats: ["..". ".."]` as advertised.  Previously this documented configuration key was being ignored
+
+# Changelog for Cldr_Dates_Times v1.2.0
 
 ### Enhancements
 
