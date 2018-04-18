@@ -58,13 +58,15 @@ defmodule Cldr.DateTime do
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.DateTime.to_string datetime, locale: Cldr.Locale.new!("en")
+      iex> Cldr.DateTime.to_string datetime, locale: "en"
       {:ok, "Jan 1, 2000, 11:59:59 PM"}
-      iex> Cldr.DateTime.to_string datetime, format: :long, locale: Cldr.Locale.new!("en")
+      iex> Cldr.DateTime.to_string datetime, format: :long, locale: "en"
       {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
-      iex> Cldr.DateTime.to_string datetime, format: :full, locale: Cldr.Locale.new!("en")
+      iex> Cldr.DateTime.to_string datetime, format: :hms, locale: "en"
+      {:ok, "11:59:59 PM"}
+      iex> Cldr.DateTime.to_string datetime, format: :full, locale: "en"
       {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
-      iex> Cldr.DateTime.to_string datetime, format: :full, locale: Cldr.Locale.new!("fr")
+      iex> Cldr.DateTime.to_string datetime, format: :full, locale: "fr"
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
   """
@@ -153,19 +155,17 @@ defmodule Cldr.DateTime do
   end
 
   # Look up for the format in :available_formats
-  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar) when is_atom(format) do
-    format_string =
-      locale_name
-      |> Format.date_time_available_formats(calendar)
-      |> Map.get(format)
-
-
+  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
+  when is_atom(format) do
+    with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar),
+         format_string <- Map.get(formats, format) do
       if format_string do
         {:ok, format_string}
       else
-        {:error, {Cldr.InvalidDateTimeFormatType, "Invalid datetime format type. " <>
+        {:error, {Cldr.InvalidDateTimeFormatType, "Invalid datetime format type #{inspect format}. " <>
                   "The valid types are #{inspect @format_types}."}}
       end
+    end
   end
 
   # Format with a number system

@@ -1,6 +1,13 @@
+# Changelog for Cldr_Dates_Times v1.2.2
+
+This is the changelog for Cldr_Dates_Times v1.2.2 released on April 18th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+
+## Bug Fixes
+
+* Fix date time format lookup for atom formats.  Fixes #3. Thanks to @lostkobrakai
+
 # Changelog for Cldr_Dates_Times v1.2.1
 
-This is the changelog for Cldr_Dates_Times v1.2.1 released on April 1st, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
 
 ## Bug Fixes
 
