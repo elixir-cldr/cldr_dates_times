@@ -11,7 +11,7 @@ defmodule Cldr.DateTime do
   CLDR provides standard format strings for `DateTime` which
   are reresented by the names `:short`, `:medium`, `:long`
   and `:full`.  This allows for locale-independent
-  formatting since each locale may define the underlying
+  formatting since each locale will define the underlying
   format string as appropriate.
   """
 
@@ -35,16 +35,23 @@ defmodule Cldr.DateTime do
     `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
     `:microsecond`.
 
-  * `options` is a keyword list of options for formatting.  The valid options are:
+  * `options` is a keyword list of options for formatting.
+
+  ## Options
+
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
       any of the keys returned by `Cldr.DateTime.available_format_names`.
       The default is `:medium`
+
     * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
       or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_current_locale/0`
+
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
+
     * `era: :variant` will use a variant for the era is one is available in the locale.
       In the "en" for example, the locale `era: :variant` will return "BCE" instead of "BC".
+
     * `period: :variant` will use a variant for the time period and flexible time period if
       one is available in the locale.  For example, in the "en" locale `period: :variant` will
       return "pm" instead of "PM"
@@ -105,16 +112,23 @@ defmodule Cldr.DateTime do
     `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
     `:microsecond`.
 
-  * `options` is a keyword list of options for formatting.  The valid options are:
+  * `options` is a keyword list of options for formatting.
+
+  ## Options
+
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
       any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.
       The default is `:medium`
+
     * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
       or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_current_locale/0`
+
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
+
     * `era: :variant` will use a variant for the era is one is available in the locale.
       In the "en" for example, the locale `era: :variant` will return "BCE" instead of "BC".
+
     * `period: :variant` will use a variant for the time period and flexible time period if
       one is available in the locale.  For example, in the "en" locale `period: :variant` will
       return "pm" instead of "PM"
