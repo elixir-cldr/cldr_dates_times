@@ -190,7 +190,7 @@ defmodule Cldr.DateTime do
         {:error,
          {Cldr.InvalidDateTimeFormatType,
           "Invalid datetime format type #{inspect(format)}. " <>
-            "The valid types are #{inspect(@format_types)}."}}
+            "The valid types are #{inspect(formats)}."}}
       end
     end
   end
