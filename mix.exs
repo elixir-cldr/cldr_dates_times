@@ -13,9 +13,9 @@ defmodule CldrDatesTimes.Mixfile do
       elixir: "~> 1.5",
       description: description(),
       package: package(),
-      start_permanent: Mix.env == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
-      compilers: Mix.compilers ++ [:cldr]
+      compilers: Mix.compilers() ++ [:cldr]
     ]
   end
 
@@ -58,17 +58,23 @@ defmodule CldrDatesTimes.Mixfile do
       licenses: ["Apache 2.0"],
       links: links(),
       files: [
-        "lib", "src", "config", "mix.exs", "README*", "CHANGELOG*", "LICENSE*"
+        "lib",
+        "src",
+        "config",
+        "mix.exs",
+        "README*",
+        "CHANGELOG*",
+        "LICENSE*"
       ]
     ]
   end
 
   def links do
     %{
-      "GitHub"    => "https://github.com/kipcole9/cldr_dates_times",
-      "Changelog" => "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/CHANGELOG.md",
-      "Readme"    => "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/README.md"
+      "GitHub" => "https://github.com/kipcole9/cldr_dates_times",
+      "Changelog" =>
+        "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/CHANGELOG.md",
+      "Readme" => "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/README.md"
     }
   end
-
 end

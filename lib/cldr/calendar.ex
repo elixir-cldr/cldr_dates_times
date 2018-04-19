@@ -38,7 +38,7 @@ defmodule Cldr.Calendar do
   end
 
   # Default territory is "World"
-  @default_territory Cldr.default_territory
+  @default_territory Cldr.default_territory()
 
   @doc """
   Returns the CLDR data that defines the structure
@@ -63,7 +63,7 @@ defmodule Cldr.Calendar do
         weekend_start: nil}
 
   """
-  @week_info Cldr.Config.week_info
+  @week_info Cldr.Config.week_info()
   def week_info do
     @week_info
   end
@@ -88,8 +88,8 @@ defmodule Cldr.Calendar do
   def first_day_of_week(locale) do
     with {:ok, locale} <- Cldr.validate_locale(locale) do
       (get_in(week_info(), [:first_day, territory_from_locale(locale)]) ||
-       get_in(week_info(), [:first_day, @default_territory]))
-       |> day_ordinal
+         get_in(week_info(), [:first_day, @default_territory]))
+      |> day_ordinal
     else
       {:error, reason} -> {:error, reason}
     end
@@ -137,7 +137,7 @@ defmodule Cldr.Calendar do
           eras: [{0, %{end: 0}}, {1, %{start: 1}}]}, ...
 
   """
-  @calendar_info Cldr.Config.calendar_info
+  @calendar_info Cldr.Config.calendar_info()
   def calendars do
     @calendar_info
   end
@@ -162,9 +162,9 @@ defmodule Cldr.Calendar do
       208
 
   """
-  def era_number_from_date(date, calendar \\ Cldr.Calendar.default_calendar) do
+  def era_number_from_date(date, calendar \\ Cldr.Calendar.default_calendar()) do
     date
-    |> Conversion.to_iso_days
+    |> Conversion.to_iso_days()
     |> era_from_iso_days(calendar)
   end
 
@@ -180,17 +180,22 @@ defmodule Cldr.Calendar do
   def era_from_iso_days(iso_days, calendar)
 
   for {calendar, content} <- @calendar_info do
-    Enum.each content[:eras], fn
+    Enum.each(content[:eras], fn
       {era, %{start: start, end: finish}} ->
         def era_from_iso_days(iso_days, unquote(calendar))
-          when iso_days in unquote(start)..unquote(finish), do: unquote(era)
+            when iso_days in unquote(start)..unquote(finish),
+            do: unquote(era)
+
       {era, %{start: start}} ->
         def era_from_iso_days(iso_days, unquote(calendar))
-          when iso_days >= unquote(start), do: unquote(era)
+            when iso_days >= unquote(start),
+            do: unquote(era)
+
       {era, %{end: finish}} ->
         def era_from_iso_days(iso_days, unquote(calendar))
-          when iso_days <= unquote(finish), do: unquote(era)
-    end
+            when iso_days <= unquote(finish),
+            do: unquote(era)
+    end)
   end
 
   @doc """
@@ -221,15 +226,31 @@ defmodule Cldr.Calendar do
   @doc """
   Converts a datetime to iso days
   """
-  def iso_days_from_datetime(%NaiveDateTime{year: year, month: month, day: day,
-                hour: hour, minute: minute, second: second, microsecond: microsecond,
-                calendar: calendar}) do
+  def iso_days_from_datetime(%NaiveDateTime{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: microsecond,
+        calendar: calendar
+      }) do
     calendar.naive_datetime_to_iso_days(year, month, day, hour, minute, second, microsecond)
   end
 
-  def iso_days_from_datetime(%DateTime{year: year, month: month, day: day,
-                hour: hour, minute: minute, second: second, microsecond: microsecond,
-                calendar: calendar, zone_abbr: "UTC", time_zone: "Etc/UTC"}) do
+  def iso_days_from_datetime(%DateTime{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: microsecond,
+        calendar: calendar,
+        zone_abbr: "UTC",
+        time_zone: "Etc/UTC"
+      }) do
     calendar.naive_datetime_to_iso_days(year, month, day, hour, minute, second, microsecond)
   end
 
@@ -252,10 +273,13 @@ defmodule Cldr.Calendar do
       365
 
   """
-  @spec day_of_year(Date.t) :: 1..366
+  @spec day_of_year(Date.t()) :: 1..366
   def day_of_year(%{year: year, month: _month, day: _day, calendar: calendar} = date) do
     {days, _fraction} = iso_days_from_date(date)
-    {new_year, _fraction} = iso_days_from_date(%{year: year, month: 1, day: 1, calendar: calendar})
+
+    {new_year, _fraction} =
+      iso_days_from_date(%{year: year, month: 1, day: 1, calendar: calendar})
+
     days - new_year + 1
   end
 
@@ -276,7 +300,7 @@ defmodule Cldr.Calendar do
       5
 
   """
-  @spec day_of_week(Date.t) :: 1..7
+  @spec day_of_week(Date.t()) :: 1..7
   def day_of_week(%{year: year, month: month, day: day, calendar: calendar}) do
     calendar.day_of_week(year, month, day)
   end
@@ -301,7 +325,7 @@ defmodule Cldr.Calendar do
   """
   def nth_week_of_year(%{year: _year, calendar: Calendar.ISO} = date, n) do
     date
-    |> ISOWeek.first_day_of_year
+    |> ISOWeek.first_day_of_year()
     |> add(7 * (n - 1))
   end
 
@@ -313,7 +337,7 @@ defmodule Cldr.Calendar do
 
   def nth_week_of_year(year, n, Calendar.ISO) do
     year
-    |> ISOWeek.first_day_of_year
+    |> ISOWeek.first_day_of_year()
     |> add(7 * (n - 1))
   end
 
@@ -438,43 +462,48 @@ defmodule Cldr.Calendar do
 
   @doc false
   def iso_days_to_float({days, {numerator, denominator}}) do
-    days + (numerator / denominator)
+    days + numerator / denominator
   end
 
   @doc false
   def calendar_error(calendar_name) do
-    {Cldr.UnknownCalendarError, "The calendar #{inspect calendar_name} is not known."}
+    {Cldr.UnknownCalendarError, "The calendar #{inspect(calendar_name)} is not known."}
   end
 
   #
   # Data storage functions
   #
   @doc false
-  def era(locale \\ Cldr.get_current_locale, calendar \\ @default_calendar)
+  def era(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
+
   def era(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
     era(cldr_locale_name, calendar)
   end
 
   @doc false
-  def period(locale \\ Cldr.get_current_locale, calendar \\ @default_calendar)
+  def period(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
+
   def period(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
     period(cldr_locale_name, calendar)
   end
 
   @doc false
-  def quarter(locale \\ Cldr.get_current_locale, calendar \\ @default_calendar)
+  def quarter(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
+
   def quarter(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
     quarter(cldr_locale_name, calendar)
   end
 
   @doc false
-  def month(locale \\ Cldr.get_current_locale, calendar \\ @default_calendar)
+  def month(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
+
   def month(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
     month(cldr_locale_name, calendar)
   end
 
   @doc false
-  def day(locale \\ Cldr.get_current_locale, calendar \\ @default_calendar)
+  def day(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
+
   def day(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
     day(cldr_locale_name, calendar)
   end
@@ -482,14 +511,14 @@ defmodule Cldr.Calendar do
   for locale_name <- Cldr.known_locale_names() do
     date_data =
       locale_name
-      |> Cldr.Config.get_locale
+      |> Cldr.Config.get_locale()
       |> Map.get(:dates)
 
     calendars =
       date_data
       |> Map.get(:calendars)
-      |> Map.take(Cldr.known_calendars)
-      |> Map.keys
+      |> Map.take(Cldr.known_calendars())
+      |> Map.keys()
 
     for calendar <- calendars do
       def era(unquote(locale_name), unquote(calendar)) do
@@ -513,16 +542,11 @@ defmodule Cldr.Calendar do
       end
     end
 
-    def era(unquote(locale_name), calendar),
-      do: {:error, calendar_error(calendar)}
-    def period(unquote(locale_name), calendar),
-      do: {:error, calendar_error(calendar)}
-    def quarter(unquote(locale_name), calendar),
-      do: {:error, calendar_error(calendar)}
-    def month(unquote(locale_name), calendar),
-      do: {:error, calendar_error(calendar)}
-    def day(unquote(locale_name), calendar),
-      do: {:error, calendar_error(calendar)}
+    def era(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def period(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def quarter(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def month(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
+    def day(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
   end
 
   def era(locale, _calendar), do: {:error, Locale.locale_error(locale)}
@@ -531,4 +555,3 @@ defmodule Cldr.Calendar do
   def month(locale, _calendar), do: {:error, Locale.locale_error(locale)}
   def day(locale, _calendar), do: {:error, Locale.locale_error(locale)}
 end
-

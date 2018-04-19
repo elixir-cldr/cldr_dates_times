@@ -1,5 +1,7 @@
 defmodule Cldr.Calendar.ISOWeek do
-  import Cldr.Calendar, only: [iso_days_from_date: 1, date_from_iso_days: 2, add: 2, day_of_year: 1]
+  import Cldr.Calendar,
+    only: [iso_days_from_date: 1, date_from_iso_days: 2, add: 2, day_of_year: 1]
+
   @doc """
   Returns the date of the first day of the first week of the year that includes
   the provided `date`.
@@ -20,6 +22,7 @@ defmodule Cldr.Calendar.ISOWeek do
   """
   def first_week_of_year(%{year: year, calendar: calendar} = date) do
     estimate = first_week_of_year(year, calendar)
+
     if Date.compare(estimate, date) in [:lt, :eq] do
       estimate
     else
@@ -30,9 +33,11 @@ defmodule Cldr.Calendar.ISOWeek do
   def first_week_of_year(year, calendar \\ Calendar.ISO) when is_integer(year) do
     new_year = %{year: year, month: 1, day: 1, calendar: calendar}
     {days, _fraction} = iso_days_from_date(new_year)
+
     case Date.day_of_week(new_year) do
       day when day in 1..4 ->
         date_from_iso_days({days - day + 1, {0, 1}}, calendar)
+
       day when day in 5..7 ->
         date_from_iso_days({days - day + 1 + 7, {0, 1}}, calendar)
     end
@@ -64,6 +69,7 @@ defmodule Cldr.Calendar.ISOWeek do
   """
   def last_week_of_year(%{year: year, calendar: calendar} = date) do
     estimate = last_week_of_year(year - 1, calendar)
+
     if Date.compare(add(estimate, 6), date) in [:gt, :eq] do
       estimate
     else
@@ -74,9 +80,11 @@ defmodule Cldr.Calendar.ISOWeek do
   def last_week_of_year(year, calendar \\ Calendar.ISO) when is_integer(year) do
     end_of_year = %{year: year, month: 12, day: 31, calendar: calendar}
     {days, _fraction} = iso_days_from_date(end_of_year)
+
     case Date.day_of_week(end_of_year) do
       day when day in 1..3 ->
         date_from_iso_days({days - day - 6, {0, 1}}, calendar)
+
       day when day in 4..7 ->
         date_from_iso_days({days - day + 1, {0, 1}}, calendar)
     end
@@ -109,6 +117,7 @@ defmodule Cldr.Calendar.ISOWeek do
   """
   def week_of_year(%{year: year, month: _month, day: _day, calendar: _calendar} = date) do
     week = div(day_of_year(date) - Date.day_of_week(date) + 10, 7)
+
     cond do
       week >= 1 and week < 53 -> week
       week < 1 -> week_of_year(last_week_of_year(year - 1))

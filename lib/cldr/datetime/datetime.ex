@@ -78,16 +78,26 @@ defmodule Cldr.DateTime do
 
   """
   def to_string(date, options \\ [])
-  def to_string(%{year: _year, month: _month, day: _day, hour: _hour, minute: _minute,
-      second: _second, calendar: calendar} = datetime, options) do
+
+  def to_string(
+        %{
+          year: _year,
+          month: _month,
+          day: _day,
+          hour: _hour,
+          minute: _minute,
+          second: _second,
+          calendar: calendar
+        } = datetime,
+        options
+      ) do
     options = Keyword.merge(default_options(), options)
 
-    with \
-      {:ok, locale} <- Cldr.validate_locale(options[:locale]),
-      {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
-      {:ok, format_string} <- format_string_from_format(options[:format], locale, cldr_calendar),
-      {:ok, formatted} <- Formatter.format(datetime, format_string, locale, options)
-    do
+    with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
+         {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
+         {:ok, format_string} <-
+           format_string_from_format(options[:format], locale, cldr_calendar),
+         {:ok, formatted} <- Formatter.format(datetime, format_string, locale, options) do
       {:ok, formatted}
     else
       {:error, reason} -> {:error, reason}
@@ -153,6 +163,7 @@ defmodule Cldr.DateTime do
 
   """
   def to_string!(date_time, options \\ [])
+
   def to_string!(date_time, options) do
     case to_string(date_time, options) do
       {:ok, string} -> string
@@ -162,7 +173,7 @@ defmodule Cldr.DateTime do
 
   # Standard format
   defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
-  when format in @format_types do
+       when format in @format_types do
     with {:ok, formats} <- Format.date_time_formats(locale_name, calendar) do
       {:ok, Map.get(formats, format)}
     end
@@ -170,31 +181,40 @@ defmodule Cldr.DateTime do
 
   # Look up for the format in :available_formats
   defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
-  when is_atom(format) do
+       when is_atom(format) do
     with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar),
          format_string <- Map.get(formats, format) do
       if format_string do
         {:ok, format_string}
       else
-        {:error, {Cldr.InvalidDateTimeFormatType, "Invalid datetime format type #{inspect format}. " <>
-                  "The valid types are #{inspect @format_types}."}}
+        {:error,
+         {Cldr.InvalidDateTimeFormatType,
+          "Invalid datetime format type #{inspect(format)}. " <>
+            "The valid types are #{inspect(@format_types)}."}}
       end
     end
   end
 
   # Format with a number system
-  defp format_string_from_format(%{number_system: number_system, format: format}, locale, calendar) do
+  defp format_string_from_format(
+         %{number_system: number_system, format: format},
+         locale,
+         calendar
+       ) do
     {:ok, format_string} = format_string_from_format(format, locale, calendar)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
   # Straight up format string
-  defp format_string_from_format(format_string, _locale, _calendar) when is_binary(format_string) do
+  defp format_string_from_format(format_string, _locale, _calendar)
+       when is_binary(format_string) do
     {:ok, format_string}
   end
 
   defp error_return(map, requirements) do
-    {:error, {ArgumentError, "Invalid date_time. Date_time is a map that requires at least #{inspect requirements} fields. " <>
-             "Found: #{inspect map}"}}
+    {:error,
+     {ArgumentError,
+      "Invalid date_time. Date_time is a map that requires at least #{inspect(requirements)} fields. " <>
+        "Found: #{inspect(map)}"}}
   end
 end
