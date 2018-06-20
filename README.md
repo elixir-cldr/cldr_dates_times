@@ -8,7 +8,7 @@
 
 `ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
 
-The primary api is `Cldr.Date.to_string/2`, `Cldr.Time.to_string/2`, `Cldr.DateTime.to_string/2` and `Cldr.Date.Relative.to_string/2`.  The following examples demonstrate:
+The primary api is `Cldr.Date.to_string/2`, `Cldr.Time.to_string/2`, `Cldr.DateTime.to_string/2` and `Cldr.DateTime.Relative.to_string/2`.  The following examples demonstrate:
 
 ```elixir
 iex> Cldr.Date.to_string Date.utc_today()
@@ -211,61 +211,61 @@ iex> Cldr.DateTime.to_string DateTime.utc_now, format: :gy_mmm_ed
 
 ## Relative Date, Time and DateTime Localization Formatting
 
-The primary API for formatting relative dates and datetimes is `Cldr.Date.Relative.to_string/2`.  Some examples:
+The primary API for formatting relative dates and datetimes is `Cldr.DateTime.Relative.to_string/2`.  Some examples:
 
 ```elixir
-      iex> Cldr.Date.Relative.to_string(-1)
+      iex> Cldr.DateTime.Relative.to_string(-1)
       {:ok, "1 second ago"}
 
-      iex> Cldr.Date.Relative.to_string(1)
+      iex> Cldr.DateTime.Relative.to_string(1)
       {:ok, "in 1 second"}
 
-      iex> Cldr.Date.Relative.to_string(1, unit: :day)
+      iex> Cldr.DateTime.Relative.to_string(1, unit: :day)
       {:ok, "tomorrow"}
 
-      iex> Cldr.Date.Relative.to_string(1, unit: :day, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1, unit: :day, locale: "fr")
       {:ok, "demain"}
 
       iex> Cldr.DateTime.Relative.to_string(1, unit: :day, format: :narrow)
       {:ok, "tomorrow"}
 
-      iex> Cldr.Date.Relative.to_string(1234, unit: :year)
+      iex> Cldr.DateTime.Relative.to_string(1234, unit: :year)
       {:ok, "in 1,234 years"}
 
-      iex> Cldr.Date.Relative.to_string(1234, unit: :year, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1234, unit: :year, locale: "fr")
       {:ok, "dans 1 234 ans"}
 
-      iex> Cldr.Date.Relative.to_string(31)
+      iex> Cldr.DateTime.Relative.to_string(31)
       {:ok, "in 31 seconds"}
 
-      iex> Cldr.Date.Relative.to_string(~D[2017-04-29], relative_to: ~D[2017-04-26])
+      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], relative_to: ~D[2017-04-26])
       {:ok, "in 3 days"}
 
-      iex> Cldr.Date.Relative.to_string(310, format: :short, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, format: :short, locale: "fr")
       {:ok, "dans 5 min"}
 
-      iex> Cldr.Date.Relative.to_string(310, format: :narrow, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, format: :narrow, locale: "fr")
       {:ok, "+5 min"}
 
-      iex> Cldr.Date.Relative.to_string 2, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string 2, unit: :wed, format: :short
       {:ok, "in 2 Wed."}
 
-      iex> Cldr.Date.Relative.to_string 1, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string 1, unit: :wed, format: :short
       {:ok, "next Wed."}
 
-      iex> Cldr.Date.Relative.to_string -1, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string -1, unit: :wed, format: :short
       {:ok, "last Wed."}
 
-      iex> Cldr.Date.Relative.to_string -1, unit: :wed
+      iex> Cldr.DateTime.Relative.to_string -1, unit: :wed
       {:ok, "last Wednesday"}
 
-      iex> Cldr.Date.Relative.to_string -1, unit: :quarter
+      iex> Cldr.DateTime.Relative.to_string -1, unit: :quarter
       {:ok, "last quarter"}
 
-      iex> Cldr.Date.Relative.to_string -1, unit: :mon, locale: "fr"
+      iex> Cldr.DateTime.Relative.to_string -1, unit: :mon, locale: "fr"
       {:ok, "lundi dernier"}
 
-      iex> Cldr.Date.Relative.to_string(~D[2017-04-29], unit: :ziggeraut)
+      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], unit: :ziggeraut)
       {:error, {Cldr.UnknownTimeUnit,
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
 ```
