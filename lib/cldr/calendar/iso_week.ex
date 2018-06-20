@@ -100,7 +100,17 @@ defmodule Cldr.Calendar.ISOWeek do
     |> add(6)
   end
 
-  def year(date) do
+  def year_number(%{year: year, month: _month, day: _day} =  date) do
+    first_day = first_day_of_year(date)
+    last_day = last_day_of_year(date)
+    cond do
+      first_day.month == 12 -> last_day.year
+      last_day.month == 1 -> first_day.year
+      true -> year
+    end
+  end
+
+  def year_range(date) do
     %Date.Range{first: first_day_of_year(date), last: last_day_of_year(date)}
   end
 
