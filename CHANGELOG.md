@@ -1,6 +1,6 @@
 # Changelog for Cldr_Dates_Times v1.3.1
 
-This is the changelog for Cldr_Dates_Times v1.2.2 released on July 20th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v1.3.1 released on July 20th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
 
 ## Enhancements
 
@@ -8,7 +8,7 @@ This is the changelog for Cldr_Dates_Times v1.2.2 released on July 20th, 2018.  
 
 # Changelog for Cldr_Dates_Times v1.3.0
 
-This is the changelog for Cldr_Dates_Times v1.2.2 released on April 18th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v1.3.0 released on April 18th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
 
 ## Enhancements
 
