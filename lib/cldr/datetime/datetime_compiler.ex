@@ -53,7 +53,7 @@ defmodule Cldr.DateTime.Compiler do
   """
   def tokenize(definition) when is_binary(definition) do
     definition
-    |> String.to_charlist
+    |> String.to_charlist()
     |> :datetime_format_lexer.string()
   end
 
@@ -78,7 +78,7 @@ defmodule Cldr.DateTime.Compiler do
   string efficiently.
 
   """
-  @spec compile(String.t) :: {:ok, List.t} | {:error, String.t}
+  @spec compile(String.t()) :: {:ok, List.t()} | {:error, String.t()}
   def compile(format_string)
 
   def compile("") do
@@ -92,11 +92,12 @@ defmodule Cldr.DateTime.Compiler do
   def compile(definition) when is_binary(definition) do
     {:ok, tokens, _end_line} = tokenize(definition)
 
-    transforms = Enum.map(tokens, fn {fun, _line, count} ->
-      quote do
-        Formatter.unquote(fun)(var!(date), unquote(count), var!(locale), var!(options))
-      end
-    end)
+    transforms =
+      Enum.map(tokens, fn {fun, _line, count} ->
+        quote do
+          Formatter.unquote(fun)(var!(date), unquote(count), var!(locale), var!(options))
+        end
+      end)
 
     {:ok, transforms}
   end
@@ -106,6 +107,6 @@ defmodule Cldr.DateTime.Compiler do
   end
 
   def compile(arg) do
-    raise ArgumentError, message: "No idea how to compile format: #{inspect arg}"
+    raise ArgumentError, message: "No idea how to compile format: #{inspect(arg)}"
   end
 end

@@ -11,4 +11,3 @@ config :ex_unit,
   module_load_timeout: 220_000,
   case_load_timeout: 220_000,
   timeout: 220_000
-

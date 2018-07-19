@@ -1,5 +1,4 @@
 defmodule Cldr.DateTime.Timezone do
-
   @doc """
   Converts the time zone offset of a `Time` or `DateTime` into
   seconds.
@@ -8,9 +7,8 @@ defmodule Cldr.DateTime.Timezone do
     offset = utc_offset + std_offset
 
     hours = div(offset, 3600)
-    minutes = div((offset - (hours * 3600)), 60)
-    seconds = offset - (hours * 3600) - (minutes * 60)
+    minutes = div(offset - hours * 3600, 60)
+    seconds = offset - hours * 3600 - minutes * 60
     {hours, minutes, seconds}
   end
 end
-

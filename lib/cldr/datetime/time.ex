@@ -63,16 +63,16 @@ defmodule Cldr.Time do
   """
 
   def to_string(time, options \\ [])
+
   def to_string(%{hour: _hour, minute: _minute} = time, options) do
     options = Keyword.merge(default_options(), options)
     calendar = Map.get(time, :calendar) || Calendar.ISO
 
-    with \
-      {:ok, locale} <- Cldr.validate_locale(options[:locale]),
-      {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
-      {:ok, format_string} <- format_string_from_format(options[:format], locale, cldr_calendar),
-      {:ok, formatted} <- Formatter.format(time, format_string, locale, options)
-    do
+    with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
+         {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
+         {:ok, format_string} <-
+           format_string_from_format(options[:format], locale, cldr_calendar),
+         {:ok, formatted} <- Formatter.format(time, format_string, locale, options) do
       {:ok, formatted}
     else
       {:error, reason} -> {:error, reason}
@@ -138,6 +138,7 @@ defmodule Cldr.Time do
 
   """
   def to_string!(time, options \\ [])
+
   def to_string!(time, options) do
     case to_string(time, options) do
       {:ok, string} -> string
@@ -146,28 +147,36 @@ defmodule Cldr.Time do
   end
 
   defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
-  when format in @format_types do
+       when format in @format_types do
     with {:ok, formats} <- Format.time_formats(locale_name, calendar) do
       {:ok, Map.get(formats, format)}
     end
   end
 
-  defp format_string_from_format(%{number_system: number_system, format: format}, locale, calendar) do
+  defp format_string_from_format(
+         %{number_system: number_system, format: format},
+         locale,
+         calendar
+       ) do
     {:ok, format_string} = format_string_from_format(format, locale, calendar)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
   defp format_string_from_format(format, _locale, _calendar) when is_atom(format) do
-    {:error, {Cldr.InvalidTimeFormatType, "Invalid time format type.  " <>
-              "The valid types are #{inspect @format_types}."}}
+    {:error,
+     {Cldr.InvalidTimeFormatType,
+      "Invalid time format type.  " <> "The valid types are #{inspect(@format_types)}."}}
   end
 
-  defp format_string_from_format(format_string, _locale, _calendar) when is_binary(format_string) do
+  defp format_string_from_format(format_string, _locale, _calendar)
+       when is_binary(format_string) do
     {:ok, format_string}
   end
 
   defp error_return(map, requirements) do
-    {:error, {ArgumentError, "Invalid time. Time is a map that requires at least #{inspect requirements} fields. " <>
-             "Found: #{inspect map}"}}
+    {:error,
+     {ArgumentError,
+      "Invalid time. Time is a map that requires at least #{inspect(requirements)} fields. " <>
+        "Found: #{inspect(map)}"}}
   end
 end

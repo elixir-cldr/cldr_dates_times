@@ -178,7 +178,12 @@ defmodule Cldr.DateTime.Formatter do
       {:ok, "17/09/03 10:09"}
 
   """
-  @spec format(Date.t | Time.t | DateTime.t, String.t, LanguageTag.t | Locale.t, Keyword.t) :: String.t
+  @spec format(
+          Date.t() | Time.t() | DateTime.t(),
+          String.t(),
+          LanguageTag.t() | Locale.t(),
+          Keyword.t()
+        ) :: String.t()
   def format(date, format, locale \\ Cldr.get_current_locale(), options \\ [])
 
   # Insert generated functions for each locale and format here which
@@ -196,7 +201,7 @@ defmodule Cldr.DateTime.Formatter do
           else
             formatted =
               formatted
-              |> Enum.join
+              |> Enum.join()
               |> transliterate(locale, number_system)
 
             {:ok, formatted}
@@ -204,7 +209,7 @@ defmodule Cldr.DateTime.Formatter do
         end
 
       {:error, message} ->
-        raise Cldr.FormatCompileError, "#{message} compiling date format: #{inspect format}"
+        raise Cldr.FormatCompileError, "#{message} compiling date format: #{inspect(format)}"
     end
   end
 
@@ -215,18 +220,22 @@ defmodule Cldr.DateTime.Formatter do
   def format(date, format, locale, options) do
     case Compiler.tokenize(format) do
       {:ok, tokens, _} ->
-        number_system = if is_map(format), do: format[:number_system], else: options[:number_system]
+        number_system =
+          if is_map(format), do: format[:number_system], else: options[:number_system]
+
         formatted = apply_transforms(tokens, date, locale, options)
 
         if error_list = format_errors(formatted) do
           {:error, Enum.join(error_list, "; ")}
         else
-          formatted = formatted
-          |> Enum.join
-          |> transliterate(locale, number_system)
+          formatted =
+            formatted
+            |> Enum.join()
+            |> transliterate(locale, number_system)
 
           {:ok, formatted}
         end
+
       {:error, reason} ->
         {:error, reason}
     end
@@ -235,9 +244,9 @@ defmodule Cldr.DateTime.Formatter do
   # Execute the transformation pipeline which does the
   # actual formatting
   defp apply_transforms(tokens, date, locale, options) do
-    Enum.map tokens, fn {token, _line, count} ->
+    Enum.map(tokens, fn {token, _line, count} ->
       apply(__MODULE__, token, [date, count, locale, options])
-    end
+    end)
   end
 
   defp transliterate(formatted, _locale, nil) do
@@ -251,7 +260,10 @@ defmodule Cldr.DateTime.Formatter do
   defp format_errors(list) do
     errors =
       list
-      |> Enum.filter(fn {:error, _reason} -> true; _ -> false end)
+      |> Enum.filter(fn
+        {:error, _reason} -> true
+        _ -> false
+      end)
       |> Enum.map(fn {:error, reason} -> reason end)
 
     if Enum.empty?(errors), do: nil, else: errors
@@ -288,7 +300,7 @@ defmodule Cldr.DateTime.Formatter do
       :evening1
 
   """
-  @spec time_period_for(Time.t | Map.t, binary) :: atom
+  @spec time_period_for(Time.t() | Map.t(), binary) :: atom
   def time_period_for(time, language)
 
   @doc """
@@ -330,14 +342,14 @@ defmodule Cldr.DateTime.Formatter do
         # For when the time range wraps around midnight
         %{"from" => [h1, 0], "before" => [h2, 0]} when h2 < h1 ->
           def time_period_for(%{hour: hour}, unquote(language))
-          when rem(hour, 24) >= unquote(h1) or rem(hour, 24) < unquote(h2) do
+              when rem(hour, 24) >= unquote(h1) or rem(hour, 24) < unquote(h2) do
             unquote(String.to_atom(period))
           end
 
         # For when the time range does not wrap around midnight
         %{"from" => [h1, 0], "before" => [h2, 0]} ->
           def time_period_for(%{hour: hour}, unquote(language))
-          when rem(hour, 24) >= unquote(h1) and rem(hour, 24) < unquote(h2) do
+              when rem(hour, 24) >= unquote(h1) and rem(hour, 24) < unquote(h2) do
             unquote(String.to_atom(period))
           end
       end
@@ -345,7 +357,7 @@ defmodule Cldr.DateTime.Formatter do
 
     # We also need a way to find out of a language supports the
     # concept of "noon" and "midnight"
-    if Map.get(periods, "noon") && Map.get(periods, "midnight")do
+    if Map.get(periods, "noon") && Map.get(periods, "midnight") do
       def language_has_noon_and_midnight?(unquote(language)), do: true
     end
   end
@@ -364,9 +376,15 @@ defmodule Cldr.DateTime.Formatter do
   this function crafts a date format string which is then inserted into
   the overall format being requested.
   """
-  @spec date(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec date(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def date(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def date(%{year: _year, month: _month, day: _day, calendar: _calendar} = d, _n, _locale, options) do
+
+  def date(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = d,
+        _n,
+        _locale,
+        options
+      ) do
     case Cldr.Date.to_string(d, options) do
       {:ok, date_string} -> date_string
       {:error, _reason} = error -> error
@@ -381,8 +399,9 @@ defmodule Cldr.DateTime.Formatter do
   this function crafts a time format string which is then inserted into
   the overall format being requested.
   """
-  @spec time(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec time(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def time(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def time(%{hour: _hour, minute: _minute} = t, _n, _locale, options) do
     case Cldr.Time.to_string(t, options) do
       {:ok, time_string} -> time_string
@@ -443,18 +462,35 @@ defmodule Cldr.DateTime.Formatter do
       "de l’ère commune"
 
   """
-  @spec era(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec era(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   @era_variant :era
   def era(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def era(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, n, locale, options) when n in 1..3 do
+
+  def era(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        n,
+        locale,
+        options
+      )
+      when n in 1..3 do
     get_era(date, :era_abbr, locale, options[@era_variant])
   end
 
-  def era(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 4, locale, options) do
+  def era(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        4,
+        locale,
+        options
+      ) do
     get_era(date, :era_names, locale, options[@era_variant])
   end
 
-  def era(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 5, locale, options) do
+  def era(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        5,
+        locale,
+        options
+      ) do
     get_era(date, :era_narrow, locale, options[@era_variant])
   end
 
@@ -522,8 +558,9 @@ defmodule Cldr.DateTime.Formatter do
       "02017"
 
   """
-  @spec year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec year(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def year(%{year: year}, 1, _locale, _options) do
     year
   end
@@ -609,19 +646,29 @@ defmodule Cldr.DateTime.Formatter do
       "02018"
 
   """
-  @spec week_aligned_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec week_aligned_year(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) ::
+          binary | {:error, binary}
   def week_aligned_year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date,
-                          2 = n, _locale, _options) do
+
+  def week_aligned_year(
+        %{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date,
+        2 = n,
+        _locale,
+        _options
+      ) do
     date
-    |> Kalendar.ISOWeek.last_week_of_year
+    |> Kalendar.ISOWeek.last_week_of_year()
     |> Map.get(:year)
     |> rem(100)
     |> pad(n)
   end
 
-  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: calendar} = date, 2 =
-                        n, _locale, _options) do
+  def week_aligned_year(
+        %{year: _year, month: _month, day: _day, calendar: calendar} = date,
+        2 = n,
+        _locale,
+        _options
+      ) do
     date
     |> calendar.last_week_of_year
     |> Map.get(:year)
@@ -629,16 +676,24 @@ defmodule Cldr.DateTime.Formatter do
     |> pad(n)
   end
 
-  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date,
-                        n, _locale, _options) do
+  def week_aligned_year(
+        %{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date,
+        n,
+        _locale,
+        _options
+      ) do
     date
-    |> Kalendar.ISOWeek.last_week_of_year
+    |> Kalendar.ISOWeek.last_week_of_year()
     |> Map.get(:year)
     |> pad(n)
   end
 
-  def week_aligned_year(%{year: _year, month: _month, day: _day, calendar: calendar} = date,
-                        n, _locale, _options) do
+  def week_aligned_year(
+        %{year: _year, month: _month, day: _day, calendar: calendar} = date,
+        n,
+        _locale,
+        _options
+      ) do
     date
     |> calendar.last_week_of_year
     |> Map.get(:year)
@@ -688,8 +743,9 @@ defmodule Cldr.DateTime.Formatter do
   For `u`, all field lengths specify a minimum number of
   digits; there is no special interpretation for `uu`.
   """
-  @spec extended_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec extended_year(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def extended_year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def extended_year(%{year: year, calendar: Calendar.ISO}, n, _locale, _options) do
     pad(year, n)
   end
@@ -732,8 +788,9 @@ defmodule Cldr.DateTime.Formatter do
   Currently the CLDR data only provides abbreviated names,
   which will be used for all requested name widths.
   """
-  @spec cyclic_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec cyclic_year(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def cyclic_year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def cyclic_year(%{year: year}, _n, _locale, _options) do
     year
   end
@@ -790,8 +847,9 @@ defmodule Cldr.DateTime.Formatter do
   lengths specify a minimum number of digits; there
   is no special interpretation for “rr”.
   """
-  @spec related_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec related_year(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def related_year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def related_year(%{year: year, calendar: Calendar.ISO}, _n, _locale, _options) do
     year
   end
@@ -860,11 +918,11 @@ defmodule Cldr.DateTime.Formatter do
       "2"
 
   """
-  @spec quarter(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec quarter(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def quarter(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def quarter(%{month: month}, 1, _locale, _options) when month in 1..3,   do: 1
-  def quarter(%{month: month}, 1, _locale, _options) when month in 4..6,   do: 2
-  def quarter(%{month: month}, 1, _locale, _options) when month in 7..9,   do: 3
+  def quarter(%{month: month}, 1, _locale, _options) when month in 1..3, do: 1
+  def quarter(%{month: month}, 1, _locale, _options) when month in 4..6, do: 2
+  def quarter(%{month: month}, 1, _locale, _options) when month in 7..9, do: 3
   def quarter(%{month: month}, 1, _locale, _options) when month in 10..12, do: 4
 
   def quarter(%{month: _month} = date, 2, locale, options) do
@@ -945,7 +1003,8 @@ defmodule Cldr.DateTime.Formatter do
       "2"
 
   """
-  @spec standalone_quarter(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec standalone_quarter(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) ::
+          binary | {:error, binary}
   def standalone_quarter(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
   def standalone_quarter(date, 1, locale, options), do: quarter(date, 1, locale, options)
   def standalone_quarter(date, 2, locale, options), do: quarter(date, 2, locale, options)
@@ -1018,8 +1077,9 @@ defmodule Cldr.DateTime.Formatter do
       "S"
 
   """
-  @spec month(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec month(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def month(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def month(%{month: month}, 1, _locale, _options) do
     month
   end
@@ -1093,8 +1153,10 @@ defmodule Cldr.DateTime.Formatter do
       "S"
 
   """
-  @spec standalone_month(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec standalone_month(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) ::
+          binary | {:error, binary}
   def standalone_month(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def standalone_month(%{month: month}, 1, _locale, _options) do
     month
   end
@@ -1163,15 +1225,26 @@ defmodule Cldr.DateTime.Formatter do
   ## Examples
 
   """
-  @spec week_of_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec week_of_year(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def week_of_year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def week_of_year(%{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date, n, _locale, _options) do
+
+  def week_of_year(
+        %{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date,
+        n,
+        _locale,
+        _options
+      ) do
     date
-    |> Kalendar.ISOWeek.week_of_year
+    |> Kalendar.ISOWeek.week_of_year()
     |> pad(n)
   end
 
-  def week_of_year(%{year: _year, month: _month, day: _day, calendar: calendar} = date, n, _locale, _options) do
+  def week_of_year(
+        %{year: _year, month: _month, day: _day, calendar: calendar} = date,
+        n,
+        _locale,
+        _options
+      ) do
     date
     |> calendar.week_of_year
     |> pad(n)
@@ -1210,9 +1283,15 @@ defmodule Cldr.DateTime.Formatter do
   ## Examples
 
   """
-  @spec week_of_month(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec week_of_month(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def week_of_month(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def week_of_month(%{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date, n, _locale, _options) do
+
+  def week_of_month(
+        %{year: _year, month: _month, day: _day, calendar: Calendar.ISO} = date,
+        n,
+        _locale,
+        _options
+      ) do
     {first_of_month, _fraction} = Kalendar.iso_days_from_date(Kalendar.first_day_of_month(date))
     {days, _fraction} = Kalendar.iso_days_from_date(date)
 
@@ -1263,8 +1342,9 @@ defmodule Cldr.DateTime.Formatter do
       "04"
 
   """
-  @spec day_of_month(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec day_of_month(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def day_of_month(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def day_of_month(%{day: day}, 1, _locale, _options) do
     day
   end
@@ -1321,11 +1401,17 @@ defmodule Cldr.DateTime.Formatter do
       "015"
 
   """
-  @spec day_of_year(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec day_of_year(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def day_of_year(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def day_of_year(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, n, _locale, _options) do
+
+  def day_of_year(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        n,
+        _locale,
+        _options
+      ) do
     date
-    |> Kalendar.day_of_year
+    |> Kalendar.day_of_year()
     |> pad(n)
   end
 
@@ -1389,21 +1475,43 @@ defmodule Cldr.DateTime.Formatter do
       "Tue"
 
   """
-  @spec day_name(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec day_name(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def day_name(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def day_name(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, n, locale, _options) when n in 1..3 do
+
+  def day_name(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        n,
+        locale,
+        _options
+      )
+      when n in 1..3 do
     get_day(date, locale, :format, :abbreviated)
   end
 
-  def day_name(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 4, locale, _options) do
+  def day_name(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        4,
+        locale,
+        _options
+      ) do
     get_day(date, locale, :format, :wide)
   end
 
-  def day_name(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 5, locale, _options) do
+  def day_name(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        5,
+        locale,
+        _options
+      ) do
     get_day(date, locale, :format, :narrow)
   end
 
-  def day_name(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 6, locale, _options) do
+  def day_name(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        6,
+        locale,
+        _options
+      ) do
     get_day(date, locale, :format, :short)
   end
 
@@ -1476,10 +1584,11 @@ defmodule Cldr.DateTime.Formatter do
       "02"
 
   """
-  @spec day_of_week(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec day_of_week(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def day_of_week(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def day_of_week(%{year: year, month: month, day: day, calendar: calendar}, n, locale, _options)
-  when n in 1..2 do
+      when n in 1..2 do
     # Calendar day is based upon Monday == 1
     calendar_day_of_week = calendar.day_of_week(year, month, day)
 
@@ -1490,12 +1599,22 @@ defmodule Cldr.DateTime.Formatter do
     |> pad(n)
   end
 
-  def day_of_week(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, n, locale, options)
-  when n >= 3 do
+  def day_of_week(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        n,
+        locale,
+        options
+      )
+      when n >= 3 do
     day_name(date, n, locale, options)
   end
 
-  def day_of_week(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, _n, _locale, _options) do
+  def day_of_week(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        _n,
+        _locale,
+        _options
+      ) do
     error_return(date, "e", [:year, :month, :day, :calendar])
   end
 
@@ -1559,26 +1678,53 @@ defmodule Cldr.DateTime.Formatter do
       "Tu"
 
   """
-  @spec standalone_day_of_week(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec standalone_day_of_week(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) ::
+          binary | {:error, binary}
   def standalone_day_of_week(date, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def standalone_day_of_week(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, n, locale, _options)
-  when n in 1..3 do
+
+  def standalone_day_of_week(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        n,
+        locale,
+        _options
+      )
+      when n in 1..3 do
     get_day(date, locale, :stand_alone, :abbreviated)
   end
 
-  def standalone_day_of_week(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 4, locale, _options) do
+  def standalone_day_of_week(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        4,
+        locale,
+        _options
+      ) do
     get_day(date, locale, :stand_alone, :wide)
   end
 
-  def standalone_day_of_week(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 5, locale, _options) do
+  def standalone_day_of_week(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        5,
+        locale,
+        _options
+      ) do
     get_day(date, locale, :stand_alone, :narrow)
   end
 
-  def standalone_day_of_week(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, 6, locale, _options) do
+  def standalone_day_of_week(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        6,
+        locale,
+        _options
+      ) do
     get_day(date, locale, :stand_alone, :short)
   end
 
-  def standalone_day_of_week(%{year: _year, month: _month, day: _day, calendar: _calendar} = date, _n, _locale, _options) do
+  def standalone_day_of_week(
+        %{year: _year, month: _month, day: _day, calendar: _calendar} = date,
+        _n,
+        _locale,
+        _options
+      ) do
     error_return(date, "c", [:year, :month, :day, :calendar])
   end
 
@@ -1645,10 +1791,11 @@ defmodule Cldr.DateTime.Formatter do
       "PM"
 
   """
-  @spec period_am_pm(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec period_am_pm(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   @period_variant :period
   def period_am_pm(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def period_am_pm(%{hour: _hour} = time, n, locale, options)  do
+
+  def period_am_pm(%{hour: _hour} = time, n, locale, options) do
     calendar = Map.get(time, :calendar, options[:calendar] || Calendar.ISO)
     type = period_type(n)
 
@@ -1659,6 +1806,7 @@ defmodule Cldr.DateTime.Formatter do
   def period_am_pm(time, _n, _locale, _options) do
     error_return(time, "a", [:hour])
   end
+
   defdelegate period(time, n, locale, options), to: __MODULE__, as: :period_am_pm
   defdelegate period(time, n, locale), to: __MODULE__, as: :period_am_pm
   defdelegate period(time, n), to: __MODULE__, as: :period_am_pm
@@ -1723,10 +1871,12 @@ defmodule Cldr.DateTime.Formatter do
       "pm"
 
   """
-  @spec period_noon_midnight(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec period_noon_midnight(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) ::
+          binary | {:error, binary}
   def period_noon_midnight(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def period_noon_midnight(%{hour: hour, minute: minute} = time, n, locale, options)
-  when (rem(hour, 12) == 0 or rem(hour, 24) == 0) and minute == 0 do
+      when (rem(hour, 12) == 0 or rem(hour, 24) == 0) and minute == 0 do
     calendar = Map.get(time, :calendar, options[:calendar] || Calendar.ISO)
     type = period_type(n)
 
@@ -1793,8 +1943,9 @@ defmodule Cldr.DateTime.Formatter do
       "at night"
 
   """
-  @spec period_flex(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec period_flex(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def period_flex(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def period_flex(%{hour: _hour, minute: _minute} = time, n, locale, options) do
     calendar = Map.get(time, :calendar, options[:calendar] || Calendar.ISO)
     time_period = time_period_for(time, locale.language)
@@ -1862,8 +2013,9 @@ defmodule Cldr.DateTime.Formatter do
       "11"
 
   """
-  @spec hour_1_12(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec hour_1_12(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def hour_1_12(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def hour_1_12(%{hour: hour}, n, _locale, _options) when hour in [0, 12, 24] do
     12
     |> pad(n)
@@ -1929,8 +2081,9 @@ defmodule Cldr.DateTime.Formatter do
       "9"
 
   """
-  @spec hour_0_11(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec hour_0_11(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def hour_0_11(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def hour_0_11(%{hour: hour}, n, _locale, _options) when hour in [0, 12, 24] do
     0
     |> pad(n)
@@ -1993,8 +2146,9 @@ defmodule Cldr.DateTime.Formatter do
       "24"
 
   """
-  @spec hour_1_24(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec hour_1_24(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def hour_1_24(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def hour_1_24(%{hour: hour}, n, _locale, _options) when hour in [0, 24] do
     24
     |> pad(n)
@@ -2052,8 +2206,9 @@ defmodule Cldr.DateTime.Formatter do
       "0"
 
   """
-  @spec hour_0_23(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec hour_0_23(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def hour_0_23(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def hour_0_23(%{hour: hour}, n, _locale, _options) when abs(hour) in [0, 24] do
     0
     |> pad(n)
@@ -2067,6 +2222,7 @@ defmodule Cldr.DateTime.Formatter do
   def hour_0_23(time, _n, _locale, _options) do
     error_return(time, "H", [:hour])
   end
+
   defdelegate hour(time, n, locale, options), to: __MODULE__, as: :hour_0_23
   defdelegate hour(time, n, locale), to: __MODULE__, as: :hour_0_23
   defdelegate hour(time, n), to: __MODULE__, as: :hour_0_23
@@ -2107,8 +2263,10 @@ defmodule Cldr.DateTime.Formatter do
       "03"
 
   """
-  @spec minute(Map.t, non_neg_integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec minute(Map.t(), non_neg_integer, Cldr.Locale.t(), Keyword.t()) ::
+          binary | {:error, binary}
   def minute(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def minute(%{minute: minute}, 1, _locale, _options) do
     minute
   end
@@ -2156,8 +2314,9 @@ defmodule Cldr.DateTime.Formatter do
       iex> Cldr.DateTime.Formatter.second %{second: 4}, 2
       "04"
   """
-  @spec second(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec second(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def second(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def second(%{second: second}, n, _locale, _options) do
     second
     |> pad(n)
@@ -2209,15 +2368,22 @@ defmodule Cldr.DateTime.Formatter do
       "4"
 
   """
-  @spec fractional_second(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec fractional_second(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) ::
+          binary | {:error, binary}
   def fractional_second(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
 
   # Note that TR35 says we should truncate the number of decimal digits
   # but we are rounding
   @microseconds 1_000_000
-  def fractional_second(%{second: second, microsecond: {fraction, resolution}}, n, _locale, _options) do
+  def fractional_second(
+        %{second: second, microsecond: {fraction, resolution}},
+        n,
+        _locale,
+        _options
+      ) do
     rounding = min(resolution, n)
-    ((second  * 1.0) + fraction / @microseconds)
+
+    (second * 1.0 + fraction / @microseconds)
     |> Float.round(rounding)
     |> to_string
   end
@@ -2274,21 +2440,23 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @milliseconds 1_000
-  @spec millisecond(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec millisecond(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def millisecond(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def millisecond(%{hour: hour, minute: minute, second: second,
-                    microsecond: {fraction, _resolution}}, n, _locale, _options) do
-    ((rem(hour, 24) * @milliseconds * 60 * 60) +
-    (minute * @milliseconds * 60) +
-    (second * @milliseconds) +
-    div(fraction, @milliseconds))
+
+  def millisecond(
+        %{hour: hour, minute: minute, second: second, microsecond: {fraction, _resolution}},
+        n,
+        _locale,
+        _options
+      ) do
+    (rem(hour, 24) * @milliseconds * 60 * 60 + minute * @milliseconds * 60 +
+       second * @milliseconds + div(fraction, @milliseconds))
     |> pad(n)
   end
 
   def millisecond(%{hour: hour, minute: minute, second: second}, n, _locale, _options) do
-    ((rem(hour, 24) * @milliseconds * 60 * 60) +
-    (minute * @milliseconds * 60) +
-    (second * @milliseconds))
+    (rem(hour, 24) * @milliseconds * 60 * 60 + minute * @milliseconds * 60 +
+       second * @milliseconds)
     |> pad(n)
   end
 
@@ -2337,13 +2505,19 @@ defmodule Cldr.DateTime.Formatter do
       "Etc/UTC"
 
   """
-  @spec zone_generic(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec zone_generic(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def zone_generic(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def zone_generic(%{time_zone: time_zone, utc_offset: _, std_offset: _}, 1, _locale, _options) do
     time_zone
   end
 
-  def zone_generic(%{time_zone: _time_zone, utc_offset: _, std_offset: _} = time, 4, locale, options) do
+  def zone_generic(
+        %{time_zone: _time_zone, utc_offset: _, std_offset: _} = time,
+        4,
+        locale,
+        options
+      ) do
     zone_id(time, 4, locale, options)
   end
 
@@ -2391,8 +2565,9 @@ defmodule Cldr.DateTime.Formatter do
       "GMT"
 
   """
-  @spec zone_generic(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec zone_generic(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def zone_short(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def zone_short(%{zone_abbr: zone_abbr}, n, _locale, _options) when n in 1..3 do
     zone_abbr
   end
@@ -2451,8 +2626,9 @@ defmodule Cldr.DateTime.Formatter do
       "GMT"
 
   """
-  @spec zone_id(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec zone_id(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def zone_id(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def zone_id(%{time_zone: _time_zone}, 1, _locale, _options) do
     "unk"
   end
@@ -2519,9 +2695,11 @@ defmodule Cldr.DateTime.Formatter do
       "+01:00:10"
 
   """
-  @spec zone_basic(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec zone_basic(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def zone_basic(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
-  def zone_basic(%{utc_offset: _offset, std_offset: _std_offset} = time, n, _locale, _options) when n in 1..3 do
+
+  def zone_basic(%{utc_offset: _offset, std_offset: _std_offset} = time, n, _locale, _options)
+      when n in 1..3 do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
     iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
   end
@@ -2601,12 +2779,14 @@ defmodule Cldr.DateTime.Formatter do
       "Z"
 
   """
-  @spec zone_iso_z(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec zone_iso_z(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def zone_iso_z(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def zone_iso_z(%{utc_offset: _offset, std_offset: _std_offset} = time, 1, _locale, _options) do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
+
       {hours, minutes, seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
         |> String.replace(~r/00\Z/, "")
@@ -2617,6 +2797,7 @@ defmodule Cldr.DateTime.Formatter do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
+
       {hours, minutes, seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
     end
@@ -2626,6 +2807,7 @@ defmodule Cldr.DateTime.Formatter do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
+
       {hours, minutes, seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
     end
@@ -2635,10 +2817,13 @@ defmodule Cldr.DateTime.Formatter do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
+
       {hours, minutes, 0 = seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+
       {hours, minutes, seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic) <> pad(seconds, 2)
+        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic) <>
+          pad(seconds, 2)
     end
   end
 
@@ -2646,6 +2831,7 @@ defmodule Cldr.DateTime.Formatter do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
+
       {hours, minutes, seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
     end
@@ -2721,10 +2907,12 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @iso_utc_offset_hours_minutes "+00:00"
-  @spec zone_iso_z(Map.t, integer, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
+  @spec zone_iso_z(Map.t(), integer, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
   def zone_iso(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def zone_iso(%{utc_offset: _offset, std_offset: _std_offset} = time, 1, _locale, _options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
+
     iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
     |> String.replace(~r/00\Z/, "")
   end
@@ -2738,6 +2926,7 @@ defmodule Cldr.DateTime.Formatter do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         @iso_utc_offset_hours_minutes
+
       {hours, minutes, _seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: 0}, format: :extended)
     end
@@ -2747,8 +2936,10 @@ defmodule Cldr.DateTime.Formatter do
     case Timezone.time_from_zone_offset(time) do
       {hours, minutes, 0 = seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+
       {hours, minutes, seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic) <> pad(seconds, 2)
+        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic) <>
+          pad(seconds, 2)
     end
   end
 
@@ -2756,6 +2947,7 @@ defmodule Cldr.DateTime.Formatter do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, 0} ->
         @iso_utc_offset_hours_minutes
+
       {hours, minutes, seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
     end
@@ -2802,6 +2994,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   def zone_gmt(time, n \\ 1, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def zone_gmt(%{utc_offset: _offset, std_offset: _std_offset} = time, 1, locale, _options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
     gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :short)
@@ -2825,8 +3018,9 @@ defmodule Cldr.DateTime.Formatter do
       "A literal"
 
   """
-  @spec literal(any, binary, Cldr.Locale.t, Keyword.t) :: binary | {:error, binary}
-  def literal(date, binary, locale \\ Cldr.get_current_locale, options \\ [])
+  @spec literal(any, binary, Cldr.Locale.t(), Keyword.t()) :: binary | {:error, binary}
+  def literal(date, binary, locale \\ Cldr.get_current_locale(), options \\ [])
+
   def literal(_date, binary, _locale, _options) do
     binary
   end
@@ -2836,31 +3030,42 @@ defmodule Cldr.DateTime.Formatter do
   # Compile the formats used for timezones GMT format
   defp gmt_tz_format(locale, offset, options \\ [])
 
-  for locale_name <- Cldr.known_locale_names do
+  for locale_name <- Cldr.known_locale_names() do
     {:ok, gmt_format} = Cldr.DateTime.Format.gmt_format(locale_name)
     {:ok, gmt_zero_format} = Cldr.DateTime.Format.gmt_zero_format(locale_name)
     {:ok, {pos_format, neg_format}} = Cldr.DateTime.Format.hour_format(locale_name)
     {:ok, pos_transforms} = Compiler.compile(pos_format)
     {:ok, neg_transforms} = Compiler.compile(neg_format)
 
-    defp gmt_tz_format(%LanguageTag{cldr_locale_name: unquote(locale_name)}, %{hour: 0, minute: 0}, _options) do
+    defp gmt_tz_format(
+           %LanguageTag{cldr_locale_name: unquote(locale_name)},
+           %{hour: 0, minute: 0},
+           _options
+         ) do
       unquote(gmt_zero_format)
     end
 
-    defp gmt_tz_format(%LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
-          %{hour: hour, minute: _minute} = date, options) when hour >= 0 do
+    defp gmt_tz_format(
+           %LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
+           %{hour: hour, minute: _minute} = date,
+           options
+         )
+         when hour >= 0 do
       unquote(pos_transforms)
       |> gmt_format_type(options[:format] || :long)
       |> Cldr.Substitution.substitute(unquote(gmt_format))
-      |> Enum.join
+      |> Enum.join()
     end
 
-    defp gmt_tz_format(%LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
-          %{hour: _hour, minute: _minute} = date, options) do
+    defp gmt_tz_format(
+           %LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
+           %{hour: _hour, minute: _minute} = date,
+           options
+         ) do
       unquote(neg_transforms)
       |> gmt_format_type(options[:format] || :long)
       |> Cldr.Substitution.substitute(unquote(gmt_format))
-      |> Enum.join
+      |> Enum.join()
     end
   end
 
@@ -2961,6 +3166,7 @@ defmodule Cldr.DateTime.Formatter do
 
   defp era_key(date, calendar, variant) do
     index = Kalendar.era_number_from_date(date, calendar)
+
     if variant do
       :"#{index}_alt_#{variant}"
     else
@@ -3020,7 +3226,7 @@ defmodule Cldr.DateTime.Formatter do
     if :cldr_calendar in functions_exported(calendar) do
       {:ok, calendar.cldr_calendar}
     else
-      {:ok, Kalendar.default_calendar}
+      {:ok, Kalendar.default_calendar()}
     end
   end
 
@@ -3030,6 +3236,7 @@ defmodule Cldr.DateTime.Formatter do
 
   defp pad(integer, n) when integer >= 0 do
     padding = n - number_of_digits(integer)
+
     if padding <= 0 do
       Integer.to_string(integer)
     else
@@ -3057,7 +3264,9 @@ defmodule Cldr.DateTime.Formatter do
   defp number_of_digits(n), do: Enum.count(Integer.digits(n))
 
   defp error_return(map, symbol, requirements) do
-    {:error, "The format symbol '#{symbol}' requires at least #{inspect requirements}.  Found: #{inspect map}"}
+    {:error,
+     "The format symbol '#{symbol}' requires at least #{inspect(requirements)}.  Found: #{
+       inspect(map)
+     }"}
   end
-
 end
