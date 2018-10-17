@@ -74,7 +74,7 @@ defmodule Cldr.DateTime.Relative do
       {:ok, "in 1,234 years"}
 
       iex> Cldr.DateTime.Relative.to_string(1234, unit: :year, locale: "fr")
-      {:ok, "dans 1 234 ans"}
+      {:ok, "dans 1 234 ans"}
 
       iex> Cldr.DateTime.Relative.to_string(31)
       {:ok, "in 31 seconds"}
@@ -92,10 +92,10 @@ defmodule Cldr.DateTime.Relative do
       {:ok, "in 2 Wed."}
 
       iex> Cldr.DateTime.Relative.to_string 1, unit: :wed, format: :short
-      {:ok, "next Wed."}
+      {:ok, "next Wed"}
 
       iex> Cldr.DateTime.Relative.to_string -1, unit: :wed, format: :short
-      {:ok, "last Wed."}
+      {:ok, "last Wed"}
 
       iex> Cldr.DateTime.Relative.to_string -1, unit: :wed
       {:ok, "last Wednesday"}

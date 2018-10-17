@@ -70,7 +70,7 @@ defmodule Cldr.DateTime do
       iex> Cldr.DateTime.to_string datetime, format: :long, locale: "en"
       {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
       iex> Cldr.DateTime.to_string datetime, format: :hms, locale: "en"
-      {:ok, "11:59:59 PM"}
+      {:ok, "23:59:59"}
       iex> Cldr.DateTime.to_string datetime, format: :full, locale: "en"
       {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
       iex> Cldr.DateTime.to_string datetime, format: :full, locale: "fr"

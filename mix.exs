@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "1.3.1"
+  @version "1.4.0"
 
   def project do
     [
@@ -42,9 +42,9 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, "~> 1.5"},
-      {:ex_cldr_numbers, "~> 1.4"},
-      {:ex_doc, "~> 0.18 or ~> 0.19.0-rc", optional: true, only: :dev},
+      {:ex_cldr, "~> 1.8"},
+      {:ex_cldr_numbers, "~> 1.6"},
+      {:ex_doc, "~> 0.18", optional: true, only: :dev},
       {:stream_data, "~> 0.4", only: :test},
       {:poison, "~> 2.1 or ~> 3.0", optional: true},
       {:jason, "~> 1.0", optional: true},
@@ -59,7 +59,7 @@ defmodule CldrDatesTimes.Mixfile do
       links: links(),
       files: [
         "lib",
-        "src/date_format_lexer.xrl",
+        "src/datetime_format_lexer.xrl",
         "config",
         "mix.exs",
         "README*",

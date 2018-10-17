@@ -72,6 +72,6 @@ defmodule Cldr.DatesTimes.Test do
                calendar: Calendar.ISO
              },
              format: "YYYY-MMM-dd KK:mm bb"
-           ) == {:ok, "2019-Jan-01 00:01 AM"}
+           ) == {:ok, "2019-Jan-01 00:01 am"}
   end
 end

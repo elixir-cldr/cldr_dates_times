@@ -1770,16 +1770,16 @@ defmodule Cldr.DateTime.Formatter do
   ## Examples
 
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}
-      "AM"
+      "am"
 
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 3, minute: 0}
-      "AM"
+      "am"
 
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}
-      "PM"
+      "pm"
 
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 21, minute: 0}
-      "PM"
+      "pm"
 
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}, 1, "en", period: :variant
       "am"
@@ -1861,10 +1861,10 @@ defmodule Cldr.DateTime.Formatter do
       "midnight"
 
       iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 11, minute: 0}
-      "AM"
+      "am"
 
       iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 16, minute: 0}
-      "PM"
+      "pm"
 
       iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 16, minute: 0}, 1, "en",
       ...> period: :variant
