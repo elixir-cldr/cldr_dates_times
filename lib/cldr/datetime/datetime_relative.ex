@@ -330,14 +330,7 @@ defmodule Cldr.DateTime.Relative do
     {:error, time_unit_error(unit)}
   end
 
-  for locale_name <- Cldr.known_locale_names() do
-    locale_data =
-      locale_name
-      |> Cldr.Config.get_locale()
-      |> Map.get(:date_fields)
-      |> Map.take(@unit_keys)
-
-    defp get_locale(%LanguageTag{cldr_locale_name: unquote(locale_name)}),
-      do: unquote(Macro.escape(locale_data))
+  defp get_locale(locale, backend) do
+    backend.get_locale(locale)
   end
 end

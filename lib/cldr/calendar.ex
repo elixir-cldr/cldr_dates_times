@@ -445,7 +445,7 @@ defmodule Cldr.Calendar do
   end
 
   @doc """
-  Returns a `Date.Rage` with the first date as the
+  Returns a `Date.Range` with the first date as the
   first day of the year and the last day as the last
   day of the year
 
@@ -470,88 +470,19 @@ defmodule Cldr.Calendar do
     {Cldr.UnknownCalendarError, "The calendar #{inspect(calendar_name)} is not known."}
   end
 
-  #
-  # Data storage functions
-  #
   @doc false
-  def era(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
-
-  def era(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-    era(cldr_locale_name, calendar)
-  end
+  def era(locale, calendar, backend), do: backend.era(calendar, backend)
 
   @doc false
-  def period(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
-
-  def period(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-    period(cldr_locale_name, calendar)
-  end
+  def period(locale, calendar, backend), do: backend.period(calendar, backend)
 
   @doc false
-  def quarter(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
-
-  def quarter(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-    quarter(cldr_locale_name, calendar)
-  end
+  def quarter(locale, calendar, backend), do: backend.quarter(calendar, backend)
 
   @doc false
-  def month(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
-
-  def month(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-    month(cldr_locale_name, calendar)
-  end
+  def month(locale, calendar, backend), do: backend.month(calendar, backend)
 
   @doc false
-  def day(locale \\ Cldr.get_current_locale(), calendar \\ @default_calendar)
-
-  def day(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-    day(cldr_locale_name, calendar)
-  end
-
-  for locale_name <- Cldr.known_locale_names() do
-    date_data =
-      locale_name
-      |> Cldr.Config.get_locale()
-      |> Map.get(:dates)
-
-    calendars =
-      date_data
-      |> Map.get(:calendars)
-      |> Map.take(Cldr.known_calendars())
-      |> Map.keys()
-
-    for calendar <- calendars do
-      def era(unquote(locale_name), unquote(calendar)) do
-        unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :eras])))
-      end
-
-      def period(unquote(locale_name), unquote(calendar)) do
-        unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :day_periods])))
-      end
-
-      def quarter(unquote(locale_name), unquote(calendar)) do
-        unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :quarters])))
-      end
-
-      def month(unquote(locale_name), unquote(calendar)) do
-        unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :months])))
-      end
-
-      def day(unquote(locale_name), unquote(calendar)) do
-        unquote(Macro.escape(get_in(date_data, [:calendars, calendar, :days])))
-      end
-    end
-
-    def era(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
-    def period(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
-    def quarter(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
-    def month(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
-    def day(unquote(locale_name), calendar), do: {:error, calendar_error(calendar)}
-  end
-
-  def era(locale, _calendar), do: {:error, Locale.locale_error(locale)}
-  def period(locale, _calendar), do: {:error, Locale.locale_error(locale)}
-  def quarter(locale, _calendar), do: {:error, Locale.locale_error(locale)}
-  def month(locale, _calendar), do: {:error, Locale.locale_error(locale)}
-  def day(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+  def day(locale, calendar, backend), do: backend.day(calendar, backend)
+end
 end
