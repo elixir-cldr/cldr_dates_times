@@ -3,6 +3,10 @@
 [![Hex pm](http://img.shields.io/hexpm/v/ex_cldr_dates_times.svg?style=flat)](https://hex.pm/packages/ex_cldr_dates_times)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/kipcole9/cldr_dates_times/blob/master/LICENSE)
 
+# Compatibility
+
+The master branch of `cldr_dates_times` is compatible with `cldr` version 1.x only.  Work is in progress for `cldr_dates_times` version 2.0 with an estimated availabiity of January 2019.
+
 ## Introduction and Getting Started
 
 `ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
