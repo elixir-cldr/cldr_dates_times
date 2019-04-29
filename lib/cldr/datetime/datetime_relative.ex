@@ -203,23 +203,23 @@ defmodule Cldr.DateTime.Relative do
     end
   end
 
-  defp to_string(relative, unit, locale, options)
+  defp to_string(relative, unit, locale, backend, options)
        when is_integer(relative) and relative in [-1, 0, +1] do
     result =
       locale
-      |> get_locale()
+      |> get_locale(backend)
       |> get_in([unit, options[:format], :relative_ordinal])
       |> Enum.at(relative + 1)
 
     if is_nil(result), do: to_string(relative / 1, unit, locale, options), else: result
   end
 
-  defp to_string(relative, unit, locale, options) when is_number(relative) do
+  defp to_string(relative, unit, locale, backend, options) when is_number(relative) do
     direction = if relative > 0, do: :relative_future, else: :relative_past
 
     rules =
       locale
-      |> get_locale()
+      |> get_locale(backend)
       |> get_in([unit, options[:format], direction])
 
     rule = Cldr.Number.Cardinal.pluralize(trunc(relative), locale, rules)

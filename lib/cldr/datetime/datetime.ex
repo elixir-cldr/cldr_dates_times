@@ -15,7 +15,6 @@ defmodule Cldr.DateTime do
   format string as appropriate.
   """
 
-  require Cldr
   alias Cldr.DateTime.{Format, Formatter}
   alias Cldr.LanguageTag
 

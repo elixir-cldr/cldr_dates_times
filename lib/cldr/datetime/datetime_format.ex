@@ -23,15 +23,14 @@ defmodule Cldr.DateTime.Format do
           short: String.t()
         }
   @type formats :: Map.t()
-  @type calendar :: atom
 
   @doc """
   Returns a list of all formats defined
   for the configured locales.
   """
-  def format_list do
-    ((known_formats(&all_date_formats/1) ++
-        known_formats(&all_time_formats/1) ++ known_formats(&all_date_time_formats/1)) ++
+  def format_list(backend) do
+    ((known_formats(&all_date_formats(&1, backend)) ++
+        known_formats(&all_time_formats(&1, backend)) ++ known_formats(&all_date_time_formats(&1, backend))) ++
        configured_precompile_list())
     |> Enum.reject(&is_atom/1)
     |> Enum.uniq()
@@ -57,7 +56,9 @@ defmodule Cldr.DateTime.Format do
        :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
 
   """
-  @spec calendars_for(Locale.name() | LanguageTag.t()) :: [calendar, ...]
+  @spec calendars_for(Locale.name() | LanguageTag.t(), Cldr.backend()) ::
+    [Cldr.Calendar.t(), ...]
+
   def calendars_for(locale, backend),
     do: backend.calendars_for(locale)
 
@@ -75,7 +76,7 @@ defmodule Cldr.DateTime.Format do
       {:ok, ["GMT", 0]}
 
   """
-  @spec gmt_format(Locale.name() | LanguageTag) :: [non_neg_integer | String.t(), ...]
+  @spec gmt_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: [non_neg_integer | String.t(), ...]
   def gmt_format(locale, backend),
     do: backend.gmt_format(locale)
 
@@ -94,7 +95,7 @@ defmodule Cldr.DateTime.Format do
       {:ok, "GMT"}
 
   """
-  @spec gmt_zero_format(Locale.name() | LanguageTag) :: String.t()
+  @spec gmt_zero_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: String.t()
   def gmt_zero_format(locale, backend),
     do: backend.gmt_zero_format(locale)
 
@@ -112,7 +113,7 @@ defmodule Cldr.DateTime.Format do
       {:ok, {"+HH:mm", "-HH:mm"}}
 
   """
-  @spec hour_format(Locale.name() | LanguageTag) :: {String.t(), String.t()}
+  @spec hour_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: {String.t(), String.t()}
   def hour_format(locale, backend),
     do: backend.hour_format(locale)
 
@@ -145,7 +146,7 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec date_formats(Locale.name() | LanguageTag.t(), calendar) :: standard_formats
+  @spec date_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) :: standard_formats
   def date_formats(locale, calendar, backend),
     do: backend.date_formats(locale, calendar)
 
@@ -178,7 +179,7 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec time_formats(Locale.name() | LanguageTag, calendar) :: standard_formats
+  @spec time_formats(Locale.name() | LanguageTag, Cldr.Calendar.t(), Cldr.backend()) :: standard_formats
   def time_formats(locale, calendar, backend),
     do: backend.time_formats(locale, calendar)
 
@@ -211,7 +212,7 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec date_time_formats(Locale.name() | LanguageTag, calendar) :: standard_formats
+  @spec date_time_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) :: standard_formats
   def date_time_formats(locale, calendar, backend),
     do: backend.date_time_formats(locale, calendar)
 
@@ -277,7 +278,7 @@ defmodule Cldr.DateTime.Format do
        }}
 
   """
-  @spec date_time_available_formats(Locale.name() | LanguageTag, calendar) :: formats
+  @spec date_time_available_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) :: formats
   def date_time_available_formats(locale, calendar, backend),
     do: backend.date_time_available_formats(locale, calendar)
 
@@ -299,9 +300,9 @@ defmodule Cldr.DateTime.Format do
       :y_mmm_ed, :y_mmmm, :y_qqq, :y_qqqq, :yw_count_other]
 
   """
-  def common_date_time_format_names do
-    Cldr.known_locale_names()
-    |> Enum.map(&date_time_available_formats/1)
+  def common_date_time_format_names(backend) do
+    Cldr.known_locale_names(backend)
+    |> Enum.map(&backend.date_time_available_formats/1)
     |> Enum.map(&elem(&1, 1))
     |> Enum.map(&Map.keys/1)
     |> Enum.map(&MapSet.new/1)
@@ -317,21 +318,21 @@ defmodule Cldr.DateTime.Format do
     |> Enum.uniq()
   end
 
-  defp all_date_formats(locale) do
-    all_formats_for(locale, &date_formats/2)
+  defp all_date_formats(locale, backend) do
+    all_formats_for(locale, backend, &backend.date_formats/2)
   end
 
-  defp all_time_formats(locale) do
-    all_formats_for(locale, &time_formats/2)
+  defp all_time_formats(locale, backend) do
+    all_formats_for(locale, backend, &backend.time_formats/2)
   end
 
-  defp all_date_time_formats(locale) do
-    all_formats_for(locale, &date_time_formats/2) ++
-      all_formats_for(locale, &date_time_available_formats/2)
+  defp all_date_time_formats(locale, backend) do
+    all_formats_for(locale, backend, &backend.date_time_formats/2) ++
+      all_formats_for(locale, backend, &backend.date_time_available_formats/2)
   end
 
-  defp all_formats_for(locale, type_function) do
-    with {:ok, calendars} <- calendars_for(locale) do
+  defp all_formats_for(locale, backend, type_function) do
+    with {:ok, calendars} <- calendars_for(locale, backend) do
       Enum.map(calendars, fn calendar ->
         {:ok, calendar_formats} = type_function.(locale, calendar)
         Map.values(calendar_formats)
