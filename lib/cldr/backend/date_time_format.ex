@@ -584,6 +584,48 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         def language_has_noon_and_midnight?(_), do: false
+
+        # Compile the formats used for timezones GMT format
+        defp gmt_tz_format(locale, offset, options \\ [])
+
+        for locale_name <- Cldr.known_locale_names() do
+          {:ok, gmt_format} = Cldr.DateTime.Format.gmt_format(locale_name)
+          {:ok, gmt_zero_format} = Cldr.DateTime.Format.gmt_zero_format(locale_name)
+          {:ok, {pos_format, neg_format}} = Cldr.DateTime.Format.hour_format(locale_name)
+          {:ok, pos_transforms} = Compiler.compile(pos_format)
+          {:ok, neg_transforms} = Compiler.compile(neg_format)
+
+          defp gmt_tz_format(
+                 %LanguageTag{cldr_locale_name: unquote(locale_name)},
+                 %{hour: 0, minute: 0},
+                 _options
+               ) do
+            unquote(gmt_zero_format)
+          end
+
+          defp gmt_tz_format(
+                 %LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
+                 %{hour: hour, minute: _minute} = date,
+                 options
+               )
+               when hour >= 0 do
+            unquote(pos_transforms)
+            |> gmt_format_type(options[:format] || :long)
+            |> Cldr.Substitution.substitute(unquote(gmt_format))
+            |> Enum.join()
+          end
+
+          defp gmt_tz_format(
+                 %LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
+                 %{hour: _hour, minute: _minute} = date,
+                 options
+               ) do
+            unquote(neg_transforms)
+            |> gmt_format_type(options[:format] || :long)
+            |> Cldr.Substitution.substitute(unquote(gmt_format))
+            |> Enum.join()
+          end
+        end
       end
     end
   end
