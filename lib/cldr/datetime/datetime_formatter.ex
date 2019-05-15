@@ -578,17 +578,21 @@ defmodule Cldr.DateTime.Formatter do
   @spec related_year(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) :: binary | {:error, binary}
   def related_year(date, n \\ 1, locale \\ Cldr.get_locale(), backend \\ Cldr.default_backend(), options \\ [])
 
-  def related_year(%{year: year, calendar: Calendar.ISO}, _n, _locale, _options) do
+  def related_year(%{year: year, calendar: Calendar.ISO}, _n, _locale, _backend, _options) do
     year
   end
 
-  def related_year(%{} = date, _n, _locale, _options) do
+  def related_year(%{year: year, calendar: Cldr.Calendar.Gregorian}, _n, _locale, _backend, _options) do
+    year
+  end
+
+  def related_year(date, _n, _locale, _backend, _options) do
     date
     |> Date.convert!(Calendar.ISO)
     |> Map.get(:year)
   end
 
-  def related_year(date, _n, _locale, _options) do
+  def related_year(date, _n, _locale, _backend, _options) do
     error_return(date, "r", [:year, :calendar])
   end
 
@@ -608,7 +612,7 @@ defmodule Cldr.DateTime.Formatter do
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-    used in `quarter/4`
+    used in `quarter/5`
 
   ## Format Symbol
 
@@ -648,32 +652,30 @@ defmodule Cldr.DateTime.Formatter do
   """
   @spec quarter(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) :: binary | {:error, binary}
   def quarter(date, n \\ 1, locale \\ Cldr.get_locale(), backend \\ Cldr.default_backend(), options \\ [])
-  def quarter(%{month: month}, 1, _locale, _options) when month in 1..3, do: 1
-  def quarter(%{month: month}, 1, _locale, _options) when month in 4..6, do: 2
-  def quarter(%{month: month}, 1, _locale, _options) when month in 7..9, do: 3
-  def quarter(%{month: month}, 1, _locale, _options) when month in 10..12, do: 4
 
-  def quarter(%{month: _month} = date, 2, locale, options) do
-    quarter(date, 1, locale, options)
+  def quarter(date, 1, locale, backend, options) do
+    Cldr.Calendar.quarter_of_year(date)
+  end
+
+  def quarter(date, 2, locale, backend, options) do
+    date
+    |> Cldr.Calendar.quarter_of_year
     |> pad(2)
   end
 
-  def quarter(%{month: _month, calendar: calendar} = date, 3, locale, options) do
-    quarter(date, 1, locale, options)
-    |> get_quarter(locale, calendar, :format, :abbreviated)
+  def quarter(date, 3, locale, backend, options) do
+    Cldr.Calendar.localize(date, :quarter, locale: locale, backend: backend, format: :abbreviated)
   end
 
-  def quarter(%{month: _month, calendar: calendar} = date, 4, locale, options) do
-    quarter(date, 1, locale, options)
-    |> get_quarter(locale, calendar, :format, :wide)
+  def quarter(date, 4, locale, backend, options) do
+    Cldr.Calendar.localize(date, :quarter, locale: locale, backend: backend, format: :wide)
   end
 
-  def quarter(%{month: _month, calendar: calendar} = date, 5, locale, options) do
-    quarter(date, 1, locale, options)
-    |> get_quarter(locale, calendar, :format, :narrow)
+  def quarter(date, 5, locale, backend, options) do
+    Cldr.Calendar.localize(date, :quarter, locale: locale, backend: backend, format: :narrow)
   end
 
-  def quarter(date, _n, _locale, _options) do
+  def quarter(date, _n, _locale, _backend, _options) do
     error_return(date, "Q", [:month])
   end
 
@@ -693,7 +695,7 @@ defmodule Cldr.DateTime.Formatter do
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-    used in `standalone_quarter/4`
+    used in `standalone_quarter/5`
 
   ## Format Symbol
 
@@ -710,23 +712,23 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex(1)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
       ...> calendar: Calendar.ISO}, 1
       2
 
-      iex(2)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
       ...> calendar: Calendar.ISO}, 2
       "02"
 
-      iex(3)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
       ...> calendar: Calendar.ISO}, 3
       "Q2"
 
-      iex(4)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
       ...> calendar: Calendar.ISO}, 4
       "2nd quarter"
 
-      iex(5)> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
       ...> calendar: Calendar.ISO}, 5
       "2"
 
