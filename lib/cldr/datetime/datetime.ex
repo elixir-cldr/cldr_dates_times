@@ -76,39 +76,34 @@ defmodule Cldr.DateTime do
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
   """
-  def to_string(date, options \\ [])
+  def to_string(datetime, backend, options \\ [])
 
-  def to_string(
-        %{
-          year: _year,
-          month: _month,
-          day: _day,
-          hour: _hour,
-          minute: _minute,
-          second: _second,
-          calendar: calendar
-        } = datetime,
-        options
-      ) do
+  def to_string(datetime, backend, options) when is_list(options) do
     options = Keyword.merge(default_options(), options)
+    format_backend = Module.concat(backend, DateTime.Format)
+    %{calendar: calendar} = datetime
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
-         {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
+         {:ok, cldr_calendar} <- type_from_calendar(calendar),
          {:ok, format_string} <-
-           format_string_from_format(options[:format], locale, cldr_calendar),
-         {:ok, formatted} <- Formatter.format(datetime, format_string, locale, options) do
+           format_string_from_format(options[:format], locale, backend, cldr_calendar),
+         {:ok, formatted} <- format_backend.format(datetime, format_string, locale, options) do
       {:ok, formatted}
     else
       {:error, reason} -> {:error, reason}
     end
   end
 
-  def to_string(datetime, _options) do
+  def to_string(datetime, _backend, _options) do
     error_return(datetime, [:year, :month, :day, :hour, :minute, :second, :calendar])
   end
 
   defp default_options do
-    [format: :medium, locale: Cldr.get_current_locale()]
+    [format: :medium, locale: Cldr.get_locale()]
+  end
+
+  def type_from_calendar(_) do
+    :gregorian
   end
 
   @doc """
@@ -161,27 +156,37 @@ defmodule Cldr.DateTime do
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
   """
-  def to_string!(date_time, options \\ [])
+  def to_string!(datetime, backend, options \\ [])
 
-  def to_string!(date_time, options) do
-    case to_string(date_time, options) do
+  def to_string!(datetime, backend, options) do
+    case to_string(datetime, backend, options) do
       {:ok, string} -> string
       {:error, {exception, message}} -> raise exception, message
     end
   end
 
   # Standard format
-  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
+  defp format_string_from_format(
+         format,
+         %LanguageTag{cldr_locale_name: locale_name},
+         backend,
+         calendar
+       )
        when format in @format_types do
-    with {:ok, formats} <- Format.date_time_formats(locale_name, calendar) do
+    with {:ok, formats} <- Format.date_time_formats(locale_name, backend, calendar) do
       {:ok, Map.get(formats, format)}
     end
   end
 
   # Look up for the format in :available_formats
-  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
+  defp format_string_from_format(
+         format,
+         %LanguageTag{cldr_locale_name: locale_name},
+         backend,
+         calendar
+       )
        when is_atom(format) do
-    with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar),
+    with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend),
          format_string <- Map.get(formats, format) do
       if format_string do
         {:ok, format_string}
@@ -198,14 +203,15 @@ defmodule Cldr.DateTime do
   defp format_string_from_format(
          %{number_system: number_system, format: format},
          locale,
+         backend,
          calendar
        ) do
-    {:ok, format_string} = format_string_from_format(format, locale, calendar)
+    {:ok, format_string} = format_string_from_format(format, locale, backend, calendar)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
   # Straight up format string
-  defp format_string_from_format(format_string, _locale, _calendar)
+  defp format_string_from_format(format_string, _locale, _backend, _calendar)
        when is_binary(format_string) do
     {:ok, format_string}
   end

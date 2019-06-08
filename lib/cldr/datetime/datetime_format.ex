@@ -9,7 +9,6 @@ defmodule Cldr.DateTime.Format do
   during the formatting process.
   """
 
-  alias Cldr.Calendar, as: Kalendar
   alias Cldr.Locale
   alias Cldr.LanguageTag
   alias Cldr.Config
@@ -30,7 +29,8 @@ defmodule Cldr.DateTime.Format do
   """
   def format_list(backend) do
     ((known_formats(&all_date_formats(&1, backend)) ++
-        known_formats(&all_time_formats(&1, backend)) ++ known_formats(&all_date_time_formats(&1, backend))) ++
+        known_formats(&all_time_formats(&1, backend)) ++
+        known_formats(&all_date_time_formats(&1, backend))) ++
        configured_precompile_list())
     |> Enum.reject(&is_atom/1)
     |> Enum.uniq()
@@ -57,7 +57,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec calendars_for(Locale.name() | LanguageTag.t(), Cldr.backend()) ::
-    [Cldr.Calendar.t(), ...]
+          [Cldr.Calendar.t(), ...]
 
   def calendars_for(locale, backend),
     do: backend.calendars_for(locale)
@@ -76,7 +76,10 @@ defmodule Cldr.DateTime.Format do
       {:ok, ["GMT", 0]}
 
   """
-  @spec gmt_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: [non_neg_integer | String.t(), ...]
+  @spec gmt_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: [
+          non_neg_integer | String.t(),
+          ...
+        ]
   def gmt_format(locale, backend),
     do: backend.gmt_format(locale)
 
@@ -146,9 +149,11 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec date_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) :: standard_formats
-  def date_formats(locale, calendar, backend),
-    do: backend.date_formats(locale, calendar)
+  @spec date_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) ::
+          standard_formats
+  def date_formats(locale, calendar, backend \\ Cldr.default_backend()) do
+    backend.date_formats(locale, calendar)
+  end
 
   @doc """
   Returns a map of the standard time formats for a given locale and calendar.
@@ -179,7 +184,8 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec time_formats(Locale.name() | LanguageTag, Cldr.Calendar.t(), Cldr.backend()) :: standard_formats
+  @spec time_formats(Locale.name() | LanguageTag, Cldr.Calendar.t(), Cldr.backend()) ::
+          standard_formats
   def time_formats(locale, calendar, backend),
     do: backend.time_formats(locale, calendar)
 
@@ -212,7 +218,8 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec date_time_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) :: standard_formats
+  @spec date_time_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) ::
+          standard_formats
   def date_time_formats(locale, calendar, backend),
     do: backend.date_time_formats(locale, calendar)
 
@@ -278,10 +285,13 @@ defmodule Cldr.DateTime.Format do
        }}
 
   """
-  @spec date_time_available_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) :: formats
+  @spec date_time_available_formats(
+          Locale.name() | LanguageTag.t(),
+          Cldr.Calendar.t(),
+          Cldr.backend()
+        ) :: formats
   def date_time_available_formats(locale, calendar, backend),
     do: backend.date_time_available_formats(locale, calendar)
-
 
   @doc """
   Returns a list of the date_time format types that are

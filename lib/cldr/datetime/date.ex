@@ -61,28 +61,30 @@ defmodule Cldr.Date do
 
   """
 
-  def to_string(date, options \\ [])
+  def to_string(date, backend \\ Cldr.default_backend, options \\ [])
 
-  def to_string(%{year: _year, month: _month, day: _day, calendar: calendar} = date, options) do
+  def to_string(date, backend, options) do
     options = Keyword.merge(default_options(), options)
+    %{calendar: calendar} = date
+    format_backend = Module.concat(backend, DateTime.Format)
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
-         {:ok, cldr_calendar} <- Formatter.type_from_calendar(calendar),
+         {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, format_string} <-
-           format_string_from_format(options[:format], locale, cldr_calendar),
-         {:ok, formatted} <- Formatter.format(date, format_string, locale, options) do
+           format_string_from_format(options[:format], locale, cldr_calendar, backend),
+         {:ok, formatted} <- format_backend.format(date, format_string, locale, options) do
       {:ok, formatted}
     else
       {:error, reason} -> {:error, reason}
     end
   end
 
-  def to_string(date, _options) do
+  def to_string(date, backend, _options) do
     error_return(date, [:year, :month, :day, :calendar])
   end
 
   defp default_options do
-    [format: :medium, locale: Cldr.get_current_locale()]
+    [format: :medium, locale: Cldr.get_locale()]
   end
 
   @doc """
@@ -129,18 +131,23 @@ defmodule Cldr.Date do
       "10 Julie 2017"
 
   """
-  def to_string!(date, options \\ [])
+  def to_string!(date, backend, options \\ [])
 
-  def to_string!(date, options) do
+  def to_string!(date, backend, options) do
     case to_string(date, options) do
       {:ok, string} -> string
       {:error, {exception, message}} -> raise exception, message
     end
   end
 
-  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, calendar)
+  defp format_string_from_format(
+         format,
+         %LanguageTag{cldr_locale_name: locale_name},
+         backend,
+         calendar
+       )
        when format in @format_types do
-    with {:ok, date_formats} <- Format.date_formats(locale_name, calendar) do
+    with {:ok, date_formats} <- Format.date_formats(locale_name, backend, calendar) do
       {:ok, Map.get(date_formats, format)}
     end
   end
@@ -148,19 +155,20 @@ defmodule Cldr.Date do
   defp format_string_from_format(
          %{number_system: number_system, format: format},
          locale,
+         backend,
          calendar
        ) do
-    {:ok, format_string} = format_string_from_format(format, locale, calendar)
+    {:ok, format_string} = format_string_from_format(format, locale, backend, calendar)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
-  defp format_string_from_format(format, _locale, _calendar) when is_atom(format) do
+  defp format_string_from_format(format, _locale, _backend, _calendar) when is_atom(format) do
     {:error,
      {Cldr.InvalidDateFormatType,
       "Invalid date format type.  " <> "The valid types are #{inspect(@format_types)}."}}
   end
 
-  defp format_string_from_format(format_string, _locale, _calendar)
+  defp format_string_from_format(format_string, _locale, _backend, _calendar)
        when is_binary(format_string) do
     {:ok, format_string}
   end

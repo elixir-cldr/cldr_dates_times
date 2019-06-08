@@ -78,7 +78,10 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec date_formats(Locale.name() | LanguageTag.t(), calendar) :: standard_formats
-        def date_formats(locale \\ unquote(backend).get_locale(), calendar \\ Cldr.Calendar.default_calendar())
+        def date_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_calendar()
+            )
 
         def date_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
           date_formats(cldr_locale_name, calendar)
@@ -114,7 +117,10 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec time_formats(Locale.name() | LanguageTag, calendar) :: standard_formats
-        def time_formats(locale \\ unquote(backend).get_locale(), calendar \\ Cldr.Calendar.default_calendar())
+        def time_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_calendar()
+            )
 
         def time_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
           time_formats(cldr_locale_name, calendar)
@@ -227,7 +233,10 @@ defmodule Cldr.DateTime.Format.Backend do
               calendar \\ Cldr.Calendar.default_calendar()
             )
 
-        def date_time_available_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
+        def date_time_available_formats(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
           date_time_available_formats(cldr_locale_name, calendar)
         end
 
@@ -349,8 +358,11 @@ defmodule Cldr.DateTime.Format.Backend do
             end
           end
 
-          def date_formats(unquote(locale), calendar), do: {:error, Cldr.Calendar.calendar_error(calendar)}
-          def time_formats(unquote(locale), calendar), do: {:error, Cldr.Calendar.calendar_error(calendar)}
+          def date_formats(unquote(locale), calendar),
+            do: {:error, Cldr.Calendar.calendar_error(calendar)}
+
+          def time_formats(unquote(locale), calendar),
+            do: {:error, Cldr.Calendar.calendar_error(calendar)}
 
           def date_time_formats(unquote(locale), calendar),
             do: {:error, Cldr.Calendar.calendar_error(calendar)}
@@ -366,7 +378,9 @@ defmodule Cldr.DateTime.Format.Backend do
         def date_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
         def time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
         def date_time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
-        def date_time_available_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+
+        def date_time_available_formats(locale, _calendar),
+          do: {:error, Locale.locale_error(locale)}
 
         @doc """
         Returns the formatted and localised date, time or datetime
@@ -430,7 +444,8 @@ defmodule Cldr.DateTime.Format.Backend do
               end
 
             {:error, message} ->
-              raise Cldr.FormatCompileError, "#{message} compiling date format: #{inspect(format)}"
+              raise Cldr.FormatCompileError,
+                    "#{message} compiling date format: #{inspect(format)}"
           end
         end
 
@@ -586,7 +601,7 @@ defmodule Cldr.DateTime.Format.Backend do
         def language_has_noon_and_midnight?(_), do: false
 
         # Compile the formats used for timezones GMT format
-        defp gmt_tz_format(locale, offset, options \\ [])
+        def gmt_tz_format(locale, offset, options \\ [])
 
         for locale_name <- Cldr.known_locale_names() do
           {:ok, gmt_format} = Cldr.DateTime.Format.gmt_format(locale_name)
@@ -595,31 +610,31 @@ defmodule Cldr.DateTime.Format.Backend do
           {:ok, pos_transforms} = Compiler.compile(pos_format)
           {:ok, neg_transforms} = Compiler.compile(neg_format)
 
-          defp gmt_tz_format(
-                 %LanguageTag{cldr_locale_name: unquote(locale_name)},
-                 %{hour: 0, minute: 0},
-                 _options
-               ) do
+          def gmt_tz_format(
+                %LanguageTag{cldr_locale_name: unquote(locale_name)},
+                %{hour: 0, minute: 0},
+                _options
+              ) do
             unquote(gmt_zero_format)
           end
 
-          defp gmt_tz_format(
-                 %LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
-                 %{hour: hour, minute: _minute} = date,
-                 options
-               )
-               when hour >= 0 do
+          def gmt_tz_format(
+                %LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
+                %{hour: hour, minute: _minute} = date,
+                options
+              )
+              when hour >= 0 do
             unquote(pos_transforms)
             |> gmt_format_type(options[:format] || :long)
             |> Cldr.Substitution.substitute(unquote(gmt_format))
             |> Enum.join()
           end
 
-          defp gmt_tz_format(
-                 %LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
-                 %{hour: _hour, minute: _minute} = date,
-                 options
-               ) do
+          def gmt_tz_format(
+                %LanguageTag{cldr_locale_name: unquote(locale_name)} = locale,
+                %{hour: _hour, minute: _minute} = date,
+                options
+              ) do
             unquote(neg_transforms)
             |> gmt_format_type(options[:format] || :long)
             |> Cldr.Substitution.substitute(unquote(gmt_format))
