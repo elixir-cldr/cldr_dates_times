@@ -1,55 +1,9 @@
-# Changelog for Cldr_Dates_Times v1.4.0
+# Changelog for Cldr_Dates_Times v2.0
 
-This is the changelog for Cldr_Dates_Times v1.4.0 released on October 18th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.0 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
 
-## Enhancements
+## Breaking Changes
 
-* Updated dependency on [ex_cldr](https://hex.pm/packages/ex_cldr) to version 1.8 which uses CLDR version 34 data.
+* `ex_cldr_dates_times` now depends upon [ex_cldr version 2.0](https://hex.pm/packages/ex_cldr/2.0.0).  As a result it is a requirement that at least one backend module be configured as described in the [ex_cldr readme](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration).
 
-# Changelog for Cldr_Dates_Times v1.3.1
-
-This is the changelog for Cldr_Dates_Times v1.3.1 released on July 20th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
-
-## Enhancements
-
-* Update dependencies and remove generated `src/*.erl` files from the package for compatibility with Elixir 1.7
-
-# Changelog for Cldr_Dates_Times v1.3.0
-
-This is the changelog for Cldr_Dates_Times v1.3.0 released on April 18th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
-
-## Enhancements
-
-* Relaxes reqirements for `ex_cldr` and `ex_cldr_numbers`
-
-# Changelog for Cldr_Dates_Times v1.2.2
-
-This is the changelog for Cldr_Dates_Times v1.2.2 released on April 18th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
-
-## Bug Fixes
-
-* Fix date time format lookup for atom formats.  Fixes #3. Thanks to @lostkobrakai
-
-# Changelog for Cldr_Dates_Times v1.2.1
-
-## Bug Fixes
-
-* Compiles the date_time formats configured under `config :ex_cldr, precompile_datetime_formats: ["..". ".."]` as advertised.  Previously this documented configuration key was being ignored
-
-## Enhancements
-
-* Update `ex_cldr` dependency to version 1.5.1 and `ex_cldr_numbers` version 1.4.1 in order to use `Cldr.Config.app_name()`
-
-# Changelog for Cldr_Dates_Times v1.2.0
-
-### Enhancements
-
-* Update ex_cldr dependency to version 1.5.0 which uses CLDR data version 33.
-
-* Update ex_cldr_numbers dependency to 1.4.0
-
-# Changelog for Cldr_Dates_Times v1.0.1
-
-### Bug Fixes
-
-* Fix @doc heredocs to ensure there is no outdenting which produces a warning on Elixir 1.7
+* The public API is now based upon functions defined on a backend module. Therefore calls to functions such as `Cldr.Number.to_string/2` should be replaced with calls to `MyApp.Cldr.Number.to_string/2` (assuming your configured backend module is called `MyApp.Cldr`).
