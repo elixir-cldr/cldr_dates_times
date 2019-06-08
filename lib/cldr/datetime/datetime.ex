@@ -15,7 +15,7 @@ defmodule Cldr.DateTime do
   format string as appropriate.
   """
 
-  alias Cldr.DateTime.{Format, Formatter}
+  alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
 
   @format_types [:short, :medium, :long, :full]
@@ -76,11 +76,16 @@ defmodule Cldr.DateTime do
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
   """
-  def to_string(datetime, backend, options \\ [])
+  def to_string(datetime, backend \\ Cldr.default_backend(), options \\ [])
+
+  def to_string(%{calendar: Calendar.ISO} = datetime, backend, options) do
+    %{datetime | calendar: Cldr.Calendar.Gregorian}
+    |> to_string(backend, options)
+  end
 
   def to_string(datetime, backend, options) when is_list(options) do
     options = Keyword.merge(default_options(), options)
-    format_backend = Module.concat(backend, DateTime.Format)
+    format_backend = Module.concat(backend, DateTime.Formatter)
     %{calendar: calendar} = datetime
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
@@ -99,11 +104,11 @@ defmodule Cldr.DateTime do
   end
 
   defp default_options do
-    [format: :medium, locale: Cldr.get_locale()]
+    [format: :medium, locale: Cldr.get_locale(), number_system: :default]
   end
 
   def type_from_calendar(_) do
-    :gregorian
+    {:ok, :gregorian}
   end
 
   @doc """
@@ -156,7 +161,7 @@ defmodule Cldr.DateTime do
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
   """
-  def to_string!(datetime, backend, options \\ [])
+  def to_string!(datetime, backend \\ Cldr.default_backend(), options \\ [])
 
   def to_string!(datetime, backend, options) do
     case to_string(datetime, backend, options) do
@@ -170,10 +175,10 @@ defmodule Cldr.DateTime do
          format,
          %LanguageTag{cldr_locale_name: locale_name},
          backend,
-         calendar
+         cldr_calendar
        )
        when format in @format_types do
-    with {:ok, formats} <- Format.date_time_formats(locale_name, backend, calendar) do
+    with {:ok, formats} <- Format.date_time_formats(locale_name, backend, cldr_calendar) do
       {:ok, Map.get(formats, format)}
     end
   end

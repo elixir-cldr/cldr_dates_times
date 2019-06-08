@@ -15,7 +15,7 @@ defmodule Cldr.Date do
   format string as appropriate.
   """
 
-  alias Cldr.DateTime.{Formatter, Format}
+  alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
 
   @format_types [:short, :medium, :long, :full]
@@ -61,12 +61,16 @@ defmodule Cldr.Date do
 
   """
 
-  def to_string(date, backend \\ Cldr.default_backend, options \\ [])
+  def to_string(date, backend \\ Cldr.default_backend(), options \\ [])
 
-  def to_string(date, backend, options) do
+  def to_string(%{calendar: Calendar.ISO} = date, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> to_string(backend, options)
+  end
+
+  def to_string(%{calendar: calendar} = date, backend, options) do
     options = Keyword.merge(default_options(), options)
-    %{calendar: calendar} = date
-    format_backend = Module.concat(backend, DateTime.Format)
+    format_backend = Module.concat(backend, DateTime.Formatter)
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
@@ -79,12 +83,12 @@ defmodule Cldr.Date do
     end
   end
 
-  def to_string(date, backend, _options) do
+  def to_string(date, _backend, _options) do
     error_return(date, [:year, :month, :day, :calendar])
   end
 
   defp default_options do
-    [format: :medium, locale: Cldr.get_locale()]
+    [format: :medium, locale: Cldr.get_locale(), number_system: :default]
   end
 
   @doc """
@@ -134,7 +138,7 @@ defmodule Cldr.Date do
   def to_string!(date, backend, options \\ [])
 
   def to_string!(date, backend, options) do
-    case to_string(date, options) do
+    case to_string(date, backend, options) do
       {:ok, string} -> string
       {:error, {exception, message}} -> raise exception, message
     end

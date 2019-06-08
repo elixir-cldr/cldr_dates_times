@@ -156,6 +156,8 @@ defmodule Cldr.DateTime.Formatter do
   """
   @spec date(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
           binary | {:error, binary}
+
+
   def date(
         date,
         n \\ 1,
@@ -164,8 +166,8 @@ defmodule Cldr.DateTime.Formatter do
         options \\ []
       )
 
-  def date(date, _n, _locale, _backend, options) do
-    with {:ok, date_string} <- Cldr.Date.to_string(date, options) do
+  def date(date, _n, _locale, backend, options) do
+    with {:ok, date_string} <- Cldr.Date.to_string(date, backend, options) do
       date_string
     end
   end
@@ -189,8 +191,8 @@ defmodule Cldr.DateTime.Formatter do
         options \\ []
       )
 
-  def time(time, _n, _locale, _backend, options) do
-    with {:ok, time_string} <- Cldr.Time.to_string(time, options) do
+  def time(time, _n, _locale, backend, options) do
+    with {:ok, time_string} <- Cldr.Time.to_string(time, backend, options) do
       time_string
     end
   end
@@ -3025,33 +3027,6 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   # Helpers
-
-  # All locales define an hour_format that have the following characteristics:
-  #  >  :hour and :minute only (and always both)
-  #  >  :minute is always 2 digits: "mm"
-  #  >  always have a sign + or -
-  #  >  have either a separator of ":", "." or no separator
-  # Therefore the format is always either 4 parts (with separator) or 3 parts (without separator)
-
-  # Short format with zero minutes
-  # defp gmt_format_type([sign, hour, _sep, "00"], :short) do
-  #   :erlang.iolist_to_binary([sign, String.replace_leading(hour, "0", "")])
-  # end
-  #
-  # # Short format with minutes > 0
-  # defp gmt_format_type([sign, hour, sep, minute], :short) do
-  #   :erlang.iolist_to_binary([sign, String.replace_leading(hour, "0", ""), sep, minute])
-  # end
-  #
-  # # Long format
-  # defp gmt_format_type([sign, hour, sep, minute], :long) do
-  #   :erlang.iolist_to_binary([sign, hour, sep, minute])
-  # end
-  #
-  # # The case when there is no separator
-  # defp gmt_format_type([sign, hour, minute], format_type) do
-  #   gmt_format_type([sign, hour, "", minute], format_type)
-  # end
 
   # ISO 8601 time zone formats:
   # The ISO 8601 basic format does not use a separator character between hours

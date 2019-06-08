@@ -77,10 +77,15 @@ defmodule Cldr.Time do
 
   def to_string(time, backend \\ Cldr.default_backend, options \\ [])
 
+  def to_string(%{calendar: Calendar.ISO} = time, backend, options) do
+    %{time | calendar: Cldr.Calendar.Gregorian}
+    |> to_string(backend, options)
+  end
+
   def to_string(%{hour: _hour, minute: _minute} = time, backend, options) do
     options = Keyword.merge(default_options(), options)
     calendar = Map.get(time, :calendar) || Cldr.Calendar.Gregorian
-    format_backend = Module.concat(backend, DateTime.Format)
+    format_backend = Module.concat(backend, DateTime.Formatter)
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
@@ -98,7 +103,7 @@ defmodule Cldr.Time do
   end
 
   defp default_options do
-    [format: :medium, locale: Cldr.get_locale()]
+    [format: :medium, locale: Cldr.get_locale(), number_system: :default]
   end
 
   @doc """
@@ -162,7 +167,7 @@ defmodule Cldr.Time do
 
   defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, backend, calendar)
        when format in @format_types do
-    with {:ok, formats} <- Format.time_formats(locale_name, calendar, backend) do
+    with {:ok, formats} <- Format.time_formats(locale_name, backend, calendar) do
       {:ok, Map.get(formats, format)}
     end
   end
