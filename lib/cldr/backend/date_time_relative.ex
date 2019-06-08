@@ -3,6 +3,7 @@ defmodule Cldr.DateTime.Relative.Backend do
 
   def define_date_time_relative_module(config) do
     backend = config.backend
+    config = Macro.escape(config)
 
     quote location: :keep, bind_quoted: [config: config, backend: backend] do
       defmodule DateTime.Relative do

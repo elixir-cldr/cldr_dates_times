@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "1.4.0"
+  @version "2.0.0"
 
   def project do
     [
@@ -16,8 +16,7 @@ defmodule CldrDatesTimes.Mixfile do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       compilers: Mix.compilers(),
-      elixirc_paths: elixirc_paths(Mix.env()),
-      cldr_provider: {Cldr.DateTime.Backend.Compiler, :define_date_time_modules, []}
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -44,9 +43,11 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, "~> 2.0"},
-      {:ex_cldr_numbers, "~> 2.0"},
-      {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release},
+      {:ex_cldr, "~> 2.6"},
+      {:ex_cldr_numbers, "~> 2.6"},
+      # {:ex_cldr_calendars, "~> 0.6"},
+      {:ex_cldr_calendars, path: "../cldr_calendars"},
+      {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release]},
       {:stream_data, "~> 0.4", only: :test},
       {:jason, "~> 1.0", optional: true},
       {:benchee, "~> 0.12", optional: true, only: :dev}

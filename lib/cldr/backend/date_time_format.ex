@@ -1,24 +1,35 @@
 defmodule Cldr.DateTime.Format.Backend do
   @moduledoc false
-  backend = config.backend
 
   def define_date_time_format_module(config) do
-    quote location: :keep, bind_quoted: [config: config, backend: backend] do
+    backend = config.backend
+    config = Macro.escape(config)
+    module = inspect(__MODULE__)
+
+    quote location: :keep, bind_quoted: [config: config, backend: backend, module: module] do
       defmodule DateTime.Format do
-        @moduledoc """
-        Manages the Date, TIme and DateTime formats
-        defined by CLDR.
+        @moduledoc false
+        if Cldr.Config.include_module_docs?(config.generate_docs) do
+          @moduledoc """
+          Manages the Date, TIme and DateTime formats
+          defined by CLDR.
 
-        The functions in `Cldr.DateTime.Format` are
-        primarily concerned with encapsulating the
-        data from CLDR in functions that are used
-        during the formatting process.
-        """
+          The functions in `Cldr.DateTime.Format` are
+          primarily concerned with encapsulating the
+          data from CLDR in functions that are used
+          during the formatting process.
+          """
+        end
 
-        alias Cldr.Calendar, as: Kalendar
         alias Cldr.Locale
         alias Cldr.LanguageTag
         alias Cldr.Config
+        alias Cldr.DateTime.Format
+
+        @standard_formats [:short, :medium, :long, :full]
+
+        @type formats :: Map.t()
+        @type calendar :: atom()
 
         @doc """
         Returns a list of calendars defined for a given locale.
@@ -30,7 +41,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Example
 
-            iex> Cldr.DateTime.Format.calendars_for "en"
+            iex> #{__MODULE__}.calendars_for "en"
             {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
              :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
              :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
@@ -72,8 +83,13 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec date_formats(Locale.name() | LanguageTag.t(), calendar) :: standard_formats
-        def date_formats(locale \\ unquote(backend).get_locale(), calendar \\ Kalendar.default_calendar())
+        @spec date_formats(Locale.name() | LanguageTag.t(), calendar) ::
+          {:ok, map()} | {:error, {atom, String.t}}
+
+        def date_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
 
         def date_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
           date_formats(cldr_locale_name, calendar)
@@ -108,8 +124,13 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec time_formats(Locale.name() | LanguageTag, calendar) :: standard_formats
-        def time_formats(locale \\ unquote(backend).get_locale(), calendar \\ Kalendar.default_calendar())
+        @spec time_formats(Locale.name() | LanguageTag, calendar) ::
+          {:ok, map()} | {:error, {atom, String.t}}
+
+        def time_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
 
         def time_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
           time_formats(cldr_locale_name, calendar)
@@ -144,14 +165,16 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec date_time_formats(Locale.name() | LanguageTag, calendar) :: standard_formats
+        @spec date_time_formats(Locale.name() | LanguageTag, calendar) ::
+          {:ok, map()} | {:error, {atom, String.t}}
+
         def date_time_formats(
               locale \\ unquote(backend).get_locale(),
-              calendar \\ Kalendar.default_calendar()
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
             )
 
-        def date_time_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-          date_time_formats(cldr_locale_name, calendar)
+        def date_time_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, cldr_calendar) do
+          date_time_formats(cldr_locale_name, cldr_calendar)
         end
 
         @doc """
@@ -219,10 +242,13 @@ defmodule Cldr.DateTime.Format.Backend do
         @spec date_time_available_formats(Locale.name() | LanguageTag, calendar) :: formats
         def date_time_available_formats(
               locale \\ unquote(backend).get_locale(),
-              calendar \\ Kalendar.default_calendar()
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
             )
 
-        def date_time_available_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
+        def date_time_available_formats(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
           date_time_available_formats(cldr_locale_name, calendar)
         end
 
@@ -292,7 +318,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         for locale <- Cldr.Config.known_locale_names(config) do
           locale_data = Cldr.Config.get_locale(locale, config)
-          calendars = Cldr.Config.calendars_for_locale(locale_data)
+          calendars = Cldr.Config.calendars_for_locale(locale, config)
 
           def calendars_for(unquote(locale)), do: {:ok, unquote(calendars)}
 
@@ -344,14 +370,17 @@ defmodule Cldr.DateTime.Format.Backend do
             end
           end
 
-          def date_formats(unquote(locale), calendar), do: {:error, Kalendar.calendar_error(calendar)}
-          def time_formats(unquote(locale), calendar), do: {:error, Kalendar.calendar_error(calendar)}
+          def date_formats(unquote(locale), calendar),
+            do: {:error, Cldr.Calendar.calendar_error(calendar)}
+
+          def time_formats(unquote(locale), calendar),
+            do: {:error, Cldr.Calendar.calendar_error(calendar)}
 
           def date_time_formats(unquote(locale), calendar),
-            do: {:error, Kalendar.calendar_error(calendar)}
+            do: {:error, Cldr.Calendar.calendar_error(calendar)}
 
           def date_time_available_formats(unquote(locale), calendar),
-            do: {:error, Kalendar.calendar_error(calendar)}
+            do: {:error, Cldr.Calendar.calendar_error(calendar)}
         end
 
         def calendars_for(locale), do: {:error, Locale.locale_error(locale)}
@@ -361,7 +390,104 @@ defmodule Cldr.DateTime.Format.Backend do
         def date_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
         def time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
         def date_time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
-        def date_time_available_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+
+        def date_time_available_formats(locale, _calendar),
+          do: {:error, Locale.locale_error(locale)}
+
+        @doc """
+        Returns the time period for a given time of day.
+
+        ## Arguments
+
+        * `time` is any `Time.t` or a map with at least `:hour`,
+          `:minute` and `:second` keys
+
+        * `language` is a binary representation of a valid and
+          configured language in `Cldr`
+
+        The time period is a locale-specific key that is used
+        to localise a time into a textual representation of "am",
+        "pm", "noon", "midnight", "evening", "morning" and so on
+        as defined in the CLDR day period rules.
+
+        ## Examples
+
+            iex> Cldr.DateTime.Formatter.time_period_for ~T[06:05:54.515228], "en"
+            :morning1
+
+            iex> Cldr.DateTime.Formatter.time_period_for ~T[13:05:54.515228], "en"
+            :afternoon1
+
+            iex> Cldr.DateTime.Formatter.time_period_for ~T[21:05:54.515228], "en"
+            :night1
+
+            iex> Cldr.DateTime.Formatter.time_period_for ~T[21:05:54.515228], "fr"
+            :evening1
+
+        """
+        @spec time_period_for(Time.t() | Map.t(), binary) :: atom
+        def time_period_for(time, language)
+
+        @doc """
+        Returns a boolean indicating is a given language defines the
+        notion of "noon" and "midnight"
+
+        ## Arguments
+
+        * `language` is a binary representation of a valid and
+          configured language in `Cldr`
+
+        ## Examples
+
+            iex> Cldr.DateTime.Formatter.language_has_noon_and_midnight? "fr"
+            true
+
+            iex> Cldr.DateTime.Formatter.language_has_noon_and_midnight? "en"
+            true
+
+            iex> Cldr.DateTime.Formatter.language_has_noon_and_midnight? "af"
+            false
+
+        """
+        @spec language_has_noon_and_midnight?(binary) :: boolean
+        def language_has_noon_and_midnight?(language)
+
+        # Insert generated functions that will identify which time period key
+        # is appropriate for a given time value.  Note that we sort the time
+        # periods such that the "at" periods come before the "from"/"before"
+        # periods so that the functions are defined in the right order.
+        for {language, periods} <- Cldr.Config.day_period_info() do
+          for {period, times} <- Enum.sort(periods, fn {_k, v}, _p2 -> !!Map.get(v, "at") end) do
+            case times do
+              %{"at" => [h, m]} ->
+                def time_period_for(%{hour: unquote(h), minute: unquote(m)}, unquote(language)) do
+                  unquote(String.to_atom(period))
+                end
+
+              # For when the time range wraps around midnight
+              %{"from" => [h1, 0], "before" => [h2, 0]} when h2 < h1 ->
+                def time_period_for(%{hour: hour}, unquote(language))
+                    when rem(hour, 24) >= unquote(h1) or rem(hour, 24) < unquote(h2) do
+                  unquote(String.to_atom(period))
+                end
+
+              # For when the time range does not wrap around midnight
+              %{"from" => [h1, 0], "before" => [h2, 0]} ->
+                def time_period_for(%{hour: hour}, unquote(language))
+                    when rem(hour, 24) >= unquote(h1) and rem(hour, 24) < unquote(h2) do
+                  unquote(String.to_atom(period))
+                end
+            end
+          end
+
+          # We also need a way to find out of a language supports the
+          # concept of "noon" and "midnight"
+          if Map.get(periods, "noon") && Map.get(periods, "midnight") do
+            def language_has_noon_and_midnight?(unquote(language)), do: true
+          end
+        end
+
+        def language_has_noon_and_midnight?(_), do: false
       end
     end
   end
