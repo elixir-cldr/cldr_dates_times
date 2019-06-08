@@ -1738,7 +1738,7 @@ defmodule Cldr.DateTime.Formatter do
       when (rem(hour, 12) == 0 or rem(hour, 24) < 12) and minute == 0 do
     format_backend = Module.concat(backend, DateTime.Format)
     if format_backend.language_has_noon_and_midnight?(locale) do
-      day_period = format_backend.time_period_for(time, locale.language)
+      day_period = format_backend.day_period_for(time, locale.language)
       Cldr.Calendar.localize(day_period, :day_periods, :format, period_format(n), backend, locale)
     else
       period_am_pm(time, n, locale, backend, options)

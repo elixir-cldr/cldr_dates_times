@@ -454,10 +454,10 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec language_has_noon_and_midnight?(binary) :: boolean
-        def language_has_noon_and_midnight?(language)
+        def language_has_noon_and_midnight?(locale)
 
-        def language_has_noon_and_midnight?(time, %LanguageTag{cldr_locale_name: locale_name}) do
-          language_has_noon_and_midnight?(time, locale_name)
+        def language_has_noon_and_midnight?(%LanguageTag{language: language}) do
+          language_has_noon_and_midnight?(language)
         end
 
         # Insert generated functions that will identify which time period key
