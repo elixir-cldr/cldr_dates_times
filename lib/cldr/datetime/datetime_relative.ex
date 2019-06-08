@@ -6,7 +6,6 @@ defmodule Cldr.DateTime.Relative do
   as "ago" or "in" with an appropriate time unit.  For example, "2 days ago" or
   "in 10 seconds"
   """
-  alias Cldr.LanguageTag
 
   @second 1
   @minute 60
@@ -111,8 +110,10 @@ defmodule Cldr.DateTime.Relative do
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
 
   """
-  @spec to_string(integer | float | Date.t() | DateTime.t(), []) :: binary
-  def to_string(relative, options \\ []) do
+  @spec to_string(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
+    {:ok, String.t} | {:error, {atom, String.t}}
+
+  def to_string(relative, backend, options \\ []) do
     options = Keyword.merge(default_options(), options)
     locale = Keyword.get(options, :locale)
     {unit, options} = Keyword.pop(options, :unit)
@@ -120,7 +121,7 @@ defmodule Cldr.DateTime.Relative do
     with {:ok, locale} <- Cldr.validate_locale(locale),
          {:ok, unit} <- validate_unit(unit),
          {relative, unit} = define_unit_and_relative_time(relative, unit, options[:relative_to]),
-         string <- to_string(relative, unit, locale, options) do
+         string <- to_string(relative, unit, locale, backend, options) do
       {:ok, string}
     else
       {:error, reason} -> {:error, reason}
@@ -128,7 +129,7 @@ defmodule Cldr.DateTime.Relative do
   end
 
   defp default_options do
-    [locale: Cldr.get_current_locale(), format: :default]
+    [locale: Cldr.get_locale(), format: :default]
   end
 
   defp define_unit_and_relative_time(relative, nil, nil) when is_number(relative) do
@@ -203,26 +204,26 @@ defmodule Cldr.DateTime.Relative do
     end
   end
 
-  defp to_string(relative, unit, locale, options)
+  defp to_string(relative, unit, locale, backend, options)
        when is_integer(relative) and relative in [-1, 0, +1] do
     result =
       locale
-      |> get_locale()
+      |> get_locale(backend)
       |> get_in([unit, options[:format], :relative_ordinal])
       |> Enum.at(relative + 1)
 
     if is_nil(result), do: to_string(relative / 1, unit, locale, options), else: result
   end
 
-  defp to_string(relative, unit, locale, options) when is_number(relative) do
+  defp to_string(relative, unit, locale, backend, options) when is_number(relative) do
     direction = if relative > 0, do: :relative_future, else: :relative_past
 
     rules =
       locale
-      |> get_locale()
+      |> get_locale(backend)
       |> get_in([unit, options[:format], direction])
 
-    rule = Cldr.Number.Cardinal.pluralize(trunc(relative), locale, rules)
+    rule = Module.concat(backend, Number.Cardinal).pluralize(trunc(relative), locale, rules)
 
     relative
     |> abs
@@ -330,14 +331,7 @@ defmodule Cldr.DateTime.Relative do
     {:error, time_unit_error(unit)}
   end
 
-  for locale_name <- Cldr.known_locale_names() do
-    locale_data =
-      locale_name
-      |> Cldr.Config.get_locale()
-      |> Map.get(:date_fields)
-      |> Map.take(@unit_keys)
-
-    defp get_locale(%LanguageTag{cldr_locale_name: unquote(locale_name)}),
-      do: unquote(Macro.escape(locale_data))
+  defp get_locale(locale, backend) do
+    backend.get_locale(locale)
   end
 end

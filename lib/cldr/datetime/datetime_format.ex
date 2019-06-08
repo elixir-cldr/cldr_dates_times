@@ -1,6 +1,6 @@
 defmodule Cldr.DateTime.Format do
   @moduledoc """
-  Manages the Date, TIme and DateTime formats
+  Manages the Date, Time and DateTime formats
   defined by CLDR.
 
   The functions in `Cldr.DateTime.Format` are
@@ -9,12 +9,9 @@ defmodule Cldr.DateTime.Format do
   during the formatting process.
   """
 
-  alias Cldr.Calendar, as: Kalendar
   alias Cldr.Locale
   alias Cldr.LanguageTag
   alias Cldr.Config
-
-  @standard_formats [:short, :medium, :long, :full]
 
   @type standard_formats :: %{
           full: String.t(),
@@ -22,16 +19,20 @@ defmodule Cldr.DateTime.Format do
           medium: String.t(),
           short: String.t()
         }
+
   @type formats :: Map.t()
-  @type calendar :: atom
 
   @doc """
   Returns a list of all formats defined
   for the configured locales.
   """
-  def format_list do
-    ((known_formats(&all_date_formats/1) ++
-        known_formats(&all_time_formats/1) ++ known_formats(&all_date_time_formats/1)) ++
+  def format_list(config) do
+    locale_names = Cldr.Config.known_locale_names(config)
+    backend = config.backend
+
+    ((known_formats(&all_date_formats(&1, backend), locale_names) ++
+        known_formats(&all_time_formats(&1, backend), locale_names) ++
+        known_formats(&all_date_time_formats(&1, backend), locale_names)) ++
        configured_precompile_list())
     |> Enum.reject(&is_atom/1)
     |> Enum.uniq()
@@ -57,11 +58,76 @@ defmodule Cldr.DateTime.Format do
        :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
 
   """
-  @spec calendars_for(Locale.name() | LanguageTag.t()) :: [calendar, ...]
-  def calendars_for(locale \\ Cldr.get_current_locale())
+  @spec calendars_for(Locale.name() | LanguageTag.t(), Cldr.backend()) ::
+          [Cldr.Calendar.t(), ...]
 
-  def calendars_for(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
-    calendars_for(cldr_locale_name)
+  def calendars_for(locale, backend) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.calendars_for(locale)
+  end
+
+  @doc """
+  Returns the GMT offset format list for a
+  for a timezone offset for a given locale.
+
+  ## Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+
+  ## Example
+
+      iex> Cldr.DateTime.Format.gmt_format "en"
+      {:ok, ["GMT", 0]}
+
+  """
+  @spec gmt_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: [
+          non_neg_integer | String.t(),
+          ...
+        ]
+  def gmt_format(locale, backend) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.gmt_format(locale)
+  end
+
+  @doc """
+  Returns the GMT format string for a
+  for a timezone with an offset of zero for
+  a given locale.
+
+  ## Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+
+  ## Example
+
+      iex> Cldr.DateTime.Format.gmt_zero_format "en"
+      {:ok, "GMT"}
+
+  """
+  @spec gmt_zero_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: String.t()
+  def gmt_zero_format(locale, backend) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.gmt_zero_format(locale)
+  end
+
+  @doc """
+  Returns the postive and negative hour format
+  for a timezone offset for a given locale.
+
+  ## Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+
+  ## Example
+
+      iex> Cldr.DateTime.Format.hour_format "en"
+      {:ok, {"+HH:mm", "-HH:mm"}}
+
+  """
+  @spec hour_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: {String.t(), String.t()}
+  def hour_format(locale, backend) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.hour_format(locale)
   end
 
   @doc """
@@ -93,11 +159,11 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec date_formats(Locale.name() | LanguageTag.t(), calendar) :: standard_formats
-  def date_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar())
-
-  def date_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-    date_formats(cldr_locale_name, calendar)
+  @spec date_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) ::
+          standard_formats
+  def date_formats(locale, calendar, backend \\ Cldr.default_backend()) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_formats(locale, calendar)
   end
 
   @doc """
@@ -129,11 +195,11 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec time_formats(Locale.name() | LanguageTag, calendar) :: standard_formats
-  def time_formats(locale \\ Cldr.get_current_locale(), calendar \\ Kalendar.default_calendar())
-
-  def time_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-    time_formats(cldr_locale_name, calendar)
+  @spec time_formats(Locale.name() | LanguageTag, Cldr.backend(), Cldr.Calendar.t()) ::
+          standard_formats
+  def time_formats(locale, backend, calendar) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.time_formats(locale, calendar)
   end
 
   @doc """
@@ -165,14 +231,11 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec date_time_formats(Locale.name() | LanguageTag, calendar) :: standard_formats
-  def date_time_formats(
-        locale \\ Cldr.get_current_locale(),
-        calendar \\ Kalendar.default_calendar()
-      )
-
-  def date_time_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-    date_time_formats(cldr_locale_name, calendar)
+  @spec date_time_formats(Locale.name() | LanguageTag.t(), Cldr.backend(), Cldr.Calendar.t()) ::
+          standard_formats
+  def date_time_formats(locale, backend, calendar) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_time_formats(locale, calendar)
   end
 
   @doc """
@@ -237,152 +300,15 @@ defmodule Cldr.DateTime.Format do
        }}
 
   """
-  @spec date_time_available_formats(Locale.name() | LanguageTag, calendar) :: formats
-  def date_time_available_formats(
-        locale \\ Cldr.get_current_locale(),
-        calendar \\ Kalendar.default_calendar()
-      )
-
-  def date_time_available_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, calendar) do
-    date_time_available_formats(cldr_locale_name, calendar)
+  @spec date_time_available_formats(
+          Locale.name() | LanguageTag.t(),
+          Cldr.Calendar.t(),
+          Cldr.backend()
+        ) :: formats
+  def date_time_available_formats(locale, backend, calendar) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_time_available_formats(locale, calendar)
   end
-
-  @doc """
-  Returns the postive and negative hour format
-  for a timezone offset for a given locale.
-
-  ## Arguments
-
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
-
-  ## Example
-
-      iex> Cldr.DateTime.Format.hour_format "en"
-      {:ok, {"+HH:mm", "-HH:mm"}}
-
-  """
-  @spec hour_format(Locale.name() | LanguageTag) :: {String.t(), String.t()}
-  def hour_format(locale \\ Cldr.get_current_locale())
-
-  def hour_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
-    hour_format(cldr_locale_name)
-  end
-
-  @doc """
-  Returns the GMT offset format list for a
-  for a timezone offset for a given locale.
-
-  ## Arguments
-
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
-
-  ## Example
-
-      iex> Cldr.DateTime.Format.gmt_format "en"
-      {:ok, ["GMT", 0]}
-
-  """
-  @spec gmt_format(Locale.name() | LanguageTag) :: [non_neg_integer | String.t(), ...]
-  def gmt_format(locale \\ Cldr.get_current_locale())
-
-  def gmt_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
-    gmt_format(cldr_locale_name)
-  end
-
-  @doc """
-  Returns the GMT format string for a
-  for a timezone with an offset of zero for
-  a given locale.
-
-  ## Arguments
-
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
-
-  ## Example
-
-      iex> Cldr.DateTime.Format.gmt_zero_format "en"
-      {:ok, "GMT"}
-
-  """
-  @spec gmt_zero_format(Locale.name() | LanguageTag) :: String.t()
-  def gmt_zero_format(locale \\ Cldr.get_current_locale())
-
-  def gmt_zero_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
-    gmt_zero_format(cldr_locale_name)
-  end
-
-  for locale <- Cldr.known_locale_names() do
-    locale_data = Cldr.Config.get_locale(locale)
-    calendars = Cldr.Config.calendars_for_locale(locale_data)
-
-    def calendars_for(unquote(locale)), do: {:ok, unquote(calendars)}
-
-    def gmt_format(unquote(locale)),
-      do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_format]))}
-
-    def gmt_zero_format(unquote(locale)),
-      do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))}
-
-    hour_formats =
-      List.to_tuple(
-        String.split(get_in(locale_data, [:dates, :time_zone_names, :hour_format]), ";")
-      )
-
-    def hour_format(unquote(locale)), do: {:ok, unquote(hour_formats)}
-
-    for calendar <- calendars do
-      calendar_data =
-        locale_data
-        |> Map.get(:dates)
-        |> get_in([:calendars, calendar])
-
-      formats = struct(Cldr.Date.Formats, Map.get(calendar_data, :date_formats))
-
-      def date_formats(unquote(locale), unquote(calendar)) do
-        {:ok, unquote(Macro.escape(formats))}
-      end
-
-      formats = struct(Cldr.Time.Formats, Map.get(calendar_data, :time_formats))
-
-      def time_formats(unquote(locale), unquote(calendar)) do
-        {:ok, unquote(Macro.escape(formats))}
-      end
-
-      formats =
-        struct(
-          Cldr.DateTime.Formats,
-          Map.get(calendar_data, :date_time_formats) |> Map.take(@standard_formats)
-        )
-
-      def date_time_formats(unquote(locale), unquote(calendar)) do
-        {:ok, unquote(Macro.escape(formats))}
-      end
-
-      formats = get_in(calendar_data, [:date_time_formats, :available_formats])
-
-      def date_time_available_formats(unquote(locale), unquote(calendar)) do
-        {:ok, unquote(Macro.escape(formats))}
-      end
-    end
-
-    def date_formats(unquote(locale), calendar), do: {:error, Kalendar.calendar_error(calendar)}
-    def time_formats(unquote(locale), calendar), do: {:error, Kalendar.calendar_error(calendar)}
-
-    def date_time_formats(unquote(locale), calendar),
-      do: {:error, Kalendar.calendar_error(calendar)}
-
-    def date_time_available_formats(unquote(locale), calendar),
-      do: {:error, Kalendar.calendar_error(calendar)}
-  end
-
-  def calendars_for(locale), do: {:error, Locale.locale_error(locale)}
-  def gmt_format(locale), do: {:error, Locale.locale_error(locale)}
-  def gmt_zero_format(locale), do: {:error, Locale.locale_error(locale)}
-  def hour_format(locale), do: {:error, Locale.locale_error(locale)}
-  def date_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
-  def time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
-  def date_time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
-  def date_time_available_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
 
   @doc """
   Returns a list of the date_time format types that are
@@ -401,9 +327,11 @@ defmodule Cldr.DateTime.Format do
       :y_mmm_ed, :y_mmmm, :y_qqq, :y_qqqq, :yw_count_other]
 
   """
-  def common_date_time_format_names do
-    Cldr.known_locale_names()
-    |> Enum.map(&date_time_available_formats/1)
+  def common_date_time_format_names(backend) do
+    datetime_module = Module.concat(backend, DateTime.Format)
+
+    Cldr.known_locale_names(backend)
+    |> Enum.map(&datetime_module.date_time_available_formats/1)
     |> Enum.map(&elem(&1, 1))
     |> Enum.map(&Map.keys/1)
     |> Enum.map(&MapSet.new/1)
@@ -412,28 +340,31 @@ defmodule Cldr.DateTime.Format do
     |> Enum.sort()
   end
 
-  defp known_formats(list) do
-    Cldr.known_locale_names()
+  defp known_formats(list, locale_names) do
+    locale_names
     |> Enum.map(&list.(&1))
     |> List.flatten()
     |> Enum.uniq()
   end
 
-  defp all_date_formats(locale) do
-    all_formats_for(locale, &date_formats/2)
+  defp all_date_formats(locale, backend) do
+    datetime_backend = Module.concat(backend, DateTime.Format)
+    all_formats_for(locale, backend, &datetime_backend.date_formats/2)
   end
 
-  defp all_time_formats(locale) do
-    all_formats_for(locale, &time_formats/2)
+  defp all_time_formats(locale, backend) do
+    datetime_backend = Module.concat(backend, DateTime.Format)
+    all_formats_for(locale, backend, &datetime_backend.time_formats/2)
   end
 
-  defp all_date_time_formats(locale) do
-    all_formats_for(locale, &date_time_formats/2) ++
-      all_formats_for(locale, &date_time_available_formats/2)
+  defp all_date_time_formats(locale, backend) do
+    datetime_backend = Module.concat(backend, DateTime.Format)
+    all_formats_for(locale, backend, &datetime_backend.date_time_formats/2) ++
+      all_formats_for(locale, backend, &datetime_backend.date_time_available_formats/2)
   end
 
-  defp all_formats_for(locale, type_function) do
-    with {:ok, calendars} <- calendars_for(locale) do
+  defp all_formats_for(locale, backend, type_function) do
+    with {:ok, calendars} <- calendars_for(locale, backend) do
       Enum.map(calendars, fn calendar ->
         {:ok, calendar_formats} = type_function.(locale, calendar)
         Map.values(calendar_formats)
@@ -449,5 +380,32 @@ defmodule Cldr.DateTime.Format do
 
   defp intersect_mapsets([a, b | tail]) do
     intersect_mapsets([MapSet.intersection(a, b) | tail])
+  end
+
+  # All locales define an hour_format that have the following characteristics:
+  #  >  :hour and :minute only (and always both)
+  #  >  :minute is always 2 digits: "mm"
+  #  >  always have a sign + or -
+  #  >  have either a separator of ":", "." or no separator
+  # Therefore the format is always either 4 parts (with separator) or 3 parts (without separator)
+
+  #Short format with zero minutes
+  def gmt_format_type([sign, hour, _sep, "00"], :short) do
+    :erlang.iolist_to_binary([sign, String.replace_leading(hour, "0", "")])
+  end
+
+  # Short format with minutes > 0
+  def gmt_format_type([sign, hour, sep, minute], :short) do
+    :erlang.iolist_to_binary([sign, String.replace_leading(hour, "0", ""), sep, minute])
+  end
+
+  # Long format
+  def gmt_format_type([sign, hour, sep, minute], :long) do
+    :erlang.iolist_to_binary([sign, hour, sep, minute])
+  end
+
+  # The case when there is no separator
+  def gmt_format_type([sign, hour, minute], format_type) do
+    gmt_format_type([sign, hour, "", minute], format_type)
   end
 end

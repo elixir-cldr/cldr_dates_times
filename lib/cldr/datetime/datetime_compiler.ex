@@ -23,8 +23,6 @@ defmodule Cldr.DateTime.Compiler do
 
   """
 
-  alias Cldr.DateTime.Formatter
-
   @doc """
   Scan a number format definition and return
   the tokens of a date/time/datetime format
@@ -78,35 +76,41 @@ defmodule Cldr.DateTime.Compiler do
   string efficiently.
 
   """
-  @spec compile(String.t()) :: {:ok, List.t()} | {:error, String.t()}
-  def compile(format_string)
+  @spec compile(String.t(), module(), module()) :: {:ok, List.t()} | {:error, String.t()}
+  def compile(format_string, backend, context)
 
-  def compile("") do
+  def compile("", _, _) do
     {:error, "empty format string cannot be compiled"}
   end
 
-  def compile(nil) do
+  def compile(nil, _, _) do
     {:error, "no format string or token list provided"}
   end
 
-  def compile(definition) when is_binary(definition) do
+  def compile(definition, backend, context) when is_binary(definition) do
     {:ok, tokens, _end_line} = tokenize(definition)
 
     transforms =
       Enum.map(tokens, fn {fun, _line, count} ->
         quote do
-          Formatter.unquote(fun)(var!(date), unquote(count), var!(locale), var!(options))
+          Cldr.DateTime.Formatter.unquote(fun)(
+            var!(date, unquote(context)),
+            unquote(count),
+            var!(locale, unquote(context)),
+            unquote(backend),
+            var!(options, unquote(context))
+          )
         end
       end)
 
     {:ok, transforms}
   end
 
-  def compile(%{number_system: _number_system, format: value}) do
-    compile(value)
+  def compile(%{number_system: _number_system, format: value}, backend, context) do
+    compile(value, backend, context)
   end
 
-  def compile(arg) do
+  def compile(arg, _, _) do
     raise ArgumentError, message: "No idea how to compile format: #{inspect(arg)}"
   end
 end

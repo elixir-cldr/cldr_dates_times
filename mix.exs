@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "1.4.0"
+  @version "2.0.0-rc.0"
 
   def project do
     [
@@ -15,7 +15,8 @@ defmodule CldrDatesTimes.Mixfile do
       package: package(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      compilers: Mix.compilers() ++ [:cldr]
+      compilers: Mix.compilers(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -42,11 +43,12 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, "~> 1.8"},
-      {:ex_cldr_numbers, "~> 1.6"},
-      {:ex_doc, "~> 0.18", optional: true, only: :dev},
+      {:ex_cldr, "~> 2.6"},
+      {:ex_cldr_numbers, "~> 2.6"},
+      # {:ex_cldr_calendars, "~> 0.6"},
+      {:ex_cldr_calendars, path: "../cldr_calendars"},
+      {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release]},
       {:stream_data, "~> 0.4", only: :test},
-      {:poison, "~> 2.1 or ~> 3.0", optional: true},
       {:jason, "~> 1.0", optional: true},
       {:benchee, "~> 0.12", optional: true, only: :dev}
     ]
@@ -77,4 +79,8 @@ defmodule CldrDatesTimes.Mixfile do
       "Readme" => "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/README.md"
     }
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test"]
+  defp elixirc_paths(:dev), do: ["lib", "mix"]
+  defp elixirc_paths(_), do: ["lib"]
 end
