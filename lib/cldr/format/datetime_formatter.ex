@@ -157,7 +157,6 @@ defmodule Cldr.DateTime.Formatter do
   @spec date(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
           binary | {:error, binary}
 
-
   def date(
         date,
         n \\ 1,
@@ -230,20 +229,11 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO}, 1
+      iex> Cldr.DateTime.Formatter.era ~D[2017-12-01], 1
       "AD"
 
-      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO}, 1,
-      ...> "en", MyApp.Cldr, era: :variant
-      "CE"
-
-      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO},
-      ...> 4, "fr", MyApp.Cldr
+      iex> Cldr.DateTime.Formatter.era ~D[2017-12-01], 4, "fr", MyApp.Cldr
       "après Jésus-Christ"
-
-      iex> Cldr.DateTime.Formatter.era %{year: 2017, month: 12, day: 1, calendar: Calendar.ISO},
-      ...> 4, "fr", MyApp.Cldr, era: :variant
-      "de l’ère commune"
 
   """
   @spec era(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
@@ -256,6 +246,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def era(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> era(n, locale, backend, options)
+  end
 
   def era(date, n, locale, backend, _options) when n in 1..3 do
     Cldr.Calendar.localize(date, :era, :format, :abbreviated, backend, locale)
@@ -344,6 +339,11 @@ defmodule Cldr.DateTime.Formatter do
         options \\ []
       )
 
+  def year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> year(n, locale, backend, options)
+  end
+
   def year(%{year: year}, 1, _locale, _backend, _options) do
     year
   end
@@ -410,23 +410,23 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
       ...> calendar: Calendar.ISO}, 1
-      "2018"
+      "2017"
 
       iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
       ...> calendar: Calendar.ISO}, 2
-      "18"
+      "17"
 
       iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
       ...> calendar: Calendar.ISO}, 3
-      "2018"
+      "2017"
 
       iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
       ...> calendar: Calendar.ISO}, 4
-      "2018"
+      "2017"
 
       iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
       ...> calendar: Calendar.ISO}, 5
-      "02018"
+      "02017"
 
   """
   @spec week_aligned_year(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
@@ -439,6 +439,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def week_aligned_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> week_aligned_year(n, locale, backend, options)
+  end
 
   def week_aligned_year(date, 1, _locale, _backend, _options) do
     {year, _week} = Cldr.Calendar.week_of_year(date)
@@ -513,6 +518,11 @@ defmodule Cldr.DateTime.Formatter do
         options \\ []
       )
 
+  def extended_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> extended_year(n, locale, backend, options)
+  end
+
   def extended_year(%{year: year, calendar: Calendar.ISO}, n, _locale, _backend, _options) do
     pad(year, n)
   end
@@ -564,6 +574,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def cyclic_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> cyclic_year(n, locale, backend, options)
+  end
 
   def cyclic_year(%{year: year}, _n, _locale, _backend, _options) do
     year
@@ -633,6 +648,11 @@ defmodule Cldr.DateTime.Formatter do
         options \\ []
       )
 
+  def related_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> related_year(n, locale, backend, options)
+  end
+
   def related_year(%{year: year, calendar: Calendar.ISO}, _n, _locale, _backend, _options) do
     year
   end
@@ -685,29 +705,30 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
       ...> calendar: Calendar.ISO}, 1
       2
 
-      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
       ...> calendar: Calendar.ISO}, 2
       "02"
 
-      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
       ...> calendar: Calendar.ISO}, 3
       "Q2"
 
-      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
       ...> calendar: Calendar.ISO}, 4
       "2nd quarter"
 
-      iex> Cldr.DateTime.Formatter.quarter %{month: 4,
+      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
       ...> calendar: Calendar.ISO}, 5
       "2"
 
   """
   @spec quarter(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
           binary | {:error, binary}
+
   def quarter(
         date,
         n \\ 1,
@@ -715,6 +736,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def quarter(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> quarter(n, locale, backend, options)
+  end
 
   def quarter(date, 1, _locale, _backend, _options) do
     Cldr.Calendar.quarter_of_year(date)
@@ -775,29 +801,37 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
-      ...> calendar: Calendar.ISO}, 1
+      iex> Cldr.DateTime.Formatter.standalone_quarter ~D[2019-06-08], 1
       2
 
-      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
-      ...> calendar: Calendar.ISO}, 2
+      iex> Cldr.DateTime.Formatter.standalone_quarter ~D[2019-06-08], 2
       "02"
 
-      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
-      ...> calendar: Calendar.ISO}, 3
+      iex> Cldr.DateTime.Formatter.standalone_quarter ~D[2019-06-08], 3
       "Q2"
 
-      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
-      ...> calendar: Calendar.ISO}, 4
+      iex> Cldr.DateTime.Formatter.standalone_quarter ~D[2019-06-08], 4
       "2nd quarter"
 
-      iex> Cldr.DateTime.Formatter.standalone_quarter %{month: 4,
-      ...> calendar: Calendar.ISO}, 5
+      iex> Cldr.DateTime.Formatter.standalone_quarter ~D[2019-06-08], 5
       "2"
 
   """
   @spec standalone_quarter(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
           binary | {:error, binary}
+
+  def standalone_quarter(
+        date,
+        n \\ 1,
+        locale \\ Cldr.get_locale(),
+        backend \\ Cldr.default_backend(),
+        options \\ []
+      )
+
+  def standalone_quarter(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> standalone_quarter(n, locale, backend, options)
+  end
 
   def standalone_quarter(date, 1, _locale, _backend, _options) do
     Cldr.Calendar.quarter_of_year(date)
@@ -858,19 +892,19 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}
+      iex> Cldr.DateTime.Formatter.month ~D[2019-09-08]
       9
 
-      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}, 2
+      iex> Cldr.DateTime.Formatter.month ~D[2019-09-08], 2
       "09"
 
-      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}, 3
+      iex> Cldr.DateTime.Formatter.month ~D[2019-09-08], 3
       "Sep"
 
-      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}, 4
+      iex> Cldr.DateTime.Formatter.month ~D[2019-09-08], 4
       "September"
 
-      iex> Cldr.DateTime.Formatter.month %{month: 9, calendar: Calendar.ISO}, 5
+      iex> Cldr.DateTime.Formatter.month ~D[2019-09-08], 5
       "S"
 
   """
@@ -883,6 +917,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def month(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> month(n, locale, backend, options)
+  end
 
   def month(%{month: month}, 1, _locale, _backend, _options) do
     month
@@ -941,19 +980,19 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}
+      iex> Cldr.DateTime.Formatter.standalone_month ~D[2019-09-08]
       9
 
-      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}, 2
+      iex> Cldr.DateTime.Formatter.standalone_month ~D[2019-09-08], 2
       "09"
 
-      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}, 3
+      iex> Cldr.DateTime.Formatter.standalone_month ~D[2019-09-08], 3
       "Sep"
 
-      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}, 4
+      iex> Cldr.DateTime.Formatter.standalone_month ~D[2019-09-08], 4
       "September"
 
-      iex> Cldr.DateTime.Formatter.standalone_month %{month: 9, calendar: Calendar.ISO}, 5
+      iex> Cldr.DateTime.Formatter.standalone_month ~D[2019-09-08], 5
       "S"
 
   """
@@ -967,6 +1006,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def standalone_month(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> standalone_month(n, locale, backend, options)
+  end
 
   def standalone_month(%{month: month}, 1, _locale, _backend, _options) do
     month
@@ -1047,6 +1091,11 @@ defmodule Cldr.DateTime.Formatter do
         options \\ []
       )
 
+  def week_of_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> week_of_year(n, locale, backend, options)
+  end
+
   def week_of_year(date, 1, _locale, _backend, _options) do
     Cldr.Calendar.week_of_year(date)
   end
@@ -1100,6 +1149,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def week_of_month(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> week_of_month(n, locale, backend, options)
+  end
 
   def week_of_month(_date, 1 = n, _locale, _backend, _options) do
     1
@@ -1157,6 +1211,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def day_of_month(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> day_of_month(n, locale, backend, options)
+  end
 
   def day_of_month(%{day: day}, 1, _locale, _backend, _options) do
     day
@@ -1223,6 +1282,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def day_of_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> day_of_year(n, locale, backend, options)
+  end
 
   def day_of_year(date, n, _locale, _backend, _options) when n in 1..3 do
     date
@@ -1299,6 +1363,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def day_name(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> day_name(n, locale, backend, options)
+  end
 
   def day_name(date, n, locale, backend, _options) when n in 1..3 do
     Cldr.Calendar.localize(date, :day_of_week, :format, :abbreviated, backend, locale)
@@ -1396,6 +1465,11 @@ defmodule Cldr.DateTime.Formatter do
         options \\ []
       )
 
+  def day_of_week(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> day_of_week(n, locale, backend, options)
+  end
+
   def day_of_week(date, n, _locale, _backend, _options) when n in 1..2 do
     date
     |> Cldr.Calendar.day_of_week()
@@ -1475,6 +1549,11 @@ defmodule Cldr.DateTime.Formatter do
         backend \\ Cldr.default_backend(),
         options \\ []
       )
+
+  def standalone_day_of_week(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+    %{date | calendar: Cldr.Calendar.Gregorian}
+    |> standalone_day_of_week(n, locale, backend, options)
+  end
 
   def standalone_day_of_week(date, n, _locale, _backend, _options) when n in 1..2 do
     date
@@ -1561,12 +1640,6 @@ defmodule Cldr.DateTime.Formatter do
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}, 1, "en", period: :variant
       "am"
 
-      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}, 1, "en", period: :variant
-      "pm"
-
-      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}, 1, "fr", period: :variant
-      "PM"
-
   """
   @spec period_am_pm(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
           binary | {:error, binary}
@@ -1649,10 +1722,6 @@ defmodule Cldr.DateTime.Formatter do
       iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 16, minute: 0}
       "pm"
 
-      iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 16, minute: 0}, 1, "en",
-      ...> period: :variant
-      "pm"
-
   """
   @spec period_noon_midnight(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
           binary | {:error, binary}
@@ -1667,9 +1736,9 @@ defmodule Cldr.DateTime.Formatter do
 
   def period_noon_midnight(%{hour: hour, minute: minute} = time, n, locale, backend, options)
       when (rem(hour, 12) == 0 or rem(hour, 24) < 12) and minute == 0 do
-    if backend.language_has_noon_and_midnight?(locale) do
-      backend = Module.concat(backend, DateTime.Format)
-      day_period = backend.time_period_for(time, locale.language)
+    format_backend = Module.concat(backend, DateTime.Format)
+    if format_backend.language_has_noon_and_midnight?(locale) do
+      day_period = format_backend.time_period_for(time, locale.language)
       Cldr.Calendar.localize(day_period, :day_periods, :format, period_format(n), backend, locale)
     else
       period_am_pm(time, n, locale, backend, options)
@@ -1743,8 +1812,8 @@ defmodule Cldr.DateTime.Formatter do
       )
 
   def period_flex(%{hour: _hour, minute: _minute} = time, n, locale, backend, _options) do
-    backend = Module.concat(backend, DateTime.Format)
-    day_period = backend.day_period_for(time, locale)
+    format_backend = Module.concat(backend, DateTime.Format)
+    day_period = format_backend.day_period_for(time, locale)
     Cldr.Calendar.localize(day_period, :day_periods, :format, period_format(n), backend, locale)
   end
 
@@ -2436,8 +2505,8 @@ defmodule Cldr.DateTime.Formatter do
     zone_abbr
   end
 
-  def zone_short(%{zone_abbr: _zone_abbr} = time, 4 = n, locale, _backend, options) do
-    zone_gmt(time, n, locale, options)
+  def zone_short(%{zone_abbr: _zone_abbr} = time, 4 = n, locale, backend, options) do
+    zone_gmt(time, n, locale, backend, options)
   end
 
   def zone_short(time, _n, _locale, _backend, _options) do
@@ -2982,7 +3051,7 @@ defmodule Cldr.DateTime.Formatter do
         _options
       ) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
-    backend = Module.concat(backend, DateTime.Format)
+    backend = Module.concat(backend, DateTime.Formatter)
 
     backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :short)
   end
@@ -2995,7 +3064,7 @@ defmodule Cldr.DateTime.Formatter do
         _options
       ) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
-    backend = Module.concat(backend, DateTime.Format)
+    backend = Module.concat(backend, DateTime.Formatter)
     backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :long)
   end
 

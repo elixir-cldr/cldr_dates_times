@@ -22,10 +22,7 @@ defmodule Cldr.DateTime.Format do
 
   @type formats :: Map.t()
 
-  @doc """
-  Returns a list of all formats defined
-  for the configured locales.
-  """
+  @doc false
   def format_list(config) do
     locale_names = Cldr.Config.known_locale_names(config)
     backend = config.backend
@@ -38,7 +35,7 @@ defmodule Cldr.DateTime.Format do
     |> Enum.uniq()
   end
 
-  def configured_precompile_list do
+  defp configured_precompile_list do
     Application.get_env(Config.app_name(), :precompile_datetime_formats, [])
   end
 
@@ -52,16 +49,16 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.calendars_for "en"
+      iex> Cldr.DateTime.Format.calendars_for "en", MyApp.Cldr
       {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
        :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
        :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
 
   """
   @spec calendars_for(Locale.name() | LanguageTag.t(), Cldr.backend()) ::
-          [Cldr.Calendar.t(), ...]
+          {:ok, [Cldr.Calendar.t(), ...]} | {:error, {atom, String.T}}
 
-  def calendars_for(locale, backend) do
+  def calendars_for(locale, backend \\ Cldr.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.calendars_for(locale)
   end
@@ -76,15 +73,17 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.gmt_format "en"
+      iex> Cldr.DateTime.Format.gmt_format "en", MyApp.Cldr
       {:ok, ["GMT", 0]}
 
   """
-  @spec gmt_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: [
-          non_neg_integer | String.t(),
-          ...
-        ]
-  def gmt_format(locale, backend) do
+  @spec(
+    gmt_format(Locale.name() | LanguageTag.t(), Cldr.backend()) ::
+      {:ok, [non_neg_integer | String.t(), ...]},
+    {:error, {atom, String.t()}}
+  )
+
+  def gmt_format(locale, backend \\ Cldr.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.gmt_format(locale)
   end
@@ -100,12 +99,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.gmt_zero_format "en"
+      iex> Cldr.DateTime.Format.gmt_zero_format "en", MyApp.Cldr
       {:ok, "GMT"}
 
   """
-  @spec gmt_zero_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: String.t()
-  def gmt_zero_format(locale, backend) do
+  @spec gmt_zero_format(Locale.name() | LanguageTag.t(), Cldr.backend()) ::
+          {:ok, String.t()} | {:error, {atom, String.t()}}
+
+  def gmt_zero_format(locale, backend \\ Cldr.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.gmt_zero_format(locale)
   end
@@ -120,12 +121,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.hour_format "en"
+      iex> Cldr.DateTime.Format.hour_format "en", MyApp.Cldr
       {:ok, {"+HH:mm", "-HH:mm"}}
 
   """
-  @spec hour_format(Locale.name() | LanguageTag.t(), Cldr.backend()) :: {String.t(), String.t()}
-  def hour_format(locale, backend) do
+  @spec hour_format(Locale.name() | LanguageTag.t(), Cldr.backend()) ::
+          {:ok, {String.t(), String.t()}} | {:error, {atom, String.t()}}
+
+  def hour_format(locale \\ Cldr.get_locale(), backend \\ Cldr.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.hour_format(locale)
   end
@@ -142,7 +145,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Examples:
 
-      iex> Cldr.DateTime.Format.date_formats "en"
+      iex> Cldr.DateTime.Format.date_formats "en", :gregorian, MyApp.Cldr
       {:ok, %Cldr.Date.Formats{
         full: "EEEE, MMMM d, y",
         long: "MMMM d, y",
@@ -150,7 +153,7 @@ defmodule Cldr.DateTime.Format do
         short: "M/d/yy"
       }}
 
-      iex> Cldr.DateTime.Format.date_formats "en", :buddhist
+      iex> Cldr.DateTime.Format.date_formats "en", :buddhist, MyApp.Cldr
       {:ok, %Cldr.Date.Formats{
         full: "EEEE, MMMM d, y G",
         long: "MMMM d, y G",
@@ -161,7 +164,12 @@ defmodule Cldr.DateTime.Format do
   """
   @spec date_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) ::
           standard_formats
-  def date_formats(locale, calendar, backend \\ Cldr.default_backend()) do
+
+  def date_formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.default_backend()
+      ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.date_formats(locale, calendar)
   end
@@ -195,9 +203,14 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec time_formats(Locale.name() | LanguageTag, Cldr.backend(), Cldr.Calendar.t()) ::
+  @spec time_formats(Locale.name() | LanguageTag, Cldr.Calendar.t(), Cldr.backend()) ::
           standard_formats
-  def time_formats(locale, backend, calendar) do
+
+  def time_formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.default_backend()
+      ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.time_formats(locale, calendar)
   end
@@ -210,7 +223,7 @@ defmodule Cldr.DateTime.Format do
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
-  The default is `:gregorian`
+    The default is `:gregorian`
 
   ## Examples:
 
@@ -222,7 +235,7 @@ defmodule Cldr.DateTime.Format do
         short: "{1}, {0}"
       }}
 
-      iex> Cldr.DateTime.Format.date_time_formats "en", :buddhist
+      iex> Cldr.DateTime.Format.date_time_formats "en", :buddhist, MyApp.Cldr
       {:ok, %Cldr.DateTime.Formats{
         full: "{1} 'at' {0}",
         long: "{1} 'at' {0}",
@@ -231,9 +244,14 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec date_time_formats(Locale.name() | LanguageTag.t(), Cldr.backend(), Cldr.Calendar.t()) ::
-          standard_formats
-  def date_time_formats(locale, backend, calendar) do
+  @spec date_time_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) ::
+    {:ok, map()} | {:error, {atom, String.t}}
+
+  def date_time_formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.default_backend()
+      ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.date_time_formats(locale, calendar)
   end
@@ -304,8 +322,13 @@ defmodule Cldr.DateTime.Format do
           Locale.name() | LanguageTag.t(),
           Cldr.Calendar.t(),
           Cldr.backend()
-        ) :: formats
-  def date_time_available_formats(locale, backend, calendar) do
+        ) :: {:ok, map()} | {:error, {atom, String.t}}
+
+  def date_time_available_formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.default_backend()
+      ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.date_time_available_formats(locale, calendar)
   end
@@ -327,7 +350,7 @@ defmodule Cldr.DateTime.Format do
       :y_mmm_ed, :y_mmmm, :y_qqq, :y_qqqq, :yw_count_other]
 
   """
-  def common_date_time_format_names(backend) do
+  def common_date_time_format_names(backend \\ Cldr.default_backend) do
     datetime_module = Module.concat(backend, DateTime.Format)
 
     Cldr.known_locale_names(backend)
@@ -359,6 +382,7 @@ defmodule Cldr.DateTime.Format do
 
   defp all_date_time_formats(locale, backend) do
     datetime_backend = Module.concat(backend, DateTime.Format)
+
     all_formats_for(locale, backend, &datetime_backend.date_time_formats/2) ++
       all_formats_for(locale, backend, &datetime_backend.date_time_available_formats/2)
   end
@@ -389,7 +413,7 @@ defmodule Cldr.DateTime.Format do
   #  >  have either a separator of ":", "." or no separator
   # Therefore the format is always either 4 parts (with separator) or 3 parts (without separator)
 
-  #Short format with zero minutes
+  # Short format with zero minutes
   def gmt_format_type([sign, hour, _sep, "00"], :short) do
     :erlang.iolist_to_binary([sign, String.replace_leading(hour, "0", "")])
   end

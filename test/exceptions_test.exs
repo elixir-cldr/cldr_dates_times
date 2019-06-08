@@ -5,19 +5,19 @@ defmodule Cldr.Exceptions.Test do
     assert_raise ArgumentError,
                  ~r/Invalid date_time. Date_time is a map that requires at least .*/,
                  fn ->
-                   Cldr.DateTime.to_string!("not a date")
+                   Cldr.DateTime.to_string!("not a date", MyApp.Cldr)
                  end
   end
 
   test "that an invalid date raises" do
     assert_raise ArgumentError, ~r/Invalid date. Date is a map that requires at least .*/, fn ->
-      Cldr.Date.to_string!("not a date")
+      Cldr.Date.to_string!("not a date", MyApp.Cldr)
     end
   end
 
   test "that an invalid time raises" do
     assert_raise ArgumentError, ~r/Invalid time. Time is a map that requires at least .*/, fn ->
-      Cldr.Time.to_string!("not a time")
+      Cldr.Time.to_string!("not a time", MyApp.Cldr)
     end
   end
 end

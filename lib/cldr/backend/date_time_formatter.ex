@@ -131,7 +131,12 @@ defmodule Cldr.DateTime.Formatter.Backend do
         end
 
         defp transliterate(formatted, locale, number_system) do
-          Cldr.Number.Transliterate.transliterate(formatted, locale, number_system, unquote(backend))
+          Cldr.Number.Transliterate.transliterate(
+            formatted,
+            locale,
+            number_system,
+            unquote(backend)
+          )
         end
 
         defp format_errors(list) do
@@ -153,8 +158,12 @@ defmodule Cldr.DateTime.Formatter.Backend do
           {:ok, gmt_format} = Cldr.DateTime.Format.gmt_format(locale_name, backend)
           {:ok, gmt_zero_format} = Cldr.DateTime.Format.gmt_zero_format(locale_name, backend)
           {:ok, {pos_format, neg_format}} = Cldr.DateTime.Format.hour_format(locale_name, backend)
-          {:ok, pos_transforms} = Compiler.compile(pos_format, backend, Cldr.DateTime.Formatter.Backend)
-          {:ok, neg_transforms} = Compiler.compile(neg_format, backend, Cldr.DateTime.Formatter.Backend)
+
+          {:ok, pos_transforms} =
+            Compiler.compile(pos_format, backend, Cldr.DateTime.Formatter.Backend)
+
+          {:ok, neg_transforms} =
+            Compiler.compile(neg_format, backend, Cldr.DateTime.Formatter.Backend)
 
           def gmt_tz_format(
                 %LanguageTag{cldr_locale_name: unquote(locale_name)},

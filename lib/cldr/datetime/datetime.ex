@@ -64,15 +64,15 @@ defmodule Cldr.DateTime do
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.DateTime.to_string datetime, locale: "en"
+      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, locale: "en"
       {:ok, "Jan 1, 2000, 11:59:59 PM"}
-      iex> Cldr.DateTime.to_string datetime, format: :long, locale: "en"
+      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :long, locale: "en"
       {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
-      iex> Cldr.DateTime.to_string datetime, format: :hms, locale: "en"
+      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :hms, locale: "en"
       {:ok, "23:59:59"}
-      iex> Cldr.DateTime.to_string datetime, format: :full, locale: "en"
+      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :full, locale: "en"
       {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
-      iex> Cldr.DateTime.to_string datetime, format: :full, locale: "fr"
+      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :full, locale: "fr"
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
   """
@@ -91,7 +91,7 @@ defmodule Cldr.DateTime do
     with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
          {:ok, cldr_calendar} <- type_from_calendar(calendar),
          {:ok, format_string} <-
-           format_string_from_format(options[:format], locale, backend, cldr_calendar),
+           format_string_from_format(options[:format], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(datetime, format_string, locale, options) do
       {:ok, formatted}
     else
@@ -151,13 +151,13 @@ defmodule Cldr.DateTime do
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.DateTime.to_string! datetime, locale: "en"
+      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, locale: "en"
       "Jan 1, 2000, 11:59:59 PM"
-      iex> Cldr.DateTime.to_string! datetime, format: :long, locale: "en"
+      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, format: :long, locale: "en"
       "January 1, 2000 at 11:59:59 PM UTC"
-      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: "en"
+      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, format: :full, locale: "en"
       "Saturday, January 1, 2000 at 11:59:59 PM GMT"
-      iex> Cldr.DateTime.to_string! datetime, format: :full, locale: "fr"
+      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, format: :full, locale: "fr"
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
   """
@@ -174,11 +174,11 @@ defmodule Cldr.DateTime do
   defp format_string_from_format(
          format,
          %LanguageTag{cldr_locale_name: locale_name},
-         backend,
-         cldr_calendar
+         cldr_calendar,
+         backend
        )
        when format in @format_types do
-    with {:ok, formats} <- Format.date_time_formats(locale_name, backend, cldr_calendar) do
+    with {:ok, formats} <- Format.date_time_formats(locale_name, cldr_calendar, backend) do
       {:ok, Map.get(formats, format)}
     end
   end
@@ -187,11 +187,11 @@ defmodule Cldr.DateTime do
   defp format_string_from_format(
          format,
          %LanguageTag{cldr_locale_name: locale_name},
-         backend,
-         calendar
+         cldr_calendar,
+         backend
        )
        when is_atom(format) do
-    with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend),
+    with {:ok, formats} <- Format.date_time_available_formats(locale_name, cldr_calendar, backend),
          format_string <- Map.get(formats, format) do
       if format_string do
         {:ok, format_string}
@@ -208,15 +208,15 @@ defmodule Cldr.DateTime do
   defp format_string_from_format(
          %{number_system: number_system, format: format},
          locale,
-         backend,
-         calendar
+         calendar,
+         backend
        ) do
-    {:ok, format_string} = format_string_from_format(format, locale, backend, calendar)
+    {:ok, format_string} = format_string_from_format(format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
   # Straight up format string
-  defp format_string_from_format(format_string, _locale, _backend, _calendar)
+  defp format_string_from_format(format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
   end

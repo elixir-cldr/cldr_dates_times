@@ -37,11 +37,17 @@ defmodule Cldr.DateTime.Relative do
 
   * `options` is a `Keyword` list of options which are:
 
-    * `:locale` is the locale in which the binary is formatted.  The default is `Cldr.get_current_locale/0`
+  ## Options
+
+    * `:locale` is the locale in which the binary is formatted.
+      The default is `Cldr.get_current_locale/0`
+
     * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
+
     * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
     `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
     `:sun`, `:quarter`
+
     * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
     calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
     for a DateTime it is `DateTime.utc_now`
@@ -54,64 +60,64 @@ defmodule Cldr.DateTime.Relative do
 
   ## Examples
 
-      iex> Cldr.DateTime.Relative.to_string(-1)
-      {:ok, "1 second ago"}
+      # iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr)
+      # {:ok, "1 second ago"}
 
-      iex> Cldr.DateTime.Relative.to_string(1)
-      {:ok, "in 1 second"}
+      # iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr)
+      # {:ok, "in 1 second"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, unit: :day)
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day)
       {:ok, "tomorrow"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, unit: :day, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
       {:ok, "demain"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, unit: :day, format: :narrow)
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
       {:ok, "tomorrow"}
 
-      iex> Cldr.DateTime.Relative.to_string(1234, unit: :year)
+      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year)
       {:ok, "in 1,234 years"}
 
-      iex> Cldr.DateTime.Relative.to_string(1234, unit: :year, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year, locale: "fr")
       {:ok, "dans 1 234 ans"}
 
-      iex> Cldr.DateTime.Relative.to_string(31)
+      iex> Cldr.DateTime.Relative.to_string(31, MyApp.Cldr)
       {:ok, "in 31 seconds"}
 
-      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], relative_to: ~D[2017-04-26])
+      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, relative_to: ~D[2017-04-26])
       {:ok, "in 3 days"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, format: :short, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :short, locale: "fr")
       {:ok, "dans 5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, format: :narrow, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :narrow, locale: "fr")
       {:ok, "+5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string 2, unit: :wed, format: :short, locale: "en"
+      iex> Cldr.DateTime.Relative.to_string 2, MyApp.Cldr, unit: :wed, format: :short, locale: "en"
       {:ok, "in 2 Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string 1, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, format: :short
       {:ok, "next Wed"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, format: :short
       {:ok, "last Wed"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, unit: :wed
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed
       {:ok, "last Wednesday"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, unit: :quarter
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :quarter
       {:ok, "last quarter"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, unit: :mon, locale: "fr"
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :mon, locale: "fr"
       {:ok, "lundi dernier"}
 
-      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], unit: :ziggeraut)
+      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, unit: :ziggeraut)
       {:error, {Cldr.UnknownTimeUnit,
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
 
   """
   @spec to_string(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
-    {:ok, String.t} | {:error, {atom, String.t}}
+          {:ok, String.t()} | {:error, {atom, String.t()}}
 
   def to_string(relative, backend, options \\ []) do
     options = Keyword.merge(default_options(), options)
@@ -184,18 +190,25 @@ defmodule Cldr.DateTime.Relative do
   * `relative` is a number or Date/Datetime representing the time distance from `now` or from
   options[:relative_to]
 
-  * `options` is a `Keyword` list of options which are:
+  * `options` is a `Keyword` list of options
 
-    * `:locale` is the locale in which the binary is formatted.  The default is `Cldr.get_current_locale/0`
+  ## Options
+
+    * `:locale` is the locale in which the binary is formatted.
+      The default is `Cldr.get_current_locale/0`
+
     * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
+
     * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
-    `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
-    `:sun`, `:quarter`
+      `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
+      `:sun`, `:quarter`
+
     * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
-    calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
-    for a DateTime it is `DateTime.utc_now`
+      calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
+      for a DateTime it is `DateTime.utc_now`
 
   See `to_string/2`
+
   """
   def to_string!(relative, options \\ []) do
     case to_string(relative, options) do
@@ -227,7 +240,7 @@ defmodule Cldr.DateTime.Relative do
 
     relative
     |> abs
-    |> Cldr.Number.to_string!(locale: locale)
+    |> Cldr.Number.to_string!(backend, locale: locale)
     |> Cldr.Substitution.substitute(rule)
     |> Enum.join()
   end
@@ -332,6 +345,7 @@ defmodule Cldr.DateTime.Relative do
   end
 
   defp get_locale(locale, backend) do
+    backend = Module.concat(backend, DateTime.Relative)
     backend.get_locale(locale)
   end
 end

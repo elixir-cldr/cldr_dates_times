@@ -47,7 +47,6 @@ defmodule CldrDatesTimes.Mixfile do
       {:ex_cldr_numbers, "~> 2.6"},
       {:ex_cldr_calendars, "~> 0.8"},
       {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release]},
-      {:stream_data, "~> 0.4", only: :test},
       {:jason, "~> 1.0", optional: true},
       {:benchee, "~> 0.12", optional: true, only: :dev}
     ]
@@ -79,7 +78,7 @@ defmodule CldrDatesTimes.Mixfile do
     }
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test"]
+  defp elixirc_paths(:test), do: ["lib", "mix", "test"]
   defp elixirc_paths(:dev), do: ["lib", "mix"]
   defp elixirc_paths(_), do: ["lib"]
 end

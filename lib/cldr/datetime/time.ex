@@ -57,25 +57,25 @@ defmodule Cldr.Time do
 
   ## Examples
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217]
+      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr
       {:ok, "7:35:13 am"}
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :short
+      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :short
       {:ok, "7:35 am"}
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :medium, locale: "fr"
+      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :medium, locale: "fr"
       {:ok, "07:35:13"}
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :medium
+      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :medium
       {:ok, "7:35:13 am"}
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.Time.to_string datetime, format: :long
+      iex> Cldr.Time.to_string datetime, MyApp.Cldr, format: :long
       {:ok, "11:59:59 pm UTC"}
 
   """
 
-  def to_string(time, backend \\ Cldr.default_backend, options \\ [])
+  def to_string(time, backend \\ Cldr.default_backend(), options \\ [])
 
   def to_string(%{calendar: Calendar.ISO} = time, backend, options) do
     %{time | calendar: Cldr.Calendar.Gregorian}
@@ -90,7 +90,7 @@ defmodule Cldr.Time do
     with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, format_string} <-
-           format_string_from_format(options[:format], locale, backend, cldr_calendar),
+           format_string_from_format(options[:format], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(time, format_string, locale, options) do
       {:ok, formatted}
     else
@@ -136,23 +136,23 @@ defmodule Cldr.Time do
 
   ## Examples
 
-      iex> Cldr.Time.to_string! ~T[07:35:13.215217]
+      iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr
       "7:35:13 am"
 
-      iex> Cldr.Time.to_string! ~T[07:35:13.215217], format: :short
+      iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr, format: :short
       "7:35 am"
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :short, period: :variant
+      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :short, period: :variant
       {:ok, "7:35 am"}
 
-      iex> Cldr.Time.to_string! ~T[07:35:13.215217], format: :medium, locale: "fr"
+      iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr, format: :medium, locale: "fr"
       "07:35:13"
 
-      iex> Cldr.Time.to_string! ~T[07:35:13.215217], format: :medium
+      iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr, format: :medium
       "7:35:13 am"
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.Time.to_string! datetime, format: :long
+      iex> Cldr.Time.to_string! datetime, MyApp.Cldr, format: :long
       "11:59:59 pm UTC"
 
   """
@@ -165,9 +165,14 @@ defmodule Cldr.Time do
     end
   end
 
-  defp format_string_from_format(format, %LanguageTag{cldr_locale_name: locale_name}, backend, calendar)
+  defp format_string_from_format(
+         format,
+         %LanguageTag{cldr_locale_name: locale_name},
+         calendar,
+         backend
+       )
        when format in @format_types do
-    with {:ok, formats} <- Format.time_formats(locale_name, backend, calendar) do
+    with {:ok, formats} <- Format.time_formats(locale_name, calendar, backend) do
       {:ok, Map.get(formats, format)}
     end
   end
@@ -178,7 +183,7 @@ defmodule Cldr.Time do
          backend,
          calendar
        ) do
-    {:ok, format_string} = format_string_from_format(format, locale, backend, calendar)
+    {:ok, format_string} = format_string_from_format(format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
@@ -188,7 +193,7 @@ defmodule Cldr.Time do
       "Invalid time format type.  " <> "The valid types are #{inspect(@format_types)}."}}
   end
 
-  defp format_string_from_format(format_string, _locale, _backend, _calendar)
+  defp format_string_from_format(format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
   end

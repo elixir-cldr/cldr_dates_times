@@ -2,10 +2,8 @@
 use Mix.Config
 
 config :ex_cldr,
-  default_locale: "en-001",
-  locales: :all,
-  gettext: Cldr.Gettext,
-  precompile_transliterations: [{:latn, :arab}, {:arab, :thai}, {:arab, :latn}]
+  default_locale: "en",
+  default_backend: MyApp.Cldr
 
 config :ex_unit,
   module_load_timeout: 220_000,
