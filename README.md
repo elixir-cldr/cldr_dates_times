@@ -60,7 +60,7 @@ config :ex_cldr,
 
 3. Update any calls to `Cldr.Date.to_string/2` to call `Cldr.Date.to_string/3` with the second parameter being a backend module. The same applies for migrating to `Cldr.DateTime.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  For example:
 
-```
+```elixir
   # Change from to_string/2 to to_string/3
   # Old version
   iex> Cldr.DateTime.to_string DateTime.utc_now, format: :short
@@ -320,7 +320,7 @@ Although largely complete (with respect to the CLDR data), there are some known 
 
 ## Installation
 
-Note that `:ex_cldr_dates_times` requires Elixir 1.5 or later.
+**Note that `:ex_cldr_dates_times` requires Elixir 1.8 or later.**
 
 Add `ex_cldr_dates_time` as a dependency to your `mix` project:
 
