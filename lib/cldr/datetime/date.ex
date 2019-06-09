@@ -30,6 +30,8 @@ defmodule Cldr.Date do
   Formats a date according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
 
+  ## Arguments
+
   * `date` is a `%Date{}` struct or any map that contains the keys
   `year`, `month`, `day` and `calendar`
 
