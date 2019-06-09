@@ -10,7 +10,7 @@ defmodule CldrDatesTimes.Mixfile do
       name: "Cldr Dates & Times",
       source_url: "https://github.com/kipcole9/cldr_dates_times",
       docs: docs(),
-      elixir: "~> 1.5",
+      elixir: "~> 1.8",
       description: description(),
       package: package(),
       start_permanent: Mix.env() == :prod,
@@ -45,10 +45,10 @@ defmodule CldrDatesTimes.Mixfile do
     [
       {:ex_cldr, "~> 2.6"},
       {:ex_cldr_numbers, "~> 2.6"},
-      {:ex_cldr_calendars, "~> 0.8"},
+      {:ex_cldr_calendars, "~> 0.9"},
       {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release]},
       {:jason, "~> 1.0", optional: true},
-      {:benchee, "~> 0.12", optional: true, only: :dev}
+      {:benchee, "~> 1.0", optional: true, only: :dev}
     ]
   end
 
