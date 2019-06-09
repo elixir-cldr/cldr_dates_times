@@ -35,7 +35,7 @@ For help in `iex`:
 ```
 ## Configuration & Migration from Version 1
 
-`ex_cldr_numbers` uses the configuration set for the dependency `ex_cldr`.  See the documentation for [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration).
+`ex_cldr_dates_times` uses the configuration set for the dependency `ex_cldr`.  See the documentation for [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration).
 
 A `backend` module is required that is used to host the functions that manage CLDR data.  An example to get started is:
 
