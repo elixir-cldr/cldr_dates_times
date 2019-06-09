@@ -37,7 +37,20 @@ defmodule CldrDatesTimes.Mixfile do
       source_ref: "v#{@version}",
       main: "readme",
       extras: ["README.md", "CHANGELOG.md", "LICENSE.md"],
-      logo: "logo.png"
+      logo: "logo.png",
+      groups_for_modules: groups_for_modules(),
+      skip_undefined_reference_warnings_on: ["changelog"]
+    ]
+  end
+
+  defp groups_for_modules do
+    [
+      Helpers: [
+        Cldr.DateTime.Compiler,
+        Cldr.DateTime.Format,
+        Cldr.DateTime.Formatter,
+        Cldr.DateTime.Timezone,
+      ]
     ]
   end
 

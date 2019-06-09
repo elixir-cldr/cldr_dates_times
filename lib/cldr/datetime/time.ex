@@ -22,6 +22,7 @@ defmodule Cldr.Time do
   @format_types [:short, :medium, :long, :full]
 
   defmodule Formats do
+    @moduledoc false
     defstruct Module.get_attribute(Cldr.Time, :format_types)
   end
 

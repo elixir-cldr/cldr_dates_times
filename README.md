@@ -33,7 +33,7 @@ For help in `iex`:
   iex> h Cldr.DateTime.to_string
   iex> h Cldr.DateTime.Relative.to_string
 ```
-## Configuration & Migration from Version 1
+## Configuration and Migration from Version 1
 
 `ex_cldr_dates_times` uses the configuration set for the dependency `ex_cldr`.  See the documentation for [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration).
 

@@ -22,6 +22,7 @@ defmodule Cldr.DateTime do
   @format_types [:short, :medium, :long, :full]
 
   defmodule Formats do
+    @moduledoc false
     defstruct Module.get_attribute(Cldr.DateTime, :format_types)
   end
 
