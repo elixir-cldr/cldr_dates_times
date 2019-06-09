@@ -447,7 +447,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def week_aligned_year(date, 1, _locale, _backend, _options) do
     {year, _week} = Cldr.Calendar.week_of_year(date)
-    year
+    inspect(year)
   end
 
   def week_aligned_year(date, 2 = n, _locale, _backend, _options) do
@@ -757,7 +757,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   def quarter(date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :quarter, :format, :abbreviated, backend, locale)
+    Cldr.Calendar.localize(date, :quarter, :format, :wide, backend, locale)
   end
 
   def quarter(date, 5, locale, backend, _options) do
@@ -848,7 +848,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   def standalone_quarter(date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :quarter, :stand_alone, :abbreviated, backend, locale)
+    Cldr.Calendar.localize(date, :quarter, :stand_alone, :wide, backend, locale)
   end
 
   def standalone_quarter(date, 5, locale, backend, _options) do
@@ -1561,27 +1561,24 @@ defmodule Cldr.DateTime.Formatter do
     |> pad(n)
   end
 
-  def standalone_day_of_week(date, n, locale, backend, options) when n >= 3 do
-    standalone_day_name(date, n, locale, backend, options)
+  def standalone_day_of_week(date, 3, locale, backend, _options) do
+    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :abbreviated, backend, locale)
+  end
+
+  def standalone_day_of_week(date, 4, locale, backend, _options) do
+    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :wide, backend, locale)
+  end
+
+  def standalone_day_of_week(date, 5, locale, backend, _options) do
+    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :narrow, backend, locale)
+  end
+
+  def standalone_day_of_week(date, 6, locale, backend, _options) do
+    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :short, backend, locale)
   end
 
   def standalone_day_of_week(date, _n, _locale, _backend, _options) do
     error_return(date, "c", [:year, :month, :day, :calendar])
-  end
-
-  @doc false
-  def standalone_day_name(date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :wide, backend, locale)
-  end
-
-  @doc false
-  def standalone_day_name(date, 5, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :narrow, backend, locale)
-  end
-
-  @doc false
-  def standalone_day_name(date, 6, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :short, backend, locale)
   end
 
   #
@@ -1626,19 +1623,16 @@ defmodule Cldr.DateTime.Formatter do
   ## Examples
 
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}
-      "am"
+      "AM"
 
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 3, minute: 0}
-      "am"
+      "AM"
 
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 13, minute: 0}
-      "pm"
+      "PM"
 
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 21, minute: 0}
-      "pm"
-
-      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 0, minute: 0}, 1, "en", period: :variant
-      "am"
+      "PM"
 
   """
   @spec period_am_pm(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
@@ -1717,10 +1711,10 @@ defmodule Cldr.DateTime.Formatter do
       "midnight"
 
       iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 11, minute: 0}
-      "am"
+      "in the morning"
 
       iex> Cldr.DateTime.Formatter.period_noon_midnight %{hour: 16, minute: 0}
-      "pm"
+      "PM"
 
   """
   @spec period_noon_midnight(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
@@ -1737,6 +1731,7 @@ defmodule Cldr.DateTime.Formatter do
   def period_noon_midnight(%{hour: hour, minute: minute} = time, n, locale, backend, options)
       when (rem(hour, 12) == 0 or rem(hour, 24) < 12) and minute == 0 do
     format_backend = Module.concat(backend, DateTime.Format)
+
     if format_backend.language_has_noon_and_midnight?(locale) do
       day_period = format_backend.day_period_for(time, locale.language)
       Cldr.Calendar.localize(day_period, :day_periods, :format, period_format(n), backend, locale)
@@ -2441,10 +2436,10 @@ defmodule Cldr.DateTime.Formatter do
         %{time_zone: _time_zone, utc_offset: _, std_offset: _} = time,
         4,
         locale,
-        _backend,
+        backend,
         options
       ) do
-    zone_id(time, 4, locale, options)
+    zone_id(time, 4, locale, backend, options)
   end
 
   def zone_generic(time, _n, _locale, _backend, _options) do
@@ -2581,8 +2576,8 @@ defmodule Cldr.DateTime.Formatter do
     "Unknown City"
   end
 
-  def zone_id(%{time_zone: _time_zone} = time, 4, locale, _backend, options) do
-    zone_gmt(time, 4, locale, options)
+  def zone_id(%{time_zone: _time_zone} = time, 4, locale, backend, options) do
+    zone_gmt(time, 4, locale, backend, options)
   end
 
   def zone_id(time, _n, _locale, _backend, _options) do
@@ -2661,10 +2656,10 @@ defmodule Cldr.DateTime.Formatter do
         %{utc_offset: _offset, std_offset: _std_offset} = time,
         4 = n,
         locale,
-        _backend,
+        backend,
         options
       ) do
-    zone_gmt(time, n, locale, options)
+    zone_gmt(time, n, locale, backend, options)
   end
 
   def zone_basic(

@@ -5,12 +5,12 @@ defmodule Cldr.DateTime.Compiler do
   During compilation, each of the date, time and datetime format
   strings defined in CLDR are compiled into a list of
   function bodies that are then grafted onto the function head
-  `Cldr.DateTime.Formatter.format/3`.  As a result these compiled
+  `format/3` in a backend module.  As a result these compiled
   formats execute with good performance.
 
   For formats not defined in CLDR (ie a user defined format),
   the tokenizing and parsing is performed, then list of function
-  bodies is created and then `Cldr.DateTime.Formatter.format/3`
+  bodies is created and then `format/3`
   recurses over the list, invoking each function and
   collecting the results.  This process is significantly slower
   than that of the precompiled formats.
@@ -29,7 +29,7 @@ defmodule Cldr.DateTime.Compiler do
   string.
 
   This function is designed to produce output
-  that is fed into `Cldr.DateTime.Compiler.compile/1`.
+  that is fed into `Cldr.DateTime.Compiler.compile/3`.
 
   ## Arguments
 

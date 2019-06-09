@@ -45,7 +45,7 @@ defmodule Cldr.DateTime.Format do
   ## Arguments
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
   ## Example
 
@@ -245,7 +245,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_time_formats(Locale.name() | LanguageTag.t(), Cldr.Calendar.t(), Cldr.backend()) ::
-    {:ok, map()} | {:error, {atom, String.t}}
+          {:ok, map()} | {:error, {atom, String.t()}}
 
   def date_time_formats(
         locale \\ Cldr.get_locale(),
@@ -322,7 +322,7 @@ defmodule Cldr.DateTime.Format do
           Locale.name() | LanguageTag.t(),
           Cldr.Calendar.t(),
           Cldr.backend()
-        ) :: {:ok, map()} | {:error, {atom, String.t}}
+        ) :: {:ok, map()} | {:error, {atom, String.t()}}
 
   def date_time_available_formats(
         locale \\ Cldr.get_locale(),
@@ -350,7 +350,7 @@ defmodule Cldr.DateTime.Format do
       :y_mmm_ed, :y_mmmm, :y_qqq, :y_qqqq, :yw_count_other]
 
   """
-  def common_date_time_format_names(backend \\ Cldr.default_backend) do
+  def common_date_time_format_names(backend \\ Cldr.default_backend()) do
     datetime_module = Module.concat(backend, DateTime.Format)
 
     Cldr.known_locale_names(backend)

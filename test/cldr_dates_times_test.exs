@@ -14,7 +14,7 @@ defmodule Cldr.DatesTimes.Test do
              },
              MyApp.Cldr,
              format: "YYYY-MMM-dd KK:mm bb"
-           ) == {:ok, "2019-Jan-01 00:00 midnight"}
+           ) == {:ok, "2018-Jan-01 00:00 midnight"}
 
     assert Cldr.DateTime.to_string(
              %{
@@ -28,6 +28,6 @@ defmodule Cldr.DatesTimes.Test do
              },
              MyApp.Cldr,
              format: "YYYY-MMM-dd KK:mm bb"
-           ) == {:ok, "2019-Jan-01 00:01 am"}
+           ) == {:ok, "2018-Jan-01 00:01 AM"}
   end
 end

@@ -33,7 +33,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
         * `format` is a valid format string, for example `yy/MM/dd hh:MM`
 
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
+          or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
         * `options` is a keyword list of options.  The valid options are:
 
@@ -48,7 +48,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
 
         ## Examples
 
-            iex> Cldr.DateTime.Formatter.format %{year: 2017, month: 9, day: 3, hour: 10, minute: 23},
+            iex> #{__MODULE__}.format %{year: 2017, month: 9, day: 3, hour: 10, minute: 23},
             ...> "yy/MM/dd hh:MM", "en"
             {:ok, "17/09/03 10:09"}
 

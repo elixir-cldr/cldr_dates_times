@@ -40,7 +40,7 @@ defmodule Cldr.DateTime.Relative do
   ## Options
 
     * `:locale` is the locale in which the binary is formatted.
-      The default is `Cldr.get_current_locale/0`
+      The default is `Cldr.get_locale/0`
 
     * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
 
@@ -60,11 +60,11 @@ defmodule Cldr.DateTime.Relative do
 
   ## Examples
 
-      # iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr)
-      # {:ok, "1 second ago"}
+      iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr)
+      {:ok, "1 second ago"}
 
-      # iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr)
-      # {:ok, "in 1 second"}
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr)
+      {:ok, "in 1 second"}
 
       iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day)
       {:ok, "tomorrow"}
@@ -97,10 +97,10 @@ defmodule Cldr.DateTime.Relative do
       {:ok, "in 2 Wed."}
 
       iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, format: :short
-      {:ok, "next Wed"}
+      {:ok, "next Wed."}
 
       iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, format: :short
-      {:ok, "last Wed"}
+      {:ok, "last Wed."}
 
       iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed
       {:ok, "last Wednesday"}
@@ -119,7 +119,7 @@ defmodule Cldr.DateTime.Relative do
   @spec to_string(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {atom, String.t()}}
 
-  def to_string(relative, backend, options \\ []) do
+  def to_string(relative, backend \\ Cldr.default_backend(), options \\ []) do
     options = Keyword.merge(default_options(), options)
     locale = Keyword.get(options, :locale)
     {unit, options} = Keyword.pop(options, :unit)
@@ -195,7 +195,7 @@ defmodule Cldr.DateTime.Relative do
   ## Options
 
     * `:locale` is the locale in which the binary is formatted.
-      The default is `Cldr.get_current_locale/0`
+      The default is `Cldr.get_locale/0`
 
     * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
 
@@ -225,7 +225,7 @@ defmodule Cldr.DateTime.Relative do
       |> get_in([unit, options[:format], :relative_ordinal])
       |> Enum.at(relative + 1)
 
-    if is_nil(result), do: to_string(relative / 1, unit, locale, options), else: result
+    if is_nil(result), do: to_string(relative / 1, unit, locale, backend, options), else: result
   end
 
   defp to_string(relative, unit, locale, backend, options) when is_number(relative) do
@@ -245,14 +245,14 @@ defmodule Cldr.DateTime.Relative do
     |> Enum.join()
   end
 
-  defp to_string(span, unit, locale, options) do
-    do_to_string(span, unit, locale, options)
+  defp to_string(span, unit, locale, backend, options) do
+    do_to_string(span, unit, locale, backend, options)
   end
 
-  defp do_to_string(seconds, unit, locale, options) do
+  defp do_to_string(seconds, unit, locale, backend, options) do
     seconds
     |> scale_relative(unit)
-    |> to_string(unit, locale, options)
+    |> to_string(unit, locale, backend, options)
   end
 
   defp time_unit_error(unit) do

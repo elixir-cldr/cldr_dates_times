@@ -3,89 +3,126 @@
 [![Hex pm](http://img.shields.io/hexpm/v/ex_cldr_dates_times.svg?style=flat)](https://hex.pm/packages/ex_cldr_dates_times)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/kipcole9/cldr_dates_times/blob/master/LICENSE)
 
-# Compatibility
 
-The master branch of `cldr_dates_times` is compatible with `cldr` version 1.x only.  Work is in progress for `cldr_dates_times` version 2.0 with an estimated availabiity of January 2019.
-
-## Introduction and Getting Started
+## Introduction
 
 `ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
 
-The primary api is `Cldr.Date.to_string/2`, `Cldr.Time.to_string/2`, `Cldr.DateTime.to_string/2` and `Cldr.DateTime.Relative.to_string/2`.  The following examples demonstrate:
+The primary api is `Cldr.Date.to_string/3`, `Cldr.Time.to_string/3`, `Cldr.DateTime.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  The following examples demonstrate:
 
 ```elixir
-iex> Cldr.Date.to_string Date.utc_today()
-{:ok, "Aug 18, 2017"}
+  iex> Cldr.Date.to_string Date.utc_today()
+  {:ok, "Jun 9, 2019"}
 
-iex> Cldr.Time.to_string Time.utc_now
-{:ok, "11:38:55 AM"}
+  iex> Cldr.Time.to_string Time.utc_now
+  {:ok, "12:11:14 AM"}
 
-iex> Cldr.DateTime.to_string DateTime.utc_now
-{:ok, "Aug 18, 2017, 11:39:08 AM"}
+  iex> Cldr.DateTime.to_string DateTime.utc_now
+  {:ok, "Jun 9, 2019, 12:11:24 AM"}
 
-iex> Cldr.DateTime.Relative.to_string 1, unit: :day, format: :narrow
-{:ok, "tomorrow"}
+  # Note that if options are provided, a backend
+  # module is also required
+  iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :day, format: :narrow
+  {:ok, "tomorrow"}
 ```
 
 For help in `iex`:
 
 ```elixir
-iex> h Cldr.Date.to_string
-iex> h Cldr.Time.to_string
-iex> h Cldr.DateTime.to_string
-iex> h Cldr.DateTime.Relative.to_string
+  iex> h Cldr.Date.to_string
+  iex> h Cldr.Time.to_string
+  iex> h Cldr.DateTime.to_string
+  iex> h Cldr.DateTime.Relative.to_string
+```
+## Configuration & Migration from Version 1
+
+`ex_cldr_numbers` uses the configuration set for the dependency `ex_cldr`.  See the documentation for [ex_cldr](https://hexdocs.pm/ex_cldr)
+
+A `backend` module is required that is used to host the functions that manage CLDR data.  An example to get started is:
+
+1. Create a backend module (see [ex_cldr](https://hexdocs.pm/ex_cldr) for details of the available options)
+
+```elixir
+defmodule MyApp.Cldr do
+  use Cldr,
+    locales: ["en", "fr", "ja"]
+
+end
+```
+
+2. Update `config.exs` configuration to specify this backend as the system default:
+
+```elixir
+config :ex_cldr,
+  default_locale: "en",
+  default_backend: MyApp.Cldr
+```
+
+3. Update any calls to `Cldr.Date.to_string/2` to call `Cldr.Date.to_string/3` with the second parameter being a backend module. The same applies for migrating to `Cldr.DateTime.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  For example:
+
+```
+  # Change from to_string/2 to to_string/3
+  # Old version
+  iex> Cldr.DateTime.to_string DateTime.utc_now, format: :short
+
+  # New version. Note the addition of a backend module as
+  # the second parameter.
+  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :short
 ```
 
 ## Date, Time and DateTime Localization Formatting
 
 Dates, Times and DateTimes can be formatted using:
 
-* The format types defined for each locale.  These format types provide cross-locale standardisation and therefore should be preferred where possible.  The format types, implemented for `Cldr.Date.to_string/2`, `Cldr.Time.to_string/2`,`Cldr.DateTime.to_string/2` are `:short`, `:medium`, `:long`  and `:full`.   The default is `:medium`. For example:
+* The format types defined for each locale.  These format types provide cross-locale standardisation and therefore should be preferred where possible.  The format types, implemented for `Cldr.Date.to_string/2`, `Cldr.Time.to_string/2`,`Cldr.DateTime.to_string/2` are `:short`, `:medium`, `:long`  and `:full`.   The default is `:medium`. For example, assuming a configured backend called `MyApp.Cldr`:
 
 ```elixir
-iex> Cldr.DateTime.to_string DateTime.utc_now, format: :short
-{:ok, "9/3/17, 11:25 PM"}
-iex> Cldr.DateTime.to_string DateTime.utc_now, format: :long
-{:ok, "September 3, 2017 at 11:25:41 PM UTC"}
-iex> Cldr.DateTime.to_string DateTime.utc_now, format: :medium
-{:ok, "Sep 3, 2017, 11:25:46 PM"}
-iex> Cldr.DateTime.to_string DateTime.utc_now, format: :long, locale: "fr"
-{:ok, "3 septembre 2017 à 23:25:55 UTC"}
+  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :short
+  {:ok, "6/9/19, 12:13 AM"}
+
+  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :long
+  {:ok, "June 9, 2019 at 12:14:15 AM UTC"}
+
+  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :medium
+  {:ok, "Jun 9, 2019, 12:14:27 AM"}
+
+  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :long, locale: "fr"
+  {:ok, "9 juin 2019 à 00:14:38 UTC"}
 ```
 
 * A user specified format string.  A format string uses one or more formatting symbols to define what date and time elements should be places in the format.  A simple example to format the time into hours and minutes:
 
 ```elixir
-iex> Cldr.DateTime.to_string DateTime.utc_now, format: "hh:MM"
-{:ok, "11:09"}
+  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: "hh:MM"
+  {:ok, "12:06"}
 ```
 
-* For `DateTime`s there is also a set of predefined format name.  These format names are returned by `Cldr.DateTime.date_time_available_formats/1`.  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` paramater to `Cldr.DateTime.to_string/2` module only.
+* For `DateTime`s there is also a set of predefined format name.  These format names are returned by `MyApp.Cldr.DateTime.date_time_available_formats/1` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` paramater to `Cldr.DateTime.to_string/2` module only.
 
 ```elixir
-iex> Cldr.DateTime.Format.date_time_available_formats
-%{mmmm_w_count_one: "'week' W 'of' MMMM", gy_mmm: "MMM y G", md: "M/d",
-  mmm_md: "MMMM d", e_hms: "E HH:mm:ss", ed: "d E", y_mmm: "MMM y",
-  e_hm: "E HH:mm", mmm_ed: "E, MMM d", y_mmm_ed: "E, MMM d, y",
-  gy_mm_md: "MMM d, y G", mmm: "LLL", y_md: "M/d/y", gy: "y G",
-  hms: "h:mm:ss a", hm: "h:mm a", y_mmmm: "MMMM y", m: "L",
-  gy_mmm_ed: "E, MMM d, y G", y_qqq: "QQQ y", e: "ccc", y_qqqq: "QQQQ y",
-  hmsv: "h:mm:ss a v", mmmm_w_count_other: "'week' W 'of' MMMM",
-  ehm: "E h:mm a", y_m_ed: "E, M/d/y", h: "h a", hmv: "h:mm a v",
-  yw_count_other: "'week' w 'of' y", mm_md: "MMM d", y_m: "M/y", m_ed: "E, M/d",
-  ms: "mm:ss", d: "d", y_mm_md: "MMM d, y", yw_count_one: "'week' w 'of' y",
-  y: "y", ehms: "E h:mm:ss a"}
+  iex> MyApp.Cldr.DateTime.Format.date_time_available_formats
+  %{mmmm_w_count_one: "'week' W 'of' MMMM", gy_mmm: "MMM y G", md: "M/d",
+    mmm_md: "MMMM d", e_hms: "E HH:mm:ss", ed: "d E", y_mmm: "MMM y",
+    e_hm: "E HH:mm", mmm_ed: "E, MMM d", y_mmm_ed: "E, MMM d, y",
+    gy_mm_md: "MMM d, y G", mmm: "LLL", y_md: "M/d/y", gy: "y G",
+    hms: "h:mm:ss a", hm: "h:mm a", y_mmmm: "MMMM y", m: "L",
+    gy_mmm_ed: "E, MMM d, y G", y_qqq: "QQQ y", e: "ccc", y_qqqq: "QQQQ y",
+    hmsv: "h:mm:ss a v", mmmm_w_count_other: "'week' W 'of' MMMM",
+    ehm: "E h:mm a", y_m_ed: "E, M/d/y", h: "h a", hmv: "h:mm a v",
+    yw_count_other: "'week' w 'of' y", mm_md: "MMM d", y_m: "M/y", m_ed: "E, M/d",
+    ms: "mm:ss", d: "d", y_mm_md: "MMM d, y", yw_count_one: "'week' w 'of' y",
+    y: "y", ehms: "E h:mm:ss a"}
 
-# These format types can be invoked for any locale - meaning
-# these format names are defined for all configured locales.
-iex> Cldr.DateTime.Format.common_date_time_format_names
-[:gy_mmm, :md, :mmm_md, :e_hms, :ed, :y_mmm, :e_hm, :mmm_ed, :y_mmm_ed,
- :gy_mm_md, :mmm, :y_md, :gy, :hms, :hm, :y_mmmm, :m, :gy_mmm_ed, :y_qqq, :e,
- :y_qqqq, :hmsv, :mmmm_w_count_other, :ehm, :y_m_ed, :h, :hmv, :yw_count_other,
- :mm_md, :y_m, :m_ed, :ms, :d, :y_mm_md, :y, :ehms]
+  # These format types can be invoked for any locale - meaning
+  # these format names are defined for all configured locales.
+  iex> Cldr.DateTime.Format.common_date_time_format_names(MyApp.Cldr)
+  [:gy_mmm, :md, :mmm_md, :e_hms, :ed, :y_mmm, :e_hm, :mmm_ed, :y_mmm_ed,
+   :gy_mm_md, :mmm, :y_md, :gy, :hms, :hm, :y_mmmm, :m, :gy_mmm_ed, :y_qqq, :e,
+   :y_qqqq, :hmsv, :mmmm_w_count_other, :ehm, :y_m_ed, :h, :hmv, :yw_count_other,
+   :mm_md, :y_m, :m_ed, :ms, :d, :y_mm_md, :y, :ehms]
 
-iex> Cldr.DateTime.to_string DateTime.utc_now, format: :gy_mmm_ed
-{:ok, "Sun, Sep 3, 2017 AD"}
+  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :gy_mmm_ed
+  {:ok, "Sun, Jun 9, 2019 AD"}
 ```
 
 ## Format strings
@@ -136,7 +173,7 @@ iex> Cldr.DateTime.to_string DateTime.utc_now, format: :gy_mmm_ed
   |                        | LLLLL      | "S"             | Narrow                             |
   | Week of Year           | w          | 2, 22           | Single digit                       |
   |                        | ww         | 02, 22          | Two digits, zero padded            |
-  | Week of Month          | W          | 2               | Single digit                       |
+  | Week of Month          | W          | 2               | Single digit. NOT IMPLEMENTED YET  |
   | Day of Year            | D          | 3, 33, 333      | Minimum necessary digits           |
   |                        | DD         | 03, 33, 333     | Minimum of 2 digits, zero padded   |
   |                        | DDD        | 003, 033, 333   | Minimum of 3 digits, zero padded   |
@@ -223,69 +260,63 @@ The primary API for formatting relative dates and datetimes is `Cldr.DateTime.Re
       iex> Cldr.DateTime.Relative.to_string(1)
       {:ok, "in 1 second"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, unit: :day)
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day)
       {:ok, "tomorrow"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, unit: :day, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
       {:ok, "demain"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, unit: :day, format: :narrow)
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
       {:ok, "tomorrow"}
 
-      iex> Cldr.DateTime.Relative.to_string(1234, unit: :year)
+      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year)
       {:ok, "in 1,234 years"}
 
-      iex> Cldr.DateTime.Relative.to_string(1234, unit: :year, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year, locale: "fr")
       {:ok, "dans 1 234 ans"}
 
       iex> Cldr.DateTime.Relative.to_string(31)
       {:ok, "in 31 seconds"}
 
-      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], relative_to: ~D[2017-04-26])
+      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, relative_to: ~D[2017-04-26])
       {:ok, "in 3 days"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, format: :short, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :short, locale: "fr")
       {:ok, "dans 5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, format: :narrow, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :narrow, locale: "fr")
       {:ok, "+5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string 2, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string 2, MyApp.Cldr, unit: :wed, format: :short
       {:ok, "in 2 Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string 1, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, format: :short
       {:ok, "next Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, format: :short
       {:ok, "last Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, unit: :wed
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed
       {:ok, "last Wednesday"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, unit: :quarter
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :quarter
       {:ok, "last quarter"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, unit: :mon, locale: "fr"
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :mon, locale: "fr"
       {:ok, "lundi dernier"}
 
-      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], unit: :ziggeraut)
+      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, unit: :ziggeraut)
       {:error, {Cldr.UnknownTimeUnit,
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
 ```
 
 ## Known restrictions and limitations
 
-Although largely complete (with respect to the CLDR data), there are some known limitations as of release 1.0.
+Although largely complete (with respect to the CLDR data), there are some known limitations as of release 2.0.
 
-* *Week of year*  The week of year is returned for the format symbol `w`.  Currently it considers weeks of the year to be those defined for the `ISOWeek` calendar.  This means that January 1st may not be the start of the first week of the year and December 31st may not be the last day of the last week of the year.
-
-* *Week of month*  The week of the mornth is returned for format symbol `W`.  Currently it considers weeks of the month to start on the first day of the month which is inconsistent with the ISOWeek standard and different from the `week_of_year` calculation.
+* *Week of month*  The week of the mornth is returned for format symbol `W`.  This is not currently implemented. It returns `1` for all input.
 
 * *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V`, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `DateTime` struct is used to format timezone data.
-
-* *First day of week is always Monday*  All formatting is done with Monday as the first day of the week.  In several territories this is not a reasonable assumption.  CLDR provides data to support a different starting day for the week.  This will be implemented before version 1.0
-
-* *Only calendar is Gregorian (Calendar.ISO)* CLDR defines many calendar systems (see `Cldr.Calendar.known_calendars/0`) however only Calendar.ISO (proleptic Gregorian calendar) is supported in this release.
 
 ## Installation
 
@@ -295,7 +326,7 @@ Add `ex_cldr_dates_time` as a dependency to your `mix` project:
 
     defp deps do
       [
-        {:ex_cldr_dates_times, "~> 1.0.0-rc or ~> 1.0"}
+        {:ex_cldr_dates_times, "~> 2.0"}
       ]
     end
 

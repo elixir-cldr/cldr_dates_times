@@ -1,18 +1,19 @@
 defmodule Cldr.DateTime do
   @moduledoc """
-  Provides an API for the localization and formatting of a `DateTime`
+  Provides localization and formatting of a `DateTime`
   struct or any map with the keys `:year`, `:month`,
   `:day`, `:calendar`, `:hour`, `:minute`, `:second` and optionally `:microsecond`.
 
   `Cldr.DateTime` provides support for the built-in calendar
-  `Calendar.ISO`.  Use of other calendars may not produce
-  the expected results.
+  `Calendar.ISO` or any calendars defined with
+  [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars)
 
   CLDR provides standard format strings for `DateTime` which
   are reresented by the names `:short`, `:medium`, `:long`
   and `:full`.  This allows for locale-independent
   formatting since each locale will define the underlying
   format string as appropriate.
+
   """
 
   alias Cldr.DateTime.Format
@@ -43,7 +44,7 @@ defmodule Cldr.DateTime do
       The default is `:medium`
 
     * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_current_locale/0`
+      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
 
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
@@ -64,6 +65,8 @@ defmodule Cldr.DateTime do
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
+      iex> Cldr.DateTime.to_string datetime
+      {:ok, "Jan 1, 2000, 11:59:59 PM"}
       iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, locale: "en"
       {:ok, "Jan 1, 2000, 11:59:59 PM"}
       iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :long, locale: "en"
@@ -76,6 +79,8 @@ defmodule Cldr.DateTime do
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
   """
+  @spec to_string(map, module, Keyword.t) :: {:ok, String.t} | {:error, {module, String.t}}
+
   def to_string(datetime, backend \\ Cldr.default_backend(), options \\ [])
 
   def to_string(%{calendar: Calendar.ISO} = datetime, backend, options) do
@@ -83,15 +88,13 @@ defmodule Cldr.DateTime do
     |> to_string(backend, options)
   end
 
-  def to_string(datetime, backend, options) when is_list(options) do
+  def to_string(%{calendar: calendar} = datetime, backend, options) when is_list(options) do
     options = Keyword.merge(default_options(), options)
     format_backend = Module.concat(backend, DateTime.Formatter)
-    %{calendar: calendar} = datetime
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
          {:ok, cldr_calendar} <- type_from_calendar(calendar),
-         {:ok, format_string} <-
-           format_string_from_format(options[:format], locale, cldr_calendar, backend),
+         {:ok, format_string} <- format_string(options[:format], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(datetime, format_string, locale, options) do
       {:ok, formatted}
     else
@@ -114,6 +117,7 @@ defmodule Cldr.DateTime do
   @doc """
   Formats a DateTime according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+  returning a formatted string or raising on error.
 
   ## Arguments
 
@@ -130,7 +134,7 @@ defmodule Cldr.DateTime do
       The default is `:medium`
 
     * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_current_locale/0`
+      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
 
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
@@ -161,6 +165,8 @@ defmodule Cldr.DateTime do
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
   """
+  @spec to_string!(map, module, Keyword.t) :: String.t | no_return
+
   def to_string!(datetime, backend \\ Cldr.default_backend(), options \\ [])
 
   def to_string!(datetime, backend, options) do
@@ -171,12 +177,7 @@ defmodule Cldr.DateTime do
   end
 
   # Standard format
-  defp format_string_from_format(
-         format,
-         %LanguageTag{cldr_locale_name: locale_name},
-         cldr_calendar,
-         backend
-       )
+  defp format_string(format, %LanguageTag{cldr_locale_name: locale_name}, cldr_calendar, backend)
        when format in @format_types do
     with {:ok, formats} <- Format.date_time_formats(locale_name, cldr_calendar, backend) do
       {:ok, Map.get(formats, format)}
@@ -184,14 +185,10 @@ defmodule Cldr.DateTime do
   end
 
   # Look up for the format in :available_formats
-  defp format_string_from_format(
-         format,
-         %LanguageTag{cldr_locale_name: locale_name},
-         cldr_calendar,
-         backend
-       )
+  defp format_string(format, %LanguageTag{cldr_locale_name: locale_name}, cldr_calendar, backend)
        when is_atom(format) do
-    with {:ok, formats} <- Format.date_time_available_formats(locale_name, cldr_calendar, backend),
+    with {:ok, formats} <-
+           Format.date_time_available_formats(locale_name, cldr_calendar, backend),
          format_string <- Map.get(formats, format) do
       if format_string do
         {:ok, format_string}
@@ -205,18 +202,13 @@ defmodule Cldr.DateTime do
   end
 
   # Format with a number system
-  defp format_string_from_format(
-         %{number_system: number_system, format: format},
-         locale,
-         calendar,
-         backend
-       ) do
-    {:ok, format_string} = format_string_from_format(format, locale, calendar, backend)
+  defp format_string(%{number_system: number_system, format: format}, locale, calendar, backend) do
+    {:ok, format_string} = format_string(format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
   # Straight up format string
-  defp format_string_from_format(format_string, _locale, _calendar, _backend)
+  defp format_string(format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
   end

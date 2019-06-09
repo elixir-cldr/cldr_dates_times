@@ -37,7 +37,7 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Arguments
 
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag` struct. The default is `Cldr.get_current_locale/0`
+          or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
         ## Example
 
