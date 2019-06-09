@@ -3,7 +3,6 @@
 [![Hex pm](http://img.shields.io/hexpm/v/ex_cldr_dates_times.svg?style=flat)](https://hex.pm/packages/ex_cldr_dates_times)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/kipcole9/cldr_dates_times/blob/master/LICENSE)
 
-
 ## Introduction
 
 `ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
@@ -36,16 +35,17 @@ For help in `iex`:
 ```
 ## Configuration & Migration from Version 1
 
-`ex_cldr_numbers` uses the configuration set for the dependency `ex_cldr`.  See the documentation for [ex_cldr](https://hexdocs.pm/ex_cldr)
+`ex_cldr_numbers` uses the configuration set for the dependency `ex_cldr`.  See the documentation for [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration).
 
 A `backend` module is required that is used to host the functions that manage CLDR data.  An example to get started is:
 
-1. Create a backend module (see [ex_cldr](https://hexdocs.pm/ex_cldr) for details of the available options)
+1. Create a backend module (see [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration) for details of the available options). Note the requirement to configure the appropriate `Cldr` provider backends.
 
 ```elixir
 defmodule MyApp.Cldr do
   use Cldr,
-    locales: ["en", "fr", "ja"]
+    locales: ["en", "fr", "ja"],
+    providers: [Cldr.Number, Cldr.Calendar, Cldr.DateTime]
 
 end
 ```
