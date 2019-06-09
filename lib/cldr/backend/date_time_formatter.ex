@@ -68,7 +68,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
         for format <- Cldr.DateTime.Format.format_list(config) do
           case Compiler.compile(format, backend, Cldr.DateTime.Formatter.Backend) do
             {:ok, transforms} ->
-              def format(date, unquote(format) = f, locale, options) do
+              def format(date, unquote(Macro.escape(format)) = f, locale, options) do
                 number_system = if is_map(f), do: f[:number_system], else: options[:number_system]
                 formatted = unquote(transforms)
 
