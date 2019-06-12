@@ -134,12 +134,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
         defp transliterate(formatted, locale, number_system) do
           with {:ok, number_system} <-
                  Number.System.system_name_from(number_system, locale, unquote(backend)) do
-            Number.Transliterate.transliterate(
-              formatted,
-              locale,
-              number_system,
-              unquote(backend)
-            )
+            Number.Transliterate.transliterate_digits(formatted, :latn, number_system)
           end
         end
 
