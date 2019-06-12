@@ -1,3 +1,11 @@
+# Changelog for Cldr_Dates_Times v2.0.2
+
+This is the changelog for Cldr_Dates_Times v2.0.2 released on June 12th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+
+## Bug Fixes
+
+* Resolve the actual number system before transliterating a date, time or datetime.  Closes #9.  Thanks to @ribanez7 for the report.
+
 # Changelog for Cldr_Dates_Times v2.0.1
 
 This is the changelog for Cldr_Dates_Times v2.0.1 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
