@@ -49,7 +49,7 @@ defmodule CldrDatesTimes.Mixfile do
         Cldr.DateTime.Compiler,
         Cldr.DateTime.Format,
         Cldr.DateTime.Formatter,
-        Cldr.DateTime.Timezone,
+        Cldr.DateTime.Timezone
       ]
     ]
   end

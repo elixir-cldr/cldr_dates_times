@@ -19,6 +19,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
 
         alias Cldr.DateTime.Compiler
         alias Cldr.DateTime.Formatter
+        alias Cldr.Number
 
         @doc """
         Returns the formatted and localised date, time or datetime
@@ -131,12 +132,15 @@ defmodule Cldr.DateTime.Formatter.Backend do
         end
 
         defp transliterate(formatted, locale, number_system) do
-          Cldr.Number.Transliterate.transliterate(
-            formatted,
-            locale,
-            number_system,
-            unquote(backend)
-          )
+          with {:ok, number_system} <-
+                 Number.System.system_name_from(number_system, locale, unquote(backend)) do
+            Number.Transliterate.transliterate(
+              formatted,
+              locale,
+              number_system,
+              unquote(backend)
+            )
+          end
         end
 
         defp format_errors(list) do
