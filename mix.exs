@@ -56,7 +56,7 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, "~> 2.6"},
+      {:ex_cldr, "~> 2.7"},
       {:ex_cldr_numbers, "~> 2.6"},
       {:ex_cldr_calendars, "~> 0.9"},
       {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release]},
