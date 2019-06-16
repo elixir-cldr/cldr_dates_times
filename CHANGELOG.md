@@ -1,4 +1,20 @@
-# Changelog for Cldr_Dates_Times v2.0
+# Changelog for Cldr_Dates_Times v2.0.2
+
+This is the changelog for Cldr_Dates_Times v2.0.2 released on June 12th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+
+## Bug Fixes
+
+* Resolve the actual number system before transliterating a date, time or datetime.  Closes #9.  Thanks to @ribanez7 for the report.
+
+# Changelog for Cldr_Dates_Times v2.0.1
+
+This is the changelog for Cldr_Dates_Times v2.0.1 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+
+## Bug Fixes
+
+* Fixes a formatter code generation error when a format is a tuple form not a string form.
+
+# Changelog for Cldr_Dates_Times v2.0.0
 
 This is the changelog for Cldr_Dates_Times v2.0 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
 

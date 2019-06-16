@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.0.0"
+  @version "2.0.2"
 
   def project do
     [
@@ -49,14 +49,14 @@ defmodule CldrDatesTimes.Mixfile do
         Cldr.DateTime.Compiler,
         Cldr.DateTime.Format,
         Cldr.DateTime.Formatter,
-        Cldr.DateTime.Timezone,
+        Cldr.DateTime.Timezone
       ]
     ]
   end
 
   defp deps do
     [
-      {:ex_cldr, "~> 2.6"},
+      {:ex_cldr, "~> 2.7"},
       {:ex_cldr_numbers, "~> 2.6"},
       {:ex_cldr_calendars, "~> 1.0"},
       {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release]},
