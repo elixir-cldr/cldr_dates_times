@@ -74,7 +74,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
                 formatted = unquote(transforms)
 
                 if error_list = format_errors(formatted) do
-                  {:error, Enum.join(error_list, "; ")}
+                  {:error, error_list}
                 else
                   formatted =
                     formatted
