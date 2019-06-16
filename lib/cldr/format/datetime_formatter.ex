@@ -1079,6 +1079,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
+      iex> import Cldr.Calendar.Sigils
+      Cldr.Calendar.Sigils
+      iex> Cldr.DateTime.Formatter.week_of_year ~D[2019-01-07], 1, "en"
+      "2"
+      iex> Cldr.DateTime.Formatter.week_of_year ~d[2019-W04-1], 2, "en"
+      "04"
+
   """
   @spec week_of_year(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
           binary | {:error, binary}
@@ -1096,14 +1103,9 @@ defmodule Cldr.DateTime.Formatter do
     |> week_of_year(n, locale, backend, options)
   end
 
-  def week_of_year(date, 1, _locale, _backend, _options) do
-    Cldr.Calendar.week_of_year(date)
-  end
-
-  def week_of_year(date, 2 = n, _locale, _backend, _options) do
-    date
-    |> Cldr.Calendar.week_of_year()
-    |> pad(n)
+  def week_of_year(date, n, _locale, _backend, _options)  when n in 1..2 do
+    {_year, week} = Cldr.Calendar.week_of_year(date)
+    pad(week, n)
   end
 
   def week_of_year(date, _n, _locale, _backend, _options) do
@@ -1138,13 +1140,20 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
+      iex> import Cldr.Calendar.Sigils
+      Cldr.Calendar.Sigils
+      iex> Cldr.DateTime.Formatter.week_of_month ~D[2019-01-07], 1, "en"
+      "2"
+      iex> Cldr.DateTime.Formatter.week_of_month ~d[2019-W04-1], 1, "en"
+      "4"
+
   """
   @spec week_of_month(map(), integer, Cldr.Locale.t(), Cldr.backend(), Keyword.t()) ::
           binary | {:error, binary}
 
   def week_of_month(
         date,
-        n \\ 1,
+        n \\ 2,
         locale \\ Cldr.get_locale(),
         backend \\ Cldr.default_backend(),
         options \\ []
@@ -1155,9 +1164,9 @@ defmodule Cldr.DateTime.Formatter do
     |> week_of_month(n, locale, backend, options)
   end
 
-  def week_of_month(_date, 1 = n, _locale, _backend, _options) do
-    1
-    |> pad(n)
+  def week_of_month(date, n, _locale, _backend, _options) when n in 1..2 do
+    {_month, week_of_month} = Cldr.Calendar.week_of_month(date)
+    pad(week_of_month, n)
   end
 
   def week_of_month(date, _n, _locale, _backend, _options) do
@@ -1193,12 +1202,10 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.day_of_month %{year: 2017, month: 1, day: 4,
-      ...> calendar: Calendar.ISO}, 1
+      iex> Cldr.DateTime.Formatter.day_of_month ~D[2017-01-04], 1
       4
 
-      iex> Cldr.DateTime.Formatter.day_of_month %{year: 2017, month: 1, day: 4,
-      ...> calendar: Calendar.ISO}, 2
+      iex> Cldr.DateTime.Formatter.day_of_month ~D[2017-01-04], 2
       "04"
 
   """
@@ -1260,16 +1267,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.day_of_year %{year: 2017, month: 1, day: 15,
-      ...> calendar: Calendar.ISO}, 1
+      iex> Cldr.DateTime.Formatter.day_of_year ~D[2017-01-15], 1
       "15"
 
-      iex> Cldr.DateTime.Formatter.day_of_year %{year: 2017, month: 1, day: 15,
-      ...> calendar: Calendar.ISO}, 2
+      iex> Cldr.DateTime.Formatter.day_of_year ~D[2017-01-15], 2
       "15"
 
-      iex> Cldr.DateTime.Formatter.day_of_year %{year: 2017, month: 1, day: 15,
-      ...> calendar: Calendar.ISO}, 3
+      iex> Cldr.DateTime.Formatter.day_of_year ~D[2017-01-15], 3
       "015"
 
   """
