@@ -408,24 +408,19 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
-      ...> calendar: Calendar.ISO}, 1
+      iex> Cldr.DateTime.Formatter.week_aligned_year ~D[2017-01-04], 1
       "2017"
 
-      iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
-      ...> calendar: Calendar.ISO}, 2
+      iex> Cldr.DateTime.Formatter.week_aligned_year ~D[2017-01-04], 2
       "17"
 
-      iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
-      ...> calendar: Calendar.ISO}, 3
+      iex> Cldr.DateTime.Formatter.week_aligned_year ~D[2017-01-04], 3
       "2017"
 
-      iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
-      ...> calendar: Calendar.ISO}, 4
+      iex> Cldr.DateTime.Formatter.week_aligned_year ~D[2017-01-04], 4
       "2017"
 
-      iex> Cldr.DateTime.Formatter.week_aligned_year %{year: 2017, month: 1, day: 4,
-      ...> calendar: Calendar.ISO}, 5
+      iex> Cldr.DateTime.Formatter.week_aligned_year ~D[2017-01-04], 5
       "02017"
 
   """
@@ -705,24 +700,19 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
-      ...> calendar: Calendar.ISO}, 1
+      iex> Cldr.DateTime.Formatter.quarter ~D[2017-04-01], 1
       2
 
-      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
-      ...> calendar: Calendar.ISO}, 2
+      iex> Cldr.DateTime.Formatter.quarter ~D[2017-04-01], 2
       "02"
 
-      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
-      ...> calendar: Calendar.ISO}, 3
+      iex> Cldr.DateTime.Formatter.quarter ~D[2017-04-01], 3
       "Q2"
 
-      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
-      ...> calendar: Calendar.ISO}, 4
+      iex> Cldr.DateTime.Formatter.quarter ~D[2017-04-01], 4
       "2nd quarter"
 
-      iex> Cldr.DateTime.Formatter.quarter %{year: 2017, month: 4, day: 1,
-      ...> calendar: Calendar.ISO}, 5
+      iex> Cldr.DateTime.Formatter.quarter ~D[2017-04-01], 5
       "2"
 
   """
