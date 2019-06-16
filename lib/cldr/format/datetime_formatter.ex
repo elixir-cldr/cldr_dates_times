@@ -1333,28 +1333,22 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 6
+      iex> Cldr.DateTime.Formatter.day_name ~D[2017-08-15], 6
       "Tu"
 
-      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 5
+      iex> Cldr.DateTime.Formatter.day_name ~D[2017-08-15], 5
       "T"
 
-      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 4
+      iex> Cldr.DateTime.Formatter.day_name ~D[2017-08-15], 4
       "Tuesday"
 
-      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 3
+      iex> Cldr.DateTime.Formatter.day_name ~D[2017-08-15], 3
       "Tue"
 
-      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 2
+      iex> Cldr.DateTime.Formatter.day_name ~D[2017-08-15], 2
       "Tue"
 
-      iex> Cldr.DateTime.Formatter.day_name %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 1
+      iex> Cldr.DateTime.Formatter.day_name ~D[2017-08-15], 1
       "Tue"
 
   """
@@ -1433,28 +1427,22 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 3
+      iex> Cldr.DateTime.Formatter.day_of_week ~D[2017-08-15], 3
       "Tue"
 
-      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 4
+      iex> Cldr.DateTime.Formatter.day_of_week ~D[2017-08-15], 4
       "Tuesday"
 
-      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 5
+      iex> Cldr.DateTime.Formatter.day_of_week ~D[2017-08-15], 5
       "T"
 
-      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 6
+      iex> Cldr.DateTime.Formatter.day_of_week ~D[2017-08-15], 6
       "Tu"
 
-      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 1
+      iex> Cldr.DateTime.Formatter.day_of_week ~D[2017-08-15], 1
       "2"
 
-      iex> Cldr.DateTime.Formatter.day_of_week %{year: 2017, month: 8, day: 15,
-      ...> calendar: Calendar.ISO}, 2
+      iex> Cldr.DateTime.Formatter.day_of_week ~D[2017-08-15], 2
       "02"
 
   """
@@ -1526,20 +1514,16 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.standalone_day_of_week %{year: 2017, month: 8,
-      ...> day: 15, calendar: Calendar.ISO}, 3
+      iex> Cldr.DateTime.Formatter.standalone_day_of_week ~D[2017-08-15], 3
       "Tue"
 
-      iex> Cldr.DateTime.Formatter.standalone_day_of_week %{year: 2017, month: 8,
-      ...> day: 15, calendar: Calendar.ISO}, 4
+      iex> Cldr.DateTime.Formatter.standalone_day_of_week ~D[2017-08-15], 4
       "Tuesday"
 
-      iex> Cldr.DateTime.Formatter.standalone_day_of_week %{year: 2017, month: 8,
-      ...> day: 15, calendar: Calendar.ISO}, 5
+      iex> Cldr.DateTime.Formatter.standalone_day_of_week ~D[2017-08-15], 5
       "T"
 
-      iex> Cldr.DateTime.Formatter.standalone_day_of_week %{year: 2017, month: 8,
-      ...> day: 15, calendar: Calendar.ISO}, 6
+      iex> Cldr.DateTime.Formatter.standalone_day_of_week ~D[2017-08-15], 6
       "Tu"
 
   """
