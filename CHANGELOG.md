@@ -1,6 +1,16 @@
+# Changelog for Cldr_Dates_Times v2.1.0
+
+This is the changelog for Cldr_Dates_Times v2.1.0 released on June 16th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+## Enhancements
+
+* All calling `Date`, `Time` and `DateTime` `to_string/3` as `to_string/1` omitting the backend and providing options.  The backend will default to `Cldr.default_backend()`. An exception will be raised if there is no default backend.
+
+* Updates to [ex_cldr_calendars 1.0](https://hex.pm/packages/ex_cldr_calendars/1.0.0) which includes `Cldr.Calendar.week_of_month/1`. The result corresponds to the `W` format which is now implemented as well.
+
 # Changelog for Cldr_Dates_Times v2.0.2
 
-This is the changelog for Cldr_Dates_Times v2.0.2 released on June 12th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.0.2 released on June 12th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
 ## Bug Fixes
 
@@ -8,7 +18,7 @@ This is the changelog for Cldr_Dates_Times v2.0.2 released on June 12th, 2019.  
 
 # Changelog for Cldr_Dates_Times v2.0.1
 
-This is the changelog for Cldr_Dates_Times v2.0.1 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.0.1 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
 ## Bug Fixes
 
@@ -16,7 +26,7 @@ This is the changelog for Cldr_Dates_Times v2.0.1 released on June 9th, 2019.  F
 
 # Changelog for Cldr_Dates_Times v2.0.0
 
-This is the changelog for Cldr_Dates_Times v2.0 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.0 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
 This release depends on [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars) which provides the underlying calendar calculations as well as providing a set of additional calendars.
 

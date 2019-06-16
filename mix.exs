@@ -1,14 +1,14 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.0.2"
+  @version "2.1.0"
 
   def project do
     [
       app: :ex_cldr_dates_times,
       version: @version,
       name: "Cldr Dates & Times",
-      source_url: "https://github.com/kipcole9/cldr_dates_times",
+      source_url: "https://github.com/elixir-cldr/cldr_dates_times",
       docs: docs(),
       elixir: "~> 1.8",
       description: description(),
@@ -84,10 +84,10 @@ defmodule CldrDatesTimes.Mixfile do
 
   def links do
     %{
-      "GitHub" => "https://github.com/kipcole9/cldr_dates_times",
+      "GitHub" => "https://github.com/elixir-cldr/cldr_dates_times",
       "Changelog" =>
-        "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/CHANGELOG.md",
-      "Readme" => "https://github.com/kipcole9/cldr_dates_times/blob/v#{@version}/README.md"
+        "https://github.com/elixir-cldr/cldr_dates_times/blob/v#{@version}/CHANGELOG.md",
+      "Readme" => "https://github.com/elixir-cldr/cldr_dates_times/blob/v#{@version}/README.md"
     }
   end
 
