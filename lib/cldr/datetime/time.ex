@@ -89,6 +89,10 @@ defmodule Cldr.Time do
     |> to_string(backend, options)
   end
 
+  def to_string(time, options, []) when is_list(options) do
+    to_string(time, Cldr.default_backend(), options)
+  end
+
   def to_string(%{hour: _hour, minute: _minute} = time, backend, options) do
     options = Keyword.merge(default_options(), options)
     calendar = Map.get(time, :calendar) || Cldr.Calendar.Gregorian

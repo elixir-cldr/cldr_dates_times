@@ -84,6 +84,10 @@ defmodule Cldr.Date do
     |> to_string(backend, options)
   end
 
+  def to_string(date, options, []) when is_list(options) do
+    to_string(date, Cldr.default_backend(), options)
+  end
+
   def to_string(%{calendar: calendar} = date, backend, options) do
     options = Keyword.merge(default_options(), options)
     format_backend = Module.concat(backend, DateTime.Formatter)
