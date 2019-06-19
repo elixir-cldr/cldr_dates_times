@@ -33,7 +33,10 @@ defmodule Cldr.Date do
   ## Arguments
 
   * `date` is a `%Date{}` struct or any map that contains the keys
-  `year`, `month`, `day` and `calendar`
+    `year`, `month`, `day` and `calendar`
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   * `options` is a keyword list of options for formatting.  The valid options are:
 
@@ -43,7 +46,7 @@ defmodule Cldr.Date do
       The default is `:medium`
 
     * `locale:` any locale returned by `Cldr.known_locale_names/1`.
-      The default is `Cldr.get_locale()`
+      The default is `Cldr.get_locale()`.
 
     * `number_system:` a number system into which the formatted date digits
       should be transliterated
@@ -118,6 +121,9 @@ defmodule Cldr.Date do
 
   * `date` is a `%Date{}` struct or any map that contains the keys
     `year`, `month`, `day` and `calendar`
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   * `options` is a keyword list of options for formatting.
 

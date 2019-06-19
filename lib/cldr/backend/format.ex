@@ -28,7 +28,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         @standard_formats [:short, :medium, :long, :full]
 
-        @type formats :: Map.t()
+        @type formats :: Cldr.Calendar.calendar()
         @type calendar :: atom()
 
         @doc """
@@ -47,7 +47,7 @@ defmodule Cldr.DateTime.Format.Backend do
              :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
 
         """
-        @spec calendars_for(Locale.name() | LanguageTag.t()) :: [calendar, ...]
+        @spec calendars_for(Locale.locale_name() | LanguageTag.t()) :: [calendar, ...]
         def calendars_for(locale \\ unquote(backend).get_locale())
 
         def calendars_for(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -83,7 +83,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec date_formats(Locale.name() | LanguageTag.t(), calendar) ::
+        @spec date_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
                 {:ok, map()} | {:error, {atom, String.t()}}
 
         def date_formats(
@@ -124,7 +124,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec time_formats(Locale.name() | LanguageTag, calendar) ::
+        @spec time_formats(Locale.locale_name() | LanguageTag, calendar) ::
                 {:ok, map()} | {:error, {atom, String.t()}}
 
         def time_formats(
@@ -165,7 +165,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec date_time_formats(Locale.name() | LanguageTag, calendar) ::
+        @spec date_time_formats(Locale.locale_name() | LanguageTag, calendar) ::
                 {:ok, map()} | {:error, {atom, String.t()}}
 
         def date_time_formats(
@@ -239,7 +239,7 @@ defmodule Cldr.DateTime.Format.Backend do
              }}
 
         """
-        @spec date_time_available_formats(Locale.name() | LanguageTag, calendar) :: formats
+        @spec date_time_available_formats(Locale.locale_name() | LanguageTag, calendar) :: formats
         def date_time_available_formats(
               locale \\ unquote(backend).get_locale(),
               calendar \\ Cldr.Calendar.default_cldr_calendar()
@@ -266,7 +266,7 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, {"+HH:mm", "-HH:mm"}}
 
         """
-        @spec hour_format(Locale.name() | LanguageTag) :: {String.t(), String.t()}
+        @spec hour_format(Locale.locale_name() | LanguageTag) :: {String.t(), String.t()}
         def hour_format(locale \\ unquote(backend).get_locale())
 
         def hour_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -287,7 +287,7 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, ["GMT", 0]}
 
         """
-        @spec gmt_format(Locale.name() | LanguageTag) :: [non_neg_integer | String.t(), ...]
+        @spec gmt_format(Locale.locale_name() | LanguageTag) :: [non_neg_integer | String.t(), ...]
         def gmt_format(locale \\ unquote(backend).get_locale())
 
         def gmt_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -309,7 +309,7 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, "GMT"}
 
         """
-        @spec gmt_zero_format(Locale.name() | LanguageTag) :: String.t()
+        @spec gmt_zero_format(Locale.locale_name() | LanguageTag) :: String.t()
         def gmt_zero_format(locale \\ unquote(backend).get_locale())
 
         def gmt_zero_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -425,7 +425,7 @@ defmodule Cldr.DateTime.Format.Backend do
             :evening1
 
         """
-        @spec day_period_for(Time.t() | Map.t(), binary) :: atom
+        @spec day_period_for(Time.t() | Cldr.Calendar.calendar(), binary) :: atom
         def day_period_for(time, language)
 
         def day_period_for(time, %LanguageTag{cldr_locale_name: locale_name}) do

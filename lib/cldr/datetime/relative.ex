@@ -5,6 +5,7 @@ defmodule Cldr.DateTime.Relative do
   This module provides formatting of numbers (as integers, floats, Dates or DateTimes)
   as "ago" or "in" with an appropriate time unit.  For example, "2 days ago" or
   "in 10 seconds"
+
   """
 
   @second 1
@@ -27,28 +28,32 @@ defmodule Cldr.DateTime.Relative do
 
   @other_units [:mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]
   @unit_keys Map.keys(@unit) ++ @other_units
+  @known_formats [:default, :narrow, :short]
 
   @doc """
   Returns a `{:ok, string}` representing a relative time (ago, in) for a given
   number, Date or Datetime.  Returns `{:error, reason}` when errors are detected.
 
   * `relative` is a number or Date/Datetime representing the time distance from `now` or from
-  options[:relative_to]
+    options[:relative_to]
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   * `options` is a `Keyword` list of options which are:
 
   ## Options
 
-    * `:locale` is the locale in which the binary is formatted.
-      The default is `Cldr.get_locale/0`
+  * `:locale` is the locale in which the binary is formatted.
+    The default is `Cldr.get_locale/0`
 
-    * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
+  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
 
-    * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
+  * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
     `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
     `:sun`, `:quarter`
 
-    * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
+  * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
     calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
     for a DateTime it is `DateTime.utc_now`
 
@@ -117,20 +122,25 @@ defmodule Cldr.DateTime.Relative do
 
   """
   @spec to_string(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
-          {:ok, String.t()} | {:error, {atom, String.t()}}
+          {:ok, String.t()} | {:error, {module, String.t()}}
 
-  def to_string(relative, backend \\ Cldr.default_backend(), options \\ []) do
+  def to_string(relative, backend \\ Cldr.default_backend(), options \\ [])
+
+  def to_string(relative, options, []) when is_list(options) do
+    to_string(relative, Cldr.default_backend(), options)
+  end
+
+  def to_string(relative, backend, options) do
     options = Keyword.merge(default_options(), options)
     locale = Keyword.get(options, :locale)
     {unit, options} = Keyword.pop(options, :unit)
 
     with {:ok, locale} <- Cldr.validate_locale(locale),
          {:ok, unit} <- validate_unit(unit),
-         {relative, unit} = define_unit_and_relative_time(relative, unit, options[:relative_to]),
-         string <- to_string(relative, unit, locale, backend, options) do
+         {:ok, _format} <- validate_format(options[:format]) do
+      {relative, unit} = define_unit_and_relative_time(relative, unit, options[:relative_to])
+      string = to_string(relative, unit, locale, backend, options)
       {:ok, string}
-    else
-      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -188,30 +198,40 @@ defmodule Cldr.DateTime.Relative do
   ## Arguments
 
   * `relative` is a number or Date/Datetime representing the time distance from `now` or from
-  options[:relative_to]
+    options[:relative_to].
 
-  * `options` is a `Keyword` list of options
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  * `options` is a `Keyword` list of options.
 
   ## Options
 
-    * `:locale` is the locale in which the binary is formatted.
-      The default is `Cldr.get_locale/0`
+  * `:locale` is the locale in which the binary is formatted.
+    The default is `Cldr.get_locale/0`
 
-    * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
+  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`.
+    The default is `:default`
 
-    * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
-      `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
-      `:sun`, `:quarter`
+  * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
+    `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
+    `:sun`, `:quarter`
 
-    * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
-      calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
-      for a DateTime it is `DateTime.utc_now`
+  * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
+    calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
+    for a DateTime it is `DateTime.utc_now`
 
-  See `to_string/2`
+  See `to_string/3`
 
   """
-  def to_string!(relative, options \\ []) do
-    case to_string(relative, options) do
+  def to_string!(relative, backend \\ Cldr.default_backend(), options \\ [])
+
+  def to_string!(relative, _backend, [] = options) do
+    to_string!(relative, Cldr.default_backend(), options)
+  end
+
+  def to_string!(relative, backend, options) do
+    case to_string(relative, backend, options) do
       {:ok, string} -> string
       {:error, {exception, reason}} -> raise exception, reason
     end
@@ -259,6 +279,12 @@ defmodule Cldr.DateTime.Relative do
     {Cldr.UnknownTimeUnit,
      "Unknown time unit #{inspect(unit)}.  Valid time units are #{inspect(@unit_keys)}"}
   end
+
+  defp format_error(format) do
+    {Cldr.UnknownFormatError,
+     "Unknown format #{inspect(format)}.  Valid formats are #{inspect(@known_formats)}"}
+  end
+
 
   @doc """
   Returns an estimate of the appropriate time unit for an integer of a given
@@ -336,12 +362,24 @@ defmodule Cldr.DateTime.Relative do
     @unit_keys
   end
 
-  def validate_unit(unit) when unit in @unit_keys or is_nil(unit) do
+  defp validate_unit(unit) when unit in @unit_keys or is_nil(unit) do
     {:ok, unit}
   end
 
-  def validate_unit(unit) do
+  defp validate_unit(unit) do
     {:error, time_unit_error(unit)}
+  end
+
+  def known_formats do
+    @known_formats
+  end
+
+  defp validate_format(format) when format in @known_formats do
+    {:ok, format}
+  end
+
+  defp validate_format(format) do
+    {:error, format_error(format)}
   end
 
   defp get_locale(locale, backend) do

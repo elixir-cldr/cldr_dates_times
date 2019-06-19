@@ -41,6 +41,9 @@ defmodule Cldr.Time do
   * `time` is a `%DateTime{}` or `%NaiveDateTime{}` struct or any map that contains the keys
     `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
 
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
   * `options` is a keyword list of options for formatting.
 
   ## Options
@@ -125,22 +128,32 @@ defmodule Cldr.Time do
   * `time` is a `%DateTime{}` or `%NaiveDateTime{}` struct or any map that contains the keys
     `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
 
-  * `options` is a keyword list of options for formatting.  The valid options are:
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  * `options` is a keyword list of options for formatting.
+
+  ## Options
+
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
        The default is `:medium`
+
     * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
       or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+
     * `number_system:` a number system into which the formatted date digits should
       be transliterated
+
     * `era: :variant` will use a variant for the era is one is available in the locale.
       In the "en" locale, for example, `era: :variant` will return "BCE" instead of "BC".
+
     * `period: :variant` will use a variant for the time period and flexible time period if
       one is available in the locale.  For example, in the "en" locale `period: :variant` will
       return "pm" instead of "PM"
 
   ## Returns
 
-  * `formatted time string` or
+  * `formatted_time_string` or
 
   * raises an exception.
 
@@ -169,6 +182,10 @@ defmodule Cldr.Time do
   @spec to_string!(map, module, Keyword.t()) :: String.t() | no_return
 
   def to_string!(time, backend \\ Cldr.default_backend(), options \\ [])
+
+  def to_string!(datetime, options, []) when is_list(options) do
+    to_string!(datetime, Cldr.default_backend(), options)
+  end
 
   def to_string!(time, backend, options) do
     case to_string(time, backend, options) do

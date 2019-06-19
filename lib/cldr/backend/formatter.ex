@@ -57,7 +57,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
         @spec format(
                 Date.t() | Time.t() | DateTime.t(),
                 String.t(),
-                LanguageTag.t() | Locale.t(),
+                LanguageTag.t() | Locale.locale_name(),
                 Keyword.t()
               ) :: String.t()
 

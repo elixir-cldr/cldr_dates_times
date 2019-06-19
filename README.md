@@ -314,8 +314,6 @@ The primary API for formatting relative dates and datetimes is `Cldr.DateTime.Re
 
 Although largely complete (with respect to the CLDR data), there are some known limitations as of release 2.0.
 
-* *Week of month*  The week of the mornth is returned for format symbol `W`.  This is not currently implemented. It returns `1` for all input.
-
 * *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V`, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `DateTime` struct is used to format timezone data.
 
 ## Installation

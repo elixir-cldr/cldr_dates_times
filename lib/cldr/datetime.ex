@@ -36,6 +36,9 @@ defmodule Cldr.DateTime do
     `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
     `:microsecond`.
 
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
   * `options` is a keyword list of options for formatting.
 
   ## Options
@@ -130,6 +133,9 @@ defmodule Cldr.DateTime do
     `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
     `:microsecond`.
 
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
   * `options` is a keyword list of options for formatting.
 
   ## Options
@@ -173,6 +179,10 @@ defmodule Cldr.DateTime do
   @spec to_string!(map, module, Keyword.t()) :: String.t() | no_return
 
   def to_string!(datetime, backend \\ Cldr.default_backend(), options \\ [])
+
+  def to_string!(datetime, options, []) when is_list(options) do
+    to_string(datetime, Cldr.default_backend(), options)
+  end
 
   def to_string!(datetime, backend, options) do
     case to_string(datetime, backend, options) do

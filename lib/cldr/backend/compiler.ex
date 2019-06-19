@@ -76,7 +76,7 @@ defmodule Cldr.DateTime.Compiler do
   string efficiently.
 
   """
-  @spec compile(String.t(), module(), module()) :: {:ok, List.t()} | {:error, String.t()}
+  @spec compile(String.t(), module(), module()) :: {:ok, Cldr.Calendar.calendar()} | {:error, String.t()}
   def compile(format_string, backend, context)
 
   def compile("", _, _) do
