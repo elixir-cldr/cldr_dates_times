@@ -1,3 +1,13 @@
+# Changelog for Cldr_Dates_Times v2.1.2
+
+This is the changelog for Cldr_Dates_Times v2.1.2 released on ____, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+## Bug Fixes
+
+* Fix references to `Cldr.get_current_locale/0` to the current `Cldr/get_locale/0`
+
+* Ensure dialyzer passes
+
 # Changelog for Cldr_Dates_Times v2.1.1
 
 This is the changelog for Cldr_Dates_Times v2.1.1 released on June 17th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
