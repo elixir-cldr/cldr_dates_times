@@ -55,9 +55,9 @@ defmodule Cldr.DateTime.Formatter.Backend do
 
         """
         @spec format(
-                Date.t() | Time.t() | DateTime.t(),
+                :'Elixir.Calendar'.date() | :'Elixir.Calendar'.time() | :'Elixir.Calendar'.datetime(),
                 String.t(),
-                LanguageTag.t() | Locale.locale_name(),
+                Cldr.LanguageTag.t() | Cldr.Locale.locale_name(),
                 Keyword.t()
               ) :: String.t()
 

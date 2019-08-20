@@ -28,7 +28,10 @@ defmodule Cldr.DateTime.Format.Backend do
 
         @standard_formats [:short, :medium, :long, :full]
 
-        @type formats :: Cldr.Calendar.calendar()
+        @doc "A struct of the format types and formats"
+        @type formats :: map()
+        
+        @doc "The CLDR calendar type as an atome"
         @type calendar :: atom()
 
         @doc """
@@ -84,7 +87,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec date_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
-                {:ok, map()} | {:error, {atom, String.t()}}
+                {:ok, map()} | {:error, {module(), String.t()}}
 
         def date_formats(
               locale \\ unquote(backend).get_locale(),
@@ -124,8 +127,8 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec time_formats(Locale.locale_name() | LanguageTag, calendar) ::
-                {:ok, map()} | {:error, {atom, String.t()}}
+        @spec time_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
+                {:ok, map()} | {:error, {module(), String.t()}}
 
         def time_formats(
               locale \\ unquote(backend).get_locale(),
@@ -165,8 +168,8 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec date_time_formats(Locale.locale_name() | LanguageTag, calendar) ::
-                {:ok, map()} | {:error, {atom, String.t()}}
+        @spec date_time_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
+                {:ok, map()} | {:error, {module(), String.t()}}
 
         def date_time_formats(
               locale \\ unquote(backend).get_locale(),
@@ -239,7 +242,7 @@ defmodule Cldr.DateTime.Format.Backend do
              }}
 
         """
-        @spec date_time_available_formats(Locale.locale_name() | LanguageTag, calendar) :: formats
+        @spec date_time_available_formats(Locale.locale_name() | LanguageTag.t(), calendar) :: {:ok, formats}
         def date_time_available_formats(
               locale \\ unquote(backend).get_locale(),
               calendar \\ Cldr.Calendar.default_cldr_calendar()
@@ -266,7 +269,7 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, {"+HH:mm", "-HH:mm"}}
 
         """
-        @spec hour_format(Locale.locale_name() | LanguageTag) :: {String.t(), String.t()}
+        @spec hour_format(Locale.locale_name() | LanguageTag.t()) :: {:ok, {String.t(), String.t()}}
         def hour_format(locale \\ unquote(backend).get_locale())
 
         def hour_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -287,7 +290,7 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, ["GMT", 0]}
 
         """
-        @spec gmt_format(Locale.locale_name() | LanguageTag) :: [non_neg_integer | String.t(), ...]
+        @spec gmt_format(Locale.locale_name() | LanguageTag.t()) :: {:ok, [non_neg_integer | String.t(), ...]}
         def gmt_format(locale \\ unquote(backend).get_locale())
 
         def gmt_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -309,7 +312,7 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, "GMT"}
 
         """
-        @spec gmt_zero_format(Locale.locale_name() | LanguageTag) :: String.t()
+        @spec gmt_zero_format(Locale.locale_name() | LanguageTag.t()) :: String.t()
         def gmt_zero_format(locale \\ unquote(backend).get_locale())
 
         def gmt_zero_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -425,7 +428,7 @@ defmodule Cldr.DateTime.Format.Backend do
             :evening1
 
         """
-        @spec day_period_for(Time.t() | Cldr.Calendar.calendar(), binary) :: atom
+        @spec day_period_for(Calendar.time(), LnngaugeTag.t() | Locale.locale_name()) :: atom
         def day_period_for(time, language)
 
         def day_period_for(time, %LanguageTag{cldr_locale_name: locale_name}) do
@@ -453,7 +456,7 @@ defmodule Cldr.DateTime.Format.Backend do
             false
 
         """
-        @spec language_has_noon_and_midnight?(binary) :: boolean
+        @spec language_has_noon_and_midnight?(LanguageTag.t() | Locale.locale_name()) :: boolean
         def language_has_noon_and_midnight?(locale)
 
         def language_has_noon_and_midnight?(%LanguageTag{language: language}) do
