@@ -162,8 +162,12 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec date_formats(Locale.locale_name() | LanguageTag.t(), Cldr.Calendar.calendar(), Cldr.backend()) ::
-          standard_formats
+  @spec date_formats(
+          Locale.locale_name() | LanguageTag.t(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) ::
+          {:ok, standard_formats} | {:error, {atom, String.t()}}
 
   def date_formats(
         locale \\ Cldr.get_locale(),
@@ -204,7 +208,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec time_formats(Locale.locale_name() | LanguageTag, Cldr.Calendar.calendar(), Cldr.backend()) ::
-          standard_formats
+          {:ok, standard_formats} | {:error, {atom, String.t()}}
 
   def time_formats(
         locale \\ Cldr.get_locale(),
@@ -244,7 +248,11 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec date_time_formats(Locale.locale_name() | LanguageTag.t(), Cldr.Calendar.calendar(), Cldr.backend()) ::
+  @spec date_time_formats(
+          Locale.locale_name() | LanguageTag.t(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) ::
           {:ok, map()} | {:error, {atom, String.t()}}
 
   def date_time_formats(
@@ -415,17 +423,17 @@ defmodule Cldr.DateTime.Format do
 
   # Short format with zero minutes
   def gmt_format_type([sign, hour, _sep, "00"], :short) do
-    :erlang.iolist_to_binary([sign, String.replace_leading(hour, "0", "")])
+    [sign, String.replace_leading(hour, "0", "")]
   end
 
   # Short format with minutes > 0
   def gmt_format_type([sign, hour, sep, minute], :short) do
-    :erlang.iolist_to_binary([sign, String.replace_leading(hour, "0", ""), sep, minute])
+    [sign, String.replace_leading(hour, "0", ""), sep, minute]
   end
 
   # Long format
   def gmt_format_type([sign, hour, sep, minute], :long) do
-    :erlang.iolist_to_binary([sign, hour, sep, minute])
+    [sign, hour, sep, minute]
   end
 
   # The case when there is no separator

@@ -224,9 +224,10 @@ defmodule Cldr.DateTime.Relative do
   See `to_string/3`
 
   """
+  @spec to_string!(number, Cldr.backend(), Keyword.t()) :: String.t()
   def to_string!(relative, backend \\ Cldr.default_backend(), options \\ [])
 
-  def to_string!(relative, _backend, [] = options) do
+  def to_string!(relative, options, []) when is_list(options) do
     to_string!(relative, Cldr.default_backend(), options)
   end
 
@@ -237,8 +238,11 @@ defmodule Cldr.DateTime.Relative do
     end
   end
 
+  @spec to_string(integer | float, atom(), Cldr.LanguageTag.t(), Cldr.backend(), Keyword.t()) ::
+          String.t()
   defp to_string(relative, unit, locale, backend, options)
-       when is_integer(relative) and relative in [-1, 0, +1] do
+
+  defp to_string(relative, unit, locale, backend, options) when relative in -1..1 do
     result =
       locale
       |> get_locale(backend)
@@ -248,7 +252,8 @@ defmodule Cldr.DateTime.Relative do
     if is_nil(result), do: to_string(relative / 1, unit, locale, backend, options), else: result
   end
 
-  defp to_string(relative, unit, locale, backend, options) when is_number(relative) do
+  defp to_string(relative, unit, locale, backend, options)
+       when is_float(relative) or is_integer(relative) do
     direction = if relative > 0, do: :relative_future, else: :relative_past
 
     rules =
@@ -284,7 +289,6 @@ defmodule Cldr.DateTime.Relative do
     {Cldr.UnknownFormatError,
      "Unknown format #{inspect(format)}.  Valid formats are #{inspect(@known_formats)}"}
   end
-
 
   @doc """
   Returns an estimate of the appropriate time unit for an integer of a given

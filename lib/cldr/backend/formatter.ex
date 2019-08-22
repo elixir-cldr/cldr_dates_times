@@ -55,11 +55,13 @@ defmodule Cldr.DateTime.Formatter.Backend do
 
         """
         @spec format(
-                :'Elixir.Calendar'.date() | :'Elixir.Calendar'.time() | :'Elixir.Calendar'.datetime(),
+                :"Elixir.Calendar".date()
+                | :"Elixir.Calendar".time()
+                | :"Elixir.Calendar".datetime(),
                 String.t(),
                 Cldr.LanguageTag.t() | Cldr.Locale.locale_name(),
                 Keyword.t()
-              ) :: String.t()
+              ) :: {:ok, String.t()} | {:error, {module(), String.t()}}
 
         def format(date, format, locale \\ Cldr.get_locale(), options \\ [])
 
@@ -70,7 +72,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
           case Compiler.compile(format, backend, Cldr.DateTime.Formatter.Backend) do
             {:ok, transforms} ->
               def format(date, unquote(Macro.escape(format)) = f, locale, options) do
-                number_system = if is_map(f), do: f[:number_system], else: options[:number_system]
+                number_system = number_system(f, options)
                 formatted = unquote(transforms)
 
                 if error_list = format_errors(formatted) do
@@ -89,6 +91,14 @@ defmodule Cldr.DateTime.Formatter.Backend do
               raise Cldr.FormatCompileError,
                     "#{message} compiling date format: #{inspect(format)}"
           end
+        end
+
+        defp number_system(%{number_system: number_system}, _options) do
+          number_system
+        end
+
+        defp number_system(_, options) do
+          options[:number_system]
         end
 
         # This is the format function that is executed if the supplied format
@@ -114,8 +124,10 @@ defmodule Cldr.DateTime.Formatter.Backend do
                 {:ok, formatted}
               end
 
-            {:error, reason} ->
-              {:error, reason}
+            {:error, {_, :datetime_format_lexer, {_, error}}, _} ->
+              {:error,
+               {Cldr.DateTime.Compiler.ParseError,
+                "Could not tokenize #{inspect(format)}. Error detected at #{inspect(error)}"}}
           end
         end
 

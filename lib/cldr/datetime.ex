@@ -96,7 +96,8 @@ defmodule Cldr.DateTime do
     to_string(datetime, Cldr.default_backend(), options)
   end
 
-  def to_string(%{calendar: calendar} = datetime, backend, options) when is_atom(backend) and is_list(options) do
+  def to_string(%{calendar: calendar} = datetime, backend, options)
+      when is_atom(backend) and is_list(options) do
     options = Keyword.merge(default_options(), options)
     format_backend = Module.concat(backend, DateTime.Formatter)
 

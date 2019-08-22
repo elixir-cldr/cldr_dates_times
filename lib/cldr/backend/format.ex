@@ -30,7 +30,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         @doc "A struct of the format types and formats"
         @type formats :: map()
-        
+
         @doc "The CLDR calendar type as an atome"
         @type calendar :: atom()
 
@@ -50,7 +50,8 @@ defmodule Cldr.DateTime.Format.Backend do
              :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
 
         """
-        @spec calendars_for(Locale.locale_name() | LanguageTag.t()) :: [calendar, ...]
+        @spec calendars_for(Locale.locale_name() | LanguageTag.t()) ::
+                {:ok, [calendar, ...]} | {:error, {module(), String.t()}}
         def calendars_for(locale \\ unquote(backend).get_locale())
 
         def calendars_for(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -242,7 +243,8 @@ defmodule Cldr.DateTime.Format.Backend do
              }}
 
         """
-        @spec date_time_available_formats(Locale.locale_name() | LanguageTag.t(), calendar) :: {:ok, formats}
+        @spec date_time_available_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
+                {:ok, formats}
         def date_time_available_formats(
               locale \\ unquote(backend).get_locale(),
               calendar \\ Cldr.Calendar.default_cldr_calendar()
@@ -269,7 +271,8 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, {"+HH:mm", "-HH:mm"}}
 
         """
-        @spec hour_format(Locale.locale_name() | LanguageTag.t()) :: {:ok, {String.t(), String.t()}}
+        @spec hour_format(Locale.locale_name() | LanguageTag.t()) ::
+                {:ok, {String.t(), String.t()}}
         def hour_format(locale \\ unquote(backend).get_locale())
 
         def hour_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -290,7 +293,8 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, ["GMT", 0]}
 
         """
-        @spec gmt_format(Locale.locale_name() | LanguageTag.t()) :: {:ok, [non_neg_integer | String.t(), ...]}
+        @spec gmt_format(Locale.locale_name() | LanguageTag.t()) ::
+                {:ok, [non_neg_integer | String.t(), ...]}
         def gmt_format(locale \\ unquote(backend).get_locale())
 
         def gmt_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -312,7 +316,8 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, "GMT"}
 
         """
-        @spec gmt_zero_format(Locale.locale_name() | LanguageTag.t()) :: String.t()
+        @spec gmt_zero_format(Locale.locale_name() | LanguageTag.t()) ::
+                {:ok, String.t()} | {:error, {module(), String.t()}}
         def gmt_zero_format(locale \\ unquote(backend).get_locale())
 
         def gmt_zero_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
@@ -428,7 +433,8 @@ defmodule Cldr.DateTime.Format.Backend do
             :evening1
 
         """
-        @spec day_period_for(Calendar.time(), LnngaugeTag.t() | Locale.locale_name()) :: atom
+        @spec day_period_for(:"Elixir.Calendar".time(), LanguageTag.t() | Locale.locale_name()) ::
+                atom
         def day_period_for(time, language)
 
         def day_period_for(time, %LanguageTag{cldr_locale_name: locale_name}) do
