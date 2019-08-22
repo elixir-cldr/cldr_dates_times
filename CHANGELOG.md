@@ -1,20 +1,16 @@
-# Changelog for Cldr_Dates_Times v2.1.2
+# Changelog for Cldr_Dates_Times v2.2.0
 
-This is the changelog for Cldr_Dates_Times v2.1.2 released on ____, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.2.0 released on August 23rd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+## Breaking change
+
+* Support Elixir 1.8 and later only since this package depends on [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars) which required Elixir 1.8.
 
 ## Bug Fixes
 
 * Fix references to `Cldr.get_current_locale/0` to the current `Cldr/get_locale/0`
 
-* Ensure dialyzer passes
-
-# Changelog for Cldr_Dates_Times v2.1.1
-
-This is the changelog for Cldr_Dates_Times v2.1.1 released on June 17th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
-
-## Breaking change
-
-* Support Elixir 1.8 and later only since this package depends on [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars) which required Elixir 1.8.
+* Fix dialyzer warnings
 
 # Changelog for Cldr_Dates_Times v2.1.0
 
