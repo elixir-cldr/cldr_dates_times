@@ -4,7 +4,7 @@ This is the changelog for Cldr_Dates_Times v2.2.0 released on August 23rd, 2019.
 
 ## Breaking change
 
-* Support Elixir 1.8 and later only since this package depends on [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars) which required Elixir 1.8.
+* Support Elixir 1.8 and later only since this package depends on [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars) which requires Elixir 1.8.
 
 ## Bug Fixes
 
