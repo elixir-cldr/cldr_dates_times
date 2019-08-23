@@ -78,7 +78,7 @@ defmodule Cldr.Date do
       {:ok, "10 Julie 2017"}
 
   """
-  @spec to_string(map, module, Keyword.t()) :: {:ok, String.t()} | {:error, {module, String.t()}}
+  @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(date, backend \\ Cldr.default_backend(), options \\ [])
 
@@ -165,7 +165,7 @@ defmodule Cldr.Date do
       "10 Julie 2017"
 
   """
-  @spec to_string!(map, module, Keyword.t()) :: String.t() | no_return
+  @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
 
   def to_string!(date, backend \\ Cldr.default_backend(), options \\ [])
 

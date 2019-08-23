@@ -1,3 +1,11 @@
+# Changelog for Cldr_Dates_Times v2.2.1
+
+This is the changelog for Cldr_Dates_Times v2.2.1 released on August 23rd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix `@spec` for `Cldr.Date.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.to_string/3` as well as the `!` variants.
+
 # Changelog for Cldr_Dates_Times v2.2.0
 
 This is the changelog for Cldr_Dates_Times v2.2.0 released on August 23rd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)

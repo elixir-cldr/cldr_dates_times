@@ -83,7 +83,7 @@ defmodule Cldr.DateTime do
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
   """
-  @spec to_string(map, module, Keyword.t()) :: {:ok, String.t()} | {:error, {module, String.t()}}
+  @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(datetime, backend \\ Cldr.default_backend(), options \\ [])
 
@@ -177,7 +177,7 @@ defmodule Cldr.DateTime do
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
   """
-  @spec to_string!(map, module, Keyword.t()) :: String.t() | no_return
+  @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
 
   def to_string!(datetime, backend \\ Cldr.default_backend(), options \\ [])
 
