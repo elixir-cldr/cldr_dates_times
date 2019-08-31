@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.2.1"
+  @version "2.2.2"
 
   def project do
     [
@@ -22,7 +22,8 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp description do
     """
-    Date, Time and DateTime localization and formatting functions for the Common Locale Data Repository (CLDR).
+    Date, Time and DateTime localization, internationalization and formatting
+    functions using the Common Locale Data Repository (CLDR).
     """
   end
 
@@ -56,13 +57,13 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, "~> 2.7"},
+      {:ex_cldr, "~> 2.8"},
       {:ex_cldr_numbers, "~> 2.6"},
-      {:ex_cldr_calendars, "~> 1.0"},
-      {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release]},
+      {:ex_cldr_calendars, "~> 1.2"},
+      {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
-      {:benchee, "~> 1.0", optional: true, only: :dev},
-      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false}
+      {:benchee, "~> 1.0", optional: true, only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0.0-rc", only: [:dev], runtime: false}
     ]
   end
 

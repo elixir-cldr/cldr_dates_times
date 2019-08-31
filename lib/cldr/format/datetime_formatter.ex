@@ -3339,9 +3339,31 @@ defmodule Cldr.DateTime.Formatter do
   defp number_of_digits(n), do: Enum.count(Integer.digits(n))
 
   defp error_return(map, symbol, requirements) do
-    {:error,
-     "The format symbol '#{symbol}' requires at least #{inspect(requirements)}.  Found: #{
-       inspect(map)
-     }"}
+    requirements =
+      requirements
+      |> Enum.map(&inspect/1)
+      |> join_requirements
+
+    raise Cldr.DateTime.UnresolvedFormat,
+          "The format symbol '#{symbol}' requires at map with at least #{requirements}. Found: #{
+            inspect(map)
+          }"
+  end
+
+  @doc false
+  def join_requirements([]) do
+    ""
+  end
+
+  def join_requirements([head]) do
+    head
+  end
+
+  def join_requirements([head, tail]) do
+    "#{head} and #{tail}"
+  end
+
+  def join_requirements([head | tail]) do
+    to_string(head) <> ", " <> join_requirements(tail)
   end
 end

@@ -83,7 +83,8 @@ defmodule Cldr.Time do
       {:ok, "11:59:59 PM UTC"}
 
   """
-  @spec to_string(map, module() | Keyword.t(), Keyword.t()) :: {:ok, String.t()} | {:error, {module, String.t()}}
+  @spec to_string(map, module() | Keyword.t(), Keyword.t()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(time, backend \\ Cldr.default_backend(), options \\ [])
 
@@ -106,9 +107,10 @@ defmodule Cldr.Time do
          {:ok, format_string} <- format_string(options[:format], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(time, format_string, locale, options) do
       {:ok, formatted}
-    else
-      {:error, reason} -> {:error, reason}
     end
+  rescue
+    e in [Cldr.DateTime.UnresolvedFormat] ->
+      {:error, {e.__struct__, e.message}}
   end
 
   def to_string(time, _backend, _options) do
@@ -218,9 +220,14 @@ defmodule Cldr.Time do
   end
 
   defp error_return(map, requirements) do
+    requirements =
+      requirements
+      |> Enum.map(&inspect/1)
+      |> Cldr.DateTime.Formatter.join_requirements()
+
     {:error,
      {ArgumentError,
-      "Invalid time. Time is a map that requires at least #{inspect(requirements)} fields. " <>
+      "Invalid time. Time is a map that contains at least #{requirements} fields. " <>
         "Found: #{inspect(map)}"}}
   end
 end

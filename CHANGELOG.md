@@ -1,3 +1,15 @@
+# Changelog for Cldr_Dates_Times v2.2.2
+
+This is the changelog for Cldr_Dates_Times v2.2.2 released on August 31st, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Changes & Deprecations
+
+* Deprecates the option `:format` on `Cldr.DateTime.Relative.to_string/3` in favour of `:style`. `:format` will be removed with `ex_cldr_dates_times` version 3.0
+
+### Bug Fixes
+
+* Return an error tuple immediately when a format code is used but no data is available to fulfill it
+
 # Changelog for Cldr_Dates_Times v2.2.1
 
 This is the changelog for Cldr_Dates_Times v2.2.1 released on August 23rd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)

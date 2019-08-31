@@ -3,21 +3,28 @@ defmodule Cldr.Exceptions.Test do
 
   test "that an invalid datetime raises" do
     assert_raise ArgumentError,
-                 ~r/Invalid date_time. Date_time is a map that requires at least .*/,
+                 ~r/Invalid DateTime. DateTime is a map that contains at least .*/,
                  fn ->
                    Cldr.DateTime.to_string!("not a date")
                  end
   end
 
   test "that an invalid date raises" do
-    assert_raise ArgumentError, ~r/Invalid date. Date is a map that requires at least .*/, fn ->
+    assert_raise ArgumentError, ~r/Invalid date. Date is a map that contains at least .*/, fn ->
       Cldr.Date.to_string!("not a date")
     end
   end
 
   test "that an invalid time raises" do
-    assert_raise ArgumentError, ~r/Invalid time. Time is a map that requires at least .*/, fn ->
+    assert_raise ArgumentError, ~r/Invalid time. Time is a map that contains at least .*/, fn ->
       Cldr.Time.to_string!("not a time")
     end
+  end
+
+  test "that an unfulfilled format directive returns an error" do
+    assert Cldr.Date.to_string(~D[2019-01-01], format: "x") ==
+             {:error,
+              {Cldr.DateTime.UnresolvedFormat,
+               "The format symbol 'x' requires at map with at least :utc_offset. Found: %Date{calendar: Cldr.Calendar.Gregorian, day: 1, month: 1, year: 2019}"}}
   end
 end

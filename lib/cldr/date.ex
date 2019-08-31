@@ -78,7 +78,8 @@ defmodule Cldr.Date do
       {:ok, "10 Julie 2017"}
 
   """
-  @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: {:ok, String.t()} | {:error, {module, String.t()}}
+  @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(date, backend \\ Cldr.default_backend(), options \\ [])
 
@@ -103,6 +104,9 @@ defmodule Cldr.Date do
     else
       {:error, reason} -> {:error, reason}
     end
+  rescue
+    e in [Cldr.DateTime.UnresolvedFormat] ->
+      {:error, {e.__struct__, e.message}}
   end
 
   def to_string(date, _backend, _options) do
@@ -200,9 +204,14 @@ defmodule Cldr.Date do
   end
 
   defp error_return(map, requirements) do
+    requirements =
+      requirements
+      |> Enum.map(&inspect/1)
+      |> Cldr.DateTime.Formatter.join_requirements()
+
     {:error,
      {ArgumentError,
-      "Invalid date. Date is a map that requires at least #{inspect(requirements)} fields. " <>
+      "Invalid date. Date is a map that contains at least #{requirements}. " <>
         "Found: #{inspect(map)}"}}
   end
 end

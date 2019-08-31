@@ -20,3 +20,15 @@ defmodule Cldr.DateTime.Compiler.ParseError do
     %__MODULE__{message: message}
   end
 end
+
+defmodule Cldr.DateTime.UnresolvedFormat do
+  @moduledoc """
+  Exception raised when formatting and there is no
+  data for the given format.
+  """
+  defexception [:message]
+
+  def exception(message) do
+    %__MODULE__{message: message}
+  end
+end

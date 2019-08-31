@@ -28,7 +28,7 @@ defmodule Cldr.DateTime.Relative do
 
   @other_units [:mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]
   @unit_keys Map.keys(@unit) ++ @other_units
-  @known_formats [:default, :narrow, :short]
+  @known_styles [:default, :narrow, :short]
 
   @doc """
   Returns a `{:ok, string}` representing a relative time (ago, in) for a given
@@ -47,7 +47,7 @@ defmodule Cldr.DateTime.Relative do
   * `:locale` is the locale in which the binary is formatted.
     The default is `Cldr.get_locale/0`
 
-  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
+  * `:style` is the style of the binary.  Style may be `:default`, `:narrow` or `:short`
 
   * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
     `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
@@ -77,7 +77,7 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
       {:ok, "demain"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, style: :narrow)
       {:ok, "tomorrow"}
 
       iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year)
@@ -92,19 +92,19 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, relative_to: ~D[2017-04-26])
       {:ok, "in 3 days"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :short, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, style: :short, locale: "fr")
       {:ok, "dans 5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :narrow, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, style: :narrow, locale: "fr")
       {:ok, "+5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string 2, MyApp.Cldr, unit: :wed, format: :short, locale: "en"
+      iex> Cldr.DateTime.Relative.to_string 2, MyApp.Cldr, unit: :wed, style: :short, locale: "en"
       {:ok, "in 2 Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, style: :short
       {:ok, "next Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, style: :short
       {:ok, "last Wed."}
 
       iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed
@@ -121,6 +121,9 @@ defmodule Cldr.DateTime.Relative do
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
 
   """
+
+  # TODO deprecate the option :format in favour of using :style in version 3.9
+
   @spec to_string(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
@@ -137,7 +140,7 @@ defmodule Cldr.DateTime.Relative do
 
     with {:ok, locale} <- Cldr.validate_locale(locale),
          {:ok, unit} <- validate_unit(unit),
-         {:ok, _format} <- validate_format(options[:format]) do
+         {:ok, _style} <- validate_style(options[:style] || options[:format]) do
       {relative, unit} = define_unit_and_relative_time(relative, unit, options[:relative_to])
       string = to_string(relative, unit, locale, backend, options)
       {:ok, string}
@@ -145,15 +148,17 @@ defmodule Cldr.DateTime.Relative do
   end
 
   defp default_options do
-    [locale: Cldr.get_locale(), format: :default]
+    [locale: Cldr.get_locale(), style: :default]
   end
 
+  # No unit or relative_to is specified so we derive them
   defp define_unit_and_relative_time(relative, nil, nil) when is_number(relative) do
     unit = unit_from_relative_time(relative)
     relative = scale_relative(relative, unit)
     {relative, unit}
   end
 
+  # Take two datetimes and calculate the seconds between them
   defp define_unit_and_relative_time(
          %{year: _, month: _, day: _, hour: _, minute: _, second: _, calendar: Calendar.ISO} =
            relative,
@@ -166,6 +171,7 @@ defmodule Cldr.DateTime.Relative do
     define_unit_and_relative_time(relative_time, unit, nil)
   end
 
+  # Take two dates and calculate the days between them
   defp define_unit_and_relative_time(
          %{year: _, month: _, day: _, calendar: Calendar.ISO} = relative,
          unit,
@@ -187,6 +193,7 @@ defmodule Cldr.DateTime.Relative do
     define_unit_and_relative_time(relative_time, unit, nil)
   end
 
+  # Anything else just return the values
   defp define_unit_and_relative_time(relative_time, unit, _relative_to) do
     {relative_time, unit}
   end
@@ -210,7 +217,7 @@ defmodule Cldr.DateTime.Relative do
   * `:locale` is the locale in which the binary is formatted.
     The default is `Cldr.get_locale/0`
 
-  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`.
+  * `:style` is the format of the binary.  Style may be `:default`, `:narrow` or `:short`.
     The default is `:default`
 
   * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
@@ -240,26 +247,34 @@ defmodule Cldr.DateTime.Relative do
 
   @spec to_string(integer | float, atom(), Cldr.LanguageTag.t(), Cldr.backend(), Keyword.t()) ::
           String.t()
+
   defp to_string(relative, unit, locale, backend, options)
 
+  # For the case when its relative by one unit, for example "tomorrow" or "yesterday"
+  # or "last"
   defp to_string(relative, unit, locale, backend, options) when relative in -1..1 do
+    style = options[:style] || options[:format]
+
     result =
       locale
       |> get_locale(backend)
-      |> get_in([unit, options[:format], :relative_ordinal])
+      |> get_in([unit, style, :relative_ordinal])
       |> Enum.at(relative + 1)
 
     if is_nil(result), do: to_string(relative / 1, unit, locale, backend, options), else: result
   end
 
+  # For the case when its more than one unit away. For example, "in 3 days"
+  # or "2 days ago"
   defp to_string(relative, unit, locale, backend, options)
        when is_float(relative) or is_integer(relative) do
     direction = if relative > 0, do: :relative_future, else: :relative_past
+    style = options[:style] || options[:format]
 
     rules =
       locale
       |> get_locale(backend)
-      |> get_in([unit, options[:format], direction])
+      |> get_in([unit, style, direction])
 
     rule = Module.concat(backend, Number.Cardinal).pluralize(trunc(relative), locale, rules)
 
@@ -270,24 +285,25 @@ defmodule Cldr.DateTime.Relative do
     |> Enum.join()
   end
 
-  defp to_string(span, unit, locale, backend, options) do
-    do_to_string(span, unit, locale, backend, options)
-  end
-
-  defp do_to_string(seconds, unit, locale, backend, options) do
-    seconds
-    |> scale_relative(unit)
-    |> to_string(unit, locale, backend, options)
-  end
+  # For all other cases
+  # defp to_string(span, unit, locale, backend, options) do
+  #   do_to_string(span, unit, locale, backend, options)
+  # end
+  #
+  # defp do_to_string(seconds, unit, locale, backend, options) do
+  #   seconds
+  #   |> scale_relative(unit)
+  #   |> to_string(unit, locale, backend, options)
+  # end
 
   defp time_unit_error(unit) do
     {Cldr.UnknownTimeUnit,
      "Unknown time unit #{inspect(unit)}.  Valid time units are #{inspect(@unit_keys)}"}
   end
 
-  defp format_error(format) do
-    {Cldr.UnknownFormatError,
-     "Unknown format #{inspect(format)}.  Valid formats are #{inspect(@known_formats)}"}
+  defp style_error(style) do
+    {Cldr.UnknownStyleError,
+     "Unknown style #{inspect(style)}.  Valid styles are #{inspect(@known_styles)}"}
   end
 
   @doc """
@@ -374,16 +390,16 @@ defmodule Cldr.DateTime.Relative do
     {:error, time_unit_error(unit)}
   end
 
-  def known_formats do
-    @known_formats
+  def known_styles do
+    @known_styles
   end
 
-  defp validate_format(format) when format in @known_formats do
-    {:ok, format}
+  defp validate_style(style) when style in @known_styles do
+    {:ok, style}
   end
 
-  defp validate_format(format) do
-    {:error, format_error(format)}
+  defp validate_style(style) do
+    {:error, style_error(style)}
   end
 
   defp get_locale(locale, backend) do
