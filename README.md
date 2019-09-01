@@ -1,7 +1,8 @@
 # Date and Time Localization and Formatting
 ![Build Status](http://sweatbox.noexpectations.com.au:8080/buildStatus/icon?job=cldr_dates_times)
-[![Hex pm](http://img.shields.io/hexpm/v/ex_cldr_dates_times.svg?style=flat)](https://hex.pm/packages/ex_cldr_dates_times)
-[![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/kipcole9/cldr_dates_times/blob/master/LICENSE)
+[![Hex.pm](https://img.shields.io/hexpm/v/ex_cldr_dates_times.svg)](https://hex.pm/packages/ex_cldr_dates_times)
+[![Hex.pm](https://img.shields.io/hexpm/dw/ex_cldr_dates_times.svg?)](https://hex.pm/packages/ex_cldr_dates_times)
+[![Hex.pm](https://img.shields.io/hexpm/l/ex_cldr_dates_times.svg)](https://hex.pm/packages/ex_cldr_dates_times)
 
 ## Introduction
 
