@@ -93,7 +93,7 @@ defmodule Cldr.Date do
   end
 
   def to_string(%{calendar: calendar} = date, backend, options) do
-    options = Keyword.merge(default_options(), options)
+    options = Keyword.merge(default_options(backend), options)
     format_backend = Module.concat(backend, DateTime.Formatter)
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
@@ -113,8 +113,8 @@ defmodule Cldr.Date do
     error_return(date, [:year, :month, :day, :calendar])
   end
 
-  defp default_options do
-    [format: :medium, locale: Cldr.get_locale(), number_system: :default]
+  defp default_options(backend) do
+    [format: :medium, locale: Cldr.get_locale(backend), number_system: :default]
   end
 
   @doc """
