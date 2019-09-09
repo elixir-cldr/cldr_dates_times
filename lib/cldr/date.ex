@@ -96,7 +96,7 @@ defmodule Cldr.Date do
     options = Keyword.merge(default_options(), options)
     format_backend = Module.concat(backend, DateTime.Formatter)
 
-    with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
+    with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, format_string} <- format_string(options[:format], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(date, format_string, locale, options) do
