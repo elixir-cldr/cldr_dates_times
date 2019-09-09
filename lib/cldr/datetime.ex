@@ -99,10 +99,10 @@ defmodule Cldr.DateTime do
 
   def to_string(%{calendar: calendar} = datetime, backend, options)
       when is_atom(backend) and is_list(options) do
-    options = Keyword.merge(default_options(), options)
+    options = Keyword.merge(default_options(backend), options)
     format_backend = Module.concat(backend, DateTime.Formatter)
 
-    with {:ok, locale} <- Cldr.validate_locale(options[:locale]),
+    with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
          {:ok, cldr_calendar} <- type_from_calendar(calendar),
          {:ok, format_string} <- format_string(options[:format], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(datetime, format_string, locale, options) do
@@ -117,8 +117,8 @@ defmodule Cldr.DateTime do
     error_return(datetime, [:year, :month, :day, :hour, :minute, :second, :calendar])
   end
 
-  defp default_options do
-    [format: :medium, locale: Cldr.get_locale(), number_system: :default]
+  defp default_options(backend) do
+    [format: :medium, locale: Cldr.get_locale(backend), number_system: :default]
   end
 
   def type_from_calendar(_) do
