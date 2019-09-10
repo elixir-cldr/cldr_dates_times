@@ -134,11 +134,11 @@ defmodule Cldr.DateTime.Relative do
   end
 
   def to_string(relative, backend, options) do
-    options = Keyword.merge(default_options(), options)
+    options = Keyword.merge(default_options(backend), options)
     locale = Keyword.get(options, :locale)
     {unit, options} = Keyword.pop(options, :unit)
 
-    with {:ok, locale} <- Cldr.validate_locale(locale),
+    with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, unit} <- validate_unit(unit),
          {:ok, _style} <- validate_style(options[:style] || options[:format]) do
       {relative, unit} = define_unit_and_relative_time(relative, unit, options[:relative_to])
@@ -147,8 +147,8 @@ defmodule Cldr.DateTime.Relative do
     end
   end
 
-  defp default_options do
-    [locale: Cldr.get_locale(), style: :default]
+  defp default_options(backend) do
+    [locale: Cldr.get_locale(backend), style: :default]
   end
 
   # No unit or relative_to is specified so we derive them
