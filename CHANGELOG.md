@@ -1,5 +1,13 @@
 # Changelog for Cldr_Dates_Times v2.2.2
 
+This is the changelog for Cldr_Dates_Times v2.2.3 released on September 14th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Correctly uses a provided `:backend` option when validating the `:locale` option to the various `to_string/3` calls.  Thanks to @lostkobrakai. Closes #108 and #109.
+
+# Changelog for Cldr_Dates_Times v2.2.2
+
 This is the changelog for Cldr_Dates_Times v2.2.2 released on August 31st, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
 ### Changes & Deprecations
