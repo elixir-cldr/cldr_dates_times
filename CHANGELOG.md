@@ -1,4 +1,4 @@
-# Changelog for Cldr_Dates_Times v2.2.2
+# Changelog for Cldr_Dates_Times v2.2.3
 
 This is the changelog for Cldr_Dates_Times v2.2.3 released on September 14th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
