@@ -7,7 +7,6 @@ defmodule CldrDatesTimes.Mixfile do
     [
       app: :ex_cldr_dates_times,
       version: @version,
-      licenses: ["Apache-2.0"],
       name: "Cldr Dates & Times",
       source_url: "https://github.com/elixir-cldr/cldr_dates_times",
       docs: docs(),
