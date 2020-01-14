@@ -93,11 +93,12 @@ defmodule Cldr.DateTime.Formatter.Backend do
           end
         end
 
+        @dialyzer {:nowarn_function, number_system: 2}
         defp number_system(%{number_system: number_system}, _options) do
           number_system
         end
 
-        defp number_system(_, options) do
+        defp number_system(format, options) when is_binary(format) do
           options[:number_system]
         end
 

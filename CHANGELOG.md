@@ -1,10 +1,12 @@
-# Changelog for Cldr_Dates_Times v2.__
+# Changelog for Cldr_Dates_Times v2.2.4
 
-This is the changelog for Cldr_Dates_Times v____ released on ____, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.2.4 released on January 14th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
 ### Bug Fixes
 
 * Update tests for Elixir 1.10 date/time inspection changes
+
+* Fix dialyzer warning in generated backend
 
 # Changelog for Cldr_Dates_Times v2.2.3
 
