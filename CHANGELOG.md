@@ -1,3 +1,25 @@
+# Changelog for Cldr_Dates_Times v2.3.0
+
+This is the changelog for Cldr_Dates_Times v2.3.0 released on February 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Enhancements
+
+* Adds backend modules `MyApp.Cldr.Date`, `MyApp.Cldr.Time` and `MyApp.Cldr.DateTime` that contain the functions `to_string/2` and `to_string!/2`. This means all the `ex_cldr` family of libraries should now be primarily called on the backend modules. This makes aliasing easier too. For example:
+
+```
+defmodule MyApp.Cldr do
+  use Cldr, providers: [Cldr.Number, Cldr.DateTime], default_locale: "en"
+end
+
+defmodule MyApp do
+  alias MyApp.Cldr
+
+  def some_fun do
+    Cldr.Date.to_string Date.utc_today()
+  end
+end
+```
+
 # Changelog for Cldr_Dates_Times v2.2.4
 
 This is the changelog for Cldr_Dates_Times v2.2.4 released on January 14th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)

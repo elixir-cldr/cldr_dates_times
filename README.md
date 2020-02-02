@@ -4,37 +4,24 @@
 [![Hex.pm](https://img.shields.io/hexpm/dw/ex_cldr_dates_times.svg?)](https://hex.pm/packages/ex_cldr_dates_times)
 [![Hex.pm](https://img.shields.io/hexpm/l/ex_cldr_dates_times.svg)](https://hex.pm/packages/ex_cldr_dates_times)
 
-## Introduction
+## Installation
 
-`ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
+**Note that `:ex_cldr_dates_times` requires Elixir 1.8 or later.**
 
-The primary api is `Cldr.Date.to_string/3`, `Cldr.Time.to_string/3`, `Cldr.DateTime.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  The following examples demonstrate:
+Add `ex_cldr_dates_time` as a dependency to your `mix` project:
 
-```elixir
-  iex> Cldr.Date.to_string Date.utc_today()
-  {:ok, "Jun 9, 2019"}
+    defp deps do
+      [
+        {:ex_cldr_dates_times, "~> 2.0"}
+      ]
+    end
 
-  iex> Cldr.Time.to_string Time.utc_now
-  {:ok, "12:11:14 AM"}
+then retrieve `ex_cldr_dates_times` from [hex](https://hex.pm/packages/ex_cldr_dates_times):
 
-  iex> Cldr.DateTime.to_string DateTime.utc_now
-  {:ok, "Jun 9, 2019, 12:11:24 AM"}
+    mix deps.get
+    mix deps.compile
 
-  # Note that if options are provided, a backend
-  # module is also required
-  iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :day, format: :narrow
-  {:ok, "tomorrow"}
-```
-
-For help in `iex`:
-
-```elixir
-  iex> h Cldr.Date.to_string
-  iex> h Cldr.Time.to_string
-  iex> h Cldr.DateTime.to_string
-  iex> h Cldr.DateTime.Relative.to_string
-```
-## Configuration and Migration from Version 1
+### Required Configuration
 
 `ex_cldr_dates_times` uses the configuration set for the dependency `ex_cldr`.  See the documentation for [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration).
 
@@ -59,7 +46,14 @@ config :ex_cldr,
   default_backend: MyApp.Cldr
 ```
 
-3. Update any calls to `Cldr.Date.to_string/2` to call `Cldr.Date.to_string/3` with the second parameter being a backend module. The same applies for migrating to `Cldr.DateTime.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  For example:
+All examples below assume the existence of a module called `MyApp.Cldr` like this one.
+
+### Migration from Cldr.DatesTimes Version 1
+
+1. In modules where there are calls to `Cldr.DateTime.string/2` (or the `Date` and `Time` equivalents), add `alias MyApp.Cldr` to the top of the module. That will ensure that calls are directed to the backend with minimal code change. This is the preferred approach.
+
+
+2. Alternatively, update any calls to `Cldr.Date.to_string/2` to call `Cldr.Date.to_string/3` with the second parameter being a backend module. The same applies for migrating to `Cldr.DateTime.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  For example:
 
 ```elixir
   # Change from to_string/2 to to_string/3
@@ -71,30 +65,61 @@ config :ex_cldr,
   iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :short
 ```
 
+## Introduction
+
+`ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
+
+The primary api is `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`, `MyApp.Cldr.DateTime.to_string/2` and `MyApp.Cldr.DateTime.Relative.to_string/3`.  In the following examples `MyApp` refers to a CLDR backend module that must be defined by the developer:
+
+```elixir
+  iex> MyApp.Cldr.Date.to_string Date.utc_today()
+  {:ok, "Jun 9, 2019"}
+
+  iex> MyApp.Cldr.Time.to_string Time.utc_now
+  {:ok, "12:11:14 AM"}
+
+  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now
+  {:ok, "Jun 9, 2019, 12:11:24 AM"}
+
+  # Note that if options are provided, a backend
+  # module is also required
+  iex> MyApp.Cldr.DateTime.Relative.to_string 1, unit: :day, format: :narrow
+  {:ok, "tomorrow"}
+```
+
+For help in `iex`:
+
+```elixir
+  iex> h MyApp.Cldr.Date.to_string
+  iex> h MyApp.Cldr.Time.to_string
+  iex> h MyApp.Cldr.DateTime.to_string
+  iex> h MyApp.Cldr.DateTime.Relative.to_string
+```
+
 ## Date, Time and DateTime Localization Formatting
 
 Dates, Times and DateTimes can be formatted using:
 
-* The format types defined for each locale.  These format types provide cross-locale standardisation and therefore should be preferred where possible.  The format types, implemented for `Cldr.Date.to_string/2`, `Cldr.Time.to_string/2`,`Cldr.DateTime.to_string/2` are `:short`, `:medium`, `:long`  and `:full`.   The default is `:medium`. For example, assuming a configured backend called `MyApp.Cldr`:
+* The format types defined for each locale.  These format types provide cross-locale standardisation and therefore should be preferred where possible.  The format types, implemented for `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`,`MyApp.Cldr.DateTime.to_string/2` are `:short`, `:medium`, `:long`  and `:full`.   The default is `:medium`. For example, assuming a configured backend called `MyApp.Cldr`:
 
 ```elixir
-  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :short
+  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: :short
   {:ok, "6/9/19, 12:13 AM"}
 
-  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :long
+  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: :long
   {:ok, "June 9, 2019 at 12:14:15 AM UTC"}
 
-  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :medium
+  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: :medium
   {:ok, "Jun 9, 2019, 12:14:27 AM"}
 
-  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :long, locale: "fr"
+  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: :long, locale: "fr"
   {:ok, "9 juin 2019 à 00:14:38 UTC"}
 ```
 
 * A user specified format string.  A format string uses one or more formatting symbols to define what date and time elements should be places in the format.  A simple example to format the time into hours and minutes:
 
 ```elixir
-  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: "hh:MM"
+  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: "hh:MM"
   {:ok, "12:06"}
 ```
 
@@ -255,58 +280,58 @@ Dates, Times and DateTimes can be formatted using:
 The primary API for formatting relative dates and datetimes is `Cldr.DateTime.Relative.to_string/2`.  Some examples:
 
 ```elixir
-      iex> Cldr.DateTime.Relative.to_string(-1)
+      iex> MyApp.Cldr.DateTime.Relative.to_string(-1)
       {:ok, "1 second ago"}
 
-      iex> Cldr.DateTime.Relative.to_string(1)
+      iex> MyApp.Cldr.DateTime.Relative.to_string(1)
       {:ok, "in 1 second"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day)
+      iex> MyApp.Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day)
       {:ok, "tomorrow"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
+      iex> MyApp.Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
       {:ok, "demain"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
+      iex> MyApp.Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
       {:ok, "tomorrow"}
 
-      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year)
+      iex> MyApp.Cldr.DateTime.Relative.to_string(1234, unit: :year)
       {:ok, "in 1,234 years"}
 
-      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year, locale: "fr")
+      iex> MyApp.Cldr.DateTime.Relative.to_string(1234, unit: :year, locale: "fr")
       {:ok, "dans 1 234 ans"}
 
-      iex> Cldr.DateTime.Relative.to_string(31)
+      iex> MyApp.Cldr.DateTime.Relative.to_string(31)
       {:ok, "in 31 seconds"}
 
-      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, relative_to: ~D[2017-04-26])
+      iex> MyApp.Cldr.DateTime.Relative.to_string(~D[2017-04-29], relative_to: ~D[2017-04-26])
       {:ok, "in 3 days"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :short, locale: "fr")
+      iex> MyApp.Cldr.DateTime.Relative.to_string(310, format: :short, locale: "fr")
       {:ok, "dans 5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :narrow, locale: "fr")
+      iex> MyApp.Cldr.DateTime.Relative.to_string(310, format: :narrow, locale: "fr")
       {:ok, "+5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string 2, MyApp.Cldr, unit: :wed, format: :short
+      iex> MyApp.Cldr.DateTime.Relative.to_string 2, unit: :wed, format: :short
       {:ok, "in 2 Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, format: :short
+      iex> MyApp.Cldr.DateTime.Relative.to_string 1, unit: :wed, format: :short
       {:ok, "next Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, format: :short
+      iex> MyApp.Cldr.DateTime.Relative.to_string -1, unit: :wed, format: :short
       {:ok, "last Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed
+      iex> MyApp.Cldr.DateTime.Relative.to_string -1, unit: :wed
       {:ok, "last Wednesday"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :quarter
+      iex> MyApp.Cldr.DateTime.Relative.to_string -1, unit: :quarter
       {:ok, "last quarter"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :mon, locale: "fr"
+      iex> MyApp.Cldr.DateTime.Relative.to_string -1, unit: :mon, locale: "fr"
       {:ok, "lundi dernier"}
 
-      iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, unit: :ziggeraut)
+      iex> MyApp.Cldr.DateTime.Relative.to_string(~D[2017-04-29], unit: :ziggeraut)
       {:error, {Cldr.UnknownTimeUnit,
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
 ```
@@ -316,20 +341,3 @@ The primary API for formatting relative dates and datetimes is `Cldr.DateTime.Re
 Although largely complete (with respect to the CLDR data), there are some known limitations as of release 2.0.
 
 * *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V`, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `DateTime` struct is used to format timezone data.
-
-## Installation
-
-**Note that `:ex_cldr_dates_times` requires Elixir 1.8 or later.**
-
-Add `ex_cldr_dates_time` as a dependency to your `mix` project:
-
-    defp deps do
-      [
-        {:ex_cldr_dates_times, "~> 2.0"}
-      ]
-    end
-
-then retrieve `ex_cldr_dates_times` from [hex](https://hex.pm/packages/ex_cldr_dates_times):
-
-    mix deps.get
-    mix deps.compile

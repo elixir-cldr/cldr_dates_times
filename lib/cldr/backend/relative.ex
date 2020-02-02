@@ -37,6 +37,138 @@ defmodule Cldr.DateTime.Relative.Backend do
           end
         end
 
+        @doc """
+        Returns a `{:ok, string}` representing a relative time (ago, in) for a given
+        number, Date or Datetime.  Returns `{:error, reason}` when errors are detected.
+
+        * `relative` is a number or Date/Datetime representing the time distance from `now` or from
+          options[:relative_to]
+
+        * `options` is a `Keyword` list of options which are:
+
+        ## Options
+
+        * `:locale` is the locale in which the binary is formatted.
+          The default is `Cldr.get_locale/0`
+
+        * `:style` is the style of the binary.  Style may be `:default`, `:narrow` or `:short`
+
+        * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
+          `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
+          `:sun`, `:quarter`
+
+        * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
+          calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
+          for a DateTime it is `DateTime.utc_now`
+
+        ### Notes
+
+        When `options[:unit]` is not specified, `MyApp.Cldr.DateTime.Relative.to_string/2`
+        attempts to identify the appropriate unit based upon the magnitude of `relative`.
+        For example, given a parameter of less than `60`, then `to_string/2` will
+        assume `:seconds` as the unit.  See `unit_from_relative_time/1`.
+
+        ## Examples
+
+            iex> #{inspect __MODULE__}.to_string(-1)
+            {:ok, "1 second ago"}
+
+            iex> #{inspect __MODULE__}.to_string(1)
+            {:ok, "in 1 second"}
+
+            iex> #{inspect __MODULE__}.to_string(1, unit: :day)
+            {:ok, "tomorrow"}
+
+            iex> #{inspect __MODULE__}.to_string(1, unit: :day, locale: "fr")
+            {:ok, "demain"}
+
+            iex> #{inspect __MODULE__}.to_string(1, unit: :day, style: :narrow)
+            {:ok, "tomorrow"}
+
+            iex> #{inspect __MODULE__}.to_string(1234, unit: :year)
+            {:ok, "in 1,234 years"}
+
+            iex> #{inspect __MODULE__}.to_string(1234, unit: :year, locale: "fr")
+            {:ok, "dans 1 234 ans"}
+
+            iex> #{inspect __MODULE__}.to_string(31)
+            {:ok, "in 31 seconds"}
+
+            iex> #{inspect __MODULE__}.to_string(~D[2017-04-29], relative_to: ~D[2017-04-26])
+            {:ok, "in 3 days"}
+
+            iex> #{inspect __MODULE__}.to_string(310, style: :short, locale: "fr")
+            {:ok, "dans 5 min"}
+
+            iex> #{inspect __MODULE__}.to_string(310, style: :narrow, locale: "fr")
+            {:ok, "+5 min"}
+
+            iex> #{inspect __MODULE__}.to_string 2, unit: :wed, style: :short, locale: "en"
+            {:ok, "in 2 Wed."}
+
+            iex> #{inspect __MODULE__}.to_string 1, unit: :wed, style: :short
+            {:ok, "next Wed."}
+
+            iex> #{inspect __MODULE__}.to_string -1, unit: :wed, style: :short
+            {:ok, "last Wed."}
+
+            iex> #{inspect __MODULE__}.to_string -1, unit: :wed
+            {:ok, "last Wednesday"}
+
+            iex> #{inspect __MODULE__}.to_string -1, unit: :quarter
+            {:ok, "last quarter"}
+
+            iex> #{inspect __MODULE__}.to_string -1, unit: :mon, locale: "fr"
+            {:ok, "lundi dernier"}
+
+            iex> #{inspect __MODULE__}.to_string(~D[2017-04-29], unit: :ziggeraut)
+            {:error, {Cldr.UnknownTimeUnit,
+             "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
+
+        """
+
+        @spec to_string(integer | float | Date.t() | DateTime.t(), Keyword.t()) ::
+                {:ok, String.t()} | {:error, {module, String.t()}}
+
+        def to_string(time, options \\ []) do
+          Cldr.DateTime.Relative.to_string(time, unquote(backend), options)
+        end
+
+        @doc """
+        Returns a `{:ok, string}` representing a relative time (ago, in) for a given
+        number, Date or Datetime or raises an exception on error.
+
+        ## Arguments
+
+        * `relative` is a number or Date/Datetime representing the time distance from `now` or from
+          options[:relative_to].
+
+        * `options` is a `Keyword` list of options.
+
+        ## Options
+
+        * `:locale` is the locale in which the binary is formatted.
+          The default is `Cldr.get_locale/0`
+
+        * `:style` is the format of the binary.  Style may be `:default`, `:narrow` or `:short`.
+          The default is `:default`
+
+        * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
+          `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
+          `:sun`, `:quarter`
+
+        * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
+          calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
+          for a DateTime it is `DateTime.utc_now`
+
+        See `to_string/2`
+
+        """
+        @spec to_string!(number, Keyword.t()) :: String.t()
+        def to_string!(time, options \\ []) do
+          Cldr.DateTime.Relative.to_string!(time, unquote(backend), options)
+        end
+
         for locale_name <- Cldr.Config.known_locale_names(config) do
           locale_data =
             locale_name

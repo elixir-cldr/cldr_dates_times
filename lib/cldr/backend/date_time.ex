@@ -298,6 +298,7 @@ defmodule Cldr.DateAndTime.Backend do
         def to_string(time, options \\ []) do
           Cldr.Time.to_string(time, unquote(backend), options)
         end
+
         @doc """
         Formats a time according to a format string
         as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
@@ -306,9 +307,6 @@ defmodule Cldr.DateAndTime.Backend do
 
         * `time` is a `%DateTime{}` or `%NaiveDateTime{}` struct or any map that contains the keys
           `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
-
-        * `backend` is any module that includes `use Cldr` and therefore
-          is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
         * `options` is a keyword list of options for formatting.
 
