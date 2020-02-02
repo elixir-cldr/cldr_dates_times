@@ -127,7 +127,7 @@ defmodule Cldr.DateTime.Relative.Backend do
 
         """
 
-        @spec to_string(integer | float | Date.t() | DateTime.t(), Keyword.t()) ::
+        @spec to_string(number | map(), Keyword.t()) ::
                 {:ok, String.t()} | {:error, {module, String.t()}}
 
         def to_string(time, options \\ []) do
@@ -164,7 +164,7 @@ defmodule Cldr.DateTime.Relative.Backend do
         See `to_string/2`
 
         """
-        @spec to_string!(number, Keyword.t()) :: String.t()
+        @spec to_string!(number | map(), Keyword.t()) :: String.t()
         def to_string!(time, options \\ []) do
           Cldr.DateTime.Relative.to_string!(time, unquote(backend), options)
         end

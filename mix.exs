@@ -16,7 +16,10 @@ defmodule CldrDatesTimes.Mixfile do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       compilers: Mix.compilers(),
-      elixirc_paths: elixirc_paths(Mix.env())
+      elixirc_paths: elixirc_paths(Mix.env()),
+      dialyzer: [
+        ignore_warnings: ".dialyzer_ignore_warnings"
+      ]
     ]
   end
 
