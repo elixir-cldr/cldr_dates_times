@@ -69,7 +69,7 @@ All examples below assume the existence of a module called `MyApp.Cldr` like thi
 
 `ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
 
-The primary api is `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`, `MyApp.Cldr.DateTime.to_string/2` and `MyApp.Cldr.DateTime.Relative.to_string/3`.  In the following examples `MyApp` refers to a CLDR backend module that must be defined by the developer:
+The primary api is `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`, `MyApp.Cldr.DateTime.to_string/2` and `MyApp.Cldr.DateTime.Relative.to_string/2`.  In the following examples `MyApp` refers to a CLDR backend module that must be defined by the developer:
 
 ```elixir
   iex> MyApp.Cldr.Date.to_string Date.utc_today()
@@ -123,7 +123,7 @@ Dates, Times and DateTimes can be formatted using:
   {:ok, "12:06"}
 ```
 
-* For `DateTime`s there is also a set of predefined format name.  These format names are returned by `MyApp.Cldr.DateTime.date_time_available_formats/1` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` paramater to `Cldr.DateTime.to_string/2` module only.
+* For `DateTime`s there is also a set of predefined format name.  These format names are returned by `MyApp.Cldr.DateTime.date_time_available_formats/0` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` paramater to `Cldr.DateTime.to_string/2` module only.
 
 ```elixir
   iex> MyApp.Cldr.DateTime.Format.date_time_available_formats

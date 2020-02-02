@@ -40,7 +40,7 @@ defmodule CldrDatesTimes.Mixfile do
       extras: ["README.md", "CHANGELOG.md", "LICENSE.md"],
       logo: "logo.png",
       groups_for_modules: groups_for_modules(),
-      skip_undefined_reference_warnings_on: ["changelog"]
+      skip_undefined_reference_warnings_on: ["changelog", "readme"]
     ]
   end
 
