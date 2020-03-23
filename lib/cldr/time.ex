@@ -83,7 +83,7 @@ defmodule Cldr.Time do
       {:ok, "11:59:59 PM UTC"}
 
   """
-  @spec to_string(map, module() | Keyword.t(), Keyword.t()) ::
+  @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(time, backend \\ Cldr.default_backend(), options \\ [])
@@ -181,7 +181,7 @@ defmodule Cldr.Time do
       "11:59:59 PM UTC"
 
   """
-  @spec to_string!(map, module() | Keyword.t(), Keyword.t()) :: String.t() | no_return
+  @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
 
   def to_string!(time, backend \\ Cldr.default_backend(), options \\ [])
 

@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.2.4"
+  @version "2.3.0"
 
   def project do
     [
@@ -16,7 +16,10 @@ defmodule CldrDatesTimes.Mixfile do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       compilers: Mix.compilers(),
-      elixirc_paths: elixirc_paths(Mix.env())
+      elixirc_paths: elixirc_paths(Mix.env()),
+      dialyzer: [
+        ignore_warnings: ".dialyzer_ignore_warnings"
+      ]
     ]
   end
 
@@ -40,7 +43,7 @@ defmodule CldrDatesTimes.Mixfile do
       extras: ["README.md", "CHANGELOG.md", "LICENSE.md"],
       logo: "logo.png",
       groups_for_modules: groups_for_modules(),
-      skip_undefined_reference_warnings_on: ["changelog"]
+      skip_undefined_reference_warnings_on: ["changelog", "readme"]
     ]
   end
 

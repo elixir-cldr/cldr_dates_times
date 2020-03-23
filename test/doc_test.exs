@@ -7,4 +7,9 @@ defmodule Cldr.DateTime.Test do
   doctest Cldr.DateTime
   doctest Cldr.Date
   doctest Cldr.Time
+
+  doctest MyApp.Cldr.Date
+  doctest MyApp.Cldr.Time
+  doctest MyApp.Cldr.DateTime
+  doctest MyApp.Cldr.DateTime.Relative
 end
