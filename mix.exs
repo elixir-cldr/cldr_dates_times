@@ -95,5 +95,6 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp elixirc_paths(:test), do: ["lib", "mix", "test"]
   defp elixirc_paths(:dev), do: ["lib", "mix"]
+  defp elixirc_paths(:docs), do: ["lib", "mix"]
   defp elixirc_paths(_), do: ["lib"]
 end

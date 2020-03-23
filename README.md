@@ -4,7 +4,49 @@
 [![Hex.pm](https://img.shields.io/hexpm/dw/ex_cldr_dates_times.svg?)](https://hex.pm/packages/ex_cldr_dates_times)
 [![Hex.pm](https://img.shields.io/hexpm/l/ex_cldr_dates_times.svg)](https://hex.pm/packages/ex_cldr_dates_times)
 
-## Introduction
+## Installation
+
+**Note that `ex_cldr_dates_times` requires Elixir 1.8 or later.**
+
+Add `ex_cldr_dates_time` as a dependency to your `mix` project:
+
+    defp deps do
+      [
+        {:ex_cldr_dates_times, "~> 2.0"}
+      ]
+    end
+
+then retrieve `ex_cldr_dates_times` from [hex](https://hex.pm/packages/ex_cldr_dates_times):
+
+    mix deps.get
+    mix deps.compile
+
+### Configuring a required backend module
+
+`ex_cldr_dates_times` uses the configuration set for the dependency `ex_cldr`.  See the documentation for [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration).
+
+A `backend` module is required that is used to host the functions that manage CLDR data.  An example to get started is:
+
+1. Create a backend module (see [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration) for details of the available options). Note the requirement to configure the appropriate `Cldr` provider backends.
+
+```elixir
+defmodule MyApp.Cldr do
+  use Cldr,
+    locales: ["en", "fr", "ja"],
+    providers: [Cldr.Number, Cldr.Calendar, Cldr.DateTime]
+
+end
+```
+
+2. [Optional] Update `config.exs` configuration to specify this backend as the system default. Not required, but often useful.
+
+```elixir
+config :ex_cldr,
+  default_locale: "en",
+  default_backend: MyApp.Cldr
+```
+
+## Usage Introduction
 
 `ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
 
@@ -34,32 +76,15 @@ For help in `iex`:
   iex> h Cldr.DateTime.to_string
   iex> h Cldr.DateTime.Relative.to_string
 ```
-## Configuration and Migration from Version 1
+## Migration from Cldr Dates Times Version 1
 
 `ex_cldr_dates_times` uses the configuration set for the dependency `ex_cldr`.  See the documentation for [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration).
 
 A `backend` module is required that is used to host the functions that manage CLDR data.  An example to get started is:
 
-1. Create a backend module (see [ex_cldr](https://hexdocs.pm/ex_cldr/2.0.0/readme.html#configuration) for details of the available options). Note the requirement to configure the appropriate `Cldr` provider backends.
+1. Create a backend module as described in the [Installation](#installation) section.
 
-```elixir
-defmodule MyApp.Cldr do
-  use Cldr,
-    locales: ["en", "fr", "ja"],
-    providers: [Cldr.Number, Cldr.Calendar, Cldr.DateTime]
-
-end
-```
-
-2. Update `config.exs` configuration to specify this backend as the system default:
-
-```elixir
-config :ex_cldr,
-  default_locale: "en",
-  default_backend: MyApp.Cldr
-```
-
-3. Update any calls to `Cldr.Date.to_string/2` to call `Cldr.Date.to_string/3` with the second parameter being a backend module. The same applies for migrating to `Cldr.DateTime.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  For example:
+2. Update any calls to `Cldr.Date.to_string/2` to call `Cldr.Date.to_string/3` with the second parameter being a backend module. The same applies for migrating to `Cldr.DateTime.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  For example:
 
 ```elixir
   # Change from to_string/2 to to_string/3
@@ -316,20 +341,3 @@ The primary API for formatting relative dates and datetimes is `Cldr.DateTime.Re
 Although largely complete (with respect to the CLDR data), there are some known limitations as of release 2.0.
 
 * *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V`, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `DateTime` struct is used to format timezone data.
-
-## Installation
-
-**Note that `:ex_cldr_dates_times` requires Elixir 1.8 or later.**
-
-Add `ex_cldr_dates_time` as a dependency to your `mix` project:
-
-    defp deps do
-      [
-        {:ex_cldr_dates_times, "~> 2.0"}
-      ]
-    end
-
-then retrieve `ex_cldr_dates_times` from [hex](https://hex.pm/packages/ex_cldr_dates_times):
-
-    mix deps.get
-    mix deps.compile
