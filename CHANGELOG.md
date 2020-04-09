@@ -1,3 +1,11 @@
+# Changelog for Cldr_Dates_Times v2.4.0
+
+This is the changelog for Cldr_Dates_Times v2.4.0 released on ______ 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Enhancements
+
+* Adds protocol support for `Cldr.Chars` which is used by `Cldr.to_string/1`.
+
 # Changelog for Cldr_Dates_Times v2.3.0
 
 This is the changelog for Cldr_Dates_Times v2.3.0 released on February 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
