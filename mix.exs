@@ -73,7 +73,7 @@ defmodule CldrDatesTimes.Mixfile do
       {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
       {:benchee, "~> 1.0", optional: true, only: :dev, runtime: false},
-      {:dialyxir, "~> 1.0.0-rc", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
 
