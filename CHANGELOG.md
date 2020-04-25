@@ -4,7 +4,9 @@ This is the changelog for Cldr_Dates_Times v2.4.0 released on ______ 2020.  For 
 
 ### Enhancements
 
-* Adds protocol support for `Cldr.Chars` which is used by `Cldr.to_string/1`.
+* Add format key `ddd` to return the day of the month with ordinal formatting
+
+* Add protocol support for `Cldr.Chars` which is used by `Cldr.to_string/1`
 
 # Changelog for Cldr_Dates_Times v2.3.0
 
