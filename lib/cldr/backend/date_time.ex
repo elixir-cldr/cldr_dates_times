@@ -47,17 +47,17 @@ defmodule Cldr.DateAndTime.Backend do
         ## Examples
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-            iex> #{inspect __MODULE__}.to_string datetime
+            iex> #{inspect(__MODULE__)}.to_string datetime
             {:ok, "Jan 1, 2000, 11:59:59 PM"}
-            iex> #{inspect __MODULE__}.to_string datetime, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string datetime, locale: "en"
             {:ok, "Jan 1, 2000, 11:59:59 PM"}
-            iex> #{inspect __MODULE__}.to_string datetime, format: :long, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string datetime, format: :long, locale: "en"
             {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
-            iex> #{inspect __MODULE__}.to_string datetime, format: :hms, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string datetime, format: :hms, locale: "en"
             {:ok, "23:59:59"}
-            iex> #{inspect __MODULE__}.to_string datetime, format: :full, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "en"
             {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
-            iex> #{inspect __MODULE__}.to_string datetime, format: :full, locale: "fr"
+            iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "fr"
             {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
         """
@@ -109,13 +109,13 @@ defmodule Cldr.DateAndTime.Backend do
         ## Examples
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-            iex> #{inspect __MODULE__}.to_string! datetime, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string! datetime, locale: "en"
             "Jan 1, 2000, 11:59:59 PM"
-            iex> #{inspect __MODULE__}.to_string! datetime, format: :long, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string! datetime, format: :long, locale: "en"
             "January 1, 2000 at 11:59:59 PM UTC"
-            iex> #{inspect __MODULE__}.to_string! datetime, format: :full, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string! datetime, format: :full, locale: "en"
             "Saturday, January 1, 2000 at 11:59:59 PM GMT"
-            iex> #{inspect __MODULE__}.to_string! datetime, format: :full, locale: "fr"
+            iex> #{inspect(__MODULE__)}.to_string! datetime, format: :full, locale: "fr"
             "samedi 1 janvier 2000 à 23:59:59 UTC"
 
         """
@@ -156,22 +156,22 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string ~D[2017-07-10], format: :medium, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string ~D[2017-07-10], format: :medium, locale: "en"
             {:ok, "Jul 10, 2017"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2017-07-10], locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string ~D[2017-07-10], locale: "en"
             {:ok, "Jul 10, 2017"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2017-07-10], format: :full, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string ~D[2017-07-10], format: :full, locale: "en"
             {:ok, "Monday, July 10, 2017"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2017-07-10], format: :short, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string ~D[2017-07-10], format: :short, locale: "en"
             {:ok, "7/10/17"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2017-07-10], format: :short, locale: "fr"
+            iex> #{inspect(__MODULE__)}.to_string ~D[2017-07-10], format: :short, locale: "fr"
             {:ok, "10/07/2017"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2017-07-10], format: :long, locale: "af"
+            iex> #{inspect(__MODULE__)}.to_string ~D[2017-07-10], format: :long, locale: "af"
             {:ok, "10 Julie 2017"}
 
         """
@@ -212,26 +212,26 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string! ~D[2017-07-10], format: :medium, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string! ~D[2017-07-10], format: :medium, locale: "en"
             "Jul 10, 2017"
 
-            iex> #{inspect __MODULE__}.to_string! ~D[2017-07-10], locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string! ~D[2017-07-10], locale: "en"
             "Jul 10, 2017"
 
-            iex> #{inspect __MODULE__}.to_string! ~D[2017-07-10], format: :full,locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string! ~D[2017-07-10], format: :full,locale: "en"
             "Monday, July 10, 2017"
 
-            iex> #{inspect __MODULE__}.to_string! ~D[2017-07-10], format: :short, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string! ~D[2017-07-10], format: :short, locale: "en"
             "7/10/17"
 
-            iex> #{inspect __MODULE__}.to_string! ~D[2017-07-10], format: :short, locale: "fr"
+            iex> #{inspect(__MODULE__)}.to_string! ~D[2017-07-10], format: :short, locale: "fr"
             "10/07/2017"
 
-            iex> #{inspect __MODULE__}.to_string! ~D[2017-07-10], format: :long, locale: "af"
+            iex> #{inspect(__MODULE__)}.to_string! ~D[2017-07-10], format: :long, locale: "af"
             "10 Julie 2017"
 
         """
-        @spec to_string!(map,  Keyword.t()) :: String.t() | no_return
+        @spec to_string!(map, Keyword.t()) :: String.t() | no_return
         def to_string!(date, options \\ []) do
           Cldr.Date.to_string!(date, unquote(backend), options)
         end
@@ -336,23 +336,23 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string! ~T[07:35:13.215217]
+            iex> #{inspect(__MODULE__)}.to_string! ~T[07:35:13.215217]
             "7:35:13 AM"
 
-            iex> #{inspect __MODULE__}.to_string! ~T[07:35:13.215217], format: :short
+            iex> #{inspect(__MODULE__)}.to_string! ~T[07:35:13.215217], format: :short
             "7:35 AM"
 
-            iex> #{inspect __MODULE__}.to_string ~T[07:35:13.215217], format: :short, period: :variant
+            iex> #{inspect(__MODULE__)}.to_string ~T[07:35:13.215217], format: :short, period: :variant
             {:ok, "7:35 AM"}
 
-            iex> #{inspect __MODULE__}.to_string! ~T[07:35:13.215217], format: :medium, locale: "fr"
+            iex> #{inspect(__MODULE__)}.to_string! ~T[07:35:13.215217], format: :medium, locale: "fr"
             "07:35:13"
 
-            iex> #{inspect __MODULE__}.to_string! ~T[07:35:13.215217], format: :medium
+            iex> #{inspect(__MODULE__)}.to_string! ~T[07:35:13.215217], format: :medium
             "7:35:13 AM"
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-            iex> #{inspect __MODULE__}.to_string! datetime, format: :long
+            iex> #{inspect(__MODULE__)}.to_string! datetime, format: :long
             "11:59:59 PM UTC"
 
         """

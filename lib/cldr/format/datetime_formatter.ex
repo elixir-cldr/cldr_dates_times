@@ -162,7 +162,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec date(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def date(date, n \\ @default_format, options \\ [])
 
@@ -177,7 +177,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec date(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def date(date, _n, _locale, backend, options) do
     with {:ok, date_string} <- Cldr.Date.to_string(date, backend, options) do
@@ -195,7 +195,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec time(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def time(time, n \\ @default_format, options \\ [])
 
@@ -210,7 +210,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec time(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def time(time, _n, _locale, backend, options) do
     with {:ok, time_string} <- Cldr.Time.to_string(time, backend, options) do
@@ -259,7 +259,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec era(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def era(era, n \\ @default_format, options \\ [])
 
@@ -274,7 +274,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec era(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def era(date, n, locale, backend, options \\ [])
 
@@ -360,7 +360,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec year(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def year(year, n \\ @default_format, options \\ [])
 
@@ -375,7 +375,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec year(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def year(date, n, locale, backend, options \\ [])
 
@@ -465,7 +465,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec week_aligned_year(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def week_aligned_year(week_aligned_year, n \\ @default_format, options \\ [])
 
@@ -480,7 +480,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec week_aligned_year(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def week_aligned_year(date, n, locale, backend, options \\ [])
 
@@ -552,7 +552,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec extended_year(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def extended_year(extended_year, n \\ @default_format, options \\ [])
 
@@ -567,7 +567,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec extended_year(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def extended_year(date, n, locale, backend, options \\ [])
 
@@ -618,7 +618,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec cyclic_year(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def cyclic_year(cyclic_year, n \\ @default_format, options \\ [])
 
@@ -633,7 +633,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec cyclic_year(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def cyclic_year(date, n, locale, backend, options \\ [])
 
@@ -700,7 +700,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec related_year(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def related_year(related_year, n \\ @default_format, options \\ [])
 
@@ -715,7 +715,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec related_year(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def related_year(date, n, locale, backend, options \\ [])
 
@@ -793,7 +793,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec quarter(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def quarter(quarter, n \\ @default_format, options \\ [])
 
@@ -808,7 +808,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec quarter(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def quarter(date, n, locale, backend, options \\ [])
 
@@ -893,7 +893,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec standalone_quarter(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def standalone_quarter(standalone_quarter, n \\ @default_format, options \\ [])
 
@@ -908,7 +908,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec standalone_quarter(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def standalone_quarter(date, n, locale, backend, options \\ [])
 
@@ -993,7 +993,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec month(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def month(month, n \\ @default_format, options \\ [])
 
@@ -1008,7 +1008,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec month(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def month(date, n, locale, backend, options \\ [])
 
@@ -1091,7 +1091,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec standalone_month(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def standalone_month(standalone_month, n \\ @default_format, options \\ [])
 
@@ -1106,7 +1106,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec standalone_month(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def standalone_month(date, n, locale, backend, options \\ [])
 
@@ -1191,7 +1191,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec week_of_year(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def week_of_year(week_of_year, n \\ @default_format, options \\ [])
 
@@ -1206,7 +1206,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec week_of_year(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def week_of_year(date, n, locale, backend, options \\ [])
 
@@ -1261,7 +1261,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec week_of_month(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def week_of_month(week_of_month, n \\ @default_format, options \\ [])
 
@@ -1276,7 +1276,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec week_of_month(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def week_of_month(date, n, locale, backend, options \\ [])
 
@@ -1336,7 +1336,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec day_of_month(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def day_of_month(day_of_month, n \\ @default_format, options \\ [])
 
@@ -1351,7 +1351,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec day_of_month(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def day_of_month(date, n, locale, backend, options \\ [])
 
@@ -1418,7 +1418,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec day_of_year(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def day_of_year(day_of_year, n \\ @default_format, options \\ [])
 
@@ -1433,7 +1433,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec day_of_year(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def day_of_year(date, n, locale, backend, options \\ [])
 
@@ -1503,7 +1503,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec day_name(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def day_name(day_name, n \\ @default_format, options \\ [])
 
@@ -1518,7 +1518,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec day_name(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def day_name(date, n, locale, backend, options \\ [])
 
@@ -1607,7 +1607,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec day_of_week(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def day_of_week(day_of_week, n \\ @default_format, options \\ [])
 
@@ -1622,7 +1622,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec day_of_week(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def day_of_week(date, n, locale, backend, options \\ [])
 
@@ -1697,7 +1697,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec standalone_day_of_week(Calendar.date(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def standalone_day_of_week(standalone_day_of_week, n \\ @default_format, options \\ [])
 
@@ -1712,7 +1712,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec standalone_day_of_week(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def standalone_day_of_week(date, n, locale, backend, options \\ [])
 
@@ -1802,7 +1802,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec period_am_pm(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def period_am_pm(period_am_pm, n \\ @default_format, options \\ [])
 
@@ -1817,7 +1817,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec period_am_pm(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def period_am_pm(time, n, locale, backend, options \\ [])
 
@@ -1893,7 +1893,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec period_noon_midnight(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def period_noon_midnight(period_noon_midnight, n \\ @default_format, options \\ [])
 
@@ -1908,7 +1908,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec period_noon_midnight(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def period_noon_midnight(time, n, locale, backend, options \\ [])
 
@@ -1980,7 +1980,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec period_flex(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def period_flex(period_flex, n \\ @default_format, options \\ [])
 
@@ -1995,7 +1995,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec period_flex(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def period_flex(time, n, locale, backend, options \\ [])
 
@@ -2057,7 +2057,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec hour_1_12(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def hour_1_12(hour_1_12, n \\ @default_format, options \\ [])
 
@@ -2072,7 +2072,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec hour_1_12(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def hour_1_12(time, n, locale, backend, options \\ [])
 
@@ -2142,7 +2142,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec hour_0_11(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def hour_0_11(hour_0_11, n \\ @default_format, options \\ [])
 
@@ -2157,7 +2157,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec hour_0_11(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def hour_0_11(time, n, locale, backend, options \\ [])
 
@@ -2224,7 +2224,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec hour_1_24(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def hour_1_24(hour_1_24, n \\ @default_format, options \\ [])
 
@@ -2239,7 +2239,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec hour_1_24(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def hour_1_24(time, n, locale, backend, options \\ [])
 
@@ -2301,7 +2301,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec hour_0_23(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def hour_0_23(hour_0_23, n \\ @default_format, options \\ [])
 
@@ -2316,7 +2316,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec hour_0_23(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def hour_0_23(time, n, locale, backend, options \\ [])
 
@@ -2375,7 +2375,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec minute(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def minute(minute, n \\ @default_format, options \\ [])
 
@@ -2390,7 +2390,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec minute(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def minute(time, n, locale, backend, options \\ [])
 
@@ -2442,7 +2442,7 @@ defmodule Cldr.DateTime.Formatter do
       "04"
   """
   @spec second(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def second(second, n \\ @default_format, options \\ [])
 
@@ -2457,7 +2457,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec second(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def second(time, n, locale, backend, options \\ [])
 
@@ -2513,7 +2513,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec fractional_second(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def fractional_second(fractional_second, n \\ @default_format, options \\ [])
 
@@ -2528,7 +2528,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec fractional_second(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   # Note that TR35 says we should truncate the number of decimal digits
   # but we are rounding
@@ -2587,7 +2587,8 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.millisecond %{hour: 0, minute: 0, second: 4, microsecond: {2000, 3}}, 1
+      iex> Cldr.DateTime.Formatter.millisecond %{hour: 0, minute: 0,
+      ...>   second: 4, microsecond: {2000, 3}}, 1
       "4002"
 
       iex> Cldr.DateTime.Formatter.millisecond %{hour: 0, minute: 0, second: 4}, 1
@@ -2601,7 +2602,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec millisecond(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def millisecond(millisecond, n \\ @default_format, options \\ [])
 
@@ -2617,7 +2618,7 @@ defmodule Cldr.DateTime.Formatter do
 
   @milliseconds 1_000
   @spec millisecond(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def millisecond(time, n, locale, backend, options \\ [])
 
@@ -2677,15 +2678,17 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 4
+      iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 4
       "GMT"
 
-      iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 1
+      iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 1
       "Etc/UTC"
 
   """
   @spec zone_generic(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_generic(zone_generic, n \\ @default_format, options \\ [])
 
@@ -2700,7 +2703,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec zone_generic(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_generic(time, n, locale, backend, options \\ [])
 
@@ -2749,15 +2752,17 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_short %{zone_abbr: "UTC", utc_offset: 0, std_offset: 0}, 1
+      iex> Cldr.DateTime.Formatter.zone_short %{zone_abbr: "UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 1
       "UTC"
 
-      iex> Cldr.DateTime.Formatter.zone_short %{zone_abbr: "UTC", utc_offset: 0, std_offset: 0}, 4
+      iex> Cldr.DateTime.Formatter.zone_short %{zone_abbr: "UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 4
       "GMT"
 
   """
   @spec zone_short(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_short(zone_short, n \\ @default_format, options \\ [])
 
@@ -2772,7 +2777,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec zone_short(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_short(time, n, locale, backend, options \\ [])
 
@@ -2821,21 +2826,25 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 1
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 1
       "unk"
 
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 2
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 2
       "Etc/UTC"
 
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 3
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 3
       "Unknown City"
 
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 4
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 4
       "GMT"
 
   """
   @spec zone_id(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_id(zone_id, n \\ @default_format, options \\ [])
 
@@ -2850,7 +2859,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec zone_id(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_id(time, n, locale, backend, options \\ [])
 
@@ -2907,21 +2916,25 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC", utc_offset: 3600, std_offset: 0}, 1
+      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3600, std_offset: 0}, 1
       "+0100"
 
-      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 4
+      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 4
       "GMT+01:00"
 
-      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 5
+      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 5
       "Z"
 
-      iex(79)> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 5
+      iex> Cldr.DateTime.Formatter.zone_basic %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 5
       "+01:00:10"
 
   """
   @spec zone_basic(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_basic(zone_basic, n \\ @default_format, options \\ [])
 
@@ -2936,7 +2949,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec zone_basic(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_basic(time, n, locale, backend, options \\ [])
 
@@ -2992,36 +3005,45 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 1
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 1
       "+01"
 
-      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 2
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 2
       "+0100"
 
-      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 3
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 3
       "+01:00:10"
 
-      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 4
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 4
       "+010010"
 
-      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 5
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 5
       "+01:00:10"
 
-      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 5
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 5
       "Z"
 
-      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 4
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 4
       "Z"
 
-      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 3
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 3
       "Z"
 
-      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 2
+      iex> Cldr.DateTime.Formatter.zone_iso_z %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 2
       "Z"
 
   """
   @spec zone_iso_z(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_iso_z(zone_iso_z, n \\ @default_format, options \\ [])
 
@@ -3036,7 +3058,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec zone_iso_z(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_iso_z(time, n, locale, backend, options \\ [])
 
@@ -3165,7 +3187,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec zone_iso(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_iso(zone_iso, n \\ @default_format, options \\ [])
 
@@ -3181,7 +3203,7 @@ defmodule Cldr.DateTime.Formatter do
 
   @iso_utc_offset_hours_minutes "+00:00"
   @spec zone_iso(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_iso(time, n, locale, backend, options \\ [])
 
@@ -3278,7 +3300,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec zone_gmt(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_gmt(zone_gmt, n \\ @default_format, options \\ [])
 
@@ -3293,7 +3315,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec zone_gmt(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()}
 
   def zone_gmt(time, n, locale, backend, options \\ [])
 

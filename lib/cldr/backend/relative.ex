@@ -70,58 +70,58 @@ defmodule Cldr.DateTime.Relative.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string(-1)
+            iex> #{inspect(__MODULE__)}.to_string(-1)
             {:ok, "1 second ago"}
 
-            iex> #{inspect __MODULE__}.to_string(1)
+            iex> #{inspect(__MODULE__)}.to_string(1)
             {:ok, "in 1 second"}
 
-            iex> #{inspect __MODULE__}.to_string(1, unit: :day)
+            iex> #{inspect(__MODULE__)}.to_string(1, unit: :day)
             {:ok, "tomorrow"}
 
-            iex> #{inspect __MODULE__}.to_string(1, unit: :day, locale: "fr")
+            iex> #{inspect(__MODULE__)}.to_string(1, unit: :day, locale: "fr")
             {:ok, "demain"}
 
-            iex> #{inspect __MODULE__}.to_string(1, unit: :day, style: :narrow)
+            iex> #{inspect(__MODULE__)}.to_string(1, unit: :day, style: :narrow)
             {:ok, "tomorrow"}
 
-            iex> #{inspect __MODULE__}.to_string(1234, unit: :year)
+            iex> #{inspect(__MODULE__)}.to_string(1234, unit: :year)
             {:ok, "in 1,234 years"}
 
-            iex> #{inspect __MODULE__}.to_string(1234, unit: :year, locale: "fr")
+            iex> #{inspect(__MODULE__)}.to_string(1234, unit: :year, locale: "fr")
             {:ok, "dans 1 234 ans"}
 
-            iex> #{inspect __MODULE__}.to_string(31)
+            iex> #{inspect(__MODULE__)}.to_string(31)
             {:ok, "in 31 seconds"}
 
-            iex> #{inspect __MODULE__}.to_string(~D[2017-04-29], relative_to: ~D[2017-04-26])
+            iex> #{inspect(__MODULE__)}.to_string(~D[2017-04-29], relative_to: ~D[2017-04-26])
             {:ok, "in 3 days"}
 
-            iex> #{inspect __MODULE__}.to_string(310, style: :short, locale: "fr")
+            iex> #{inspect(__MODULE__)}.to_string(310, style: :short, locale: "fr")
             {:ok, "dans 5 min"}
 
-            iex> #{inspect __MODULE__}.to_string(310, style: :narrow, locale: "fr")
+            iex> #{inspect(__MODULE__)}.to_string(310, style: :narrow, locale: "fr")
             {:ok, "+5 min"}
 
-            iex> #{inspect __MODULE__}.to_string 2, unit: :wed, style: :short, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string 2, unit: :wed, style: :short, locale: "en"
             {:ok, "in 2 Wed."}
 
-            iex> #{inspect __MODULE__}.to_string 1, unit: :wed, style: :short
+            iex> #{inspect(__MODULE__)}.to_string 1, unit: :wed, style: :short
             {:ok, "next Wed."}
 
-            iex> #{inspect __MODULE__}.to_string -1, unit: :wed, style: :short
+            iex> #{inspect(__MODULE__)}.to_string -1, unit: :wed, style: :short
             {:ok, "last Wed."}
 
-            iex> #{inspect __MODULE__}.to_string -1, unit: :wed
+            iex> #{inspect(__MODULE__)}.to_string -1, unit: :wed
             {:ok, "last Wednesday"}
 
-            iex> #{inspect __MODULE__}.to_string -1, unit: :quarter
+            iex> #{inspect(__MODULE__)}.to_string -1, unit: :quarter
             {:ok, "last quarter"}
 
-            iex> #{inspect __MODULE__}.to_string -1, unit: :mon, locale: "fr"
+            iex> #{inspect(__MODULE__)}.to_string -1, unit: :mon, locale: "fr"
             {:ok, "lundi dernier"}
 
-            iex> #{inspect __MODULE__}.to_string(~D[2017-04-29], unit: :ziggeraut)
+            iex> #{inspect(__MODULE__)}.to_string(~D[2017-04-29], unit: :ziggeraut)
             {:error, {Cldr.UnknownTimeUnit,
              "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
 

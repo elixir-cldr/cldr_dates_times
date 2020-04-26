@@ -18,5 +18,4 @@ defmodule Cldr.DateTime.CharsTest do
       assert Cldr.to_string(~U[2020-04-09 23:39:25.040129Z]) == "Apr 9, 2020, 11:39:25 PM"
     end
   end
-
 end

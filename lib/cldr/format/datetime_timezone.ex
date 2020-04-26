@@ -15,5 +15,4 @@ defmodule Cldr.DateTime.Timezone do
   def time_from_zone_offset(other) do
     Cldr.DateTime.Formatter.error_return(other, "x", [:utc_offset])
   end
-
 end

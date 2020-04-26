@@ -25,4 +25,3 @@ defimpl Cldr.Chars, for: NaiveDateTime do
     Cldr.DateTime.to_string!(datetime, locale.backend, locale: locale)
   end
 end
-
