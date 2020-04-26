@@ -632,7 +632,7 @@ defmodule Cldr.DateTime.Formatter do
     cyclic_year(cyclic_year, n, locale, backend, options)
   end
 
-  @spec cyclic_year(Caleendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
+  @spec cyclic_year(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t()) ::
          String.t() | {:error, String.t()}
 
   def cyclic_year(date, n, locale, backend, options \\ [])
@@ -3324,25 +3324,16 @@ defmodule Cldr.DateTime.Formatter do
       "A literal"
 
   """
-  @spec literal(Calendar.time(), integer, Keyword.t()) ::
-         String.t() | {:error, String.t()}
+  @spec literal(any(), String.t(), Keyword.t()) :: String.t()
 
-  def literal(literal, n \\ @default_format, options \\ [])
-
-  def literal(literal, options, []) when is_list(options) do
+  def literal(date, literal, options \\ []) do
     {locale, backend} = extract_locale(options)
-    literal(literal, @default_format, locale, backend, options)
+    literal(date, literal, locale, backend, options)
   end
 
-  def literal(literal, n, options) do
-    {locale, backend} = extract_locale(options)
-    literal(literal, n, locale, backend, options)
-  end
+  @spec literal(any(), String.t(), locale(), Cldr.backend(), Keyword.t()) :: String.t()
 
-  @spec literal(any, binary, locale(), Cldr.backend(), Keyword.t()) ::
-         String.t() | {:error, String.t()}
-
-  def literal(time, n, locale, backend, options \\ [])
+  def literal(_date, binary, locale, backend, options \\ [])
 
   def literal(_date, binary, _locale, _backend, _options) do
     binary
