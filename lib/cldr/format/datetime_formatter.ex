@@ -167,12 +167,12 @@ defmodule Cldr.DateTime.Formatter do
   def date(date, n \\ @default_format, options \\ [])
 
   def date(date, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     date(date, @default_format, locale, backend, options)
   end
 
   def date(date, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     date(date, n, locale, backend, options)
   end
 
@@ -200,12 +200,12 @@ defmodule Cldr.DateTime.Formatter do
   def time(time, n \\ @default_format, options \\ [])
 
   def time(time, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     time(time, @default_format, locale, backend, options)
   end
 
   def time(time, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     time(time, n, locale, backend, options)
   end
 
@@ -264,12 +264,12 @@ defmodule Cldr.DateTime.Formatter do
   def era(era, n \\ @default_format, options \\ [])
 
   def era(era, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     era(era, @default_format, locale, backend, options)
   end
 
   def era(era, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     era(era, n, locale, backend, options)
   end
 
@@ -365,12 +365,12 @@ defmodule Cldr.DateTime.Formatter do
   def year(year, n \\ @default_format, options \\ [])
 
   def year(year, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     year(year, @default_format, locale, backend, options)
   end
 
   def year(year, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     year(year, n, locale, backend, options)
   end
 
@@ -470,12 +470,12 @@ defmodule Cldr.DateTime.Formatter do
   def week_aligned_year(week_aligned_year, n \\ @default_format, options \\ [])
 
   def week_aligned_year(week_aligned_year, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     week_aligned_year(week_aligned_year, @default_format, locale, backend, options)
   end
 
   def week_aligned_year(week_aligned_year, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     week_aligned_year(week_aligned_year, n, locale, backend, options)
   end
 
@@ -557,12 +557,12 @@ defmodule Cldr.DateTime.Formatter do
   def extended_year(extended_year, n \\ @default_format, options \\ [])
 
   def extended_year(extended_year, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     extended_year(extended_year, @default_format, locale, backend, options)
   end
 
   def extended_year(extended_year, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     extended_year(extended_year, n, locale, backend, options)
   end
 
@@ -623,12 +623,12 @@ defmodule Cldr.DateTime.Formatter do
   def cyclic_year(cyclic_year, n \\ @default_format, options \\ [])
 
   def cyclic_year(cyclic_year, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     cyclic_year(cyclic_year, @default_format, locale, backend, options)
   end
 
   def cyclic_year(cyclic_year, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     cyclic_year(cyclic_year, n, locale, backend, options)
   end
 
@@ -705,12 +705,12 @@ defmodule Cldr.DateTime.Formatter do
   def related_year(related_year, n \\ @default_format, options \\ [])
 
   def related_year(related_year, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     related_year(related_year, @default_format, locale, backend, options)
   end
 
   def related_year(related_year, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     related_year(related_year, n, locale, backend, options)
   end
 
@@ -798,12 +798,12 @@ defmodule Cldr.DateTime.Formatter do
   def quarter(quarter, n \\ @default_format, options \\ [])
 
   def quarter(quarter, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     quarter(quarter, @default_format, locale, backend, options)
   end
 
   def quarter(quarter, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     quarter(quarter, n, locale, backend, options)
   end
 
@@ -898,12 +898,12 @@ defmodule Cldr.DateTime.Formatter do
   def standalone_quarter(standalone_quarter, n \\ @default_format, options \\ [])
 
   def standalone_quarter(standalone_quarter, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     standalone_quarter(standalone_quarter, @default_format, locale, backend, options)
   end
 
   def standalone_quarter(standalone_quarter, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     standalone_quarter(standalone_quarter, n, locale, backend, options)
   end
 
@@ -998,12 +998,12 @@ defmodule Cldr.DateTime.Formatter do
   def month(month, n \\ @default_format, options \\ [])
 
   def month(month, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     month(month, @default_format, locale, backend, options)
   end
 
   def month(month, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     month(month, n, locale, backend, options)
   end
 
@@ -1096,12 +1096,12 @@ defmodule Cldr.DateTime.Formatter do
   def standalone_month(standalone_month, n \\ @default_format, options \\ [])
 
   def standalone_month(standalone_month, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     standalone_month(standalone_month, @default_format, locale, backend, options)
   end
 
   def standalone_month(standalone_month, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     standalone_month(standalone_month, n, locale, backend, options)
   end
 
@@ -1196,12 +1196,12 @@ defmodule Cldr.DateTime.Formatter do
   def week_of_year(week_of_year, n \\ @default_format, options \\ [])
 
   def week_of_year(week_of_year, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     week_of_year(week_of_year, @default_format, locale, backend, options)
   end
 
   def week_of_year(week_of_year, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     week_of_year(week_of_year, n, locale, backend, options)
   end
 
@@ -1266,12 +1266,12 @@ defmodule Cldr.DateTime.Formatter do
   def week_of_month(week_of_month, n \\ @default_format, options \\ [])
 
   def week_of_month(week_of_month, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     week_of_month(week_of_month, @default_format, locale, backend, options)
   end
 
   def week_of_month(week_of_month, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     week_of_month(week_of_month, n, locale, backend, options)
   end
 
@@ -1341,12 +1341,12 @@ defmodule Cldr.DateTime.Formatter do
   def day_of_month(day_of_month, n \\ @default_format, options \\ [])
 
   def day_of_month(day_of_month, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     day_of_month(day_of_month, @default_format, locale, backend, options)
   end
 
   def day_of_month(day_of_month, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     day_of_month(day_of_month, n, locale, backend, options)
   end
 
@@ -1423,12 +1423,12 @@ defmodule Cldr.DateTime.Formatter do
   def day_of_year(day_of_year, n \\ @default_format, options \\ [])
 
   def day_of_year(day_of_year, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     day_of_year(day_of_year, @default_format, locale, backend, options)
   end
 
   def day_of_year(day_of_year, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     day_of_year(day_of_year, n, locale, backend, options)
   end
 
@@ -1508,12 +1508,12 @@ defmodule Cldr.DateTime.Formatter do
   def day_name(day_name, n \\ @default_format, options \\ [])
 
   def day_name(day_name, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     day_name(day_name, @default_format, locale, backend, options)
   end
 
   def day_name(day_name, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     day_name(day_name, n, locale, backend, options)
   end
 
@@ -1612,12 +1612,12 @@ defmodule Cldr.DateTime.Formatter do
   def day_of_week(day_of_week, n \\ @default_format, options \\ [])
 
   def day_of_week(day_of_week, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     day_of_week(day_of_week, @default_format, locale, backend, options)
   end
 
   def day_of_week(day_of_week, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     day_of_week(day_of_week, n, locale, backend, options)
   end
 
@@ -1702,12 +1702,12 @@ defmodule Cldr.DateTime.Formatter do
   def standalone_day_of_week(standalone_day_of_week, n \\ @default_format, options \\ [])
 
   def standalone_day_of_week(standalone_day_of_week, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     standalone_day_of_week(standalone_day_of_week, @default_format, locale, backend, options)
   end
 
   def standalone_day_of_week(standalone_day_of_week, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     standalone_day_of_week(standalone_day_of_week, n, locale, backend, options)
   end
 
@@ -1807,12 +1807,12 @@ defmodule Cldr.DateTime.Formatter do
   def period_am_pm(period_am_pm, n \\ @default_format, options \\ [])
 
   def period_am_pm(period_am_pm, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     period_am_pm(period_am_pm, @default_format, locale, backend, options)
   end
 
   def period_am_pm(period_am_pm, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     period_am_pm(period_am_pm, n, locale, backend, options)
   end
 
@@ -1898,12 +1898,12 @@ defmodule Cldr.DateTime.Formatter do
   def period_noon_midnight(period_noon_midnight, n \\ @default_format, options \\ [])
 
   def period_noon_midnight(period_noon_midnight, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     period_noon_midnight(period_noon_midnight, @default_format, locale, backend, options)
   end
 
   def period_noon_midnight(period_noon_midnight, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     period_noon_midnight(period_noon_midnight, n, locale, backend, options)
   end
 
@@ -1985,12 +1985,12 @@ defmodule Cldr.DateTime.Formatter do
   def period_flex(period_flex, n \\ @default_format, options \\ [])
 
   def period_flex(period_flex, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     period_flex(period_flex, @default_format, locale, backend, options)
   end
 
   def period_flex(period_flex, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     period_flex(period_flex, n, locale, backend, options)
   end
 
@@ -2014,12 +2014,67 @@ defmodule Cldr.DateTime.Formatter do
   defp period_format(5), do: :narrow
 
   @doc """
+  Returns the hour formatted in a locale-specific format
+
+  ## Arguments
+
+  * `time` is a `Time` struct or any map that contains at least the key `:hour`
+
+  * `n` is the number of digits to which `:hour` is padded
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+    `hour/4`
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.hour ~N[2020-04-25 15:00:00.0]
+      "3"
+
+      iex> Cldr.DateTime.Formatter.hour ~N[2020-04-25 15:00:00.0], locale: "fr"
+      "15"
+
+      iex> Cldr.DateTime.Formatter.hour ~N[2020-04-25 15:00:00.0], locale: "en-AU"
+      "3"
+
+      iex> Cldr.DateTime.Formatter.hour ~N[2020-04-25 15:00:00.0], locale: "en-AU-u-hc-h23"
+      "15"
+
+  """
+  @spec hour(Calendar.time(), integer, Keyword.t()) ::
+          String.t() | {:error, String.t()}
+
+  def hour(hour, n \\ @default_format, options \\ [])
+
+  def hour(hour, options, []) when is_list(options) do
+    {locale, backend} = extract_locale!(options)
+    hour(hour, @default_format, locale, backend, options)
+  end
+
+  def hour(hour, n, options) do
+    {locale, backend} = extract_locale!(options)
+    hour(hour, n, locale, backend, options)
+  end
+
+  @spec hour(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
+          String.t() | {:error, String.t()}
+
+  def hour(time, n, locale, backend, options \\ [])
+
+  def hour(hour, n, locale, backend, options) do
+    hour_formatter = Cldr.Time.hour_format_from_locale(locale)
+    apply(__MODULE__, hour_formatter, [hour, n, locale, backend, options])
+  end
+
+  @doc """
   Returns the formatting of the `:hour` (format symbol `h`) as a number in the
   range 1..12 as a string.
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the key `:second`
+  * `time` is a `Time` struct or any map that contains at least the key `:hour`
 
   * `n` is the number of digits to which `:hour` is padded
 
@@ -2062,12 +2117,12 @@ defmodule Cldr.DateTime.Formatter do
   def hour_1_12(hour_1_12, n \\ @default_format, options \\ [])
 
   def hour_1_12(hour_1_12, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     hour_1_12(hour_1_12, @default_format, locale, backend, options)
   end
 
   def hour_1_12(hour_1_12, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     hour_1_12(hour_1_12, n, locale, backend, options)
   end
 
@@ -2101,7 +2156,7 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the key `:second`
+  * `time` is a `Time` struct or any map that contains at least the key `:hour`
 
   * `n` is the number of digits to which `:hour` is padded
 
@@ -2147,12 +2202,12 @@ defmodule Cldr.DateTime.Formatter do
   def hour_0_11(hour_0_11, n \\ @default_format, options \\ [])
 
   def hour_0_11(hour_0_11, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     hour_0_11(hour_0_11, @default_format, locale, backend, options)
   end
 
   def hour_0_11(hour_0_11, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     hour_0_11(hour_0_11, n, locale, backend, options)
   end
 
@@ -2186,7 +2241,7 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the key `:second`
+  * `time` is a `Time` struct or any map that contains at least the key `:hour`
 
   * `n` is the number of digits to which `:hour` is padded
 
@@ -2229,12 +2284,12 @@ defmodule Cldr.DateTime.Formatter do
   def hour_1_24(hour_1_24, n \\ @default_format, options \\ [])
 
   def hour_1_24(hour_1_24, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     hour_1_24(hour_1_24, @default_format, locale, backend, options)
   end
 
   def hour_1_24(hour_1_24, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     hour_1_24(hour_1_24, n, locale, backend, options)
   end
 
@@ -2263,7 +2318,7 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the key `:second`
+  * `time` is a `Time` struct or any map that contains at least the key `:hour`
 
   * `n` is the number of digits to which `:hour` is padded
 
@@ -2306,12 +2361,12 @@ defmodule Cldr.DateTime.Formatter do
   def hour_0_23(hour_0_23, n \\ @default_format, options \\ [])
 
   def hour_0_23(hour_0_23, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     hour_0_23(hour_0_23, @default_format, locale, backend, options)
   end
 
   def hour_0_23(hour_0_23, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     hour_0_23(hour_0_23, n, locale, backend, options)
   end
 
@@ -2333,11 +2388,6 @@ defmodule Cldr.DateTime.Formatter do
   def hour_0_23(time, _n, _locale, _backend, _options) do
     error_return(time, "H", [:hour])
   end
-
-  defdelegate hour(time, n, locale, backend, options), to: __MODULE__, as: :hour_0_23
-  defdelegate hour(time, n, locale), to: __MODULE__, as: :hour_0_23
-  defdelegate hour(time, n), to: __MODULE__, as: :hour_0_23
-  defdelegate hour(time), to: __MODULE__, as: :hour_0_23
 
   @doc """
   Returns the `:minute` of a `time` or `datetime` (format symbol `m`) as number
@@ -2380,12 +2430,12 @@ defmodule Cldr.DateTime.Formatter do
   def minute(minute, n \\ @default_format, options \\ [])
 
   def minute(minute, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     minute(minute, @default_format, locale, backend, options)
   end
 
   def minute(minute, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     minute(minute, n, locale, backend, options)
   end
 
@@ -2447,12 +2497,12 @@ defmodule Cldr.DateTime.Formatter do
   def second(second, n \\ @default_format, options \\ [])
 
   def second(second, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     second(second, @default_format, locale, backend, options)
   end
 
   def second(second, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     second(second, n, locale, backend, options)
   end
 
@@ -2518,12 +2568,12 @@ defmodule Cldr.DateTime.Formatter do
   def fractional_second(fractional_second, n \\ @default_format, options \\ [])
 
   def fractional_second(fractional_second, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     fractional_second(fractional_second, @default_format, locale, backend, options)
   end
 
   def fractional_second(fractional_second, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     fractional_second(fractional_second, n, locale, backend, options)
   end
 
@@ -2607,12 +2657,12 @@ defmodule Cldr.DateTime.Formatter do
   def millisecond(millisecond, n \\ @default_format, options \\ [])
 
   def millisecond(millisecond, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     millisecond(millisecond, @default_format, locale, backend, options)
   end
 
   def millisecond(millisecond, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     millisecond(millisecond, n, locale, backend, options)
   end
 
@@ -2693,12 +2743,12 @@ defmodule Cldr.DateTime.Formatter do
   def zone_generic(zone_generic, n \\ @default_format, options \\ [])
 
   def zone_generic(zone_generic, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_generic(zone_generic, @default_format, locale, backend, options)
   end
 
   def zone_generic(zone_generic, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_generic(zone_generic, n, locale, backend, options)
   end
 
@@ -2767,12 +2817,12 @@ defmodule Cldr.DateTime.Formatter do
   def zone_short(zone_short, n \\ @default_format, options \\ [])
 
   def zone_short(zone_short, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_short(zone_short, @default_format, locale, backend, options)
   end
 
   def zone_short(zone_short, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_short(zone_short, n, locale, backend, options)
   end
 
@@ -2849,12 +2899,12 @@ defmodule Cldr.DateTime.Formatter do
   def zone_id(zone_id, n \\ @default_format, options \\ [])
 
   def zone_id(zone_id, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_id(zone_id, @default_format, locale, backend, options)
   end
 
   def zone_id(zone_id, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_id(zone_id, n, locale, backend, options)
   end
 
@@ -2939,12 +2989,12 @@ defmodule Cldr.DateTime.Formatter do
   def zone_basic(zone_basic, n \\ @default_format, options \\ [])
 
   def zone_basic(zone_basic, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_basic(zone_basic, @default_format, locale, backend, options)
   end
 
   def zone_basic(zone_basic, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_basic(zone_basic, n, locale, backend, options)
   end
 
@@ -3048,12 +3098,12 @@ defmodule Cldr.DateTime.Formatter do
   def zone_iso_z(zone_iso_z, n \\ @default_format, options \\ [])
 
   def zone_iso_z(zone_iso_z, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_iso_z(zone_iso_z, @default_format, locale, backend, options)
   end
 
   def zone_iso_z(zone_iso_z, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_iso_z(zone_iso_z, n, locale, backend, options)
   end
 
@@ -3155,34 +3205,44 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 1
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 1
       "+01"
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 2
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 2
       "+0100"
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 3
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 3
       "+01:00"
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 4
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 4
       "+010010"
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 3610, std_offset: 0}, 5
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 3610, std_offset: 0}, 5
       "+01:00:10"
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 5
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 5
       "+00:00"
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 4
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 4
       "+0000"
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 3
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 3
       "+00:00"
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 2
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 2
       "+0000"
 
-      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC", utc_offset: 0, std_offset: 0}, 1
+      iex> Cldr.DateTime.Formatter.zone_iso %{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 1
       "+00"
 
   """
@@ -3192,12 +3252,12 @@ defmodule Cldr.DateTime.Formatter do
   def zone_iso(zone_iso, n \\ @default_format, options \\ [])
 
   def zone_iso(zone_iso, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_iso(zone_iso, @default_format, locale, backend, options)
   end
 
   def zone_iso(zone_iso, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_iso(zone_iso, n, locale, backend, options)
   end
 
@@ -3305,12 +3365,12 @@ defmodule Cldr.DateTime.Formatter do
   def zone_gmt(zone_gmt, n \\ @default_format, options \\ [])
 
   def zone_gmt(zone_gmt, options, []) when is_list(options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_gmt(zone_gmt, @default_format, locale, backend, options)
   end
 
   def zone_gmt(zone_gmt, n, options) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     zone_gmt(zone_gmt, n, locale, backend, options)
   end
 
@@ -3349,7 +3409,7 @@ defmodule Cldr.DateTime.Formatter do
   @spec literal(any(), String.t(), Keyword.t()) :: String.t()
 
   def literal(date, literal, options \\ []) do
-    {locale, backend} = extract_locale(options)
+    {locale, backend} = extract_locale!(options)
     literal(date, literal, locale, backend, options)
   end
 
@@ -3382,27 +3442,27 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :basic) do
-    sign(hour) <> hour(time, 2) <> minute(time, 2)
+    sign(hour) <> hour_0_23(time, 2) <> minute(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :short) do
-    sign(hour) <> hour(time, 2)
+    sign(hour) <> hour_0_23(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :long) do
-    sign(hour) <> hour(time, 2) <> ":" <> minute(time, 2)
+    sign(hour) <> hour_0_23(time, 2) <> ":" <> minute(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute, second: 0} = time, :extended) do
-    sign(hour) <> hour(time, 2) <> ":" <> minute(time, 2)
+    sign(hour) <> hour_0_23(time, 2) <> ":" <> minute(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute, second: _second} = time, :extended) do
-    sign(hour) <> hour(time, 2) <> ":" <> minute(time, 2) <> ":" <> second(time, 2)
+    sign(hour) <> hour_0_23(time, 2) <> ":" <> minute(time, 2) <> ":" <> second(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :extended) do
-    sign(hour) <> hour(time, 2) <> ":" <> minute(time, 2)
+    sign(hour) <> hour_0_23(time, 2) <> ":" <> minute(time, 2)
   end
 
   defp sign(number) when number >= 0, do: "+"
@@ -3467,12 +3527,14 @@ defmodule Cldr.DateTime.Formatter do
     to_string(head) <> ", " <> join_requirements(tail)
   end
 
-  defp extract_locale(options) do
+  defp extract_locale!(options) do
     locale = Keyword.get(options, :locale, Cldr.get_locale())
     backend = Keyword.get(options, :backend)
 
     with {:ok, locale} <- Cldr.validate_locale(locale, backend) do
       {locale, backend || locale.backend}
+    else
+      {:error, {exception, reason}} -> raise exception, reason
     end
   end
 end

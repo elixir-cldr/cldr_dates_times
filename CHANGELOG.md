@@ -4,7 +4,11 @@ This is the changelog for Cldr_Dates_Times v2.4.0 released on ______ 2020.  For 
 
 ### Enhancements
 
-* Add format key `ddd` to return the day of the month with ordinal formatting
+* Add `Cldr.Time.hour_format_from_locale/1` to return the hour formatted preferred for a locale
+
+* Add `Cldr.DateTime.Formatter.hour/{2, 4}` that formats the hour part of a time in accordance with locale preferences (including honouring the `hc` key of the `u` language tag extension)
+
+* Add format symbol `ddd` to return the day of the month with ordinal formatting. This not a CLDR standard format symbol.
 
 * Add protocol support for `Cldr.Chars` which is used by `Cldr.to_string/1`
 

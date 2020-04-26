@@ -219,6 +219,92 @@ defmodule Cldr.Time do
     {:ok, format_string}
   end
 
+  @doc """
+  Return the preferred time format for a locale.
+
+  ## Arguments
+
+  * `language_tag` is any language tag returned by `Cldr.Locale.new/2`
+    or any `locale_name` returned by `Cldr.known_locale_names/1`
+
+  ## Returns
+
+  * The hour format as an atom to be used for localization purposes. The
+    return value is used as a function name in `Cldr.DateTime.Formatter`
+
+  ## Notes
+
+  * The `hc` key of the `u` extension is honoured and will
+    override the default preferences for a locale or territory.
+    See the last example below.
+
+  * Different locales and territories present the hour
+    of day in different ways. These are represented
+    in `Cldr.DateTime.Formatter` in the following way:
+
+  | Symbol  | Midn.  |  Morning  | Noon  |  Afternoon | Midn. |
+  | :----:  | :---:  | :-----:   | :--:  | :--------: | :---: |
+  |   h     |  12    | 1...11    |  12   |   1...11   |  12   |
+  |   K     |   0    | 1...11    |   0   |   1...11   |   0   |
+  |   H     |   0    | 1...11    |  12   |  13...23   |   0   |
+  |   k     |  24    | 1...11    |  12   |  13...23   |  24   |
+
+  ## Examples
+
+      iex> Cldr.Time.hour_format_from_locale "en-AU"
+      :hour_1_12
+
+      iex> Cldr.Time.hour_format_from_locale "fr"
+      :hour_0_23
+
+      iex> Cldr.Time.hour_format_from_locale "fr-u-hc-h12"
+      :hour_1_12
+
+  """
+  def hour_format_from_locale(%LanguageTag{locale: %{hour_cycle: hour_cycle}})
+      when not is_nil(hour_cycle) do
+    hour_cycle
+  end
+
+  def hour_format_from_locale(%LanguageTag{} = locale) do
+    preferences = time_preferences()
+    territory = Cldr.Locale.territory_from_locale(locale)
+
+    preference =
+      preferences[locale.cldr_locale_name] ||
+      preferences[territory] ||
+      preferences[Cldr.the_world()]
+
+    Map.fetch!(time_symbols(), preference.preferred)
+  end
+
+  def hour_format_from_locale(locale_name, backend \\ Cldr.default_backend()) do
+    with {:ok, locale} <- Cldr.validate_locale(locale_name, backend) do
+      hour_format_from_locale(locale)
+    end
+  end
+
+  @time_preferences Cldr.Config.time_preferences()
+  defp time_preferences do
+    @time_preferences
+  end
+
+  # | Symbol  | Midn.  |  Morning  | Noon |  Afternoon  | Midn. |
+  # | :----:  | :---: | :-----: | :--: | :--------: | :---: |
+  # |   h      |  12    | 1...11  |  12   |   1...11   |  12   |
+  # |   K      |   0    | 1...11  |   0   |   1...11   |   0   |
+  # |   H      |   0    | 1...11  |  12   |  13...23   |   0   |
+  # |   k      |  24    | 1...11  |  12   |  13...23   |  24   |
+  #
+  defp time_symbols do
+    %{
+      "h" => :hour_1_12,
+      "K" => :hour_0_11,
+      "H" => :hour_0_23,
+      "k" => :hour_1_24
+    }
+  end
+
   defp error_return(map, requirements) do
     requirements =
       requirements
