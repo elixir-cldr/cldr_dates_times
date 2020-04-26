@@ -11,4 +11,9 @@ defmodule Cldr.DateTime.Timezone do
     seconds = offset - hours * 3600 - minutes * 60
     {hours, minutes, seconds}
   end
+
+  def time_from_zone_offset(other) do
+    Cldr.DateTime.Formatter.error_return(other, "x", [:utc_offset])
+  end
+
 end
