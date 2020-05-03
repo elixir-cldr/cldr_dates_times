@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.4.0-dev"
+  @version "2.4.0-rc.0"
 
   def project do
     [
@@ -60,15 +60,8 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, path: "../cldr", override: true},
-      {:ex_cldr_currencies, github: "elixir-cldr/cldr_currencies"},
-      {:cldr_utils, github: "elixir-cldr/cldr_utils", override: true},
-      {:ex_cldr_calendars, github: "elixir-cldr/cldr_calendars"},
-      {:ex_cldr_numbers, github: "elixir-cldr/cldr_numbers"},
-
-      # {:ex_cldr, "~> 2.14"},
-      # {:ex_cldr_numbers, "~> 2.13"},
-      # {:ex_cldr_calendars, "~> 1.8"},
+      {:ex_cldr_numbers, "~> 2.13-rc"},
+      {:ex_cldr_calendars, "~> 1.8-rc"},
 
       {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
