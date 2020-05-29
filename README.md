@@ -117,7 +117,7 @@ Dates, Times and DateTimes can be formatted using:
 * A user specified format string.  A format string uses one or more formatting symbols to define what date and time elements should be places in the format.  A simple example to format the time into hours and minutes:
 
 ```elixir
-  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: "hh:MM"
+  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: "hh:mm"
   {:ok, "12:06"}
 ```
 
