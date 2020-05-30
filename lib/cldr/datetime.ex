@@ -73,13 +73,13 @@ defmodule Cldr.DateTime do
       {:ok, "Jan 1, 2000, 11:59:59 PM"}
       iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, locale: "en"
       {:ok, "Jan 1, 2000, 11:59:59 PM"}
-      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, style: :long, locale: "en"
+      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :long, locale: "en"
       {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
-      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, style: :hms, locale: "en"
+      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :hms, locale: "en"
       {:ok, "23:59:59"}
-      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, style: :full, locale: "en"
+      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :full, locale: "en"
       {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
-      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, style: :full, locale: "fr"
+      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :full, locale: "fr"
       {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
   """
@@ -121,7 +121,7 @@ defmodule Cldr.DateTime do
 
   defp normalize_options(backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    style = options[:style] || options[:format] || :medium
+    style = options[:format] || options[:style] || :medium
 
     options
     |> Keyword.put(:locale, locale)
@@ -152,7 +152,7 @@ defmodule Cldr.DateTime do
 
   ## Options
 
-    * `style:` `:short` | `:medium` | `:long` | `:full` or a format string or
+    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
       any of the keys returned by `Cldr.DateTime.available_format_names` or a format string.
       The default is `:medium`
 
@@ -180,11 +180,11 @@ defmodule Cldr.DateTime do
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
       iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, locale: "en"
       "Jan 1, 2000, 11:59:59 PM"
-      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, style: :long, locale: "en"
+      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, format: :long, locale: "en"
       "January 1, 2000 at 11:59:59 PM UTC"
-      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, style: :full, locale: "en"
+      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, format: :full, locale: "en"
       "Saturday, January 1, 2000 at 11:59:59 PM GMT"
-      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, style: :full, locale: "fr"
+      iex> Cldr.DateTime.to_string! datetime, MyApp.Cldr, format: :full, locale: "fr"
       "samedi 1 janvier 2000 à 23:59:59 UTC"
 
   """
@@ -229,9 +229,9 @@ defmodule Cldr.DateTime do
   end
 
   # Format with a number system
-  defp format_string(%{number_system: number_system, style: style}, locale, calendar, backend) do
+  defp format_string(%{number_system: number_system, format: style}, locale, calendar, backend) do
     {:ok, format_string} = format_string(style, locale, calendar, backend)
-    {:ok, %{number_system: number_system, style: format_string}}
+    {:ok, %{number_system: number_system, format: format_string}}
   end
 
   # Straight up format string

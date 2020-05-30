@@ -42,7 +42,7 @@ defmodule Cldr.Date do
 
   ## Options
 
-    * `style:` `:short` | `:medium` | `:long` | `:full` or a format string.
+    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
       The default is `:medium`
 
     * `locale:` any locale returned by `Cldr.known_locale_names/1`.
@@ -59,19 +59,19 @@ defmodule Cldr.Date do
 
   ## Examples
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :medium, locale: "en"
+      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, format: :medium, locale: "en"
       {:ok, "Jul 10, 2017"}
 
       iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, locale: "en"
       {:ok, "Jul 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :full, locale: "en"
+      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, format: :full, locale: "en"
       {:ok, "Monday, July 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :short, locale: "en"
+      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, format: :short, locale: "en"
       {:ok, "7/10/17"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :short, locale: "fr"
+      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, format: :short, locale: "fr"
       {:ok, "10/07/2017"}
 
       iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :long, locale: "af"
@@ -117,7 +117,7 @@ defmodule Cldr.Date do
 
   defp normalize_options(backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    style = options[:style] || options[:format] || :medium
+    style = options[:format] || options[:style] || :medium
 
     options
     |> Keyword.put(:locale, locale)
@@ -159,22 +159,22 @@ defmodule Cldr.Date do
 
   ## Examples
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :medium, locale: "en"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :medium, locale: "en"
       "Jul 10, 2017"
 
       iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, locale: "en"
       "Jul 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :full,locale: "en"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :full,locale: "en"
       "Monday, July 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :short, locale: "en"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :short, locale: "en"
       "7/10/17"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :short, locale: "fr"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :short, locale: "fr"
       "10/07/2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :long, locale: "af"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :long, locale: "af"
       "10 Julie 2017"
 
   """

@@ -1,3 +1,13 @@
+# Changelog for Cldr_Dates_Times v2.4.1
+
+This is the changelog for Cldr_Dates_Times v2.4.1 released on June 1st, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Correct doc examples in README.md. Thanks to @tcitworld. Closes #13.
+
+* Fix options processing for `:style` and `:format`.  `:format` is preferred although `:style` is honoured.
+
 # Changelog for Cldr_Dates_Times v2.4.0
 
 This is the changelog for Cldr_Dates_Times v2.4.0 released on May 4th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
