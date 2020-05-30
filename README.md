@@ -56,11 +56,11 @@ config :ex_cldr,
 ```elixir
   # Change from to_string/2 to to_string/3
   # Old version
-  iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :short
+  iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], style: :short
 
   # New version. Note the addition of a backend module as
   # the second parameter.
-  iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, format: :short
+  iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, style: :short
 ```
 
 ## Usage Introduction
@@ -81,7 +81,7 @@ The primary api is `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`,
 
   # Note that if options are provided, a backend
   # module is also required
-  iex> MyApp.Cldr.DateTime.Relative.to_string 1, unit: :day, format: :narrow
+  iex> MyApp.Cldr.DateTime.Relative.to_string 1, unit: :day, style: :narrow
   {:ok, "tomorrow"}
 ```
 
@@ -101,23 +101,23 @@ Dates, Times and DateTimes can be formatted using:
 * The format types defined for each locale.  These format types provide cross-locale standardisation and therefore should be preferred where possible.  The format types, implemented for `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`,`MyApp.Cldr.DateTime.to_string/2` are `:short`, `:medium`, `:long`  and `:full`.   The default is `:medium`. For example, assuming a configured backend called `MyApp.Cldr`:
 
 ```elixir
-  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :short
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], style: :short
   {:ok, "5/30/20, 3:52 AM"}
 
-  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :long
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], style: :long
   {:ok, "May 30, 2020 at 3:52:56 AM UTC"}
 
-  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :medium
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], style: :medium
   {:ok, "May 30, 2020, 3:52:56 AM"}
 
-  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :long, locale: "fr"
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], style: :long, locale: "fr"
   {:ok, "30 mai 2020 à 03:52:56 UTC"}
 ```
 
 * A user specified format string.  A format string uses one or more formatting symbols to define what date and time elements should be places in the format.  A simple example to format the time into hours and minutes:
 
 ```elixir
-  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: "hh:mm"
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], style: "hh:mm"
   {:ok, "03:52"}
 ```
 
@@ -145,7 +145,7 @@ Dates, Times and DateTimes can be formatted using:
    :y_qqqq, :hmsv, :mmmm_w_count_other, :ehm, :y_m_ed, :h, :hmv, :yw_count_other,
    :mm_md, :y_m, :m_ed, :ms, :d, :y_mm_md, :y, :ehms]
 
-  iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, format: :gy_mmm_ed
+  iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, style: :gy_mmm_ed
   {:ok, "Sat, May 30, 2020 AD"}
 ```
 
