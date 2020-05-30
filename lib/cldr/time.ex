@@ -48,7 +48,7 @@ defmodule Cldr.Time do
 
   ## Options
 
-  * `style:` `:short` | `:medium` | `:long` | `:full` or a format string.
+  * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
      The default is `:medium`
 
   * `locale:` any locale returned by `Cldr.known_locale_names/1`.  The default is `
@@ -212,9 +212,9 @@ defmodule Cldr.Time do
     end
   end
 
-  defp format_string(%{number_system: number_system, style: style}, locale, calendar, backend) do
+  defp format_string(%{number_system: number_system, format: style}, locale, calendar, backend) do
     {:ok, format_string} = format_string(style, locale, calendar, backend)
-    {:ok, %{number_system: number_system, style: format_string}}
+    {:ok, %{number_system: number_system, format: format_string}}
   end
 
   defp format_string(style, _locale, _backend, _calendar) when is_atom(style) do
