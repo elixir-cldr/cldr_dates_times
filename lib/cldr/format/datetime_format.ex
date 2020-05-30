@@ -146,7 +146,7 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_formats "en", :gregorian, MyApp.Cldr
-      {:ok, %Cldr.Date.Formats{
+      {:ok, %Cldr.Date.Styles{
         full: "EEEE, MMMM d, y",
         long: "MMMM d, y",
         medium: "MMM d, y",
@@ -154,7 +154,7 @@ defmodule Cldr.DateTime.Format do
       }}
 
       iex> Cldr.DateTime.Format.date_formats "en", :buddhist, MyApp.Cldr
-      {:ok, %Cldr.Date.Formats{
+      {:ok, %Cldr.Date.Styles{
         full: "EEEE, MMMM d, y G",
         long: "MMMM d, y G",
         medium: "MMM d, y G",
@@ -191,7 +191,7 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.time_formats "en"
-      {:ok, %Cldr.Time.Formats{
+      {:ok, %Cldr.Time.Styles{
         full: "h:mm:ss a zzzz",
         long: "h:mm:ss a z",
         medium: "h:mm:ss a",
@@ -199,7 +199,7 @@ defmodule Cldr.DateTime.Format do
       }}
 
       iex> Cldr.DateTime.Format.time_formats "en", :buddhist
-      {:ok, %Cldr.Time.Formats{
+      {:ok, %Cldr.Time.Styles{
         full: "h:mm:ss a zzzz",
         long: "h:mm:ss a z",
         medium: "h:mm:ss a",
@@ -232,7 +232,7 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_time_formats "en"
-      {:ok, %Cldr.DateTime.Formats{
+      {:ok, %Cldr.DateTime.Styles{
         full: "{1} 'at' {0}",
         long: "{1} 'at' {0}",
         medium: "{1}, {0}",
@@ -240,7 +240,7 @@ defmodule Cldr.DateTime.Format do
       }}
 
       iex> Cldr.DateTime.Format.date_time_formats "en", :buddhist, MyApp.Cldr
-      {:ok, %Cldr.DateTime.Formats{
+      {:ok, %Cldr.DateTime.Styles{
         full: "{1} 'at' {0}",
         long: "{1} 'at' {0}",
         medium: "{1}, {0}",

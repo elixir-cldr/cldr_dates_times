@@ -71,7 +71,7 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Examples:
 
             iex> #{__MODULE__}.date_formats "en"
-            {:ok, %Cldr.Date.Formats{
+            {:ok, %Cldr.Date.Styles{
               full: "EEEE, MMMM d, y",
               long: "MMMM d, y",
               medium: "MMM d, y",
@@ -79,7 +79,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
             iex> #{__MODULE__}.date_formats "en", :buddhist
-            {:ok, %Cldr.Date.Formats{
+            {:ok, %Cldr.Date.Styles{
               full: "EEEE, MMMM d, y G",
               long: "MMMM d, y G",
               medium: "MMM d, y G",
@@ -112,7 +112,7 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Examples:
 
             iex> #{__MODULE__}.time_formats "en"
-            {:ok, %Cldr.Time.Formats{
+            {:ok, %Cldr.Time.Styles{
               full: "h:mm:ss a zzzz",
               long: "h:mm:ss a z",
               medium: "h:mm:ss a",
@@ -120,7 +120,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
             iex> #{__MODULE__}.time_formats "en", :buddhist
-            {:ok, %Cldr.Time.Formats{
+            {:ok, %Cldr.Time.Styles{
               full: "h:mm:ss a zzzz",
               long: "h:mm:ss a z",
               medium: "h:mm:ss a",
@@ -153,7 +153,7 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Examples:
 
             iex> #{__MODULE__}.date_time_formats "en"
-            {:ok, %Cldr.DateTime.Formats{
+            {:ok, %Cldr.DateTime.Styles{
               full: "{1} 'at' {0}",
               long: "{1} 'at' {0}",
               medium: "{1}, {0}",
@@ -161,7 +161,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
             iex> #{__MODULE__}.date_time_formats "en", :buddhist
-            {:ok, %Cldr.DateTime.Formats{
+            {:ok, %Cldr.DateTime.Styles{
               full: "{1} 'at' {0}",
               long: "{1} 'at' {0}",
               medium: "{1}, {0}",
@@ -349,13 +349,13 @@ defmodule Cldr.DateTime.Format.Backend do
               |> Map.get(:dates)
               |> get_in([:calendars, calendar])
 
-            formats = struct(Cldr.Date.Formats, Map.get(calendar_data, :date_formats))
+            formats = struct(Cldr.Date.Styles, Map.get(calendar_data, :date_formats))
 
             def date_formats(unquote(locale), unquote(calendar)) do
               {:ok, unquote(Macro.escape(formats))}
             end
 
-            formats = struct(Cldr.Time.Formats, Map.get(calendar_data, :time_formats))
+            formats = struct(Cldr.Time.Styles, Map.get(calendar_data, :time_formats))
 
             def time_formats(unquote(locale), unquote(calendar)) do
               {:ok, unquote(Macro.escape(formats))}
@@ -363,7 +363,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
             formats =
               struct(
-                Cldr.DateTime.Formats,
+                Cldr.DateTime.Styles,
                 Map.get(calendar_data, :date_time_formats) |> Map.take(@standard_formats)
               )
 

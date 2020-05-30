@@ -35,7 +35,7 @@ defmodule Cldr.DateTime.Relative do
   number, Date or Datetime.  Returns `{:error, reason}` when errors are detected.
 
   * `relative` is a number or Date/Datetime representing the time distance from `now` or from
-    options[:relative_to]
+    `options[:relative_to]`
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
@@ -122,7 +122,7 @@ defmodule Cldr.DateTime.Relative do
 
   """
 
-  # TODO deprecate the option :format in favour of using :style in version 3.9
+  # TODO deprecate the option :format in favour of using :style in version 3.0
 
   @spec to_string(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
@@ -134,7 +134,7 @@ defmodule Cldr.DateTime.Relative do
   end
 
   def to_string(relative, backend, options) do
-    options = Keyword.merge(default_options(backend), options)
+    options = normalize_options(backend, options)
     locale = Keyword.get(options, :locale)
     {unit, options} = Keyword.pop(options, :unit)
 
@@ -147,8 +147,14 @@ defmodule Cldr.DateTime.Relative do
     end
   end
 
-  defp default_options(backend) do
-    [locale: Cldr.get_locale(backend), style: :default]
+  defp normalize_options(backend, options) do
+    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+    style = options[:style] || options[:format] || :default
+
+    options
+    |> Keyword.put(:locale, locale)
+    |> Keyword.put(:style, style)
+    |> Keyword.delete(:format)
   end
 
   # No unit or relative_to is specified so we derive them

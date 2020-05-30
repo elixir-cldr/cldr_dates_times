@@ -19,11 +19,11 @@ defmodule Cldr.Time do
   alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
 
-  @format_types [:short, :medium, :long, :full]
+  @style_types [:short, :medium, :long, :full]
 
-  defmodule Formats do
+  defmodule Styles do
     @moduledoc false
-    defstruct Module.get_attribute(Cldr.Time, :format_types)
+    defstruct Module.get_attribute(Cldr.Time, :style_types)
   end
 
   @doc """
@@ -48,7 +48,7 @@ defmodule Cldr.Time do
 
   ## Options
 
-  * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
+  * `style:` `:short` | `:medium` | `:long` | `:full` or a format string.
      The default is `:medium`
 
   * `locale:` any locale returned by `Cldr.known_locale_names/1`.  The default is `
@@ -98,13 +98,13 @@ defmodule Cldr.Time do
   end
 
   def to_string(%{hour: _hour, minute: _minute} = time, backend, options) do
-    options = Keyword.merge(default_options(backend), options)
+    options = normalize_options(backend, options)
     calendar = Map.get(time, :calendar) || Cldr.Calendar.Gregorian
     format_backend = Module.concat(backend, DateTime.Formatter)
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
-         {:ok, format_string} <- format_string(options[:format], locale, cldr_calendar, backend),
+         {:ok, format_string} <- format_string(options[:style], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(time, format_string, locale, options) do
       {:ok, formatted}
     end
@@ -117,8 +117,17 @@ defmodule Cldr.Time do
     error_return(time, [:hour, :minute, :second])
   end
 
-  defp default_options(backend) do
-    [format: :medium, locale: Cldr.get_locale(backend), number_system: :default]
+  # TODO deprecate :format in version 3.0
+
+  defp normalize_options(backend, options) do
+    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+    style = options[:style] || options[:format] || :medium
+
+    options
+    |> Keyword.put(:locale, locale)
+    |> Keyword.put(:style, style)
+    |> Keyword.delete(:format)
+    |> Keyword.put_new(:number_system, :default)
   end
 
   @doc """
@@ -196,22 +205,22 @@ defmodule Cldr.Time do
     end
   end
 
-  defp format_string(format, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
-       when format in @format_types do
-    with {:ok, formats} <- Format.time_formats(locale_name, calendar, backend) do
-      {:ok, Map.get(formats, format)}
+  defp format_string(style, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
+       when style in @style_types do
+    with {:ok, styles} <- Format.time_formats(locale_name, calendar, backend) do
+      {:ok, Map.get(styles, style)}
     end
   end
 
-  defp format_string(%{number_system: number_system, format: format}, locale, calendar, backend) do
-    {:ok, format_string} = format_string(format, locale, calendar, backend)
-    {:ok, %{number_system: number_system, format: format_string}}
+  defp format_string(%{number_system: number_system, style: style}, locale, calendar, backend) do
+    {:ok, format_string} = format_string(style, locale, calendar, backend)
+    {:ok, %{number_system: number_system, style: format_string}}
   end
 
-  defp format_string(format, _locale, _backend, _calendar) when is_atom(format) do
+  defp format_string(style, _locale, _backend, _calendar) when is_atom(style) do
     {:error,
-     {Cldr.InvalidTimeFormatType,
-      "Invalid time format type.  " <> "The valid types are #{inspect(@format_types)}."}}
+     {Cldr.DateTime.InvalidStyle,
+      "Invalid time format style.  " <> "The valid styles are #{inspect(@style_types)}."}}
   end
 
   defp format_string(format_string, _locale, _calendar, _backend)

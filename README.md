@@ -56,11 +56,11 @@ config :ex_cldr,
 ```elixir
   # Change from to_string/2 to to_string/3
   # Old version
-  iex> Cldr.DateTime.to_string DateTime.utc_now, format: :short
+  iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :short
 
   # New version. Note the addition of a backend module as
   # the second parameter.
-  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :short
+  iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, format: :short
 ```
 
 ## Usage Introduction
@@ -70,14 +70,14 @@ config :ex_cldr,
 The primary api is `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`, `MyApp.Cldr.DateTime.to_string/2` and `MyApp.Cldr.DateTime.Relative.to_string/2`.  In the following examples `MyApp` refers to a CLDR backend module that must be defined by the developer:
 
 ```elixir
-  iex> MyApp.Cldr.Date.to_string Date.utc_today()
-  {:ok, "Jun 9, 2019"}
+  iex> MyApp.Cldr.Date.to_string ~D[2020-05-30]
+  {:ok, "May 30, 2020"}
 
-  iex> MyApp.Cldr.Time.to_string Time.utc_now
-  {:ok, "12:11:14 AM"}
+  iex> MyApp.Cldr.Time.to_string ~U[2020-05-30 03:52:56Z]
+  {:ok, "3:52:56 AM"}
 
-  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now
-  {:ok, "Jun 9, 2019, 12:11:24 AM"}
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z]
+  {:ok, "May 30, 2020, 3:52:56 AM"}
 
   # Note that if options are provided, a backend
   # module is also required
@@ -101,24 +101,24 @@ Dates, Times and DateTimes can be formatted using:
 * The format types defined for each locale.  These format types provide cross-locale standardisation and therefore should be preferred where possible.  The format types, implemented for `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`,`MyApp.Cldr.DateTime.to_string/2` are `:short`, `:medium`, `:long`  and `:full`.   The default is `:medium`. For example, assuming a configured backend called `MyApp.Cldr`:
 
 ```elixir
-  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: :short
-  {:ok, "6/9/19, 12:13 AM"}
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :short
+  {:ok, "5/30/20, 3:52 AM"}
 
-  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: :long
-  {:ok, "June 9, 2019 at 12:14:15 AM UTC"}
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :long
+  {:ok, "May 30, 2020 at 3:52:56 AM UTC"}
 
-  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: :medium
-  {:ok, "Jun 9, 2019, 12:14:27 AM"}
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :medium
+  {:ok, "May 30, 2020, 3:52:56 AM"}
 
-  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: :long, locale: "fr"
-  {:ok, "9 juin 2019 à 00:14:38 UTC"}
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :long, locale: "fr"
+  {:ok, "30 mai 2020 à 03:52:56 UTC"}
 ```
 
 * A user specified format string.  A format string uses one or more formatting symbols to define what date and time elements should be places in the format.  A simple example to format the time into hours and minutes:
 
 ```elixir
-  iex> MyApp.Cldr.DateTime.to_string DateTime.utc_now, format: "hh:MM"
-  {:ok, "12:06"}
+  iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: "hh:mm"
+  {:ok, "03:52"}
 ```
 
 * For `DateTime`s there is also a set of predefined format name.  These format names are returned by `MyApp.Cldr.DateTime.date_time_available_formats/0` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` paramater to `Cldr.DateTime.to_string/2` module only.
@@ -145,8 +145,8 @@ Dates, Times and DateTimes can be formatted using:
    :y_qqqq, :hmsv, :mmmm_w_count_other, :ehm, :y_m_ed, :h, :hmv, :yw_count_other,
    :mm_md, :y_m, :m_ed, :ms, :d, :y_mm_md, :y, :ehms]
 
-  iex> Cldr.DateTime.to_string DateTime.utc_now, MyApp.Cldr, format: :gy_mmm_ed
-  {:ok, "Sun, Jun 9, 2019 AD"}
+  iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, format: :gy_mmm_ed
+  {:ok, "Sat, May 30, 2020 AD"}
 ```
 
 ## Format strings
@@ -275,7 +275,7 @@ Dates, Times and DateTimes can be formatted using:
 
 ## Relative Date, Time and DateTime Localization Formatting
 
-The primary API for formatting relative dates and datetimes is `Cldr.DateTime.Relative.to_string/2`.  Some examples:
+The primary API for formatting relative dates and datetimes is `MyApp.Cldr.DateTime.Relative.to_string/2`.  Some examples:
 
 ```elixir
       iex> MyApp.Cldr.DateTime.Relative.to_string(-1)
@@ -284,20 +284,20 @@ The primary API for formatting relative dates and datetimes is `Cldr.DateTime.Re
       iex> MyApp.Cldr.DateTime.Relative.to_string(1)
       {:ok, "in 1 second"}
 
-      iex> MyApp.Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day)
+      iex> MyApp.Cldr.DateTime.Relative.to_string(1, unit: :day)
       {:ok, "tomorrow"}
 
-      iex> MyApp.Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
+      iex> MyApp.Cldr.DateTime.Relative.to_string(1, unit: :day, locale: "fr")
       {:ok, "demain"}
 
-      iex> MyApp.Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
+      iex> MyApp.Cldr.DateTime.Relative.to_string(1, unit: :day, style: :narrow)
       {:ok, "tomorrow"}
 
       iex> MyApp.Cldr.DateTime.Relative.to_string(1234, unit: :year)
       {:ok, "in 1,234 years"}
 
       iex> MyApp.Cldr.DateTime.Relative.to_string(1234, unit: :year, locale: "fr")
-      {:ok, "dans 1 234 ans"}
+      {:ok, "dans 1 234 ans"}
 
       iex> MyApp.Cldr.DateTime.Relative.to_string(31)
       {:ok, "in 31 seconds"}
@@ -305,19 +305,19 @@ The primary API for formatting relative dates and datetimes is `Cldr.DateTime.Re
       iex> MyApp.Cldr.DateTime.Relative.to_string(~D[2017-04-29], relative_to: ~D[2017-04-26])
       {:ok, "in 3 days"}
 
-      iex> MyApp.Cldr.DateTime.Relative.to_string(310, format: :short, locale: "fr")
+      iex> MyApp.Cldr.DateTime.Relative.to_string(310, style: :short, locale: "fr")
       {:ok, "dans 5 min"}
 
-      iex> MyApp.Cldr.DateTime.Relative.to_string(310, format: :narrow, locale: "fr")
+      iex> MyApp.Cldr.DateTime.Relative.to_string(310, style: :narrow, locale: "fr")
       {:ok, "+5 min"}
 
-      iex> MyApp.Cldr.DateTime.Relative.to_string 2, unit: :wed, format: :short
+      iex> MyApp.Cldr.DateTime.Relative.to_string 2, unit: :wed, style: :short
       {:ok, "in 2 Wed."}
 
-      iex> MyApp.Cldr.DateTime.Relative.to_string 1, unit: :wed, format: :short
+      iex> MyApp.Cldr.DateTime.Relative.to_string 1, unit: :wed, style: :short
       {:ok, "next Wed."}
 
-      iex> MyApp.Cldr.DateTime.Relative.to_string -1, unit: :wed, format: :short
+      iex> MyApp.Cldr.DateTime.Relative.to_string -1, unit: :wed, style: :short
       {:ok, "last Wed."}
 
       iex> MyApp.Cldr.DateTime.Relative.to_string -1, unit: :wed

@@ -9,7 +9,7 @@ defmodule Cldr.Date do
   [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars)
 
   CLDR provides standard format strings for `Date` which
-  are reresented by the names `:short`, `:medium`, `:long`
+  are reresented by the styles `:short`, `:medium`, `:long`
   and `:full`.  This allows for locale-independent
   formatting since each locale may define the underlying
   format string as appropriate.
@@ -19,11 +19,11 @@ defmodule Cldr.Date do
   alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
 
-  @format_types [:short, :medium, :long, :full]
+  @style_types [:short, :medium, :long, :full]
 
-  defmodule Formats do
+  defmodule Styles do
     @moduledoc false
-    defstruct Module.get_attribute(Cldr.Date, :format_types)
+    defstruct Module.get_attribute(Cldr.Date, :style_types)
   end
 
   @doc """
@@ -42,7 +42,7 @@ defmodule Cldr.Date do
 
   ## Options
 
-    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
+    * `style:` `:short` | `:medium` | `:long` | `:full` or a format string.
       The default is `:medium`
 
     * `locale:` any locale returned by `Cldr.known_locale_names/1`.
@@ -59,22 +59,22 @@ defmodule Cldr.Date do
 
   ## Examples
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, format: :medium, locale: "en"
+      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :medium, locale: "en"
       {:ok, "Jul 10, 2017"}
 
       iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, locale: "en"
       {:ok, "Jul 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, format: :full, locale: "en"
+      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :full, locale: "en"
       {:ok, "Monday, July 10, 2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, format: :short, locale: "en"
+      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :short, locale: "en"
       {:ok, "7/10/17"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, format: :short, locale: "fr"
+      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :short, locale: "fr"
       {:ok, "10/07/2017"}
 
-      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, format: :long, locale: "af"
+      iex> Cldr.Date.to_string ~D[2017-07-10], MyApp.Cldr, style: :long, locale: "af"
       {:ok, "10 Julie 2017"}
 
   """
@@ -93,12 +93,12 @@ defmodule Cldr.Date do
   end
 
   def to_string(%{calendar: calendar} = date, backend, options) do
-    options = Keyword.merge(default_options(backend), options)
+    options = normalize_options(backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
-         {:ok, format_string} <- format_string(options[:format], locale, cldr_calendar, backend),
+         {:ok, format_string} <- format_string(options[:style], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(date, format_string, locale, options) do
       {:ok, formatted}
     else
@@ -113,8 +113,17 @@ defmodule Cldr.Date do
     error_return(date, [:year, :month, :day, :calendar])
   end
 
-  defp default_options(backend) do
-    [format: :medium, locale: Cldr.get_locale(backend), number_system: :default]
+  # TODO deprecate :format in version 3.0
+
+  defp normalize_options(backend, options) do
+    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+    style = options[:style] || options[:format] || :medium
+
+    options
+    |> Keyword.put(:locale, locale)
+    |> Keyword.put(:style, style)
+    |> Keyword.delete(:format)
+    |> Keyword.put_new(:number_system, :default)
   end
 
   @doc """
@@ -150,22 +159,22 @@ defmodule Cldr.Date do
 
   ## Examples
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :medium, locale: "en"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :medium, locale: "en"
       "Jul 10, 2017"
 
       iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, locale: "en"
       "Jul 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :full,locale: "en"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :full,locale: "en"
       "Monday, July 10, 2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :short, locale: "en"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :short, locale: "en"
       "7/10/17"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :short, locale: "fr"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :short, locale: "fr"
       "10/07/2017"
 
-      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, format: :long, locale: "af"
+      iex> Cldr.Date.to_string! ~D[2017-07-10], MyApp.Cldr, style: :long, locale: "af"
       "10 Julie 2017"
 
   """
@@ -181,21 +190,21 @@ defmodule Cldr.Date do
   end
 
   defp format_string(format, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
-       when format in @format_types do
+       when format in @style_types do
     with {:ok, date_formats} <- Format.date_formats(locale_name, calendar, backend) do
       {:ok, Map.get(date_formats, format)}
     end
   end
 
-  defp format_string(%{number_system: number_system, format: format}, locale, calendar, backend) do
-    {:ok, format_string} = format_string(format, locale, calendar, backend)
-    {:ok, %{number_system: number_system, format: format_string}}
+  defp format_string(%{number_system: number_system, style: style}, locale, calendar, backend) do
+    {:ok, format_string} = format_string(style, locale, calendar, backend)
+    {:ok, %{number_system: number_system, style: format_string}}
   end
 
-  defp format_string(format, _locale, _calendar, _backend) when is_atom(format) do
+  defp format_string(style, _locale, _calendar, _backend) when is_atom(style) do
     {:error,
-     {Cldr.InvalidDateFormatType,
-      "Invalid date format type.  " <> "The valid types are #{inspect(@format_types)}."}}
+     {Cldr.DateTime.InvalidStyle,
+      "Invalid date style.  " <> "The valid styles are #{inspect(@style_types)}."}}
   end
 
   defp format_string(format_string, _locale, _calendar, _backend)
