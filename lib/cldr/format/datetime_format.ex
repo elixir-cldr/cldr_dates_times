@@ -29,9 +29,14 @@ defmodule Cldr.DateTime.Format do
 
     ((known_formats(&all_date_formats(&1, backend), locale_names) ++
         known_formats(&all_time_formats(&1, backend), locale_names) ++
-        known_formats(&all_date_time_formats(&1, backend), locale_names)) ++
+        known_formats(&all_date_time_formats(&1, backend), locale_names) ++
+        known_formats(&all_interval_formats(&1, backend), locale_names)) ++
        configured_precompile_list())
     |> Enum.reject(&is_atom/1)
+    |> Enum.reject(fn
+         string when is_binary(string) -> String.contains?(string, "{0}")
+         _other -> false
+       end)
     |> Enum.uniq()
   end
 
@@ -342,6 +347,43 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
+  Returns a map of the interval formats for a
+  given locale and calendar.
+
+  ## Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+    The default is `:gregorian`
+
+  ## Examples:
+
+      Cldr.DateTime.Format.interval_formats "en", :gregorian, MyApp.Cldr
+      => {:ok,
+       %{
+         bh: %{b: ["h B", "h B"], h: ["h", "h B"]},
+         bhm: %{b: ["h:mm B", "h:mm B"], h: ["h:mm", "h:mm B"], m: ["h:mm", "h:mm B"]},
+         d: %{d: ["d", "d"]},
+         gy: %{g: ["y G", "y G"], y: ["y", "y G"]},
+         ...
+
+  """
+  @spec interval_formats(
+          Locale.locale_name() | LanguageTag.t(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) :: {:ok, map()} | {:error, {atom, String.t()}}
+
+  def interval_formats(locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_time_interval_formats(locale, calendar)
+  end
+
+  @doc """
   Returns a list of the date_time format types that are
   available in all locales.
 
@@ -395,11 +437,31 @@ defmodule Cldr.DateTime.Format do
       all_formats_for(locale, backend, &datetime_backend.date_time_available_formats/2)
   end
 
+  defp all_interval_formats(locale, backend) do
+    datetime_backend = Module.concat(backend, DateTime.Format)
+    all_interval_formats_for(locale, backend, &datetime_backend.date_time_interval_formats/2)
+  end
+
   defp all_formats_for(locale, backend, type_function) do
     with {:ok, calendars} <- calendars_for(locale, backend) do
       Enum.map(calendars, fn calendar ->
         {:ok, calendar_formats} = type_function.(locale, calendar)
         Map.values(calendar_formats)
+      end)
+      |> List.flatten()
+      |> Enum.uniq()
+    end
+  end
+
+  defp all_interval_formats_for(locale, backend, type_function) do
+    with {:ok, calendars} <- calendars_for(locale, backend) do
+      Enum.map(calendars, fn calendar ->
+        {:ok, calendar_formats} = type_function.(locale, calendar)
+
+        calendar_formats
+        |> Map.values
+        |> Enum.filter(&is_map/1)
+        |> Enum.flat_map(&Map.values/1)
       end)
       |> List.flatten()
       |> Enum.uniq()

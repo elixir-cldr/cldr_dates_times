@@ -29,7 +29,7 @@ defmodule Cldr.DateTime.Relative.Backend do
         @unit_keys Map.keys(@unit) ++ @other_units
 
         @doc false
-        def get_locale(locale \\ Cldr.get_locale())
+        def get_locale(locale \\ unquote(backend).get_locale())
 
         def get_locale(locale_name) when is_binary(locale_name) do
           with {:ok, locale} <- Cldr.validate_locale(locale_name, unquote(backend)) do

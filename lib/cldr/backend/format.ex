@@ -376,6 +376,41 @@ defmodule Cldr.DateTime.Format.Backend do
             def date_time_available_formats(unquote(locale), unquote(calendar)) do
               {:ok, unquote(Macro.escape(formats))}
             end
+
+            formats = get_in(calendar_data, [:date_time_formats, :interval_formats])
+
+            interval_format_fallback = get_in(calendar_data,
+              [:date_time_formats, :interval_formats, :interval_format_fallback])
+
+            separator =
+              interval_format_fallback
+              |> String.replace(~r/{.}/, "")
+
+            formats =
+              formats
+              |> Map.delete(:interval_format_fallback)
+              |> Enum.map(fn {k, v} ->
+                split_formats = Enum.map(v, fn {k2, v2} ->
+                  {k2, String.split(v2, separator)}
+                end)
+                |> Map.new
+
+                {k, split_formats}
+              end)
+              |> Map.new
+
+            def date_time_interval_formats(unquote(locale), unquote(calendar)) do
+              {:ok, unquote(Macro.escape(formats))}
+            end
+
+            def date_time_interval_separator(unquote(locale), unquote(calendar)) do
+              unquote(separator)
+            end
+
+            parsed_fallback = Cldr.Substitution.parse(interval_format_fallback)
+            def date_time_interval_fallback(unquote(locale), unquote(calendar)) do
+              unquote(parsed_fallback)
+            end
           end
 
           def date_formats(unquote(locale), calendar),
@@ -389,6 +424,15 @@ defmodule Cldr.DateTime.Format.Backend do
 
           def date_time_available_formats(unquote(locale), calendar),
             do: {:error, Cldr.Calendar.calendar_error(calendar)}
+
+          def date_time_interval_formats(unquote(locale), calendar),
+            do: {:error, Cldr.Calendar.calendar_error(calendar)}
+
+          def date_time_interval_separator(unquote(locale), calendar),
+            do: {:error, Cldr.Calendar.calendar_error(calendar)}
+
+          def date_time_interval_fallback(unquote(locale), calendar),
+            do: {:error, Cldr.Calendar.calendar_error(calendar)}
         end
 
         def calendars_for(locale), do: {:error, Locale.locale_error(locale)}
@@ -400,6 +444,15 @@ defmodule Cldr.DateTime.Format.Backend do
         def date_time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
 
         def date_time_available_formats(locale, _calendar),
+          do: {:error, Locale.locale_error(locale)}
+
+        def date_time_interval_formats(locale, _calendar),
+          do: {:error, Locale.locale_error(locale)}
+
+        def date_time_interval_separator(locale, _calendar),
+          do: {:error, Locale.locale_error(locale)}
+
+        def date_time_interval_fallback(locale, _calendar),
           do: {:error, Locale.locale_error(locale)}
 
         @doc """
