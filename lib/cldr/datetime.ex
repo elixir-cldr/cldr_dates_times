@@ -117,8 +117,6 @@ defmodule Cldr.DateTime do
     error_return(datetime, [:year, :month, :day, :hour, :minute, :second, :calendar])
   end
 
-  # TODO deprecate :format in version 3.0
-
   defp normalize_options(backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     style = options[:format] || options[:style] || :medium
@@ -130,8 +128,14 @@ defmodule Cldr.DateTime do
     |> Keyword.put_new(:number_system, :default)
   end
 
-  def type_from_calendar(_) do
-    {:ok, :gregorian}
+  @doc false
+
+  # Returns the CLDR calendar type for a calendar
+
+  def type_from_calendar(calendar) do
+    with {:ok, calendar} <- Cldr.Calendar.validate_calendar(calendar) do
+      {:ok, calendar.cldr_calendar_type}
+    end
   end
 
   @doc """

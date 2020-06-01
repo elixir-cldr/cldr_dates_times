@@ -281,8 +281,8 @@ defmodule Cldr.Time do
 
     preference =
       preferences[locale.cldr_locale_name] ||
-      preferences[territory] ||
-      preferences[Cldr.the_world()]
+        preferences[territory] ||
+        preferences[Cldr.the_world()]
 
     Map.fetch!(time_symbols(), preference.preferred)
   end

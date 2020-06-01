@@ -34,9 +34,9 @@ defmodule Cldr.DateTime.Format do
        configured_precompile_list())
     |> Enum.reject(&is_atom/1)
     |> Enum.reject(fn
-         string when is_binary(string) -> String.contains?(string, "{0}")
-         _other -> false
-       end)
+      string when is_binary(string) -> String.contains?(string, "{0}")
+      _other -> false
+    end)
     |> Enum.uniq()
   end
 
@@ -375,7 +375,8 @@ defmodule Cldr.DateTime.Format do
           Cldr.backend()
         ) :: {:ok, map()} | {:error, {atom, String.t()}}
 
-  def interval_formats(locale \\ Cldr.get_locale(),
+  def interval_formats(
+        locale \\ Cldr.get_locale(),
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
         backend \\ Cldr.default_backend()
       ) do
@@ -459,7 +460,7 @@ defmodule Cldr.DateTime.Format do
         {:ok, calendar_formats} = type_function.(locale, calendar)
 
         calendar_formats
-        |> Map.values
+        |> Map.values()
         |> Enum.filter(&is_map/1)
         |> Enum.flat_map(&Map.values/1)
       end)
@@ -501,5 +502,88 @@ defmodule Cldr.DateTime.Format do
   # The case when there is no separator
   def gmt_format_type([sign, hour, minute], format_type) do
     gmt_format_type([sign, hour, "", minute], format_type)
+  end
+
+  ### Helpers
+
+  @doc false
+
+  # Used during compilation to split an interval into
+  # the from and to parts
+
+  def split_interval(interval) do
+    do_split_interval(interval, [], "")
+  end
+
+  defp do_split_interval("", _acc, left) do
+    raise ArgumentError, "Couldn't split datetime interval skeleton #{inspect(left)}"
+  end
+
+  # Quoted strings pass through. This assumes the quotes
+  # are correctly closed.
+
+  @literal "'"
+  defp do_split_interval(<<@literal, rest::binary>>, acc, left) do
+    [literal, rest] = String.split(rest, @literal, parts: 2)
+    do_split_interval(rest, acc, left <> @literal <> literal <> @literal)
+  end
+
+  # characters that are not format characters
+  # pass through
+
+  defp do_split_interval(<<c::utf8, rest::binary>>, acc, left)
+       when c not in ?a..?z and c not in ?A..?Z do
+    do_split_interval(rest, acc, left <> List.to_string([c]))
+  end
+
+  # Handle format characters that repeat up to a maximum of
+  # 5 times
+
+  defp do_split_interval(
+         <<c::binary-1, c::binary-1, c::binary-1, c::binary-1, c::binary-1, rest::binary>>,
+         acc,
+         left
+       ) do
+    if c in acc do
+      [left, String.duplicate(c, 5) <> rest]
+    else
+      do_split_interval(rest, [c | acc], left <> String.duplicate(c, 5))
+    end
+  end
+
+  defp do_split_interval(
+         <<c::binary-1, c::binary-1, c::binary-1, c::binary-1, rest::binary>>,
+         acc,
+         left
+       ) do
+    if c in acc do
+      [left, String.duplicate(c, 4) <> rest]
+    else
+      do_split_interval(rest, [c | acc], left <> String.duplicate(c, 4))
+    end
+  end
+
+  defp do_split_interval(<<c::binary-1, c::binary-1, c::binary-1, rest::binary>>, acc, left) do
+    if c in acc do
+      [left, String.duplicate(c, 3) <> rest]
+    else
+      do_split_interval(rest, [c | acc], left <> String.duplicate(c, 3))
+    end
+  end
+
+  defp do_split_interval(<<c::binary-1, c::binary-1, rest::binary>>, acc, left) do
+    if c in acc do
+      [left, String.duplicate(c, 2) <> rest]
+    else
+      do_split_interval(rest, [c | acc], left <> String.duplicate(c, 2))
+    end
+  end
+
+  defp do_split_interval(<<c::binary-1, rest::binary>>, acc, left) do
+    if c in acc do
+      [left, c <> rest]
+    else
+      do_split_interval(rest, [c | acc], left <> c)
+    end
   end
 end

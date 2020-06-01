@@ -62,7 +62,6 @@ defmodule CldrDatesTimes.Mixfile do
     [
       {:ex_cldr_numbers, "~> 2.14"},
       {:ex_cldr_calendars, "~> 1.8"},
-
       {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
       {:benchee, "~> 1.0", optional: true, only: :dev, runtime: false},

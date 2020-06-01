@@ -89,22 +89,25 @@ defmodule Cldr.DateTime.Compiler do
   end
 
   def compile(definition, backend, context) when is_binary(definition) do
-    {:ok, tokens, _end_line} = tokenize(definition)
+    with {:ok, tokens, _end_line} <- tokenize(definition) do
+      transforms =
+        Enum.map(tokens, fn {fun, _line, count} ->
+          quote do
+            Cldr.DateTime.Formatter.unquote(fun)(
+              var!(date, unquote(context)),
+              unquote(count),
+              var!(locale, unquote(context)),
+              unquote(backend),
+              var!(options, unquote(context))
+            )
+          end
+        end)
 
-    transforms =
-      Enum.map(tokens, fn {fun, _line, count} ->
-        quote do
-          Cldr.DateTime.Formatter.unquote(fun)(
-            var!(date, unquote(context)),
-            unquote(count),
-            var!(locale, unquote(context)),
-            unquote(backend),
-            var!(options, unquote(context))
-          )
-        end
-      end)
-
-    {:ok, transforms}
+      {:ok, transforms}
+    else
+      error ->
+        raise ArgumentError, "Could not parse #{inspect(definition)}: #{inspect(error)}"
+    end
   end
 
   def compile(%{number_system: _number_system, format: value}, backend, context) do

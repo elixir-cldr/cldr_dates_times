@@ -188,6 +188,7 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Arguments
 
         * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `Cldr.LanguageTag.t()`
 
         * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
         The default is `:gregorian`
@@ -255,6 +256,36 @@ defmodule Cldr.DateTime.Format.Backend do
               calendar
             ) do
           date_time_available_formats(cldr_locale_name, calendar)
+        end
+
+        @doc """
+        Returns a map of the interval formats for a
+        given locale and calendar.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `Cldr.LanguageTag.t()`
+
+        * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+          The default is `:gregorian`
+
+        ## Examples:
+
+
+        """
+        @spec date_time_interval_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
+                {:ok, formats}
+        def date_time_interval_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
+
+        def date_time_interval_formats(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
+          date_time_interval_formats(cldr_locale_name, calendar)
         end
 
         @doc """
@@ -379,35 +410,32 @@ defmodule Cldr.DateTime.Format.Backend do
 
             formats = get_in(calendar_data, [:date_time_formats, :interval_formats])
 
-            interval_format_fallback = get_in(calendar_data,
-              [:date_time_formats, :interval_formats, :interval_format_fallback])
-
-            separator =
-              interval_format_fallback
-              |> String.replace(~r/{.}/, "")
+            interval_format_fallback =
+              get_in(
+                calendar_data,
+                [:date_time_formats, :interval_formats, :interval_format_fallback]
+              )
 
             formats =
               formats
               |> Map.delete(:interval_format_fallback)
               |> Enum.map(fn {k, v} ->
-                split_formats = Enum.map(v, fn {k2, v2} ->
-                  {k2, String.split(v2, separator)}
-                end)
-                |> Map.new
+                split_formats =
+                  Enum.map(v, fn {k2, v2} ->
+                    {k2, Cldr.DateTime.Format.split_interval(v2)}
+                  end)
+                  |> Map.new()
 
                 {k, split_formats}
               end)
-              |> Map.new
+              |> Map.new()
 
             def date_time_interval_formats(unquote(locale), unquote(calendar)) do
               {:ok, unquote(Macro.escape(formats))}
             end
 
-            def date_time_interval_separator(unquote(locale), unquote(calendar)) do
-              unquote(separator)
-            end
-
             parsed_fallback = Cldr.Substitution.parse(interval_format_fallback)
+
             def date_time_interval_fallback(unquote(locale), unquote(calendar)) do
               unquote(parsed_fallback)
             end
@@ -428,9 +456,6 @@ defmodule Cldr.DateTime.Format.Backend do
           def date_time_interval_formats(unquote(locale), calendar),
             do: {:error, Cldr.Calendar.calendar_error(calendar)}
 
-          def date_time_interval_separator(unquote(locale), calendar),
-            do: {:error, Cldr.Calendar.calendar_error(calendar)}
-
           def date_time_interval_fallback(unquote(locale), calendar),
             do: {:error, Cldr.Calendar.calendar_error(calendar)}
         end
@@ -447,9 +472,6 @@ defmodule Cldr.DateTime.Format.Backend do
           do: {:error, Locale.locale_error(locale)}
 
         def date_time_interval_formats(locale, _calendar),
-          do: {:error, Locale.locale_error(locale)}
-
-        def date_time_interval_separator(locale, _calendar),
           do: {:error, Locale.locale_error(locale)}
 
         def date_time_interval_fallback(locale, _calendar),
