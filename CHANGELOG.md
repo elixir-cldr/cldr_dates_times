@@ -1,6 +1,10 @@
-# Changelog for Cldr_Dates_Times v2.4.1
+# Changelog for Cldr_Dates_Times v2.5.0
 
-This is the changelog for Cldr_Dates_Times v2.4.1 released on June 1st, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.5.0 released on ____, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Enhancements
+
+* Add localized interval formatting
 
 ### Bug Fixes
 
