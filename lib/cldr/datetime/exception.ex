@@ -44,3 +44,17 @@ defmodule Cldr.DateTime.InvalidStyle do
     %__MODULE__{message: message}
   end
 end
+
+defmodule Cldr.DateTime.IntervalFormatError do
+  @moduledoc """
+  Exception raised when attempting to
+  compile an interval format.
+  """
+  defexception [:message]
+
+  def exception(message) do
+    %__MODULE__{message: message}
+  end
+end
+
+

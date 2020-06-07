@@ -512,11 +512,25 @@ defmodule Cldr.DateTime.Format do
   # the from and to parts
 
   def split_interval(interval) do
-    do_split_interval(interval, [], "")
+    case do_split_interval(interval, [], "") do
+      {:error, reason} -> {:error, reason}
+      success -> {:ok, success}
+    end
+  end
+
+  @doc false
+  def split_interval!(interval) do
+    case do_split_interval(interval, [], "") do
+      {:error, {exception, reason}} -> raise exception, reason
+      success -> success
+    end
   end
 
   defp do_split_interval("", _acc, left) do
-    raise ArgumentError, "Couldn't split datetime interval skeleton #{inspect(left)}"
+    {:error,
+      {Cldr.DateTime.IntervalFormatError,
+      "Invalid datetime interval format #{inspect(left)}"
+    }}
   end
 
   # Quoted strings pass through. This assumes the quotes
