@@ -33,10 +33,6 @@ defmodule Cldr.DateTime.Format do
         known_formats(&all_interval_formats(&1, backend), locale_names)) ++
        configured_precompile_list())
     |> Enum.reject(&is_atom/1)
-    |> Enum.reject(fn
-      string when is_binary(string) -> String.contains?(string, "{0}")
-      _other -> false
-    end)
     |> Enum.uniq()
   end
 

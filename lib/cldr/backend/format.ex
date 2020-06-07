@@ -289,6 +289,38 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         @doc """
+        Returns the fallback format for a given
+        locale and calendar type
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `Cldr.LanguageTag.t()`
+
+        * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+          The default is `:gregorian`
+
+        ## Examples:
+
+            iex> #{__MODULE__}.date_time_interval_fallback "en", :gregorian
+            [0, " – ", 1]
+
+        """
+        @spec date_time_interval_fallback(Locale.locale_name() | LanguageTag.t(), calendar) ::
+                {:ok, formats}
+        def date_time_interval_fallback(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
+
+        def date_time_interval_fallback(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
+          date_time_interval_fallback(cldr_locale_name, calendar)
+        end
+
+        @doc """
         Returns the postive and negative hour format
         for a timezone offset for a given locale.
 
@@ -395,7 +427,8 @@ defmodule Cldr.DateTime.Format.Backend do
             formats =
               struct(
                 Cldr.DateTime.Styles,
-                Map.get(calendar_data, :date_time_formats) |> Map.take(@standard_formats)
+                Map.get(calendar_data, :date_time_formats)
+                |> Map.take(@standard_formats)
               )
 
             def date_time_formats(unquote(locale), unquote(calendar)) do

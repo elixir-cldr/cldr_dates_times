@@ -53,56 +53,93 @@ defmodule Cldr.Date.Interval do
   @styles Map.keys(@style_map)
   @formats Map.keys(@style_map.date)
 
+  @default_format :medium
+  @default_style :date
+
   def styles do
     @style_map
+  end
+
+  def to_string(%Date.Range{first: first, last: last}, backend) do
+    to_string(first, last, backend, [])
   end
 
   def to_string(%Date.Range{first: first, last: last}, backend, options) do
     to_string(first, last, backend, options)
   end
 
+  def to_string(from, to, backend, options \\ [])
+
   def to_string(%{calendar: Calendar.ISO} = from, %{calendar: Calendar.ISO} = to, backend, options) do
     from = %{from | calendar: Cldr.Calendar.Gregorian}
     to = %{to | calendar: Cldr.Calendar.Gregorian}
+
     to_string(from, to, backend, options)
   end
 
   def to_string(%{calendar: calendar} = from, %{calendar: calendar} = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     formatter = Module.concat(backend, DateTime.Formatter)
+    format = Keyword.get(options, :format, @default_format)
 
-    with {:ok, duration} <- Cldr.Calendar.Duration.new(from, to),
-         {:ok, backend} <- Cldr.validate_backend(backend),
+    with {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type, backend),
-         {:ok, [left, right]} <- resolve_format(duration, formats, options),
+         {:ok, [left, right]} <- resolve_format(from, to, formats, options),
          {:ok, left_format} <- formatter.format(from, left, locale, options),
          {:ok, right_format} <- formatter.format(to, right, locale, options) do
 
       {:ok, left_format <> right_format}
+    else
+      {:error, :no_practical_difference} ->
+        options =
+          options
+          |> Keyword.put(:locale, locale)
+          |> Keyword.put(:format, format)
+          |> Keyword.delete(:style)
+
+        Cldr.Date.to_string(from, backend, options)
+
+      other ->
+        other
     end
   end
 
-  @default_format :medium
-  @default_style :date
-
-  def resolve_format(duration, formats, options) do
+  def resolve_format(from, to, formats, options) do
     format = Keyword.get(options, :format, @default_format)
     style = Keyword.get(options, :style, @default_style)
 
     with {:ok, style} <- validate_style(style),
          {:ok, format} <- validate_format(formats, style, format),
-         {:ok, greatest_difference} = greatest_difference(duration) do
+         {:ok, greatest_difference} <- greatest_difference(from, to) do
       greatest_difference_format(format, greatest_difference)
     end
   end
 
-  defp greatest_difference_format(format, difference) do
+  defp greatest_difference_format(format, :y = difference) do
     case Map.fetch(format, difference) do
-      :error ->  {:error, format_error(format, format)}
+      :error ->  {:error, format_error(format, difference)}
       success -> success
     end
+  end
+
+  defp greatest_difference_format(format, :M) do
+    case Map.fetch(format, :m) do
+      :error ->  greatest_difference_format(format, :y)
+      success -> success
+    end
+  end
+
+  defp greatest_difference_format(format, :d = difference) do
+    case Map.fetch(format, difference) do
+      :error ->  greatest_difference_format(format, :M)
+      success -> success
+    end
+  end
+
+  defp greatest_difference_format(_format, _difference) do
+    {:error, :no_practical_difference}
   end
 
   defp validate_style(style) when style in @styles, do: {:ok, style}
@@ -119,6 +156,7 @@ defmodule Cldr.Date.Interval do
   end
 
   # Direct specification of a format
+  @doc false
   defp validate_format(formats, _style, format_key) when is_atom(format_key) do
     case Map.fetch(formats, format_key) do
       :error -> {:error, format_error(formats, format_key)}
@@ -127,11 +165,13 @@ defmodule Cldr.Date.Interval do
   end
 
   # Direct specification of a format as a string
+  @doc false
   defp validate_format(_formats, _style, format) when is_binary(format) do
     Cldr.DateTime.Format.split_interval(format)
   end
 
-  defp style_error(style) do
+  @doc false
+  def style_error(style) do
      {
        Cldr.DateTime.InvalidStyle,
        "The interval style #{inspect style} is invalid. " <>
@@ -139,11 +179,12 @@ defmodule Cldr.Date.Interval do
      }
   end
 
-  defp format_error(formats, format) do
+  @doc false
+  def format_error(_formats, format) do
      {
        Cldr.DateTime.UnresolvedFormat,
        "The interval format #{inspect format} is invalid. " <>
-       "Valid formats are #{inspect(@formats ++ Map.keys(formats))}"
+       "Valid formats are #{inspect(@formats ++ [:y, :M, :d])}"
      }
   end
 
@@ -153,18 +194,46 @@ defmodule Cldr.Date.Interval do
   # based upon the greatest difference between
   # two dates/times represented as a duration.
 
-  # Microseconds are ignored since they have
+  # Microseconds and seconds are ignored since they have
   # no format placeholder in interval formats.
 
-  def greatest_difference(%Cldr.Calendar.Duration{} = duration) do
+  def greatest_difference(unquote(Cldr.Calendar.datetime()) = from, unquote(Cldr.Calendar.datetime()) = to) do
     cond do
-      duration.year != 0 -> {:ok, :y}
-      duration.month != 0 -> {:ok, :M}
-      duration.day != 0 -> {:ok, :d}
-      duration.hour != 0 -> {:ok, :H}
-      duration.minute != 0 -> {:ok, :m}
-      duration.second != 0 -> {:ok, :s}
+      from.year != to.year -> {:ok, :y}
+      from.month != to.month -> {:ok, :M}
+      from.day != to.day -> {:ok, :d}
+      from.hour != to.hour -> {:ok, :H}
+      from.minute != to.minute -> {:ok, :m}
       true -> {:error, :no_practical_difference}
     end
   end
+
+  def greatest_difference(unquote(Cldr.Calendar.naivedatetime()) = from, unquote(Cldr.Calendar.naivedatetime()) = to) do
+    cond do
+      from.year != to.year -> {:ok, :y}
+      from.month != to.month -> {:ok, :M}
+      from.day != to.day -> {:ok, :d}
+      from.hour != to.hour -> {:ok, :H}
+      from.minute != to.minute -> {:ok, :m}
+      true -> {:error, :no_practical_difference}
+    end
+  end
+
+  def greatest_difference(unquote(Cldr.Calendar.date()) = from, unquote(Cldr.Calendar.date()) = to) do
+    cond do
+      from.year != to.year -> {:ok, :y}
+      from.month != to.month -> {:ok, :M}
+      from.day != to.day -> {:ok, :d}
+      true -> {:error, :no_practical_difference}
+    end
+  end
+
+  def greatest_difference(unquote(Cldr.Calendar.time()) = from, unquote(Cldr.Calendar.time()) = to) do
+    cond do
+      from.hour != to.hour -> {:ok, :H}
+      from.minute != to.minute -> {:ok, :m}
+      true -> {:error, :no_practical_difference}
+    end
+  end
+
 end
