@@ -1,5 +1,4 @@
 defmodule Cldr.Date.Interval do
-
   alias Cldr.DateTime.Format
 
   # Date styles not defined
@@ -14,41 +13,41 @@ defmodule Cldr.Date.Interval do
 
   @doc false
   @style_map %{
-      # Can be used with any
-      # date
-      date: %{
-        short: :y_md,
-        medium: :y_mm_md,
-        long: :y_mmm_ed
-        },
+    # Can be used with any
+    # date
+    date: %{
+      short: :y_md,
+      medium: :y_mm_md,
+      long: :y_mmm_ed
+    },
 
-      # Can be used when the year
-      # is the same with different
-      # months and days
-      month_and_day: %{
-        short: :md,
-        medium: :mm_md,
-        long: :mmm_ed
-        },
+    # Can be used when the year
+    # is the same with different
+    # months and days
+    month_and_day: %{
+      short: :md,
+      medium: :mm_md,
+      long: :mmm_ed
+    },
 
-      # Can be used when the year
-      # is the same and the coverage
-      # is full months
-      month: %{
-        short: :m,
-        medium: :mmm,
-        long: :mmm
-        },
+    # Can be used when the year
+    # is the same and the coverage
+    # is full months
+    month: %{
+      short: :m,
+      medium: :mmm,
+      long: :mmm
+    },
 
-      # Can be used when different
-      # years and the coverage is
-      # full months
-      year_and_month: %{
-        short: :y_m,
-        medium: :y_mmm,
-        long: :y_mmmm
-      }
+    # Can be used when different
+    # years and the coverage is
+    # full months
+    year_and_month: %{
+      short: :y_m,
+      medium: :y_mmm,
+      long: :y_mmmm
     }
+  }
 
   @styles Map.keys(@style_map)
   @formats Map.keys(@style_map.date)
@@ -109,7 +108,6 @@ defmodule Cldr.Date.Interval do
          {:ok, [left, right]} <- resolve_format(from, to, formats, options),
          {:ok, left_format} <- formatter.format(from, left, locale, options),
          {:ok, right_format} <- formatter.format(to, right, locale, options) do
-
       {:ok, left_format <> right_format}
     else
       {:error, :no_practical_difference} ->
@@ -147,21 +145,21 @@ defmodule Cldr.Date.Interval do
 
   defp greatest_difference_format(format, :y = difference) do
     case Map.fetch(format, difference) do
-      :error ->  {:error, format_error(format, difference)}
+      :error -> {:error, format_error(format, difference)}
       success -> success
     end
   end
 
   defp greatest_difference_format(format, :M) do
     case Map.fetch(format, :m) do
-      :error ->  greatest_difference_format(format, :y)
+      :error -> greatest_difference_format(format, :y)
       success -> success
     end
   end
 
   defp greatest_difference_format(format, :d = difference) do
     case Map.fetch(format, difference) do
-      :error ->  greatest_difference_format(format, :M)
+      :error -> greatest_difference_format(format, :M)
       success -> success
     end
   end
@@ -200,20 +198,20 @@ defmodule Cldr.Date.Interval do
 
   @doc false
   def style_error(style) do
-     {
-       Cldr.DateTime.InvalidStyle,
-       "The interval style #{inspect style} is invalid. " <>
-       "Valid styles are #{inspect @styles}"
-     }
+    {
+      Cldr.DateTime.InvalidStyle,
+      "The interval style #{inspect(style)} is invalid. " <>
+        "Valid styles are #{inspect(@styles)}."
+    }
   end
 
   @doc false
   def format_error(_formats, format) do
-     {
-       Cldr.DateTime.UnresolvedFormat,
-       "The interval format #{inspect format} is invalid. " <>
-       "Valid formats are #{inspect(@formats ++ [:y, :M, :d])}"
-     }
+    {
+      Cldr.DateTime.UnresolvedFormat,
+      "The interval format #{inspect(format)} is invalid. " <>
+        "Valid formats are #{inspect(@formats)} or an interval format string."
+    }
   end
 
   @doc false
@@ -224,8 +222,9 @@ defmodule Cldr.Date.Interval do
 
   # Microseconds and seconds are ignored since they have
   # no format placeholder in interval formats.
+  import Cldr.Calendar, only: [date: 0, naivedatetime: 0, datetime: 0, time: 0]
 
-  def greatest_difference(unquote(Cldr.Calendar.datetime()) = from, unquote(Cldr.Calendar.datetime()) = to) do
+  def greatest_difference(unquote(datetime()) = from, unquote(datetime()) = to) do
     cond do
       from.year != to.year -> {:ok, :y}
       from.month != to.month -> {:ok, :M}
@@ -236,7 +235,7 @@ defmodule Cldr.Date.Interval do
     end
   end
 
-  def greatest_difference(unquote(Cldr.Calendar.naivedatetime()) = from, unquote(Cldr.Calendar.naivedatetime()) = to) do
+  def greatest_difference(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to) do
     cond do
       from.year != to.year -> {:ok, :y}
       from.month != to.month -> {:ok, :M}
@@ -247,7 +246,7 @@ defmodule Cldr.Date.Interval do
     end
   end
 
-  def greatest_difference(unquote(Cldr.Calendar.date()) = from, unquote(Cldr.Calendar.date()) = to) do
+  def greatest_difference(unquote(date()) = from, unquote(date()) = to) do
     cond do
       from.year != to.year -> {:ok, :y}
       from.month != to.month -> {:ok, :M}
@@ -256,12 +255,11 @@ defmodule Cldr.Date.Interval do
     end
   end
 
-  def greatest_difference(unquote(Cldr.Calendar.time()) = from, unquote(Cldr.Calendar.time()) = to) do
+  def greatest_difference(unquote(time()) = from, unquote(time()) = to) do
     cond do
       from.hour != to.hour -> {:ok, :H}
       from.minute != to.minute -> {:ok, :m}
       true -> {:error, :no_practical_difference}
     end
   end
-
 end

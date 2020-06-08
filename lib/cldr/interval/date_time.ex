@@ -1,12 +1,11 @@
 defmodule Cldr.DateTime.Interval do
-
-  import Cldr.Date.Interval, only: [
-    greatest_difference: 2
-  ]
+  import Cldr.Date.Interval,
+    only: [
+      greatest_difference: 2
+    ]
 
   @default_format :medium
   @formats [:short, :medium, :long]
-
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
     def to_string(%CalendarInterval{} = interval, backend) do
@@ -44,22 +43,11 @@ defmodule Cldr.DateTime.Interval do
          {:ok, format} <- validate_format(format),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
-
-      options =
-        options
-        |> Keyword.put(:locale, locale)
-        |> Keyword.put(:format, format)
-        |> Keyword.delete(:style)
-
+      options = adjust_options(options, locale, format)
       format_date_time(from, to, locale, backend, calendar, greatest_difference, options)
     else
       {:error, :no_practical_difference} ->
-        options =
-          options
-          |> Keyword.put(:locale, locale)
-          |> Keyword.put(:format, format)
-          |> Keyword.delete(:style)
-
+        options = adjust_options(options, locale, format)
         Cldr.DateTime.to_string(from, backend, options)
 
       other ->
@@ -67,43 +55,43 @@ defmodule Cldr.DateTime.Interval do
     end
   end
 
-  # The difference is only in the time part
-  defp format_date_time(from, to, locale, backend, calendar, difference, options)
-      when difference in [:H, :m] do
+  defp adjust_options(options, locale, format) do
+    options
+    |> Keyword.put(:locale, locale)
+    |> Keyword.put(:format, format)
+    |> Keyword.delete(:style)
+  end
+
+  defp format_date_time(from, to, locale, backend, calendar, difference, options) do
     backend_format = Module.concat(backend, DateTime.Format)
-    calendar = calendar.cldr_calendar_type
-    interval_fallback_format = backend_format.date_time_interval_fallback(locale, calendar)
+    {:ok, calendar} = Cldr.DateTime.type_from_calendar(calendar)
+    fallback = backend_format.date_time_interval_fallback(locale, calendar)
     format = Keyword.fetch!(options, :format)
 
     [from_format, to_format] = extract_format(format)
-    from_options =  Keyword.put(options, :format, from_format)
+    from_options = Keyword.put(options, :format, from_format)
     to_options = Keyword.put(options, :format, to_format)
 
-    with {:ok, from_string} <- Cldr.DateTime.to_string(from, backend, from_options),
-         {:ok, to_time} <- Cldr.Time.to_string(to, backend, to_options) do
+    do_format_date_time(from, to, backend, format, difference, from_options, to_options, fallback)
+  end
 
-      {:ok, combine_result(from_string, to_time, format, interval_fallback_format)}
+  # The difference is only in the time part
+  defp do_format_date_time(from, to, backend, format, difference, from_opts, to_opts, fallback)
+       when difference in [:H, :m] do
+    with {:ok, from_string} <- Cldr.DateTime.to_string(from, backend, from_opts),
+         {:ok, to_string} <- Cldr.Time.to_string(to, backend, to_opts) do
+      {:ok, combine_result(from_string, to_string, format, fallback)}
     end
   end
 
   # The difference is in the date part
   # Format each datetime separately and join with
   # the interval fallback format
-  defp format_date_time(from, to, locale, backend, calendar, difference, options)
-      when difference in [:y, :M, :d] do
-    backend_format = Module.concat(backend, DateTime.Format)
-    {:ok, calendar} = Cldr.DateTime.type_from_calendar(calendar)
-    interval_fallback_format = backend_format.date_time_interval_fallback(locale, calendar)
-    format = Keyword.fetch!(options, :format)
-
-    [from_format, to_format] = extract_format(format)
-    from_options =  Keyword.put(options, :format, from_format)
-    to_options = Keyword.put(options, :format, to_format)
-
-    with {:ok, from_string} <- Cldr.DateTime.to_string(from, backend, from_options),
-         {:ok, to_string} <- Cldr.DateTime.to_string(to, backend, to_options) do
-
-      {:ok, combine_result(from_string, to_string, format, interval_fallback_format)}
+  defp do_format_date_time(from, to, backend, format, difference, from_opts, to_opts, fallback)
+       when difference in [:y, :M, :d] do
+    with {:ok, from_string} <- Cldr.DateTime.to_string(from, backend, from_opts),
+         {:ok, to_string} <- Cldr.DateTime.to_string(to, backend, to_opts) do
+      {:ok, combine_result(from_string, to_string, format, fallback)}
     end
   end
 
@@ -114,7 +102,7 @@ defmodule Cldr.DateTime.Interval do
   defp combine_result(left, right, format, fallback) when is_atom(format) do
     [left, right]
     |> Cldr.Substitution.substitute(fallback)
-    |> Enum.join
+    |> Enum.join()
   end
 
   defp extract_format(format) when is_atom(format) do
@@ -136,13 +124,12 @@ defmodule Cldr.DateTime.Interval do
     Cldr.DateTime.Format.split_interval(format)
   end
 
-
   @doc false
   def format_error(format) do
-     {
-       Cldr.DateTime.UnresolvedFormat,
-       "The interval format #{inspect format} is invalid. " <>
-       "Valid formats are #{inspect(@formats ++ [:y, :M, :d])}"
-     }
+    {
+      Cldr.DateTime.UnresolvedFormat,
+      "The interval format #{inspect(format)} is invalid. " <>
+        "Valid formats are #{inspect(@formats)} or an interval format string.}"
+    }
   end
 end

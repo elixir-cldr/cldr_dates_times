@@ -1,11 +1,12 @@
 defmodule Cldr.Time.Interval do
-
   alias Cldr.DateTime.Format
-  import Cldr.Date.Interval, only: [
-    format_error: 2,
-    style_error: 1,
-    greatest_difference: 2
-  ]
+
+  import Cldr.Date.Interval,
+    only: [
+      format_error: 2,
+      style_error: 1,
+      greatest_difference: 2
+    ]
 
   # Time styles not defined
   # by a grouping but can still
@@ -13,30 +14,30 @@ defmodule Cldr.Time.Interval do
 
   @doc false
   @style_map %{
-      # Can be used with any
-      # time
-      time: %{
-        short: :h,
-        medium: :hm,
-        long: :hm
-        },
+    # Can be used with any
+    # time
+    time: %{
+      short: :h,
+      medium: :hm,
+      long: :hm
+    },
 
-      # Includes the timezone
-      zone: %{
-        short: :hv,
-        medium: :hmv,
-        long: :hmv
-        },
+    # Includes the timezone
+    zone: %{
+      short: :hv,
+      medium: :hmv,
+      long: :hmv
+    },
 
-      # Includes flex times
-      # annotation like
-      # ".. in the evening"
-      flex: %{
-        short: :bh,
-        medium: :bhm,
-        long: :bhm
-      }
+    # Includes flex times
+    # annotation like
+    # ".. in the evening"
+    flex: %{
+      short: :bh,
+      medium: :bhm,
+      long: :bhm
     }
+  }
 
   @styles Map.keys(@style_map)
   @formats Map.keys(@style_map.time)
@@ -69,7 +70,6 @@ defmodule Cldr.Time.Interval do
          {:ok, [left, right]} <- resolve_format(from, to, formats, options),
          {:ok, left_format} <- formatter.format(from, left, locale, options),
          {:ok, right_format} <- formatter.format(to, right, locale, options) do
-
       {:ok, left_format <> right_format}
     else
       {:error, :no_practical_difference} ->
@@ -93,7 +93,6 @@ defmodule Cldr.Time.Interval do
     with {:ok, style} <- validate_style(style),
          {:ok, format} <- validate_format(formats, style, format),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
-
       greatest_difference_format(format, greatest_difference)
     end
   end
@@ -104,14 +103,14 @@ defmodule Cldr.Time.Interval do
 
   defp greatest_difference_format(format, :H) do
     case Map.fetch(format, :h) do
-      :error ->  {:error, format_error(format, format)}
+      :error -> {:error, format_error(format, format)}
       success -> success
     end
   end
 
   defp greatest_difference_format(format, :m = difference) do
     case Map.fetch(format, difference) do
-      :error ->  greatest_difference_format(format, :H)
+      :error -> greatest_difference_format(format, :H)
       success -> success
     end
   end
@@ -145,5 +144,4 @@ defmodule Cldr.Time.Interval do
   defp validate_format(_formats, _style, format) when is_binary(format) do
     Cldr.DateTime.Format.split_interval(format)
   end
-
 end

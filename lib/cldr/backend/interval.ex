@@ -19,7 +19,6 @@ defmodule Cldr.DateTime.Interval.Backend do
           Cldr.DateTime.Interval.to_string(from, to, unquote(backend), [])
         end
 
-
         def to_string(from, to, options) do
           Cldr.DateTime.Interval.to_string(from, to, unquote(backend), options)
         end

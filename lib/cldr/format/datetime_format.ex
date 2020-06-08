@@ -524,9 +524,7 @@ defmodule Cldr.DateTime.Format do
 
   defp do_split_interval("", _acc, left) do
     {:error,
-      {Cldr.DateTime.IntervalFormatError,
-      "Invalid datetime interval format #{inspect(left)}"
-    }}
+     {Cldr.DateTime.IntervalFormatError, "Invalid datetime interval format #{inspect(left)}"}}
   end
 
   # Quoted strings pass through. This assumes the quotes

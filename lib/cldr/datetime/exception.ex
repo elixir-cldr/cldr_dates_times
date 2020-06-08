@@ -56,5 +56,3 @@ defmodule Cldr.DateTime.IntervalFormatError do
     %__MODULE__{message: message}
   end
 end
-
-
