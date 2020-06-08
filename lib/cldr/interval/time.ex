@@ -8,6 +8,8 @@ defmodule Cldr.Time.Interval do
       greatest_difference: 2
     ]
 
+  import Cldr.Calendar, only: [time: 0]
+
   # Time styles not defined
   # by a grouping but can still
   # be used directly
@@ -51,19 +53,21 @@ defmodule Cldr.Time.Interval do
 
   def to_string(from, to, backend, options \\ [])
 
-  def to_string(%{calendar: Calendar.ISO} = from, %{calendar: Calendar.ISO} = to, backend, options) do
+  def to_string(%{calendar: calendar} = from, %{calendar: calendar} = to, backend, options)
+      when calendar == Calendar.ISO do
     from = %{from | calendar: Cldr.Calendar.Gregorian}
     to = %{to | calendar: Cldr.Calendar.Gregorian}
 
     to_string(from, to, backend, options)
   end
 
-  def to_string(%{calendar: calendar} = from, %{calendar: calendar} = to, backend, options) do
+  def to_string(unquote(time()) = from, unquote(time()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     formatter = Module.concat(backend, DateTime.Formatter)
     format = Keyword.get(options, :format, @default_format)
 
-    with {:ok, backend} <- Cldr.validate_backend(backend),
+    with {:ok, _} <- from_less_than_or_equal_to(from, to),
+         {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type, backend),
@@ -88,7 +92,14 @@ defmodule Cldr.Time.Interval do
     end
   end
 
-  def resolve_format(from, to, formats, options) do
+  defp from_less_than_or_equal_to(from, to) do
+    case Time.compare(from, to) do
+      comp when comp in [:eq, :lt] -> {:ok, comp}
+      _other -> {:error, Cldr.Date.Interval.datetime_order_error(from, to)}
+    end
+  end
+
+  defp resolve_format(from, to, formats, options) do
     format = Keyword.get(options, :format, @default_format)
     style = Keyword.get(options, :style, @default_style)
 

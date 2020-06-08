@@ -4,6 +4,11 @@ defmodule Cldr.DateTime.Interval do
       greatest_difference: 2
     ]
 
+  import Cldr.Calendar,
+    only: [
+      naivedatetime: 0
+    ]
+
   @default_format :medium
   @formats [:short, :medium, :long]
 
@@ -27,18 +32,20 @@ defmodule Cldr.DateTime.Interval do
 
   def to_string(from, to, backend, options \\ [])
 
-  def to_string(%{calendar: Calendar.ISO} = from, %{calendar: Calendar.ISO} = to, backend, options) do
+  def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend, options)
+      when calendar == Calendar.ISO do
     from = %{from | calendar: Cldr.Calendar.Gregorian}
     to = %{to | calendar: Cldr.Calendar.Gregorian}
 
     to_string(from, to, backend, options)
   end
 
-  def to_string(%{calendar: calendar} = from, %{calendar: calendar} = to, backend, options) do
+   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     format = Keyword.get(options, :format, @default_format)
 
-    with {:ok, backend} <- Cldr.validate_backend(backend),
+    with {:ok, _} <- from_less_than_or_equal_to(from, to),
+         {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, format} <- validate_format(format),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
@@ -85,6 +92,24 @@ defmodule Cldr.DateTime.Interval do
     case to_string(from, to, backend, options) do
       {:ok, string} -> string
       {:error, {exception, reason}} -> raise exception, reason
+    end
+  end
+
+  defp from_less_than_or_equal_to(%{time_zone: zone} = from, %{time_zone: zone} = to) do
+    case DateTime.compare(from, to) do
+      comp when comp in [:eq, :lt] -> {:ok, comp}
+      _other -> {:error, Cldr.Date.Interval.datetime_order_error(from, to)}
+    end
+  end
+
+  defp from_less_than_or_equal_to(%{time_zone: _zone1} = from, %{time_zone: _zone2} = to) do
+    {:error, Cldr.Date.Interval.datetime_incompatible_timezone_error(from, to)}
+  end
+
+  defp from_less_than_or_equal_to(from, to) do
+    case NaiveDateTime.compare(from, to) do
+      comp when comp in [:eq, :lt] -> {:ok, comp}
+      _other -> {:error, Cldr.Date.Interval.datetime_order_error(from, to)}
     end
   end
 

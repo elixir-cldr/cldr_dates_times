@@ -56,3 +56,30 @@ defmodule Cldr.DateTime.IntervalFormatError do
     %__MODULE__{message: message}
   end
 end
+
+defmodule Cldr.DateTime.DateTimeOrderError do
+  @moduledoc """
+  Exception raised when the first
+  datetime in an interval is greater than
+  the last datetime.
+  """
+  defexception [:message]
+
+  def exception(message) do
+    %__MODULE__{message: message}
+  end
+end
+
+defmodule Cldr.DateTime.IncompatibleTimeZonerError do
+  @moduledoc """
+  Exception raised when the two
+  datetimes are in different time zones
+  """
+  defexception [:message]
+
+  def exception(message) do
+    %__MODULE__{message: message}
+  end
+end
+
+

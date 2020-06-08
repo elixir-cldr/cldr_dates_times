@@ -1,5 +1,7 @@
 defmodule Cldr.Date.Interval do
+
   alias Cldr.DateTime.Format
+  import Cldr.Calendar, only: [date: 0]
 
   # Date styles not defined
   # by a grouping but can still
@@ -89,19 +91,21 @@ defmodule Cldr.Date.Interval do
 
   def to_string(from, to, backend, options \\ [])
 
-  def to_string(%{calendar: Calendar.ISO} = from, %{calendar: Calendar.ISO} = to, backend, options) do
+  def to_string(unquote(date()) = from, unquote(date()) = to, backend, options)
+      when calendar == Calendar.ISO do
     from = %{from | calendar: Cldr.Calendar.Gregorian}
     to = %{to | calendar: Cldr.Calendar.Gregorian}
 
     to_string(from, to, backend, options)
   end
 
-  def to_string(%{calendar: calendar} = from, %{calendar: calendar} = to, backend, options) do
+  def to_string(unquote(date()) = from, unquote(date()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     formatter = Module.concat(backend, DateTime.Formatter)
     format = Keyword.get(options, :format, @default_format)
 
-    with {:ok, backend} <- Cldr.validate_backend(backend),
+    with {:ok, _} <- from_less_than_or_equal_to(from, to),
+         {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type, backend),
@@ -137,7 +141,14 @@ defmodule Cldr.Date.Interval do
     end
   end
 
-  def resolve_format(from, to, formats, options) do
+  defp from_less_than_or_equal_to(from, to) do
+    case Date.compare(from, to) do
+      comp when comp in [:eq, :lt] -> {:ok, comp}
+      _other -> {:error, Cldr.Date.Interval.datetime_order_error(from, to)}
+    end
+  end
+
+  defp resolve_format(from, to, formats, options) do
     format = Keyword.get(options, :format, @default_format)
     style = Keyword.get(options, :style, @default_style)
 
@@ -224,6 +235,24 @@ defmodule Cldr.Date.Interval do
       Cldr.DateTime.UnresolvedFormat,
       "The interval format #{inspect(format)} is invalid. " <>
         "Valid formats are #{inspect(@formats)} or an interval format string."
+    }
+  end
+
+  @doc false
+  def datetime_order_error(from, to) do
+    {
+      Cldr.DateTime.DateTimeOrderError,
+      "Start date/time must be earlier or equal to end date/time. " <>
+      "Found #{inspect from}, #{inspect to}."
+    }
+  end
+
+  @doc false
+  def datetime_incompatible_timezone_error(from, to) do
+    {
+      Cldr.DateTime.IncompatibleTimeZonerError,
+      "Start and end dates must be in the same time zone. " <>
+      "Found #{inspect from}, #{inspect to}."
     }
   end
 
