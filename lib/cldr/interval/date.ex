@@ -111,16 +111,29 @@ defmodule Cldr.Date.Interval do
       {:ok, left_format <> right_format}
     else
       {:error, :no_practical_difference} ->
-        options =
-          options
-          |> Keyword.put(:locale, locale)
-          |> Keyword.put(:format, format)
-          |> Keyword.delete(:style)
-
+        options = Cldr.DateTime.Interval.adjust_options(options, locale, format)
         Cldr.Date.to_string(from, backend, options)
 
       other ->
         other
+    end
+  end
+
+  def to_string!(%Date.Range{} = range, backend) do
+    to_string!(range, backend, [])
+  end
+
+  def to_string!(%Date.Range{} = range, backend, options) do
+    case to_string(range, backend, options) do
+      {:ok, string} -> string
+      {:error, {exception, reason}} -> raise exception, reason
+    end
+  end
+
+  def to_string!(from, to, backend, options \\ []) do
+    case to_string(from, to, backend, options) do
+      {:ok, string} -> string
+      {:error, {exception, reason}} -> raise exception, reason
     end
   end
 

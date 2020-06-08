@@ -55,7 +55,41 @@ defmodule Cldr.DateTime.Interval do
     end
   end
 
-  defp adjust_options(options, locale, format) do
+  def to_string!(%Date.Range{} = range, backend) do
+    to_string!(range, backend, [])
+  end
+
+  if Cldr.Code.ensure_compiled?(CalendarInterval) do
+    def to_string!(%CalendarInterval{} = range, backend) do
+      to_string!(range, backend, [])
+    end
+  end
+
+  def to_string!(%Date.Range{} = range, backend, options) do
+    case to_string(range, backend, options) do
+      {:ok, string} -> string
+      {:error, {exception, reason}} -> raise exception, reason
+    end
+  end
+
+  if Cldr.Code.ensure_compiled?(CalendarInterval) do
+    def to_string!(%CalendarInterval{} = range, backend, options) do
+      case to_string(range, backend, options) do
+        {:ok, string} -> string
+        {:error, {exception, reason}} -> raise exception, reason
+      end
+    end
+  end
+
+  def to_string!(from, to, backend, options \\ []) do
+    case to_string(from, to, backend, options) do
+      {:ok, string} -> string
+      {:error, {exception, reason}} -> raise exception, reason
+    end
+  end
+
+  @doc false
+  def adjust_options(options, locale, format) do
     options
     |> Keyword.put(:locale, locale)
     |> Keyword.put(:format, format)

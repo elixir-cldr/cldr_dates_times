@@ -25,3 +25,19 @@ defimpl Cldr.Chars, for: NaiveDateTime do
     Cldr.DateTime.to_string!(datetime, locale.backend, locale: locale)
   end
 end
+
+defimpl Cldr.Chars, for: Date.Range do
+  def to_string(range) do
+    locale = Cldr.get_locale()
+    Cldr.Date.Interval.to_string!(range, locale.backend, locale: locale)
+  end
+end
+
+if Cldr.Code.ensure_compiled?(CalendarInterval) do
+  defimpl Cldr.Chars, for: CalendarInterval do
+    def to_string(interval) do
+      locale = Cldr.get_locale()
+      Cldr.DateTime.Interval.to_string!(interval, locale.backend, locale: locale)
+    end
+  end
+end
