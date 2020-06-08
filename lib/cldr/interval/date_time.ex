@@ -73,13 +73,16 @@ defmodule Cldr.DateTime.Interval do
     backend_format = Module.concat(backend, DateTime.Format)
     calendar = calendar.cldr_calendar_type
     interval_fallback_format = backend_format.date_time_interval_fallback(locale, calendar)
+    format = Keyword.fetch!(options, :format)
 
-    with {:ok, from_string} <- Cldr.DateTime.to_string(from, backend, options),
-         {:ok, to_time} <- Cldr.Time.to_string(to, backend, options) do
+    [from_format, to_format] = extract_format(format)
+    from_options =  Keyword.put(options, :format, from_format)
+    to_options = Keyword.put(options, :format, to_format)
 
-      [from_string, to_time]
-      |> Cldr.Substitution.substitute(interval_fallback_format)
-      |> Enum.join
+    with {:ok, from_string} <- Cldr.DateTime.to_string(from, backend, from_options),
+         {:ok, to_time} <- Cldr.Time.to_string(to, backend, to_options) do
+
+      {:ok, combine_result(from_string, to_time, format, interval_fallback_format)}
     end
   end
 
@@ -90,15 +93,36 @@ defmodule Cldr.DateTime.Interval do
       when difference in [:y, :M, :d] do
     backend_format = Module.concat(backend, DateTime.Format)
     {:ok, calendar} = Cldr.DateTime.type_from_calendar(calendar)
-    fallback_format = backend_format.date_time_interval_fallback(locale, calendar)
+    interval_fallback_format = backend_format.date_time_interval_fallback(locale, calendar)
+    format = Keyword.fetch!(options, :format)
 
-    with {:ok, from_string} <- Cldr.DateTime.to_string(from, backend, options),
-         {:ok, to_string} <- Cldr.DateTime.to_string(to, backend, options) do
+    [from_format, to_format] = extract_format(format)
+    from_options =  Keyword.put(options, :format, from_format)
+    to_options = Keyword.put(options, :format, to_format)
 
-      [from_string, to_string]
-      |> Cldr.Substitution.substitute(fallback_format)
-      |> Enum.join
+    with {:ok, from_string} <- Cldr.DateTime.to_string(from, backend, from_options),
+         {:ok, to_string} <- Cldr.DateTime.to_string(to, backend, to_options) do
+
+      {:ok, combine_result(from_string, to_string, format, interval_fallback_format)}
     end
+  end
+
+  defp combine_result(left, right, format, _fallback) when is_binary(format) do
+    left <> right
+  end
+
+  defp combine_result(left, right, format, fallback) when is_atom(format) do
+    [left, right]
+    |> Cldr.Substitution.substitute(fallback)
+    |> Enum.join
+  end
+
+  defp extract_format(format) when is_atom(format) do
+    [format, format]
+  end
+
+  defp extract_format([from_format, to_format]) do
+    [from_format, to_format]
   end
 
   # Using standard format terms like :short, :medium, :long
@@ -109,12 +133,9 @@ defmodule Cldr.DateTime.Interval do
   # Direct specification of a format as a string
   @doc false
   defp validate_format(format) when is_binary(format) do
-    {:ok, format}
+    Cldr.DateTime.Format.split_interval(format)
   end
 
-  defp validate_format(format) when is_binary(format) do
-    format_error(format)
-  end
 
   @doc false
   def format_error(format) do

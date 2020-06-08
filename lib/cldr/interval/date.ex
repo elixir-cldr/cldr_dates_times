@@ -64,8 +64,28 @@ defmodule Cldr.Date.Interval do
     to_string(first, last, backend, [])
   end
 
+  if Cldr.Code.ensure_compiled?(CalendarInterval) do
+    def to_string(%CalendarInterval{} = interval, backend) do
+      to_string(interval, backend, [])
+    end
+  end
+
   def to_string(%Date.Range{first: first, last: last}, backend, options) do
     to_string(first, last, backend, options)
+  end
+
+  if Cldr.Code.ensure_compiled?(CalendarInterval) do
+    def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
+        when precision in [:year, :month, :day] do
+      to_string(from, to, backend, options)
+    end
+
+    def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
+        when precision in [:hour, :minute] do
+      from = %{from | second: 0, microsecond: {0, 6}}
+      to = %{to | second: 0, microsecond: {0, 6}}
+      Cldr.DateTime.Interval.to_string(from, to, backend, options)
+    end
   end
 
   def to_string(from, to, backend, options \\ [])
@@ -115,6 +135,14 @@ defmodule Cldr.Date.Interval do
          {:ok, greatest_difference} <- greatest_difference(from, to) do
       greatest_difference_format(format, greatest_difference)
     end
+  end
+
+  defp greatest_difference_format(format, _) when is_binary(format) do
+    {:ok, format}
+  end
+
+  defp greatest_difference_format(format, _) when is_list(format) do
+    {:ok, format}
   end
 
   defp greatest_difference_format(format, :y = difference) do
