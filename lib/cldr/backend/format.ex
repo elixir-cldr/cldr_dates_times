@@ -400,7 +400,7 @@ defmodule Cldr.DateTime.Format.Backend do
             do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))}
 
           hour_formats =
-            List.to_tuple(
+            Elixir.List.to_tuple(
               String.split(get_in(locale_data, [:dates, :time_zone_names, :hour_format]), ";")
             )
 
