@@ -1,4 +1,14 @@
 defmodule Cldr.DateTime.Interval do
+  @moduledoc """
+  Interval formats allow for software to format intervals like "Jan 10-12, 2008" as a
+  shorter and more natural format than "Jan 10, 2008 - Jan 12, 2008". They are designed
+  to take a start and end date, time or datetime plus a formatting pattern
+  and use that information to produce a localized format.
+
+  See `Cldr.Interval.to_string/3` and `Cldr.DateTime.Interval.to_string/3`
+
+  """
+
   import Cldr.Date.Interval,
     only: [
       greatest_difference: 2
@@ -44,12 +54,8 @@ defmodule Cldr.DateTime.Interval do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     format = Keyword.get(options, :format, @default_format)
 
-    number_system =
-      Keyword.get(
-        options,
-        :number_system,
-        Cldr.Number.System.number_system_from_locale(locale, backend)
-      )
+    number_system = Keyword.get(options, :number_system,
+        Cldr.Number.System.number_system_from_locale(locale, backend))
 
     options =
       options

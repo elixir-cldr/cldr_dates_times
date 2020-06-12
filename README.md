@@ -334,6 +334,45 @@ The primary API for formatting relative dates and datetimes is `MyApp.Cldr.DateT
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
 ```
 
+## Interval Formatting
+
+Interval formats allow for software to format intervals like "Jan 10-12, 2008" as a shorter and more natural format than "Jan 10, 2008 - Jan 12, 2008". They are designed to take a start and end date, time or datetime plus a formatting pattern and use that information to produce a localized format.
+
+An interval is expressed as either a `from` and `to` date, time or datetime. Or it can also be a `Date.Range` or `CalendarInterval` from the [calendar_interval](https://hex.pm/pacakges/calendar_interval) library.
+
+`Cldr.Interval.to_string/3` function to format an interval based upon the type of the arguments: date, datetime or time.  The modules `Cldr.Date.Interval`, `Cldr.Time.Interval` and `Cldr.DateTime.Interval` also provide a `to_string/3` function for when the desired output format is more specific.
+
+Some examples:
+
+```elixir
+iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr
+{:ok, "Jan 1 – Dec 31, 2020"}
+
+iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr
+{:ok, "Jan 1 – 12, 2020"}
+
+iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
+...> format: :long
+{:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
+
+iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
+...> format: :long, style: :year_and_month
+{:ok, "January – December 2020"}
+
+iex> use CalendarInterval
+iex> Cldr.Interval.to_string ~I"2020-01-01/12", MyApp.Cldr,
+...> format: :long
+{:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
+
+iex> Cldr.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z], MyApp.Cldr,
+...> format: :long
+{:ok, "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"}
+
+iex> Cldr.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z], MyApp.Cldr,
+...> format: :long
+{:ok, "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"}
+```
+
 ## Known restrictions and limitations
 
 Although largely complete (with respect to the CLDR data), there are some known limitations as of release 2.0.

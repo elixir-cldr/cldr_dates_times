@@ -246,50 +246,73 @@ defmodule Cldr.Interval do
   # Single argument version.
   # Derive backend and locale
   def to_string(%Date.Range{} = range) do
-    locale = Cldr.get_locale()
-    backend = locale.backend
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
     to_string(range, backend, locale: locale)
   end
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
     def to_string(%CalendarInterval{} = interval) do
-      locale = Cldr.get_locale()
-      backend = locale.backend
+      {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
       to_string(interval, backend, locale: locale)
     end
   end
 
   def to_string(unquote(date()) = from, unquote(date()) = to) do
-    locale = Cldr.get_locale()
-    backend = locale.backend
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
     to_string(from, to, backend, locale: locale)
   end
 
   def to_string(unquote(time()) = from, unquote(time()) = to) do
-    locale = Cldr.get_locale()
-    backend = locale.backend
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
     to_string(from, to, backend, locale: locale)
   end
 
   @doc false
-  # Dual argument version
-  # Default arguments to []
-  def to_string(%Date.Range{} = range, backend) do
-    to_string(range, backend, [])
+  # Dual argument version  with backend
+  def to_string(%Date.Range{} = range, backend) when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(range, backend, locale: locale)
   end
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
-    def to_string(%CalendarInterval{} = interval, backend) do
-      to_string(interval, backend, [])
+    def to_string(%CalendarInterval{} = interval, backend) when is_atom(backend) do
+      {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+      to_string(interval, backend, locale: locale)
     end
   end
 
-  def to_string(unquote(date()) = from, unquote(date()) = to, backend) do
-    to_string(from, to, backend, [])
+  def to_string(unquote(date()) = from, unquote(date()) = to, backend) when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
   end
 
-  def to_string(unquote(time()) = from, unquote(time()) = to, backend) do
-    to_string(from, to, backend, [])
+  def to_string(unquote(time()) = from, unquote(time()) = to, backend) when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  @doc false
+  # Dual argument version with options
+  def to_string(%Date.Range{} = range, options) when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(range, backend, locale: Keyword.put_new(options, :locale, locale))
+  end
+
+  if Cldr.Code.ensure_compiled?(CalendarInterval) do
+    def to_string(%CalendarInterval{} = interval, options) when is_list(options) do
+      {locale, backend} = Cldr.locale_and_backend_from(options)
+      to_string(interval, backend, Keyword.put_new(options, :locale, locale))
+    end
+  end
+
+  def to_string(unquote(date()) = from, unquote(date()) = to, options) when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
+
+  def to_string(unquote(time()) = from, unquote(time()) = to, options) when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
   end
 
   @doc """
@@ -305,7 +328,7 @@ defmodule Cldr.Interval do
     `CalendarInterval.t` can be provided.
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore an `ex_cldr` backend module
+    is therefore a `Cldr` backend module
 
   * `options` is a keyword list of options. The default is `[]`.
 
@@ -313,7 +336,7 @@ defmodule Cldr.Interval do
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representing of an interval
-    format. The deault is `:medium`.
+    format. The default is `:medium`.
 
   * `:style` supports dfferent formatting styles. The valid
     styles depends on whether formatting is for a date, time or datetime.
@@ -470,7 +493,7 @@ defmodule Cldr.Interval do
     `CalendarInterval.t` can be provided.
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore an `ex_cldr` backend module
+    is therefore a `Cldr` backend module
 
   * `options` is a keyword list of options. The default is `[]`.
 
@@ -478,7 +501,7 @@ defmodule Cldr.Interval do
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representing of an interval
-    format. The deault is `:medium`.
+    format. The default is `:medium`.
 
   * `:style` supports dfferent formatting styles. The valid
     styles depends on whether formatting is for a date, time or datetime.

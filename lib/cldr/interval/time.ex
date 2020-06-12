@@ -1,4 +1,14 @@
 defmodule Cldr.Time.Interval do
+  @moduledoc """
+  Interval formats allow for software to format intervals like "Jan 10-12, 2008" as a
+  shorter and more natural format than "Jan 10, 2008 - Jan 12, 2008". They are designed
+  to take a start and end date, time or datetime plus a formatting pattern
+  and use that information to produce a localized format.
+
+  See `Cldr.Interval.to_string/3` and `Cldr.Time.Interval.to_string/3`
+
+  """
+
   alias Cldr.DateTime.Format
 
   import Cldr.Date.Interval,
@@ -8,7 +18,9 @@ defmodule Cldr.Time.Interval do
       greatest_difference: 2
     ]
 
-  import Cldr.Calendar, only: [time: 0]
+  import Cldr.Calendar, only: [
+    time: 0
+  ]
 
   # Time styles not defined
   # by a grouping but can still
@@ -51,6 +63,103 @@ defmodule Cldr.Time.Interval do
     @style_map
   end
 
+  @doc false
+  def to_string(unquote(time()) = from, unquote(time()) = to) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  @doc false
+  def to_string(unquote(time()) = from, unquote(time()) = to, backend) when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  @doc false
+  def to_string(unquote(time()) = from, unquote(time()) = to, options) when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
+
+  @doc """
+  Returns a string representing the formatted
+  interval formed by two times.
+
+  ## Arguments
+
+  * `from` and `to` are any maps that conform to the
+    `Calendar.time` type which means a map that includes
+    at least the keys `:hour`, `:minute` and `:second` and
+    `:microsecond`
+
+  * `backend` is any module that includes `use Cldr` and
+    is therefore `Cldr` backend module
+
+  * `options` is a keyword list of options. The default is `[]`.
+
+  ## Options
+
+  * `:format` is one of `:short`, `:medium` or `:long` or a
+    specific format type or a string representing of an interval
+    format. The default is `:medium`.
+
+  * `:style` supports dfferent formatting styles. The
+    alternatives are `:time`, `:zone`,
+    and `:flex`. The default is `:time`.
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+
+  * `number_system:` a number system into which the formatted date digits should
+    be transliterated
+
+  ## Returns
+
+  * `{:ok, string}` or
+
+  * `{:error, {exception, reason}}`
+
+  ## Notes
+
+  * For more information on interval format string
+    see `Cldr.Interval`.
+
+  * The available predefined formats that can be applied are the
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
+    where `"en"` can be replaced by any configured locale name and `:gregorian`
+    is the underlying `CLDR` calendar type.
+
+  * In the case where `from` and `to` are equal, a single
+    time is formatted instead of an interval
+
+  ## Examples
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
+      {:ok, "10 – 10"}
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
+      {:ok, "10:00 – 10:03"}
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :long
+      {:ok, "10:00 – 10:03"}
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
+      ...> format: :long, style: :flex
+      {:ok, "10:00 – 10:03 in the morning"}
+
+      iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
+      ...> MyApp.Cldr, format: :long, style: :flex
+      {:ok, "12:00 – 10:00 in the morning"}
+
+      iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
+      ...> MyApp.Cldr, format: :long, style: :zone
+      {:ok, "00:00 – 10:00 Etc/UTC"}
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
+      ...> format: :long, style: :flex, locale: "th"
+      {:ok, "10:00 – 10:03 ในตอนเช้า"}
+
+  """
   def to_string(from, to, backend, options \\ [])
 
   def to_string(%{calendar: calendar} = from, %{calendar: calendar} = to, backend, options)
@@ -98,6 +207,91 @@ defmodule Cldr.Time.Interval do
     end
   end
 
+  @doc false
+  def to_string!(unquote(time()) = from, unquote(time()) = to) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string!(from, to, backend, locale: locale)
+  end
+
+  @doc """
+  Returns a string representing the formatted
+  interval formed by two times.
+
+  ## Arguments
+
+  * `from` and `to` are any maps that conform to the
+    `Calendar.time` type which means a map that includes
+    at least the keys `:hour`, `:minute` and `:second` and
+    `:microsecond`
+
+  * `backend` is any module that includes `use Cldr` and
+    is therefore `Cldr` backend module
+
+  * `options` is a keyword list of options. The default is `[]`.
+
+  ## Options
+
+  * `:format` is one of `:short`, `:medium` or `:long` or a
+    specific format type or a string representing of an interval
+    format. The default is `:medium`.
+
+  * `:style` supports dfferent formatting styles. The
+    alternatives are `:time`, `:zone`,
+    and `:flex`. The default is `:time`.
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+
+  * `number_system:` a number system into which the formatted date digits should
+    be transliterated
+
+  ## Returns
+
+  * `{:ok, string}` or
+
+  * `{:error, {exception, reason}}`
+
+  ## Notes
+
+  * For more information on interval format string
+    see `Cldr.Interval`.
+
+  * The available predefined formats that can be applied are the
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
+    where `"en"` can be replaced by any configured locale name and `:gregorian`
+    is the underlying `CLDR` calendar type.
+
+  * In the case where `from` and `to` are equal, a single
+    time is formatted instead of an interval
+
+  ## Examples
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
+      {:ok, "10 – 10"}
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
+      {:ok, "10:00 – 10:03"}
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :long
+      {:ok, "10:00 – 10:03"}
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
+      ...> format: :long, style: :flex
+      {:ok, "10:00 – 10:03 in the morning"}
+
+      iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
+      ...> MyApp.Cldr, format: :long, style: :flex
+      {:ok, "12:00 – 10:00 in the morning"}
+
+      iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
+      ...> MyApp.Cldr, format: :long, style: :zone
+      {:ok, "00:00 – 10:00 Etc/UTC"}
+
+      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
+      ...> format: :long, style: :flex, locale: "th"
+      {:ok, "10:00 – 10:03 ในตอนเช้า"}
+
+  """
   def to_string!(from, to, backend, options \\ []) do
     case to_string(from, to, backend, options) do
       {:ok, string} -> string

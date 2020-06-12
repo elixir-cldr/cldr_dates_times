@@ -103,7 +103,7 @@ This is the changelog for Cldr_Dates_Times v2.2.0 released on August 23rd, 2019.
 
 ## Bug Fixes
 
-* Fix references to `Cldr.get_current_locale/0` to the current `Cldr/get_locale/0`
+* Fix references to `Cldr.get_current_locale/0` to the current `Cldr.get_locale/0`
 
 * Fix dialyzer warnings
 

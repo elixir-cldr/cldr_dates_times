@@ -1,4 +1,13 @@
 defmodule Cldr.Date.Interval do
+  @moduledoc """
+  Interval formats allow for software to format intervals like "Jan 10-12, 2008" as a
+  shorter and more natural format than "Jan 10, 2008 - Jan 12, 2008". They are designed
+  to take a start and end date, time or datetime plus a formatting pattern
+  and use that information to produce a localized format.
+
+  See `Cldr.Interval.to_string/3` and `Cldr.Date.Interval.to_string/3`
+
+  """
   alias Cldr.DateTime.Format
   import Cldr.Calendar, only: [date: 0]
 
@@ -62,42 +71,42 @@ defmodule Cldr.Date.Interval do
 
   @doc false
   def to_string(%Date.Range{first: first, last: last}) do
-    locale = Cldr.get_locale
-    backend = locale.backend
-    to_string(first, last, backend, [])
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(first, last, backend, locale: locale)
   end
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
     @doc false
     def to_string(%CalendarInterval{} = interval) do
-      locale = Cldr.get_locale
-      backend = locale.backend
-      to_string(interval, backend, [])
+      {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+      to_string(interval, backend, locale: locale)
     end
   end
 
   @doc false
   def to_string(unquote(date()) = from, unquote(date()) = to) do
-    locale = Cldr.get_locale
-    backend = locale.backend
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
     to_string(from, to, backend, locale: locale)
   end
 
   @doc false
-  def to_string(%Date.Range{first: first, last: last}, backend) do
-    to_string(first, last, backend, [])
+  def to_string(%Date.Range{first: first, last: last}, backend) when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(first, last, backend, locale: locale)
   end
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
     @doc false
-    def to_string(%CalendarInterval{} = interval, backend) do
-      to_string(interval, backend, [])
+    def to_string(%CalendarInterval{} = interval, backend) when is_atom(backend) do
+      {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+      to_string(interval, backend, locale: locale)
     end
   end
 
   @doc false
-  def to_string(unquote(date()) = from, unquote(date()) = to, backend) do
-    to_string(from, to, backend, [])
+  def to_string(unquote(date()) = from, unquote(date()) = to, backend) when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
   end
 
   @doc """
@@ -110,7 +119,7 @@ defmodule Cldr.Date.Interval do
     or a `CalendarInterval.t`
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore an `ex_cldr` backend module
+    is therefore an `Cldr` backend module
 
   * `options` is a keyword list of options. The default is `[]`.
 
@@ -118,7 +127,7 @@ defmodule Cldr.Date.Interval do
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representing of an interval
-    format. The deault is `:medium`.
+    format. The default is `:medium`.
 
   * `:style` supports dfferent formatting styles. The
     alternatives are `:date`, `:month_and_day`, `:month`
@@ -143,7 +152,7 @@ defmodule Cldr.Date.Interval do
     to the `deps` configuration in `mix.exs`.
 
   * For more information on interval format string
-    see the [module documentation]().
+    see the `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
@@ -205,7 +214,7 @@ defmodule Cldr.Date.Interval do
 
   @doc """
   Returns a string representing the formatted
-  interval formed by two date.
+  interval formed by two dates.
 
   ## Arguments
 
@@ -214,7 +223,7 @@ defmodule Cldr.Date.Interval do
     at least the keys `:year`, `:month` and `:day`
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore an `ex_cldr` backend module
+    is therefore an `Cldr` backend module
 
   * `options` is a keyword list of options. The default is `[]`.
 
@@ -222,7 +231,7 @@ defmodule Cldr.Date.Interval do
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representing of an interval
-    format. The deault is `:medium`.
+    format. The default is `:medium`.
 
   * `:style` supports dfferent formatting styles. The
     alternatives are `:date`, `:month_and_day`, `:month`
@@ -247,7 +256,7 @@ defmodule Cldr.Date.Interval do
     to the `deps` configuration in `mix.exs`.
 
   * For more information on interval format string
-    see the [module documentation]().
+    see the `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
@@ -358,7 +367,7 @@ defmodule Cldr.Date.Interval do
     or a `CalendarInterval.t`
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore an `ex_cldr` backend module
+    is therefore an `Cldr` backend module
 
   * `options` is a keyword list of options. The default is `[]`.
 
@@ -366,7 +375,7 @@ defmodule Cldr.Date.Interval do
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representing of an interval
-    format. The deault is `:medium`.
+    format. The default is `:medium`.
 
   * `:style` supports dfferent formatting styles. The
     alternatives are `:date`, `:month_and_day`, `:month`
@@ -391,7 +400,7 @@ defmodule Cldr.Date.Interval do
     to the `deps` configuration in `mix.exs`.
 
   * For more information on interval format string
-    see the [module documentation]().
+    see the `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
@@ -448,7 +457,6 @@ defmodule Cldr.Date.Interval do
     end
   end
 
-
   @doc """
   Returns a string representing the formatted
   interval formed by two date.
@@ -461,7 +469,7 @@ defmodule Cldr.Date.Interval do
     date `from` must precede or equal the date `to`.
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore an `ex_cldr` backend module
+    is therefore an `Cldr` backend module
 
   * `options` is a keyword list of options
 
@@ -469,7 +477,7 @@ defmodule Cldr.Date.Interval do
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representing of an interval
-    format. The deault is `:medium`.
+    format. The default is `:medium`.
 
   * `:style` supports dfferent formatting styles. The
     alternatives are `:date`, `:month_and_day`, `:month`
@@ -494,7 +502,7 @@ defmodule Cldr.Date.Interval do
     to the `deps` configuration in `mix.exs`.
 
   * For more information on interval format string
-    see the [module documentation]().
+    see `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
@@ -533,6 +541,7 @@ defmodule Cldr.Date.Interval do
       "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"
 
   """
+
   @spec to_string!(Calendar.date(), Calendar.date(), Cldr.backend(), Keyword.t()) ::
     String.t() | no_return()
 
