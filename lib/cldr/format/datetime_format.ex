@@ -30,7 +30,7 @@ defmodule Cldr.DateTime.Format do
         known_formats(&all_time_formats(&1, backend), locale_names) ++
         known_formats(&all_date_time_formats(&1, backend), locale_names) ++
         known_formats(&all_interval_formats(&1, backend), locale_names)) ++
-        config.precompile_date_time_formats ++ precompile_interval_formats(config))
+       config.precompile_date_time_formats ++ precompile_interval_formats(config))
     |> Enum.uniq()
     |> Enum.reject(&is_atom/1)
   end

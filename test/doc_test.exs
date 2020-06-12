@@ -18,6 +18,7 @@ defmodule Cldr.DateTime.Test do
   doctest MyApp.Cldr.DateTime
   doctest MyApp.Cldr.DateTime.Relative
 
+  doctest MyApp.Cldr.Interval
   doctest MyApp.Cldr.DateTime.Interval
   doctest MyApp.Cldr.Date.Interval
   doctest MyApp.Cldr.Time.Interval

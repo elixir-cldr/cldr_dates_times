@@ -191,8 +191,8 @@ defmodule Cldr.Date.Interval do
       {:ok, "mer. 1 – dim. 12 janv. 2020"}
 
   """
-  @spec to_string(Cldr.Interval.range, Cldr.backend(), Keyword.t()) ::
-      {:ok, String.t()} | {:error, {module(), String.t()}}
+  @spec to_string(Cldr.Interval.range(), Cldr.backend(), Keyword.t()) ::
+          {:ok, String.t()} | {:error, {module(), String.t()}}
 
   def to_string(%Date.Range{first: first, last: last}, backend, options) do
     to_string(first, last, backend, options)
@@ -296,9 +296,14 @@ defmodule Cldr.Date.Interval do
 
   """
   @spec to_string(Calendar.date(), Calendar.date(), Cldr.backend(), Keyword.t()) ::
-      {:ok, String.t()} | {:error, {module(), String.t()}}
+          {:ok, String.t()} | {:error, {module(), String.t()}}
 
   def to_string(from, to, backend, options \\ [])
+
+  def to_string(unquote(date()) = from, unquote(date()) = to, options, []) when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
 
   def to_string(unquote(date()) = from, unquote(date()) = to, backend, options)
       when calendar == Calendar.ISO do
@@ -363,8 +368,12 @@ defmodule Cldr.Date.Interval do
 
   ## Arguments
 
-  * `range` is either a `Date.Range.t` returned from `Date.range/2`
-    or a `CalendarInterval.t`
+  * `dates_or_range` is either of:
+
+    * `range` as either a`Date.Range.t` returned from `Date.range/2`
+      or a `CalendarInterval.t` or
+
+    * two date arguments `from` and `to`
 
   * `backend` is any module that includes `use Cldr` and
     is therefore an `Cldr` backend module
@@ -440,8 +449,8 @@ defmodule Cldr.Date.Interval do
 
   """
 
-  @spec to_string!(Cldr.Interval.range, Cldr.backend(), Keyword.t()) ::
-    String.t() | no_return()
+  @spec to_string!(Cldr.Interval.range(), Cldr.backend(), Keyword.t()) ::
+          String.t() | no_return()
 
   def to_string!(%Date.Range{} = range, backend, options) do
     case to_string(range, backend, options) do
@@ -543,7 +552,7 @@ defmodule Cldr.Date.Interval do
   """
 
   @spec to_string!(Calendar.date(), Calendar.date(), Cldr.backend(), Keyword.t()) ::
-    String.t() | no_return()
+          String.t() | no_return()
 
   def to_string!(from, to, backend, options \\ []) do
     case to_string(from, to, backend, options) do

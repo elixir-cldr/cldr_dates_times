@@ -307,7 +307,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec date_time_interval_fallback(Locale.locale_name() | LanguageTag.t(), atom()) ::
-                list() | {:error, {module(), String.t}}
+                list() | {:error, {module(), String.t()}}
 
         def date_time_interval_fallback(
               locale \\ unquote(backend).get_locale(),

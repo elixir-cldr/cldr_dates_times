@@ -18,9 +18,10 @@ defmodule Cldr.Time.Interval do
       greatest_difference: 2
     ]
 
-  import Cldr.Calendar, only: [
-    time: 0
-  ]
+  import Cldr.Calendar,
+    only: [
+      time: 0
+    ]
 
   # Time styles not defined
   # by a grouping but can still
@@ -266,30 +267,30 @@ defmodule Cldr.Time.Interval do
 
   ## Examples
 
-      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
-      {:ok, "10 – 10"}
+      iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
+      "10 – 10"
 
-      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
-      {:ok, "10:00 – 10:03"}
+      iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
+      "10:00 – 10:03"
 
-      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :long
-      {:ok, "10:00 – 10:03"}
+      iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :long
+      "10:00 – 10:03"
 
-      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
+      iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex
-      {:ok, "10:00 – 10:03 in the morning"}
+      "10:00 – 10:03 in the morning"
 
-      iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
+      iex> Cldr.Time.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
       ...> MyApp.Cldr, format: :long, style: :flex
-      {:ok, "12:00 – 10:00 in the morning"}
+      "12:00 – 10:00 in the morning"
 
-      iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
+      iex> Cldr.Time.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
       ...> MyApp.Cldr, format: :long, style: :zone
-      {:ok, "00:00 – 10:00 Etc/UTC"}
+      "00:00 – 10:00 Etc/UTC"
 
-      iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
+      iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex, locale: "th"
-      {:ok, "10:00 – 10:03 ในตอนเช้า"}
+      "10:00 – 10:03 ในตอนเช้า"
 
   """
   def to_string!(from, to, backend, options \\ []) do

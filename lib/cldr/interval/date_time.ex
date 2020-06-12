@@ -23,21 +23,32 @@ defmodule Cldr.DateTime.Interval do
   @formats [:short, :medium, :long]
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
-    def to_string(%CalendarInterval{} = interval, backend) do
-      to_string(interval, backend, [])
+    @doc false
+    def to_string(%CalendarInterval{} = interval) do
+      {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+      to_string(interval, backend, locale: locale)
     end
+  end
 
-    def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
-        when precision in [:year, :month, :day] do
-      Cldr.Date.Interval.to_string(from, to, backend, options)
-    end
+  @doc false
+  def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(from, to, backend, locale: locale)
+  end
 
-    def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
-        when precision in [:hour, :minute] do
-      from = %{from | second: 0, microsecond: {0, 6}}
-      to = %{to | second: 0, microsecond: {0, 6}}
-      to_string(from, to, backend, options)
+  if Cldr.Code.ensure_compiled?(CalendarInterval) do
+    @doc false
+    def to_string(%CalendarInterval{} = interval, backend) when is_atom(backend) do
+      {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+      to_string(interval, backend, locale: locale)
     end
+  end
+
+  @doc false
+  def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend)
+      when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
   end
 
   def to_string(from, to, backend, options \\ [])
@@ -50,12 +61,22 @@ defmodule Cldr.DateTime.Interval do
     to_string(from, to, backend, options)
   end
 
+  def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options, [])
+      when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
+
   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     format = Keyword.get(options, :format, @default_format)
 
-    number_system = Keyword.get(options, :number_system,
-        Cldr.Number.System.number_system_from_locale(locale, backend))
+    number_system =
+      Keyword.get(
+        options,
+        :number_system,
+        Cldr.Number.System.number_system_from_locale(locale, backend)
+      )
 
     options =
       options

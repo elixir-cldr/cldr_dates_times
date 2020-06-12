@@ -226,20 +226,22 @@ defmodule Cldr.Interval do
 
   @typedoc "Any date, time or datetime"
   @type datetime ::
-    Calendar.date() |
-    Calendar.datetime() |
-    Calendar.naive_datetime() |
-    Calendar.time()
+          Calendar.date()
+          | Calendar.datetime()
+          | Calendar.naive_datetime()
+          | Calendar.time()
 
-  import Cldr.Calendar, only: [
-    date: 0,
-    datetime: 0,
-    time: 0
-  ]
+  import Cldr.Calendar,
+    only: [
+      date: 0,
+      datetime: 0,
+      time: 0
+    ]
 
-  import Kernel, except: [
-    to_string: 1
-  ]
+  import Kernel,
+    except: [
+      to_string: 1
+    ]
 
   @doc false
 
@@ -597,7 +599,7 @@ defmodule Cldr.Interval do
       "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"
 
   """
-  @spec to_string!(range, Cldr.backend, Keyword.t) :: String.t | no_return()
+  @spec to_string!(range, Cldr.backend(), Keyword.t()) :: String.t() | no_return()
 
   def to_string!(range, backend, options) do
     case to_string(range, backend, options) do
@@ -606,7 +608,7 @@ defmodule Cldr.Interval do
     end
   end
 
-  @spec to_string!(datetime, datetime, Cldr.backend, Keyword.t) :: String.t | no_return()
+  @spec to_string!(datetime, datetime, Cldr.backend(), Keyword.t()) :: String.t() | no_return()
 
   def to_string!(from, to, backend, options) do
     case to_string(from, to, backend, options) do
