@@ -218,9 +218,12 @@ defmodule Cldr.Date.Interval do
 
   ## Arguments
 
-  * `from` and `to` are any maps that conform to the
-    `Calendar.date` type which means a map that includes
-    at least the keys `:year`, `:month` and `:day`
+  * `from` is any map that conforms to the
+    `Calendar.date` type.
+
+  * `to` is any map that conforms to the
+    `Calendar.date` type. `to` must occur
+    on or after `from`.
 
   * `backend` is any module that includes `use Cldr` and
     is therefore an `Cldr` backend module
@@ -250,10 +253,6 @@ defmodule Cldr.Date.Interval do
   * `{:error, {exception, reason}}`
 
   ## Notes
-
-  * `CalendarInterval` support requires adding the
-    dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
-    to the `deps` configuration in `mix.exs`.
 
   * For more information on interval format string
     see the `Cldr.Interval`.
@@ -368,15 +367,11 @@ defmodule Cldr.Date.Interval do
 
   ## Arguments
 
-  * `dates_or_range` is either of:
-
-    * `range` as either a`Date.Range.t` returned from `Date.range/2`
-      or a `CalendarInterval.t` or
-
-    * two date arguments `from` and `to`
+  * `range` is either a `Date.Range.t` returned from `Date.range/2`
+    or a `CalendarInterval.t`
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore an `Cldr` backend module
+    is therefore a `Cldr` backend module
 
   * `options` is a keyword list of options. The default is `[]`.
 
@@ -472,10 +467,12 @@ defmodule Cldr.Date.Interval do
 
   ## Arguments
 
-  * `from` and `to` are any maps that conform to the
-    `Calendar.date` type which means a map that includes
-    at least the keys `:year`, `:month` and `:day`. The
-    date `from` must precede or equal the date `to`.
+  * `from` is any map that conforms to the
+    `Calendar.date` type.
+
+  * `to` is any map that conforms to the
+    `Calendar.date` type. `to` must occur
+    on or after `from`.
 
   * `backend` is any module that includes `use Cldr` and
     is therefore an `Cldr` backend module
@@ -500,15 +497,11 @@ defmodule Cldr.Date.Interval do
 
   ## Returns
 
-  * `{:ok, string}` or
+  * `string` or
 
-  * `{:error, {exception, reason}}`
+  * raises an exception
 
   ## Notes
-
-  * `CalendarInterval` support requires adding the
-    dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
-    to the `deps` configuration in `mix.exs`.
 
   * For more information on interval format string
     see `Cldr.Interval`.

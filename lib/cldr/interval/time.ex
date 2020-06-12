@@ -88,10 +88,12 @@ defmodule Cldr.Time.Interval do
 
   ## Arguments
 
-  * `from` and `to` are any maps that conform to the
-    `Calendar.time` type which means a map that includes
-    at least the keys `:hour`, `:minute` and `:second` and
-    `:microsecond`
+  * `from` is any map that conforms to the
+    `Calendar.time` type.
+
+  * `to` is any map that conforms to the
+    `Calendar.time` type. `to` must occur
+    on or after `from`.
 
   * `backend` is any module that includes `use Cldr` and
     is therefore `Cldr` backend module
@@ -220,10 +222,12 @@ defmodule Cldr.Time.Interval do
 
   ## Arguments
 
-  * `from` and `to` are any maps that conform to the
-    `Calendar.time` type which means a map that includes
-    at least the keys `:hour`, `:minute` and `:second` and
-    `:microsecond`
+  * `from` is any map that conforms to the
+    `Calendar.time` type.
+
+  * `to` is any map that conforms to the
+    `Calendar.time` type. `to` must occur
+    on or after `from`.
 
   * `backend` is any module that includes `use Cldr` and
     is therefore `Cldr` backend module
@@ -248,9 +252,9 @@ defmodule Cldr.Time.Interval do
 
   ## Returns
 
-  * `{:ok, string}` or
+  * `string` or
 
-  * `{:error, {exception, reason}}`
+  * raises an exception
 
   ## Notes
 

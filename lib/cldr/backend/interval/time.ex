@@ -23,10 +23,12 @@ defmodule Cldr.Time.Interval.Backend do
 
         ## Arguments
 
-        * `from` and `to` are any maps that conform to the
-          `Calendar.time` type which means a map that includes
-          at least the keys `:hour`, `:minute` and `:second` and
-          `:microsecond`
+        * `from` is any map that conforms to the
+          `Calendar.time` type.
+
+        * `to` is any map that conforms to the
+          `Calendar.time` type. `to` must occur
+          on or after `from`.
 
         * `options` is a keyword list of options. The default is `[]`.
 
@@ -41,7 +43,7 @@ defmodule Cldr.Time.Interval.Backend do
           and `:flex`. The default is `:time`.
 
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+          or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`
 
         * `number_system:` a number system into which the formatted date digits should
           be transliterated
@@ -93,7 +95,12 @@ defmodule Cldr.Time.Interval.Backend do
             {:ok, "10:00 – 10:03 ในตอนเช้า"}
 
         """
+        @spec to_string(Calendar.time, Calendar.time, Keyword.t) ::
+            {:ok, String.t} | {:error, {module, String.t}}
+
         def to_string(from, to, options \\ []) do
+          locale = unquote(backend).get_locale
+          options = Keyword.put_new(options, :locale, locale)
           Cldr.Time.Interval.to_string(from, to, unquote(backend), options)
         end
 
@@ -103,13 +110,12 @@ defmodule Cldr.Time.Interval.Backend do
 
         ## Arguments
 
-        * `from` and `to` are any maps that conform to the
-          `Calendar.time` type which means a map that includes
-          at least the keys `:hour`, `:minute` and `:second` and
-          `:microsecond`
+        * `from` is any map that conforms to the
+          `Calendar.time` type.
 
-        * `backend` is any module that includes `use Cldr` and
-          is therefore `Cldr` backend module
+        * `to` is any map that conforms to the
+          `Calendar.time` type. `to` must occur
+          on or after `from`.
 
         * `options` is a keyword list of options. The default is `[]`.
 
@@ -124,16 +130,16 @@ defmodule Cldr.Time.Interval.Backend do
           and `:flex`. The default is `:time`.
 
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+          or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`
 
         * `number_system:` a number system into which the formatted date digits should
           be transliterated
 
         ## Returns
 
-        * `{:ok, string}` or
+        * `string` or
 
-        * `{:error, {exception, reason}}`
+        * raises an exception
 
         ## Notes
 
@@ -176,7 +182,12 @@ defmodule Cldr.Time.Interval.Backend do
             "10:00 – 10:03 ในตอนเช้า"
 
         """
+        @spec to_string!(Calendar.time, Calendar.time, Keyword.t) ::
+            String.t | no_return()
+
         def to_string!(from, to, options \\ []) do
+          locale = unquote(backend).get_locale
+          options = Keyword.put_new(options, :locale, locale)
           Cldr.Time.Interval.to_string!(from, to, unquote(backend), options)
         end
       end

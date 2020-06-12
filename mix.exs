@@ -50,6 +50,12 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp groups_for_modules do
     [
+      Interval: [
+        Cldr.Interval,
+        Cldr.Date.Interval,
+        Cldr.Time.Interval,
+        Cldr.DateTime.Interval
+        ],
       Helpers: [
         Cldr.DateTime.Compiler,
         Cldr.DateTime.Format,

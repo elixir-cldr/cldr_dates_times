@@ -30,18 +30,91 @@ defmodule Cldr.DateTime.Interval do
     end
   end
 
-  @doc false
-  def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to) do
-    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
-    to_string(from, to, backend, locale: locale)
-  end
-
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
     @doc false
     def to_string(%CalendarInterval{} = interval, backend) when is_atom(backend) do
       {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
       to_string(interval, backend, locale: locale)
     end
+
+    @doc false
+    def to_string(%CalendarInterval{} = interval, options) when is_list(options) do
+      {locale, backend} = Cldr.locale_and_backend_from(options)
+      to_string(interval, backend, locale: locale)
+    end
+
+    @doc """
+    Returns a localised string representing the formatted
+    `CalendarInterval`.
+
+    ## Arguments
+
+    * `range` is a `CalendarInterval.t`
+
+    * `backend` is any module that includes `use Cldr` and
+      is therefore a `Cldr` backend module
+
+    * `options` is a keyword list of options. The default is `[]`.
+
+    ## Options
+
+    * `:format` is one of `:short`, `:medium` or `:long` or a
+      specific format type or a string representing of an interval
+      format. The default is `:medium`.
+
+    * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+
+    * `number_system:` a number system into which the formatted date digits should
+      be transliterated
+
+    ## Returns
+
+    * `{:ok, string}` or
+
+    * `{:error, {exception, reason}}`
+
+    ## Notes
+
+    * `CalendarInterval` support requires adding the
+      dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
+      to the `deps` configuration in `mix.exs`.
+
+    * For more information on interval format string
+      see the `Cldr.Interval`.
+
+    * The available predefined formats that can be applied are the
+      keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
+      where `"en"` can be replaced by any configuration locale name and `:gregorian`
+      is the underlying `CLDR` calendar type.
+
+    * In the case where `from` and `to` are equal, a single
+      datetime is formatted instead of an interval
+
+    ## Examples
+
+        iex> Cldr.DateTime.Interval.to_string ~I"2020-01-01 10:00/12:00", MyApp.Cldr
+        {:ok, "Jan 1, 2020, 10:00:00 AM – 12:00:59 PM"}
+
+    """
+    @spec to_string(CalendarInterval.t, Cldr.backend(), Keyword.t) ::
+        {:ok, String.t} | {:error, {module, String.t}}
+
+    def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
+        when precision in [:year, :month, :day] do
+      Cldr.Date.Interval.to_string(from, to, backend, options)
+    end
+
+    def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
+        when precision in [:hour, :minute] do
+      to_string(from, to, backend, options)
+    end
+  end
+
+  @doc false
+  def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(from, to, backend, locale: locale)
   end
 
   @doc false
@@ -50,6 +123,72 @@ defmodule Cldr.DateTime.Interval do
     {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
     to_string(from, to, backend, locale: locale)
   end
+
+  @doc false
+  def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options)
+      when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  @doc """
+  Returns a localised string representing the formatted
+  interval formed by two dates.
+
+  ## Arguments
+
+  * `from` is any map that conforms to the
+    `Calendar.datetime` type.
+
+  * `to` is any map that conforms to the
+    `Calendar.datetime` type. `to` must occur
+    on or after `from`.
+
+  * `backend` is any module that includes `use Cldr` and
+    is therefore a `Cldr` backend module
+
+  * `options` is a keyword list of options. The default is `[]`.
+
+  ## Options
+
+  * `:format` is one of `:short`, `:medium` or `:long` or a
+    specific format type or a string representing of an interval
+    format. The default is `:medium`.
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+
+  * `number_system:` a number system into which the formatted date digits should
+    be transliterated
+
+  ## Returns
+
+  * `{:ok, string}` or
+
+  * `{:error, {exception, reason}}`
+
+  ## Notes
+
+  * For more information on interval format string
+    see the `Cldr.Interval`.
+
+  * The available predefined formats that can be applied are the
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
+    where `"en"` can be replaced by any configuration locale name and `:gregorian`
+    is the underlying `CLDR` calendar type.
+
+  * In the case where `from` and `to` are equal, a single
+    date is formatted instead of an interval
+
+  ## Examples
+
+      iex> Cldr.DateTime.Interval.to_string ~U[2020-01-01 00:00:00.0Z],
+      ...> ~U[2020-12-31 10:00:00.0Z], MyApp.Cldr
+      {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
+
+  """
+  @spec to_string(Calendar.datetime, Calendar.datetime, Cldr.backend(), Keyword.t) ::
+      {:ok, String.t} | {:error, {module, String.t}}
 
   def to_string(from, to, backend, options \\ [])
 
@@ -102,32 +241,151 @@ defmodule Cldr.DateTime.Interval do
     end
   end
 
-  def to_string!(%Date.Range{} = range, backend) do
-    to_string!(range, backend, [])
-  end
-
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
-    def to_string!(%CalendarInterval{} = range, backend) do
-      to_string!(range, backend, [])
+    @doc false
+    def to_string!(%CalendarInterval{} = range, backend) when is_atom(backend) do
+      {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+      to_string!(range, backend, locale: locale)
     end
-  end
 
-  def to_string!(%Date.Range{} = range, backend, options) do
-    case to_string(range, backend, options) do
-      {:ok, string} -> string
-      {:error, {exception, reason}} -> raise exception, reason
+    @doc false
+    def to_string!(%CalendarInterval{} = range, options) when is_list(options) do
+      {locale, backend} = Cldr.locale_and_backend_from(options[:locale], nil)
+      options = Keyword.put_new(options, :locale, locale)
+      to_string!(range, backend, options)
     end
   end
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
-    def to_string!(%CalendarInterval{} = range, backend, options) do
-      case to_string(range, backend, options) do
-        {:ok, string} -> string
-        {:error, {exception, reason}} -> raise exception, reason
-      end
+    @doc """
+    Returns a localised string representing the formatted
+    interval formed by two dates or raises an
+    exception.
+
+    ## Arguments
+
+    * `from` is any map that conforms to the
+      `Calendar.datetime` type.
+
+    * `to` is any map that conforms to the
+      `Calendar.datetime` type. `to` must occur
+      on or after `from`.
+
+    * `backend` is any module that includes `use Cldr` and
+      is therefore a `Cldr` backend module.
+
+    * `options` is a keyword list of options. The default is `[]`.
+
+    ## Options
+
+    * `:format` is one of `:short`, `:medium` or `:long` or a
+      specific format type or a string representing of an interval
+      format. The default is `:medium`.
+
+    * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
+
+    * `number_system:` a number system into which the formatted date digits should
+      be transliterated.
+
+    ## Returns
+
+    * `string` or
+
+    * raises an exception
+
+    ## Notes
+
+    * For more information on interval format string
+      see the `Cldr.Interval`.
+
+    * The available predefined formats that can be applied are the
+      keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
+      where `"en"` can be replaced by any configuration locale name and `:gregorian`
+      is the underlying `CLDR` calendar type.
+
+    * In the case where `from` and `to` are equal, a single
+      date is formatted instead of an interval
+
+    ## Examples
+
+        iex> use CalendarInterval
+        iex> Cldr.DateTime.Interval.to_string! ~I"2020-01-01 00:00/10:00", MyApp.Cldr
+        "Jan 1, 2020, 12:00:00 AM – 10:00:59 AM"
+
+    """
+
+    @spec to_string!(CalendarInterval.t, Cldr.backend(), Keyword.t) ::
+        String.t | no_return
+
+    def to_string!(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
+        when precision in [:year, :month, :day] do
+      Cldr.Date.Interval.to_string!(from, to, backend, options)
+    end
+
+    def to_string!(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
+        when precision in [:hour, :minute] do
+      to_string!(from, to, backend, options)
     end
   end
 
+  @doc """
+  Returns a localised string representing the formatted
+  interval formed by two dates or raises an
+  exception.
+
+  ## Arguments
+
+  * `from` is any map that conforms to the
+    `Calendar.datetime` type.
+
+  * `to` is any map that conforms to the
+    `Calendar.datetime` type. `to` must occur
+    on or after `from`.
+
+  * `backend` is any module that includes `use Cldr` and
+    is therefore a `Cldr` backend module.
+
+  * `options` is a keyword list of options. The default is `[]`.
+
+  ## Options
+
+  * `:format` is one of `:short`, `:medium` or `:long` or a
+    specific format type or a string representing of an interval
+    format. The default is `:medium`.
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
+
+  * `number_system:` a number system into which the formatted date digits should
+    be transliterated.
+
+  ## Returns
+
+  * `string` or
+
+  * raises an exception
+
+  ## Notes
+
+  * For more information on interval format string
+    see the `Cldr.Interval`.
+
+  * The available predefined formats that can be applied are the
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
+    where `"en"` can be replaced by any configuration locale name and `:gregorian`
+    is the underlying `CLDR` calendar type.
+
+  * In the case where `from` and `to` are equal, a single
+    date is formatted instead of an interval
+
+  ## Examples
+
+      iex> Cldr.DateTime.Interval.to_string! ~U[2020-01-01 00:00:00.0Z],
+      ...> ~U[2020-12-31 10:00:00.0Z], MyApp.Cldr
+      "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"
+
+  """
   def to_string!(from, to, backend, options \\ []) do
     case to_string(from, to, backend, options) do
       {:ok, string} -> string

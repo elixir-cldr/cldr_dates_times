@@ -309,12 +309,14 @@ defmodule Cldr.Interval do
 
   def to_string(unquote(date()) = from, unquote(date()) = to, options) when is_list(options) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
-    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+    options = Keyword.put_new(options, :locale, locale)
+    to_string(from, to, backend, options)
   end
 
   def to_string(unquote(time()) = from, unquote(time()) = to, options) when is_list(options) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
-    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+    options =  Keyword.put_new(options, :locale, locale)
+    to_string(from, to, backend, options)
   end
 
   @doc """
