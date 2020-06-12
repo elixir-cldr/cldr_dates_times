@@ -18,7 +18,8 @@ defmodule CldrDatesTimes.Mixfile do
       compilers: Mix.compilers(),
       elixirc_paths: elixirc_paths(Mix.env()),
       dialyzer: [
-        ignore_warnings: ".dialyzer_ignore_warnings"
+        ignore_warnings: ".dialyzer_ignore_warnings",
+        plt_add_apps: ~w(calendar_interval)a
       ]
     ]
   end
