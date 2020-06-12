@@ -48,7 +48,7 @@ config :ex_cldr,
 
 ### Migration from Cldr.DatesTimes Version 1
 
-1. In modules where there are calls to `Cldr.DateTime.string/2` (or the `Date` and `Time` equivalents), add `alias MyApp.Cldr` to the top of the module. That will ensure that calls are directed to the backend with minimal code change. This is the preferred approach.
+1. In modules where there are calls to `Cldr.DateTime.to_string/2` (or the `Date` and `Time` equivalents), add `alias MyApp.Cldr` to the top of the module. That will ensure that calls are directed to the backend with minimal code change. This is the preferred approach.
 
 
 2. Alternatively, update any calls to `Cldr.Date.to_string/2` to call `Cldr.Date.to_string/3` with the second parameter being a backend module. The same applies for migrating to `Cldr.DateTime.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  For example:
@@ -121,7 +121,7 @@ Dates, Times and DateTimes can be formatted using:
   {:ok, "03:52"}
 ```
 
-* For `DateTime`s there is also a set of predefined format name.  These format names are returned by `MyApp.Cldr.DateTime.date_time_available_formats/0` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` paramater to `Cldr.DateTime.to_string/2` module only.
+* For `DateTime`s there is also a set of predefined format name.  These format names are returned by `MyApp.Cldr.DateTime.Format.date_time_available_formats/0` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` paramater to `Cldr.DateTime.to_string/2` module only.
 
 ```elixir
   iex> MyApp.Cldr.DateTime.Format.date_time_available_formats

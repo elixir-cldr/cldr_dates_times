@@ -124,10 +124,10 @@ defmodule Cldr.Date.Interval do
     alternatives are `:date`, `:month_and_day`, `:month`
     and `:year_and_month`. The default is `:date`.
 
-  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
 
-  * `number_system:` a number system into which the formatted date digits should
+  * `:number_system` a number system into which the formatted date digits should
     be transliterated
 
   ## Returns
@@ -146,7 +146,7 @@ defmodule Cldr.Date.Interval do
     see the [module documentation]().
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying `CLDR` calendar type.
 
@@ -182,13 +182,7 @@ defmodule Cldr.Date.Interval do
       {:ok, "mer. 1 – dim. 12 janv. 2020"}
 
   """
-  if Cldr.Code.ensure_compiled?(CalendarInterval) do
-    @type range :: Date.Range.t() | CalendarInterval.t()
-  else
-    @type Date.Range.t()
-  end
-
-  @spec to_string(range, Cldr.backend(), Keyword.t()) ::
+  @spec to_string(Cldr.Interval.range, Cldr.backend(), Keyword.t()) ::
       {:ok, String.t()}, {:error, {module(), String.t()}}
 
   def to_string(%Date.Range{first: first, last: last}, backend, options) do
@@ -256,7 +250,7 @@ defmodule Cldr.Date.Interval do
     see the [module documentation]().
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying `CLDR` calendar type.
 
@@ -400,7 +394,7 @@ defmodule Cldr.Date.Interval do
     see the [module documentation]().
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying `CLDR` calendar type.
 
@@ -437,7 +431,7 @@ defmodule Cldr.Date.Interval do
 
   """
 
-  @spec to_string!(range, Cldr.backend(), Keyword.t()) ::
+  @spec to_string!(Cldr.Interval.range, Cldr.backend(), Keyword.t()) ::
     String.t() | no_return()
 
   def to_string!(%Date.Range{} = range, backend, options) do
@@ -503,7 +497,7 @@ defmodule Cldr.Date.Interval do
     see the [module documentation]().
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying `CLDR` calendar type.
 

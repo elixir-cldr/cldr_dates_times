@@ -10,13 +10,12 @@ defmodule Cldr.Interval do
   format pattern.
 
   For example, the greatest difference in "Jan 10-12, 2008" is the day field, while
-  the greatest difference in "Jan 10 - Feb 12, 2008" is the month field.
-
-  This is used to pick the exact pattern to be used.
+  the greatest difference in "Jan 10 - Feb 12, 2008" is the month field. This is used to
+  pick the exact pattern to be used.
 
   ### Interval Format Styles
 
-  CLDR provides a set of abstract formats that map to a concrete format string.
+  CLDR provides a set of format types that map to a concrete format string.
   To simplify the developer experience, `ex_cldr_dates_times` groups these
   formats into `styles` and `format types`.
 
@@ -30,6 +29,13 @@ defmodule Cldr.Interval do
     month: %{long: :mmm, medium: :mmm, short: :m},
     month_and_day: %{long: :mmm_ed, medium: :mm_md, short: :md},
     year_and_month: %{long: :y_mmmm, medium: :y_mmm, short: :y_m}
+  }
+
+  iex> Cldr.Time.Interval.styles
+  %{
+    flex: %{long: :bhm, medium: :bhm, short: :bh},
+    time: %{long: :hm, medium: :hm, short: :h},
+    zone: %{long: :hmv, medium: :hmv, short: :hv}
   }
   ```
 
@@ -211,10 +217,28 @@ defmodule Cldr.Interval do
 
   """
 
+  @typedoc "A Date.Range or CalendarInterval range"
+  if Cldr.Code.ensure_compiled?(CalendarInterval) do
+    @type range :: Date.Range.t() | CalendarInterval.t()
+  else
+    @type range :: Date.Range.t()
+  end
+
+  @typedoc "Any date, time or datetime"
+  @type datetime ::
+    Calendar.date() |
+    Calendar.datetime() |
+    Calendar.naive_datetime() |
+    Calendar.time()
+
   import Cldr.Calendar, only: [
     date: 0,
     datetime: 0,
     time: 0
+  ]
+
+  import Kernel, except: [
+    to_string: 1
   ]
 
   @doc false
@@ -322,12 +346,12 @@ defmodule Cldr.Interval do
 
   ## Notes
 
-  * `to_string/3` will decide which formatter to use based upon
+  * `to_string/3` will decide which formatter to call based upon
     the aguments provided to it.
 
     * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
 
-    * A `CalendarInterval` will call Cldr.Date.Interval.to_string/3`
+    * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
       if its `:precision` is `:year`, `:month` or `:day`. Othersie
       it will call `Cldr.Time.Interval.to_string/3`
 
@@ -348,7 +372,7 @@ defmodule Cldr.Interval do
     see `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying `CLDR` calendar type.
 
@@ -415,5 +439,156 @@ defmodule Cldr.Interval do
 
   def to_string(unquote(time()) = from, unquote(time()) = to, backend, options) do
     Cldr.Time.Interval.to_string(from, to, backend, options)
+  end
+
+  @doc false
+  def to_string!(range) do
+    case to_string(range) do
+      {:ok, string} -> string
+      {:error, {exception, reason}} -> raise exception, reason
+    end
+  end
+
+  @doc false
+  def to_string!(range, backend) do
+    case to_string(range, backend) do
+      {:ok, string} -> string
+      {:error, {exception, reason}} -> raise exception, reason
+    end
+  end
+
+  @doc """
+  Returns a string representing the formatted
+  interval formed by two date.
+
+  ## Arguments
+
+  * `from` and `to` are any maps that conform to the
+    `Calendar.date` type which means a map that includes
+    at least the keys `:year`, `:month` and `:day`.
+    Instead of `from` and `to`, a `Date.Range.t` or
+    `CalendarInterval.t` can be provided.
+
+  * `backend` is any module that includes `use Cldr` and
+    is therefore an `ex_cldr` backend module
+
+  * `options` is a keyword list of options. The default is `[]`.
+
+  ## Options
+
+  * `:format` is one of `:short`, `:medium` or `:long` or a
+    specific format type or a string representing of an interval
+    format. The deault is `:medium`.
+
+  * `:style` supports dfferent formatting styles. The valid
+    styles depends on whether formatting is for a date, time or datetime.
+    Since the functions in this module will make a determination as
+    to which formatter to be used based upon the data passed to them
+    it is recommended the style option be ommitted. If styling is important
+    then call `to_string/3` directly on `Cldr.Date.Interval`, `Cldr.Time.Interval`
+    or `Cldr.DateTime.Interval`.
+
+    * For a date the alternatives are `:date`, `:month_and_day`, `:month`
+      and `:year_and_month`. The default is `:date`.
+
+    * For a time the alternatives are `:time`, `:zone` and
+      `:flex`. The default is `:time`
+
+    * For a datetime there are no style options, the default
+      for each of the date and time part is used
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+
+  * `number_system:` a number system into which the formatted date digits should
+    be transliterated
+
+  ## Returns
+
+  * `{:ok, string}` or
+
+  * `{:error, {exception, reason}}`
+
+  ## Notes
+
+  * `to_string/3` will decide which formatter to call based upon
+    the aguments provided to it.
+
+    * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
+
+    * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
+      if its `:precision` is `:year`, `:month` or `:day`. Othersie
+      it will call `Cldr.Time.Interval.to_string/3`
+
+    * If `from` and `to` both conform to the `Calendar.datetime()`
+      type then `Cldr.DateTime.Interval.to_string/3` is called
+
+    * Otherwise if `from` and `to` conform to the `Calendar.date()`
+      type then `Cldr.Date.Interval.to_string/3` is called
+
+    * Otherwise if `from` and `to` conform to the `Calendar.time()`
+      type then `Cldr.Time.Interval.to_string/3` is called
+
+  * `CalendarInterval` support requires adding the
+    dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
+    to the `deps` configuration in `mix.exs`.
+
+  * For more information on interval format string
+    see `Cldr.Interval`.
+
+  * The available predefined formats that can be applied are the
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
+    where `"en"` can be replaced by any configuration locale name and `:gregorian`
+    is the underlying `CLDR` calendar type.
+
+  * In the case where `from` and `to` are equal, a single
+    date, time or datetime is formatted instead of an interval
+
+  ## Examples
+
+      iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr
+      "Jan 1 – Dec 31, 2020"
+
+      iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr
+      "Jan 1 – 12, 2020"
+
+      iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
+      ...> format: :long
+      "Wed, Jan 1 – Sun, Jan 12, 2020"
+
+      iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
+      ...> format: :long, style: :year_and_month
+      "January – December 2020"
+
+      iex> use CalendarInterval
+      iex> Cldr.Interval.to_string! ~I"2020-01-01/12", MyApp.Cldr,
+      ...> format: :long
+      "Wed, Jan 1 – Sun, Jan 12, 2020"
+
+      iex> Cldr.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z], MyApp.Cldr,
+      ...> format: :long
+      "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"
+
+      iex> Cldr.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z], MyApp.Cldr,
+      ...> format: :long
+      "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"
+
+  """
+  @spec to_string!(range, Cldr.backend, Keyword.t) :: String.t | no_return()
+
+  def to_string!(range, backend, options) do
+    case to_string(range, backend, options) do
+      {:ok, string} -> string
+      {:error, {exception, reason}} -> raise exception, reason
+    end
+  end
+
+  @spec to_string!(datetime, datetime, Cldr.backend, Keyword.t) :: String.t | no_return()
+
+  def to_string!(from, to, backend, options) do
+    case to_string(from, to, backend, options) do
+      {:ok, string} -> string
+      {:error, {exception, reason}} -> raise exception, reason
+    end
   end
 end
