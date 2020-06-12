@@ -4,13 +4,20 @@ This is the changelog for Cldr_Dates_Times v2.5.0 released on ____, 2020.  For o
 
 ### Enhancements
 
-* Add localized interval formatting
+* Add localized interval formatting with `Cldr.Interval.to_string/3` and specific implementations in `Cldr.Date.Interval.to_string/3`, `Cldr.Time.Interval.to_string/3` and `Cldr.DateTime.to_string/3`
+
+* Add `:precompiled_interval_formats` defined in the backend configuration
 
 ### Bug Fixes
 
 * Correct doc examples in README.md. Thanks to @tcitworld. Closes #13.
 
-* Fix options processing for `:style` and `:format`.  `:format` is preferred although `:style` is honoured.
+* Fix options processing for `:style` and `:format` for `Cldr.Date.to_string/3`, `Cldr.DateTime.to_string/3` and `Cldr.Time.to_string/3`.  `:format` is preferred although `:style` is honoured.
+
+* Fix transliteration to other number systems
+
+* Retrieve `:precompiled_date_time_formats` from the backend configuration, not the global configuration
+
 
 # Changelog for Cldr_Dates_Times v2.4.0
 

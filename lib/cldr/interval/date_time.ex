@@ -40,13 +40,26 @@ defmodule Cldr.DateTime.Interval do
     to_string(from, to, backend, options)
   end
 
-   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend, options) do
+  def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     format = Keyword.get(options, :format, @default_format)
+
+    number_system =
+      Keyword.get(
+        options,
+        :number_system,
+        Cldr.Number.System.number_system_from_locale(locale, backend)
+      )
+
+    options =
+      options
+      |> Keyword.put(:locale, locale)
+      |> Keyword.put(:nunber_system, number_system)
 
     with {:ok, _} <- from_less_than_or_equal_to(from, to),
          {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
+         {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, format} <- validate_format(format),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, greatest_difference} <- greatest_difference(from, to) do

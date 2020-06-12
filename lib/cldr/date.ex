@@ -142,14 +142,14 @@ defmodule Cldr.Date do
 
   ## Options
 
-    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
-      The default is `:medium`
+  * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
+    The default is `:medium`
 
-    * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
 
-    * `number_system:` a number system into which the formatted date digits should
-      be transliterated
+  * `number_system:` a number system into which the formatted date digits should
+    be transliterated
 
   ## Returns
 

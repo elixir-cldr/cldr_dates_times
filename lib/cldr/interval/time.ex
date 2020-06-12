@@ -66,9 +66,22 @@ defmodule Cldr.Time.Interval do
     formatter = Module.concat(backend, DateTime.Formatter)
     format = Keyword.get(options, :format, @default_format)
 
+    number_system =
+      Keyword.get(
+        options,
+        :number_system,
+        Cldr.Number.System.number_system_from_locale(locale, backend)
+      )
+
+    options =
+      options
+      |> Keyword.put(:locale, locale)
+      |> Keyword.put(:nunber_system, number_system)
+
     with {:ok, _} <- from_less_than_or_equal_to(from, to),
          {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
+         {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type, backend),
          {:ok, [left, right]} <- resolve_format(from, to, formats, options),

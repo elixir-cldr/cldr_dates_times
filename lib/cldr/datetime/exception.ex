@@ -81,5 +81,3 @@ defmodule Cldr.DateTime.IncompatibleTimeZonerError do
     %__MODULE__{message: message}
   end
 end
-
-

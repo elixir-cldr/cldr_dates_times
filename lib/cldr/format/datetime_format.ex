@@ -11,7 +11,6 @@ defmodule Cldr.DateTime.Format do
 
   alias Cldr.Locale
   alias Cldr.LanguageTag
-  alias Cldr.Config
 
   @type standard_formats :: %{
           full: String.t(),
@@ -31,13 +30,14 @@ defmodule Cldr.DateTime.Format do
         known_formats(&all_time_formats(&1, backend), locale_names) ++
         known_formats(&all_date_time_formats(&1, backend), locale_names) ++
         known_formats(&all_interval_formats(&1, backend), locale_names)) ++
-       configured_precompile_list())
-    |> Enum.reject(&is_atom/1)
+        config.precompile_date_time_formats ++ precompile_interval_formats(config))
     |> Enum.uniq()
+    |> Enum.reject(&is_atom/1)
   end
 
-  defp configured_precompile_list do
-    Application.get_env(Config.app_name(), :precompile_datetime_formats, [])
+  defp precompile_interval_formats(config) do
+    config.precompile_interval_formats
+    |> Enum.flat_map(&split_interval!/1)
   end
 
   @doc """
