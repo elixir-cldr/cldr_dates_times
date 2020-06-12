@@ -173,7 +173,7 @@ defmodule Cldr.DateTime.Interval do
     end
   end
 
-  defp combine_result(left, right, format, _fallback) when is_binary(format) do
+  defp combine_result(left, right, format, _fallback) when is_list(format) do
     left <> right
   end
 
