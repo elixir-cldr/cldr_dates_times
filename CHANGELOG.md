@@ -1,10 +1,12 @@
 # Changelog for Cldr_Dates_Times v2.5.0
 
-This is the changelog for Cldr_Dates_Times v2.5.0 released on ____, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.5.0 released on June 13th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
 ### Enhancements
 
 * Add localized interval formatting with `Cldr.Interval.to_string/3` and specific implementations in `Cldr.Date.Interval.to_string/3`, `Cldr.Time.Interval.to_string/3` and `Cldr.DateTime.to_string/3`
+
+* Add `<backend>.Interval.to_string/3`, `<backend>.Date.Interval.to_string/3`, `<backend>.Time.Interval.to_string/3`, `<backend>.DateTime.Interval.to_string/3`
 
 * Add `:precompiled_interval_formats` defined in the backend configuration
 

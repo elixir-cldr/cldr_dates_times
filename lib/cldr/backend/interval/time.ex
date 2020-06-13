@@ -95,7 +95,7 @@ defmodule Cldr.Time.Interval.Backend do
             {:ok, "10:00 – 10:03 ในตอนเช้า"}
 
         """
-        @spec to_string(Calendar.time, Calendar.time, Keyword.t) ::
+        @spec to_string(Elixir.Calendar.time, Elixir.Calendar.time, Keyword.t) ::
             {:ok, String.t} | {:error, {module, String.t}}
 
         def to_string(from, to, options \\ []) do
@@ -106,7 +106,8 @@ defmodule Cldr.Time.Interval.Backend do
 
         @doc """
         Returns a string representing the formatted
-        interval formed by two times.
+        interval formed by two times or raises an
+        exception.
 
         ## Arguments
 
@@ -182,7 +183,7 @@ defmodule Cldr.Time.Interval.Backend do
             "10:00 – 10:03 ในตอนเช้า"
 
         """
-        @spec to_string!(Calendar.time, Calendar.time, Keyword.t) ::
+        @spec to_string!(Elixir.Calendar.time, Elixir.Calendar.time, Keyword.t) ::
             String.t | no_return()
 
         def to_string!(from, to, options \\ []) do

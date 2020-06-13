@@ -148,7 +148,8 @@ defmodule Cldr.DateTime.Interval.Backend do
             {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
 
         """
-        @spec to_string(Calendar.datetime, Calendar.datetime, Keyword.t) ::
+        @spec to_string(Elixir.Calendar.naive_datetime,
+            Elixir.Calendar.naive_datetime, Keyword.t) ::
             {:ok, String.t} | {:error, {module, String.t}}
 
         def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options \\ []) do
@@ -281,7 +282,8 @@ defmodule Cldr.DateTime.Interval.Backend do
             "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"
 
         """
-        @spec to_string!(Calendar.datetime, Calendar.datetime, Keyword.t) ::
+        @spec to_string!(Elixir.Calendar.naive_datetime,
+            Elixir.Calendar.naive_datetime, Keyword.t) ::
             String.t | no_return()
 
         def to_string!(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options \\ []) do

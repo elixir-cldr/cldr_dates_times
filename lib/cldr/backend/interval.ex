@@ -38,8 +38,8 @@ defmodule Cldr.Interval.Backend do
         end
 
         @doc """
-        Returns a string representing the formatted
-        interval formed by two date.
+        Returns a `Date.Range` or `CalendarInterval` as
+        a localised string.
 
         ## Arguments
 
@@ -145,7 +145,7 @@ defmodule Cldr.Interval.Backend do
 
         @doc """
         Returns a string representing the formatted
-        interval formed by two date.
+        interval formed by two dates.
 
         ## Arguments
 
@@ -278,9 +278,8 @@ defmodule Cldr.Interval.Backend do
         end
 
         @doc """
-        Returns a string representing the formatted
-        interval formed by two dates or raises an
-        exception.
+        Returns a `Date.Range` or `CalendarInterval` as
+        a localised string or raises an exception.
 
         ## Arguments
 

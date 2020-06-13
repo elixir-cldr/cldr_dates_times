@@ -17,6 +17,10 @@ defmodule Cldr.Date.Interval.Backend do
 
         """
 
+        import Cldr.Calendar, only: [
+          date: 0
+        ]
+
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           @doc false
           def to_string(%CalendarInterval{} = interval) do
@@ -122,7 +126,7 @@ defmodule Cldr.Date.Interval.Backend do
         end
 
         @doc false
-        def to_string(from, to) do
+        def to_string(unquote(date()) = from, unquote(date()) = to) do
           Cldr.Date.Interval.to_string(from, to, unquote(backend), [])
         end
 
@@ -205,10 +209,10 @@ defmodule Cldr.Date.Interval.Backend do
             {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
 
         """
-        @spec to_string(Calendar.date, Calendar.date, Keyword.t) ::
+        @spec to_string(Elixir.Calendar.date, Elixir.Calendar.date, Keyword.t) ::
             {:ok, String.t} | {:error, {module, String.t}}
 
-        def to_string(from, to, options) do
+        def to_string(unquote(date()) = from, unquote(date()) = to, options) do
           Cldr.Date.Interval.to_string(from, to, unquote(backend), options)
         end
 
@@ -325,7 +329,7 @@ defmodule Cldr.Date.Interval.Backend do
         @doc false
         def to_string!(from, to) do
           locale = unquote(backend).get_locale
-          Cldr.Date.Interval.to_string!(from, to, locale: locale)
+          Cldr.Date.Interval.to_string!(from, to, unquote(backend), locale: locale)
         end
 
         @doc """
@@ -407,13 +411,13 @@ defmodule Cldr.Date.Interval.Backend do
             "mer. 1 – dim. 12 janv. 2020"
 
         """
-        @spec to_string!(Calendar.date, Calendar.date, Keyword.t) ::
+        @spec to_string!(Elixir.Calendar.date, Elixir.Calendar.date, Keyword.t) ::
             String.t | no_return
 
-        def to_string!(from, to, options) do
+        def to_string!(unquote(date()) = from, unquote(date()) = to, options) do
           locale = unquote(backend).get_locale
           options = Keyword.put_new(options, :locale, locale)
-          Cldr.Date.Interval.to_string!(from, to, options)
+          Cldr.Date.Interval.to_string!(from, to, unquote(backend), options)
         end
       end
     end
