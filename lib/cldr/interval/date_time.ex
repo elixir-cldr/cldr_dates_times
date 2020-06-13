@@ -209,13 +209,8 @@ defmodule Cldr.DateTime.Interval do
   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     format = Keyword.get(options, :format, @default_format)
-
-    number_system =
-      Keyword.get(
-        options,
-        :number_system,
-        Cldr.Number.System.number_system_from_locale(locale, backend)
-      )
+    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+    number_system = Keyword.get(options, :number_system, locale_number_system)
 
     options =
       options
