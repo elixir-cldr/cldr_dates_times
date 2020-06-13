@@ -148,7 +148,7 @@ defmodule Cldr.Date.Interval do
   ## Notes
 
   * `CalendarInterval` support requires adding the
-    dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
+    dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
     to the `deps` configuration in `mix.exs`.
 
   * For more information on interval format string
@@ -395,7 +395,7 @@ defmodule Cldr.Date.Interval do
   ## Notes
 
   * `CalendarInterval` support requires adding the
-    dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
+    dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
     to the `deps` configuration in `mix.exs`.
 
   * For more information on interval format string

@@ -77,7 +77,7 @@ defmodule Cldr.DateTime.Interval do
     ## Notes
 
     * `CalendarInterval` support requires adding the
-      dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
+      dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
       to the `deps` configuration in `mix.exs`.
 
     * For more information on interval format string
@@ -94,7 +94,7 @@ defmodule Cldr.DateTime.Interval do
     ## Examples
 
         iex> Cldr.DateTime.Interval.to_string ~I"2020-01-01 10:00/12:00", MyApp.Cldr
-        {:ok, "Jan 1, 2020, 10:00:00 AM – 12:00:59 PM"}
+        {:ok, "Jan 1, 2020, 10:00:00 AM – 12:00:00 PM"}
 
     """
     @spec to_string(CalendarInterval.t, Cldr.backend(), Keyword.t) ::
@@ -106,7 +106,16 @@ defmodule Cldr.DateTime.Interval do
     end
 
     def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
-        when precision in [:hour, :minute, :second] do
+        when precision in [:hour, :minute] do
+      from = %{from | second: 0, microsecond: {0, 6}}
+      to = %{to | second: 0, microsecond: {0, 6}}
+      to_string(from, to, backend, options)
+    end
+
+    def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
+        when precision in [:hour, :minute] do
+      from = %{from | microsecond: {0, 6}}
+      to = %{to | microsecond: {0, 6}}
       to_string(from, to, backend, options)
     end
   end

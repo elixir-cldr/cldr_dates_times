@@ -59,7 +59,7 @@ defmodule Cldr.DateTime.Interval.Backend do
           ## Notes
 
           * `CalendarInterval` support requires adding the
-            dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
+            dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
             to the `deps` configuration in `mix.exs`.
 
           * For more information on interval format string
@@ -77,7 +77,7 @@ defmodule Cldr.DateTime.Interval.Backend do
 
               iex> use CalendarInterval
               iex> #{inspect __MODULE__}.to_string ~I"2020-01-01 00:00/10:00"
-              {:ok, "Jan 1, 2020, 12:00:00 AM – 10:00:59 AM"}
+              {:ok, "Jan 1, 2020, 12:00:00 AM – 10:00:00 AM"}
 
           """
 
@@ -127,7 +127,7 @@ defmodule Cldr.DateTime.Interval.Backend do
         ## Notes
 
         * `CalendarInterval` support requires adding the
-          dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
+          dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
           to the `deps` configuration in `mix.exs`.
 
         * For more information on interval format string
@@ -196,7 +196,7 @@ defmodule Cldr.DateTime.Interval.Backend do
           ## Notes
 
           * `CalendarInterval` support requires adding the
-            dependency [calendar_interval](https://hex.pn/packages/calendar_interval)
+            dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
             to the `deps` configuration in `mix.exs`.
 
           * For more information on interval format string

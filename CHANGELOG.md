@@ -1,10 +1,14 @@
-# Changelog for Cldr_Dates_Times v2.6.0
+# Changelog for Cldr_Dates_Times v2.5.1
 
-This is the changelog for Cldr_Dates_Times v2.6.0 released on ______, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.5.1 released on ______, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
 ### Bug Fixes
 
 * Use locale's number system if no optional number system is provided. Fixes `Cldr.Date`, `Cldr.Time` and `Cldr.DateTime`
+
+* Fix datetime formatting for `CalendarInterval`s that have minute precision. In these cases, `:seconds` and `:microseconds` should be zeroed.
+
+* Fix links to `hex.pm` for `calendar_interval`
 
 ### Enhancements
 
