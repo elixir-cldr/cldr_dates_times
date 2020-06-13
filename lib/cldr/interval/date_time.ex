@@ -106,7 +106,7 @@ defmodule Cldr.DateTime.Interval do
     end
 
     def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
-        when precision in [:hour, :minute] do
+        when precision in [:hour, :minute, :second] do
       to_string(from, to, backend, options)
     end
   end
@@ -324,7 +324,7 @@ defmodule Cldr.DateTime.Interval do
     end
 
     def to_string!(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
-        when precision in [:hour, :minute] do
+        when precision in [:hour, :minute, :second] do
       to_string!(from, to, backend, options)
     end
   end
