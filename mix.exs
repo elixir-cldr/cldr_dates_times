@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.5.1-dev"
+  @version "2.5.1"
 
   def project do
     [
