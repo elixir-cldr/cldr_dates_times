@@ -47,7 +47,7 @@ defmodule Cldr.DateTime.Relative do
   * `:locale` is the locale in which the binary is formatted.
     The default is `Cldr.get_locale/0`
 
-  * `:style` is the style of the binary.  Style may be `:default`, `:narrow` or `:short`
+  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
 
   * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
     `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
@@ -77,7 +77,7 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
       {:ok, "demain"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, style: :narrow)
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
       {:ok, "tomorrow"}
 
       iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year)
@@ -92,19 +92,19 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, relative_to: ~D[2017-04-26])
       {:ok, "in 3 days"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, style: :short, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :short, locale: "fr")
       {:ok, "dans 5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, style: :narrow, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :narrow, locale: "fr")
       {:ok, "+5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string 2, MyApp.Cldr, unit: :wed, style: :short, locale: "en"
+      iex> Cldr.DateTime.Relative.to_string 2, MyApp.Cldr, unit: :wed, format: :short, locale: "en"
       {:ok, "in 2 Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, style: :short
+      iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, format: :short
       {:ok, "next Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, style: :short
+      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, format: :short
       {:ok, "last Wed."}
 
       iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed
@@ -121,8 +121,6 @@ defmodule Cldr.DateTime.Relative do
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
 
   """
-
-  # TODO deprecate the option :format in favour of using :style in version 3.0
 
   @spec to_string(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
@@ -223,7 +221,7 @@ defmodule Cldr.DateTime.Relative do
   * `:locale` is the locale in which the binary is formatted.
     The default is `Cldr.get_locale/0`
 
-  * `:style` is the format of the binary.  Style may be `:default`, `:narrow` or `:short`.
+  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`.
     The default is `:default`
 
   * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
