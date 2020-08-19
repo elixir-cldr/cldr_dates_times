@@ -202,7 +202,7 @@ defmodule Cldr.DateTime do
   def to_string!(datetime, backend \\ Cldr.default_backend(), options \\ [])
 
   def to_string!(datetime, options, []) when is_list(options) do
-    to_string(datetime, Cldr.default_backend(), options)
+    to_string!(datetime, Cldr.default_backend(), options)
   end
 
   def to_string!(datetime, backend, options) do
