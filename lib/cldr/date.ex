@@ -188,7 +188,7 @@ defmodule Cldr.Date do
   def to_string!(date, backend \\ Cldr.default_backend(), options \\ [])
 
   def to_string!(date, backend, options) do
-    case to_string(date, backend, options) do
+    case to_string!(date, backend, options) do
       {:ok, string} -> string
       {:error, {exception, message}} -> raise exception, message
     end
