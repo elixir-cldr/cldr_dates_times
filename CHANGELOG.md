@@ -1,6 +1,14 @@
+# Changelog for Cldr_Dates_Times v2.5.2
+
+This is the changelog for Cldr_Dates_Times v2.5.2 released on September 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Correct the spec for Cldr.DateTime.Relative.to_string!/3. Thanks to @loskobrakai.
+
 # Changelog for Cldr_Dates_Times v2.5.1
 
-This is the changelog for Cldr_Dates_Times v2.5.1 released on June 17tg, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.5.1 released on June 17th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
 ### Bug Fixes
 
@@ -9,8 +17,6 @@ This is the changelog for Cldr_Dates_Times v2.5.1 released on June 17tg, 2020.  
 * Fix datetime formatting for `CalendarInterval`s that have minute precision. In these cases, `:seconds` and `:microseconds` should be zeroed.
 
 * Fix links to `hex.pm` for `calendar_interval`
-
-### Enhancements
 
 
 # Changelog for Cldr_Dates_Times v2.5.0
