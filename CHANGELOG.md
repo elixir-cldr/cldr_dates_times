@@ -18,7 +18,6 @@ This is the changelog for Cldr_Dates_Times v2.5.1 released on June 17th, 2020.  
 
 * Fix links to `hex.pm` for `calendar_interval`
 
-
 # Changelog for Cldr_Dates_Times v2.5.0
 
 This is the changelog for Cldr_Dates_Times v2.5.0 released on June 13th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
@@ -40,7 +39,6 @@ This is the changelog for Cldr_Dates_Times v2.5.0 released on June 13th, 2020.  
 * Fix transliteration to other number systems
 
 * Retrieve `:precompiled_date_time_formats` from the backend configuration, not the global configuration
-
 
 # Changelog for Cldr_Dates_Times v2.4.0
 
