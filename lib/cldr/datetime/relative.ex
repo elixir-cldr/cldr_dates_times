@@ -235,7 +235,7 @@ defmodule Cldr.DateTime.Relative do
   See `to_string/3`
 
   """
-  @spec to_string!(number, Cldr.backend(), Keyword.t()) :: String.t()
+  @spec to_string!(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) :: String.t()
   def to_string!(relative, backend \\ Cldr.default_backend(), options \\ [])
 
   def to_string!(relative, options, []) when is_list(options) do
