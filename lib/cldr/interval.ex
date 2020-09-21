@@ -252,7 +252,6 @@ defmodule Cldr.Interval do
     to_string(range, backend, locale: locale)
   end
 
-  @doc false
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
     def to_string(%CalendarInterval{} = interval) do
       {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
@@ -266,21 +265,18 @@ defmodule Cldr.Interval do
     to_string(from, to, backend, locale: locale)
   end
 
-  @doc false
   def to_string(unquote(time()) = from, unquote(time()) = to) do
     {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
     to_string(from, to, backend, locale: locale)
   end
 
-  @doc false
-  # Dual argument version  with backend
+  # Dual argument version with backend
   def to_string(%Date.Range{} = range, backend) when is_atom(backend) do
     {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
     to_string(range, backend, locale: locale)
   end
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
-    @doc false
     def to_string(%CalendarInterval{} = interval, backend) when is_atom(backend) do
       {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
       to_string(interval, backend, locale: locale)
@@ -293,13 +289,11 @@ defmodule Cldr.Interval do
     to_string(from, to, backend, locale: locale)
   end
 
-  @doc false
   def to_string(unquote(time()) = from, unquote(time()) = to, backend) when is_atom(backend) do
     {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
     to_string(from, to, backend, locale: locale)
   end
 
-  @doc false
   # Dual argument version with options
   def to_string(%Date.Range{} = range, options) when is_list(options) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
@@ -307,21 +301,18 @@ defmodule Cldr.Interval do
   end
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
-    @doc false
     def to_string(%CalendarInterval{} = interval, options) when is_list(options) do
       {locale, backend} = Cldr.locale_and_backend_from(options)
       to_string(interval, backend, Keyword.put_new(options, :locale, locale))
     end
   end
 
-  @doc false
   def to_string(unquote(date()) = from, unquote(date()) = to, options) when is_list(options) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
     options = Keyword.put_new(options, :locale, locale)
     to_string(from, to, backend, options)
   end
 
-  @doc false
   def to_string(unquote(time()) = from, unquote(time()) = to, options) when is_list(options) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
     options =  Keyword.put_new(options, :locale, locale)

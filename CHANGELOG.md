@@ -1,3 +1,11 @@
+# Changelog for Cldr_Dates_Times v2.5.3
+
+This is the changelog for Cldr_Dates_Times v2.5.3 released on September 22nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix compiler warns on duplicate `@doc` on Elixir 1.11
+
 # Changelog for Cldr_Dates_Times v2.5.2
 
 This is the changelog for Cldr_Dates_Times v2.5.2 released on September 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
