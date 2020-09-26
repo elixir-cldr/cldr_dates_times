@@ -82,7 +82,7 @@ defmodule Cldr.Date do
   @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
-  def to_string(date, backend \\ Cldr.default_backend(), options \\ [])
+  def to_string(date, backend \\ Cldr.Date.default_backend(), options \\ [])
 
   def to_string(%{calendar: Calendar.ISO} = date, backend, options) do
     %{date | calendar: Cldr.Calendar.Gregorian}
@@ -90,7 +90,7 @@ defmodule Cldr.Date do
   end
 
   def to_string(date, options, []) when is_list(options) do
-    to_string(date, Cldr.default_backend(), options)
+    to_string(date, Cldr.Date.default_backend(), options)
   end
 
   def to_string(%{calendar: calendar} = date, backend, options) do
@@ -185,7 +185,7 @@ defmodule Cldr.Date do
   """
   @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
 
-  def to_string!(date, backend \\ Cldr.default_backend(), options \\ [])
+  def to_string!(date, backend \\ Cldr.Date.default_backend(), options \\ [])
 
   def to_string!(date, backend, options) do
     case to_string(date, backend, options) do
@@ -227,5 +227,17 @@ defmodule Cldr.Date do
      {ArgumentError,
       "Invalid date. Date is a map that contains at least #{requirements}. " <>
         "Found: #{inspect(map)}"}}
+  end
+
+  @doc false
+  # TODO remove for Cldr 3.0
+  if Code.ensure_loaded?(Cldr) && function_exported?(Cldr, :default_backend!, 0) do
+    def default_backend do
+      Cldr.default_backend!()
+    end
+  else
+    def default_backend do
+      Cldr.default_backend()
+    end
   end
 end

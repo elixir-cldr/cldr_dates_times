@@ -125,10 +125,10 @@ defmodule Cldr.DateTime.Relative do
   @spec to_string(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
-  def to_string(relative, backend \\ Cldr.default_backend(), options \\ [])
+  def to_string(relative, backend \\ Cldr.Date.default_backend(), options \\ [])
 
   def to_string(relative, options, []) when is_list(options) do
-    to_string(relative, Cldr.default_backend(), options)
+    to_string(relative, Cldr.Date.default_backend(), options)
   end
 
   def to_string(relative, backend, options) do
@@ -236,10 +236,10 @@ defmodule Cldr.DateTime.Relative do
 
   """
   @spec to_string!(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) :: String.t()
-  def to_string!(relative, backend \\ Cldr.default_backend(), options \\ [])
+  def to_string!(relative, backend \\ Cldr.Date.default_backend(), options \\ [])
 
   def to_string!(relative, options, []) when is_list(options) do
-    to_string!(relative, Cldr.default_backend(), options)
+    to_string!(relative, Cldr.Date.default_backend(), options)
   end
 
   def to_string!(relative, backend, options) do

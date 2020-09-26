@@ -1,3 +1,11 @@
+# Changelog for Cldr_Dates_Times v2.5.4
+
+This is the changelog for Cldr_Dates_Times v2.5.4 released on September 26th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Use `Cldr.Date.default_backend/0` as a shim to provide compatibility for the upcoming `ex_cldr` version `2.18.0` where `Cldr.default_backend/0` is deprecated in favour of `Cldr.default_backend!/0`
+
 # Changelog for Cldr_Dates_Times v2.5.3
 
 This is the changelog for Cldr_Dates_Times v2.5.3 released on September 22nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)

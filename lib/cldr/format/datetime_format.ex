@@ -59,7 +59,7 @@ defmodule Cldr.DateTime.Format do
   @spec calendars_for(Locale.locale_name() | LanguageTag.t(), Cldr.backend()) ::
           {:ok, [Cldr.Calendar.calendar(), ...]} | {:error, {atom, String.T}}
 
-  def calendars_for(locale, backend \\ Cldr.default_backend()) do
+  def calendars_for(locale, backend \\ Cldr.Date.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.calendars_for(locale)
   end
@@ -84,7 +84,7 @@ defmodule Cldr.DateTime.Format do
     {:error, {atom, String.t()}}
   )
 
-  def gmt_format(locale, backend \\ Cldr.default_backend()) do
+  def gmt_format(locale, backend \\ Cldr.Date.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.gmt_format(locale)
   end
@@ -107,7 +107,7 @@ defmodule Cldr.DateTime.Format do
   @spec gmt_zero_format(Locale.locale_name() | LanguageTag.t(), Cldr.backend()) ::
           {:ok, String.t()} | {:error, {atom, String.t()}}
 
-  def gmt_zero_format(locale, backend \\ Cldr.default_backend()) do
+  def gmt_zero_format(locale, backend \\ Cldr.Date.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.gmt_zero_format(locale)
   end
@@ -129,7 +129,7 @@ defmodule Cldr.DateTime.Format do
   @spec hour_format(Locale.locale_name() | LanguageTag.t(), Cldr.backend()) ::
           {:ok, {String.t(), String.t()}} | {:error, {atom, String.t()}}
 
-  def hour_format(locale \\ Cldr.get_locale(), backend \\ Cldr.default_backend()) do
+  def hour_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.hour_format(locale)
   end
@@ -173,7 +173,7 @@ defmodule Cldr.DateTime.Format do
   def date_formats(
         locale \\ Cldr.get_locale(),
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
-        backend \\ Cldr.default_backend()
+        backend \\ Cldr.Date.default_backend()
       ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.date_formats(locale, calendar)
@@ -214,7 +214,7 @@ defmodule Cldr.DateTime.Format do
   def time_formats(
         locale \\ Cldr.get_locale(),
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
-        backend \\ Cldr.default_backend()
+        backend \\ Cldr.Date.default_backend()
       ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.time_formats(locale, calendar)
@@ -259,7 +259,7 @@ defmodule Cldr.DateTime.Format do
   def date_time_formats(
         locale \\ Cldr.get_locale(),
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
-        backend \\ Cldr.default_backend()
+        backend \\ Cldr.Date.default_backend()
       ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.date_time_formats(locale, calendar)
@@ -336,7 +336,7 @@ defmodule Cldr.DateTime.Format do
   def date_time_available_formats(
         locale \\ Cldr.get_locale(),
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
-        backend \\ Cldr.default_backend()
+        backend \\ Cldr.Date.default_backend()
       ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.date_time_available_formats(locale, calendar)
@@ -374,7 +374,7 @@ defmodule Cldr.DateTime.Format do
   def interval_formats(
         locale \\ Cldr.get_locale(),
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
-        backend \\ Cldr.default_backend()
+        backend \\ Cldr.Date.default_backend()
       ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.date_time_interval_formats(locale, calendar)
@@ -397,7 +397,7 @@ defmodule Cldr.DateTime.Format do
       :y_mmm_ed, :y_mmmm, :y_qqq, :y_qqqq, :yw_count_other]
 
   """
-  def common_date_time_format_names(backend \\ Cldr.default_backend()) do
+  def common_date_time_format_names(backend \\ Cldr.Date.default_backend()) do
     datetime_module = Module.concat(backend, DateTime.Format)
 
     Cldr.known_locale_names(backend)

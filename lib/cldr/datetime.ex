@@ -87,7 +87,7 @@ defmodule Cldr.DateTime do
   @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
-  def to_string(datetime, backend \\ Cldr.default_backend(), options \\ [])
+  def to_string(datetime, backend \\ Cldr.Date.default_backend(), options \\ [])
 
   def to_string(%{calendar: Calendar.ISO} = datetime, backend, options) do
     %{datetime | calendar: Cldr.Calendar.Gregorian}
@@ -95,7 +95,7 @@ defmodule Cldr.DateTime do
   end
 
   def to_string(datetime, options, []) when is_list(options) do
-    to_string(datetime, Cldr.default_backend(), options)
+    to_string(datetime, Cldr.Date.default_backend(), options)
   end
 
   def to_string(%{calendar: calendar} = datetime, backend, options)
@@ -199,10 +199,10 @@ defmodule Cldr.DateTime do
   """
   @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
 
-  def to_string!(datetime, backend \\ Cldr.default_backend(), options \\ [])
+  def to_string!(datetime, backend \\ Cldr.Date.default_backend(), options \\ [])
 
   def to_string!(datetime, options, []) when is_list(options) do
-    to_string!(datetime, Cldr.default_backend(), options)
+    to_string!(datetime, Cldr.Date.default_backend(), options)
   end
 
   def to_string!(datetime, backend, options) do

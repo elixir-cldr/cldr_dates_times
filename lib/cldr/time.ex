@@ -87,7 +87,7 @@ defmodule Cldr.Time do
   @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
-  def to_string(time, backend \\ Cldr.default_backend(), options \\ [])
+  def to_string(time, backend \\ Cldr.Date.default_backend(), options \\ [])
 
   def to_string(%{calendar: Calendar.ISO} = time, backend, options) do
     %{time | calendar: Cldr.Calendar.Gregorian}
@@ -95,7 +95,7 @@ defmodule Cldr.Time do
   end
 
   def to_string(time, options, []) when is_list(options) do
-    to_string(time, Cldr.default_backend(), options)
+    to_string(time, Cldr.Date.default_backend(), options)
   end
 
   def to_string(%{hour: _hour, minute: _minute} = time, backend, options) do
@@ -197,10 +197,10 @@ defmodule Cldr.Time do
   """
   @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
 
-  def to_string!(time, backend \\ Cldr.default_backend(), options \\ [])
+  def to_string!(time, backend \\ Cldr.Date.default_backend(), options \\ [])
 
   def to_string!(datetime, options, []) when is_list(options) do
-    to_string!(datetime, Cldr.default_backend(), options)
+    to_string!(datetime, Cldr.Date.default_backend(), options)
   end
 
   def to_string!(time, backend, options) do
@@ -292,7 +292,7 @@ defmodule Cldr.Time do
     Map.fetch!(time_symbols(), preference.preferred)
   end
 
-  def hour_format_from_locale(locale_name, backend \\ Cldr.default_backend()) do
+  def hour_format_from_locale(locale_name, backend \\ Cldr.Date.default_backend()) do
     with {:ok, locale} <- Cldr.validate_locale(locale_name, backend) do
       hour_format_from_locale(locale)
     end
