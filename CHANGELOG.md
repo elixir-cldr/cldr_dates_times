@@ -1,6 +1,6 @@
-# Changelog for Cldr_Dates_Times v2.6.0-rc.0
+# Changelog for Cldr_Dates_Times v2.6.0
 
-This is the changelog for Cldr_Dates_Times v2.6.0-rc.0 released on October 27th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_calendars/tags)
+This is the changelog for Cldr_Dates_Times v2.6.0 released on November 1st, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_calendars/tags)
 
 ### Enhancements
 

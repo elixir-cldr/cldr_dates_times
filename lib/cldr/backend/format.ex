@@ -457,7 +457,8 @@ defmodule Cldr.DateTime.Format.Backend do
               |> Enum.map(fn {k, v} ->
                 split_formats =
                   Enum.map(v, fn {k2, v2} ->
-                    {k2, Cldr.DateTime.Format.split_interval!(v2)}
+                    interval_formats = Cldr.DateTime.Format.split_interval!(v2)
+                    {k2, interval_formats}
                   end)
                   |> Map.new()
 
