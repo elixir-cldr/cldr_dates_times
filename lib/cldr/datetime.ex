@@ -129,13 +129,13 @@ defmodule Cldr.DateTime do
 
   defp normalize_options(backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    style = options[:format] || options[:style] || @default_type
+    format = options[:format] || options[:style] || @default_type
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
 
     options
     |> Keyword.put(:locale, locale)
-    |> Keyword.put(:format, style)
+    |> Keyword.put(:format, format)
     |> Keyword.delete(:style)
     |> Keyword.put_new(:number_system, number_system)
   end
@@ -144,9 +144,13 @@ defmodule Cldr.DateTime do
 
   # Returns the CLDR calendar type for a calendar
 
+  def type_from_calendar(Cldr.Calendar.Gregorian = calendar) do
+    {:ok, calendar.cldr_calendar_type()}
+  end
+
   def type_from_calendar(calendar) do
     with {:ok, calendar} <- Cldr.Calendar.validate_calendar(calendar) do
-      {:ok, calendar.cldr_calendar_type}
+      {:ok, calendar.cldr_calendar_type()}
     end
   end
 

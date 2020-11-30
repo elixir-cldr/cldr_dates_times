@@ -107,7 +107,7 @@ defmodule Cldr.Time do
     with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format_string} <- format_string(options[:style], locale, cldr_calendar, backend),
+         {:ok, format_string} <- format_string(options[:format], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(time, format_string, locale, options) do
       {:ok, formatted}
     end
@@ -120,18 +120,24 @@ defmodule Cldr.Time do
     error_return(time, [:hour, :minute, :second])
   end
 
-  # TODO deprecate :format in version 3.0
+  # TODO deprecate :style in version 3.0
+  defp normalize_options(backend, []) do
+    locale = Cldr.get_locale()
+    number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+
+    [locale: locale, number_system: number_system, format: @default_type]
+  end
 
   defp normalize_options(backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    style = options[:style] || options[:format] || @default_type
+    format = options[:format] || options[:stylet] || @default_type
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
 
     options
     |> Keyword.put(:locale, locale)
-    |> Keyword.put(:style, style)
-    |> Keyword.delete(:format)
+    |> Keyword.put(:format, format)
+    |> Keyword.delete(:style)
     |> Keyword.put_new(:number_system, number_system)
   end
 

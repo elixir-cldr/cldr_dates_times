@@ -20,6 +20,9 @@ defmodule CldrDatesTimes.Mixfile do
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore_warnings",
         plt_add_apps: ~w(calendar_interval)a
+      ],
+      xref: [
+        exclude: :eprof
       ]
     ]
   end
