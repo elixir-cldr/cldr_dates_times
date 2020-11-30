@@ -73,18 +73,13 @@ defmodule Cldr.DateTime.Formatter.Backend do
             {:ok, transforms} ->
               def format(date, unquote(Macro.escape(format)) = f, locale, options) do
                 number_system = number_system(f, options)
-                formatted = unquote(transforms)
 
-                if error_list = format_errors(formatted) do
-                  {:error, error_list}
-                else
-                  formatted =
-                    formatted
-                    |> Enum.join()
-                    |> transliterate(locale, number_system)
+                formatted =
+                  unquote(transforms)
+                  |> Enum.join()
+                  |> transliterate(locale, number_system)
 
-                  {:ok, formatted}
-                end
+                {:ok, formatted}
               end
 
             {:error, message} ->
@@ -112,18 +107,13 @@ defmodule Cldr.DateTime.Formatter.Backend do
               number_system =
                 if is_map(format), do: format[:number_system], else: options[:number_system]
 
-              formatted = apply_transforms(tokens, date, locale, options)
+              formatted =
+                tokens
+                |> apply_transforms(date, locale, options)
+                |> Enum.join()
+                |> transliterate(locale, number_system)
 
-              if error_list = format_errors(formatted) do
-                {:error, Enum.join(error_list, "; ")}
-              else
-                formatted =
-                  formatted
-                  |> Enum.join()
-                  |> transliterate(locale, number_system)
-
-                {:ok, formatted}
-              end
+              {:ok, formatted}
 
             {:error, {_, :datetime_format_lexer, {_, error}}, _} ->
               {:error,
