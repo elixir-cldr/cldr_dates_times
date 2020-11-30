@@ -140,7 +140,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
           end)
         end
 
-        defp transliterate(formatted, _locale, :latn) do
+        defp transliterate(formatted, _locale, nil) do
           formatted
         end
 
