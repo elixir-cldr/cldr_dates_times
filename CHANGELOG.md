@@ -1,3 +1,11 @@
+# Changelog for Cldr_Dates_Times v2.6.2
+
+This is the changelog for Cldr_Dates_Times v2.6.2 released on December 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix regression whereby formatting via a backend with no options would raise a `Cldr.NoDefaultBackendError (No default :ex_cldr backend is configured)` exception. Closes #18. Thanks to @maennchen.
+
 # Changelog for Cldr_Dates_Times v2.6.1
 
 This is the changelog for Cldr_Dates_Times v2.6.1 released on November 30th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
