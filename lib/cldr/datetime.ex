@@ -95,7 +95,7 @@ defmodule Cldr.DateTime do
   end
 
   def to_string(datetime, options, []) when is_list(options) do
-    to_string(datetime, Cldr.default_backend!(), options)
+    to_string(datetime, Cldr.Date.default_backend(), options)
   end
 
   def to_string(%{calendar: calendar} = datetime, backend, options)
@@ -121,7 +121,7 @@ defmodule Cldr.DateTime do
   end
 
   defp normalize_options(backend, []) do
-    locale = Cldr.get_locale()
+    {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
 
     [locale: locale, number_system: number_system, format: @default_type]
