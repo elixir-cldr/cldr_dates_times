@@ -2,7 +2,7 @@
 
 This is the changelog for Cldr_Dates_Times v2.6.1 released on November 30th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
-### Bug Fixes
+### Performance improvements
 
 * Don't transliterate when the number system is `:latn` (which it most commonly is). The improves formatting performance by about 40%.
 
