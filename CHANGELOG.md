@@ -4,8 +4,7 @@ This is the changelog for Cldr_Dates_Times v2.6.3 released on December 3rd, 2020
 
 ### Bug Fixes
 
-* [UPDATED] Fix regression whereby formatting a Date or Time via a backend with no options would raise a `Cldr.NoDefaultBackendError (No default :ex_cldr backend is configured)` exception. Closes #18. Thanks to @maennchen.
-
+* [UPDATED] Fix regression whereby formatting a Date or Time via a backend with no options would raise a `Cldr.NoDefaultBackendError (No default :ex_cldr backend is configured)` exception. Closes #18 properly. Thanks to @maennchen.
 
 # Changelog for Cldr_Dates_Times v2.6.2
 
