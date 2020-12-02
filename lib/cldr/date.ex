@@ -118,7 +118,7 @@ defmodule Cldr.Date do
 
   # TODO deprecate :style in version 3.0
   defp normalize_options(backend, []) do
-    locale = Cldr.get_locale()
+    {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
 
     [locale: locale, number_system: number_system, format: @default_type]
