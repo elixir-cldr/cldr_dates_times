@@ -22,7 +22,7 @@ defmodule CldrDatesTimes.Mixfile do
         plt_add_apps: ~w(calendar_interval)a
       ],
       xref: [
-        exclude: :eprof
+        exclude: [:eprof]
       ]
     ]
   end
