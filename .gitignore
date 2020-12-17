@@ -17,3 +17,5 @@ erl_crash.dump
 
 # Generated *.erl
 src/*.erl
+
+.tools-versions

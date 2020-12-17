@@ -1,4 +1,4 @@
--file("/Users/kip/.asdf/installs/erlang/23.0/lib/parsetools-2.2/include/leexinc.hrl", 0).
+-file("/Users/kip/.asdf/installs/erlang/23.1.4/lib/parsetools-2.2/include/leexinc.hrl", 0).
 %% The source of this file is part of leex distribution, as such it
 %% has the same Copyright as the other files in the leex
 %% distribution. The Copyright is defined in the accompanying file
@@ -22,7 +22,7 @@ unquote([_ | Tail]) ->
   [_ | Rev] = lists:reverse(Tail),
   lists:reverse(Rev).
 
--file("/Users/kip/.asdf/installs/erlang/23.0/lib/parsetools-2.2/include/leexinc.hrl", 14).
+-file("/Users/kip/.asdf/installs/erlang/23.1.4/lib/parsetools-2.2/include/leexinc.hrl", 14).
 
 format_error({illegal,S}) -> ["illegal characters ",io_lib:write_string(S)];
 format_error({user,S}) -> S.
@@ -948,4 +948,4 @@ yyaction_39(TokenLine) ->
 yyaction_40(TokenChars, TokenLine) ->
      { token, { literal, TokenLine, 'Elixir.List' : to_string (TokenChars) } } .
 
--file("/Users/kip/.asdf/installs/erlang/23.0/lib/parsetools-2.2/include/leexinc.hrl", 313).
+-file("/Users/kip/.asdf/installs/erlang/23.1.4/lib/parsetools-2.2/include/leexinc.hrl", 313).

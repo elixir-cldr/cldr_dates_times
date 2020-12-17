@@ -1,3 +1,13 @@
+# Changelog for Cldr_Dates_Times v2.6.4
+
+This is the changelog for Cldr_Dates_Times v2.6.4 released on December 17th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Remove `xref` section from the project in `mix.exs`. The fixes an error where the configuration for `xref` was incorrect and causing compiler errors on some versions of Elixir. Closes #19. Thanks to @fertapric.
+
+* Make dependencies `eprof` and `dialyixir` optional so that they aren't dragged into host apps unnecessarily.
+
 # Changelog for Cldr_Dates_Times v2.6.3
 
 This is the changelog for Cldr_Dates_Times v2.6.3 released on December 3rd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
