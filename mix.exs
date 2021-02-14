@@ -67,6 +67,7 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
+      {:ex_cldr, path: "../cldr", override: true},
       {:ex_cldr_numbers, "~> 2.16"},
       {:ex_cldr_calendars, "~> 1.11"},
       {:calendar_interval, "~> 0.2", optional: true},
