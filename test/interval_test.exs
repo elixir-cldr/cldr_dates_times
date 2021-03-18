@@ -99,6 +99,7 @@ defmodule Cldr.DateTime.Interval.Test do
                "The interval style \"unknown\" is invalid. Valid styles are [:date, :month, :month_and_day, :year_and_month]."}}
   end
 
+  @tag :elixir_1_10
   test "that dates in the wrong order return an error" do
     assert Cldr.Date.Interval.to_string(Date.range(~D[2020-12-01], ~D[2020-01-12]), MyApp.Cldr) ==
              {:error,
@@ -106,6 +107,7 @@ defmodule Cldr.DateTime.Interval.Test do
                "Start date/time must be earlier or equal to end date/time. Found ~D[2020-12-01 Cldr.Calendar.Gregorian], ~D[2020-01-12 Cldr.Calendar.Gregorian]."}}
   end
 
+  @tag :elixir_1_10
   test "that datetimes in the wrong order return an error" do
     assert Cldr.DateTime.Interval.to_string(
              ~U[2020-02-01 00:00:00.0Z],
@@ -121,6 +123,7 @@ defmodule Cldr.DateTime.Interval.Test do
              }
   end
 
+  @tag :elixir_1_10
   test "that times in the wrong order return an error" do
     assert Cldr.Time.Interval.to_string(~T[10:00:00], ~T[00:00:00], MyApp.Cldr) ==
              {
