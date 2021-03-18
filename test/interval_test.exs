@@ -15,6 +15,15 @@ defmodule Cldr.DateTime.Interval.Test do
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], ~T[10:00:00.0], MyApp.Cldr, locale: "fr")
   end
 
+  # Just to get tests compiling. Those tests will
+  # then be omitted by the tag
+  unless Version.match?(System.version, "~> 1.9") do
+    defmacrop sigil_U(string, _options) do
+      string
+    end
+  end
+
+  @tag :elixir_1_9
   test "datetime formatting" do
     assert Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-02-01 10:00:00.0Z])
 
@@ -46,6 +55,7 @@ defmodule Cldr.DateTime.Interval.Test do
     assert MyApp.Cldr.Time.Interval.to_string(~T[00:00:00.0], ~T[10:00:00.0], locale: "fr")
   end
 
+  @tag :elixir_1_9
   test "backend datetime formatting" do
     assert MyApp.Cldr.DateTime.Interval.to_string(
              ~U[2020-01-01 00:00:00.0Z],
