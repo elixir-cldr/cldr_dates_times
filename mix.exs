@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.6.4"
+  @version "2.7.0-rc.0"
 
   def project do
     [
@@ -20,7 +20,8 @@ defmodule CldrDatesTimes.Mixfile do
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore_warnings",
         plt_add_apps: ~w(calendar_interval)a
-      ]
+        ],
+      xref: [exclude: [:eprof]]
     ]
   end
 
@@ -67,9 +68,8 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, path: "../cldr", override: true},
-      {:ex_cldr_numbers, "~> 2.16"},
-      {:ex_cldr_calendars, "~> 1.11"},
+      {:ex_cldr_numbers, "~> 2.17 or ~> 2.17-rc"},
+      {:ex_cldr_calendars, "~> 1.13 or ~> 1.13-rc"},
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
