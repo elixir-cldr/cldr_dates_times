@@ -1,3 +1,27 @@
+# Changelog for Cldr_Dates_Times v2.7.0
+
+This is the changelog for Cldr_Dates_Times v2.7.0 released on April 8th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Data changes
+
+* Some date and time formats have changed for some locales. This applies to interval date, time and datetime formats in `en` locale for example. Some time formats have also now changed in `en` from 24-hour times to `am/pm` formats.
+
+### Enhancements
+
+* Add support for [CLDR 39](http://cldr.unicode.org/index/downloads/cldr-39)
+
+# Changelog for Cldr_Dates_Times v2.7.0-rc.0
+
+This is the changelog for Cldr_Dates_Times v2.7.0-rc.0 released on March 19th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Data changes
+
+* Some date and time formats have changed for some locales. This applies to interval date, time and datetime formats in `en` locale for example. Some time formats have also now changed in `en` from 24-hour times to `am/pm` formats.
+
+### Enhancements
+
+* Add support for [CLDR 39](http://cldr.unicode.org/index/downloads/cldr-39)
+
 # Changelog for Cldr_Dates_Times v2.6.4
 
 This is the changelog for Cldr_Dates_Times v2.6.4 released on December 17th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

@@ -138,13 +138,13 @@ defmodule Cldr.Time.Interval do
   ## Examples
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
-      {:ok, "10 – 10"}
+      {:ok, "10 – 10 AM"}
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
-      {:ok, "10:00 – 10:03"}
+      {:ok, "10:00 – 10:03 AM"}
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :long
-      {:ok, "10:00 – 10:03"}
+      {:ok, "10:00 – 10:03 AM"}
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex
@@ -156,7 +156,7 @@ defmodule Cldr.Time.Interval do
 
       iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
       ...> MyApp.Cldr, format: :long, style: :zone
-      {:ok, "00:00 – 10:00 Etc/UTC"}
+      {:ok, "12:00 – 10:00 AM Etc/UTC"}
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex, locale: "th"
@@ -267,13 +267,13 @@ defmodule Cldr.Time.Interval do
   ## Examples
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
-      "10 – 10"
+      "10 – 10 AM"
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
-      "10:00 – 10:03"
+      "10:00 – 10:03 AM"
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :long
-      "10:00 – 10:03"
+      "10:00 – 10:03 AM"
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex
@@ -285,7 +285,7 @@ defmodule Cldr.Time.Interval do
 
       iex> Cldr.Time.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
       ...> MyApp.Cldr, format: :long, style: :zone
-      "00:00 – 10:00 Etc/UTC"
+      "12:00 – 10:00 AM Etc/UTC"
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex, locale: "th"

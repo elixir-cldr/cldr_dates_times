@@ -54,7 +54,7 @@ defmodule Cldr.DateAndTime.Backend do
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :long, locale: "en"
             {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :hms, locale: "en"
-            {:ok, "23:59:59"}
+            {:ok, "11:59:59 PM"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "en"
             {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "fr"
