@@ -1,3 +1,11 @@
+# Changelog for Cldr_Dates_Times v2.7.1
+
+This is the changelog for Cldr_Dates_Times v2.7.1 released on May 6th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix formatting time intervals where the start time is "a.m." and the end time is "p.m.". Thanks to @sfusato for the report. Closes #21.
+
 # Changelog for Cldr_Dates_Times v2.7.0
 
 This is the changelog for Cldr_Dates_Times v2.7.0 released on April 8th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

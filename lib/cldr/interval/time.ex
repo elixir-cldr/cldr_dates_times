@@ -313,29 +313,30 @@ defmodule Cldr.Time.Interval do
     with {:ok, style} <- validate_style(style),
          {:ok, format} <- validate_format(formats, style, format),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
-      greatest_difference_format(format, greatest_difference)
+      greatest_difference_format(from, to, format, greatest_difference)
     end
   end
 
-  defp greatest_difference_format(format, _) when is_binary(format) do
+  defp greatest_difference_format(_from, _to, format, _) when is_binary(format) do
     {:ok, format}
   end
 
-  defp greatest_difference_format(format, :H) do
-    case Map.fetch(format, :h) do
+  defp greatest_difference_format(from, to, format, :H) do
+    format_key = if from.hour < 12 and to.hour >= 12, do: :a, else: :h
+    case Map.fetch(format, format_key) do
       :error -> {:error, format_error(format, format)}
       success -> success
     end
   end
 
-  defp greatest_difference_format(format, :m = difference) do
+  defp greatest_difference_format(from, to, format, :m = difference) do
     case Map.fetch(format, difference) do
-      :error -> greatest_difference_format(format, :H)
+      :error -> greatest_difference_format(from, to, format, :H)
       success -> success
     end
   end
 
-  defp greatest_difference_format(_format, _difference) do
+  defp greatest_difference_format(_from, _to, _format, _difference) do
     {:error, :no_practical_difference}
   end
 
