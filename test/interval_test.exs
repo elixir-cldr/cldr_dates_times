@@ -136,6 +136,7 @@ defmodule Cldr.DateTime.Interval.Test do
   test "time intervals that cross midday" do
     assert Cldr.Time.Interval.to_string!(~T[08:00:00], ~T[22:00:00]) == "8:00 AM – 10:00 PM"
     assert Cldr.Time.Interval.to_string!(~T[20:00:00], ~T[22:00:00]) == "8:00 – 10:00 PM"
+    assert Cldr.Time.Interval.to_string!(~U[2021-05-06 11:45:00Z], ~U[2021-05-06 12:15:00Z], MyApp.Cldr, format: :bhm) == "11:45 in the morning – 12:15 in the afternoon"
   end
 
   @tag :elixir_1_10

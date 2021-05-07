@@ -321,9 +321,15 @@ defmodule Cldr.Time.Interval do
     {:ok, format}
   end
 
-  defp greatest_difference_format(from, to, format, :H) do
-    format_key = if from.hour < 12 and to.hour >= 12, do: :a, else: :h
-    case Map.fetch(format, format_key) do
+  defp greatest_difference_format(%{hour: from}, %{hour: to}, format, :H) when from < 12 and to >= 12 do
+    case Map.get(format, :b) || Map.get(format, :a) do
+      nil -> {:error, format_error(format, format)}
+      success -> {:ok, success}
+    end
+  end
+
+  defp greatest_difference_format(_from, _to, format, :H) do
+    case Map.fetch(format, :h) do
       :error -> {:error, format_error(format, format)}
       success -> success
     end
