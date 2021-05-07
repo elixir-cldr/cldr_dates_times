@@ -4,7 +4,7 @@ This is the changelog for Cldr_Dates_Times v2.7.2 released on May 6th, 2021.  Fo
 
 ### Bug Fixes
 
-* Fix regression time intervals where the start time is "a.m." and the end time is "p.m." and the format code is `:b` (previously assumed `:b`). Thanks to @bryanlep for the report. Closes #22.
+* Fix regression time intervals where the start time is "a.m." and the end time is "p.m." and the format code is `:b` (previously assumed `:a`). Thanks to @bryanlep for the report. Closes #22.
 
 # Changelog for Cldr_Dates_Times v2.7.1
 
