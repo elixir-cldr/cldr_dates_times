@@ -13,11 +13,16 @@ defmodule Cldr.DateTime.Interval.Test do
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], ~T[10:00:00.0], MyApp.Cldr)
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], ~T[10:00:00.0], locale: "fr")
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], ~T[10:00:00.0], MyApp.Cldr, locale: "fr")
+
+    assert Cldr.Time.Interval.to_string(~T[10:00:00], ~T[22:03:00], MyApp.Cldr,
+             format: :short,
+             locale: "en-GB"
+           ) == {:ok, "10 – 22"}
   end
 
   # Just to get tests compiling. Those tests will
   # then be omitted by the tag
-  unless Version.match?(System.version, "~> 1.9") do
+  unless Version.match?(System.version(), "~> 1.9") do
     defmacrop sigil_U(string, _options) do
       string
     end
@@ -78,7 +83,7 @@ defmodule Cldr.DateTime.Interval.Test do
     assert Cldr.Date.Interval.to_string(Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
              locale: "unknown"
            ) ==
-             {:error, {Cldr.UnknownLocaleError, "The locale \"unknown\" is not known."}}
+             {:error, {Cldr.InvalidLanguageError, "The language \"unknown\" is invalid"}}
 
     assert Cldr.Date.Interval.to_string(Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
              format: "unknown"
@@ -140,7 +145,12 @@ defmodule Cldr.DateTime.Interval.Test do
 
   @tag :elixir_1_10
   test "datetime intervals that cross midday" do
-    assert Cldr.Time.Interval.to_string!(~U[2021-05-06 11:45:00Z], ~U[2021-05-06 12:15:00Z], MyApp.Cldr, format: :bhm) == "11:45 in the morning – 12:15 in the afternoon"
+    assert Cldr.Time.Interval.to_string!(
+             ~U[2021-05-06 11:45:00Z],
+             ~U[2021-05-06 12:15:00Z],
+             MyApp.Cldr,
+             format: :bhm
+           ) == "11:45 in the morning – 12:15 in the afternoon"
   end
 
   @tag :elixir_1_10

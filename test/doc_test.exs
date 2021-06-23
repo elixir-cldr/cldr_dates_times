@@ -8,7 +8,7 @@ defmodule Cldr.DateTime.Test do
   doctest Cldr.Date
   doctest Cldr.Time
 
-  if Version.match?(System.version, "~> 1.9") do
+  if Version.match?(System.version(), "~> 1.9") do
     doctest Cldr.Interval
     doctest Cldr.DateTime.Interval
     doctest Cldr.Date.Interval

@@ -13,13 +13,14 @@ defmodule Cldr.Date.Interval.Backend do
         to take a start and end date, time or datetime plus a formatting pattern
         and use that information to produce a localized format.
 
-        See `#{inspect __MODULE__}.to_string/3` and `#{inspect backend}.Interval.to_string/3`
+        See `#{inspect(__MODULE__)}.to_string/3` and `#{inspect(backend)}.Interval.to_string/3`
 
         """
 
-        import Cldr.Calendar, only: [
-          date: 0
-        ]
+        import Cldr.Calendar,
+          only: [
+            date: 0
+          ]
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           @doc false
@@ -85,35 +86,35 @@ defmodule Cldr.Date.Interval.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string Date.range(~D[2020-01-01], ~D[2020-12-31])
+            iex> #{inspect(__MODULE__)}.to_string Date.range(~D[2020-01-01], ~D[2020-12-31])
             {:ok, "Jan 1 – Dec 31, 2020"}
 
-            iex> #{inspect __MODULE__}.to_string Date.range(~D[2020-01-01], ~D[2020-01-12])
+            iex> #{inspect(__MODULE__)}.to_string Date.range(~D[2020-01-01], ~D[2020-01-12])
             {:ok, "Jan 1 – 12, 2020"}
 
-            iex> #{inspect __MODULE__}.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]),
+            iex> #{inspect(__MODULE__)}.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]),
             ...> format: :long
             {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
-            iex> #{inspect __MODULE__}.to_string Date.range(~D[2020-01-01], ~D[2020-12-01]),
+            iex> #{inspect(__MODULE__)}.to_string Date.range(~D[2020-01-01], ~D[2020-12-01]),
             ...> format: :long, style: :year_and_month
             {:ok, "January – December 2020"}
 
             iex> use CalendarInterval
-            iex> #{inspect __MODULE__}.to_string ~I"2020-01/12"
+            iex> #{inspect(__MODULE__)}.to_string ~I"2020-01/12"
             {:ok, "Jan 1 – Dec 31, 2020"}
 
-            iex> #{inspect __MODULE__}.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]),
+            iex> #{inspect(__MODULE__)}.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]),
             ...> format: :short
             {:ok, "1/1/2020 – 1/12/2020"}
 
-            iex> #{inspect __MODULE__}.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]),
+            iex> #{inspect(__MODULE__)}.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]),
             ...> format: :long, locale: "fr"
             {:ok, "mer. 1 – dim. 12 janv. 2020"}
 
         """
-        @spec to_string(Cldr.Interval.range, Keyword.t) ::
-            {:ok, String.t} | {:error, {module, String.t}}
+        @spec to_string(Cldr.Interval.range(), Keyword.t()) ::
+                {:ok, String.t()} | {:error, {module, String.t()}}
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           def to_string(%CalendarInterval{} = interval, options) do
@@ -182,35 +183,35 @@ defmodule Cldr.Date.Interval.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string ~D[2020-01-01], ~D[2020-12-31]
+            iex> #{inspect(__MODULE__)}.to_string ~D[2020-01-01], ~D[2020-12-31]
             {:ok, "Jan 1 – Dec 31, 2020"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2020-01-01], ~D[2020-01-12]
+            iex> #{inspect(__MODULE__)}.to_string ~D[2020-01-01], ~D[2020-01-12]
             {:ok, "Jan 1 – 12, 2020"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2020-01-01], ~D[2020-01-12],
+            iex> #{inspect(__MODULE__)}.to_string ~D[2020-01-01], ~D[2020-01-12],
             ...> format: :long
             {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2020-01-01], ~D[2020-12-01],
+            iex> #{inspect(__MODULE__)}.to_string ~D[2020-01-01], ~D[2020-12-01],
             ...> format: :long, style: :year_and_month
             {:ok, "January – December 2020"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2020-01-01], ~D[2020-01-12],
+            iex> #{inspect(__MODULE__)}.to_string ~D[2020-01-01], ~D[2020-01-12],
             ...> format: :short
             {:ok, "1/1/2020 – 1/12/2020"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2020-01-01], ~D[2020-01-12],
+            iex> #{inspect(__MODULE__)}.to_string ~D[2020-01-01], ~D[2020-01-12],
             ...> format: :long, locale: "fr"
             {:ok, "mer. 1 – dim. 12 janv. 2020"}
 
-            iex> #{inspect __MODULE__}.to_string ~D[2020-01-01], ~D[2020-01-12],
+            iex> #{inspect(__MODULE__)}.to_string ~D[2020-01-01], ~D[2020-01-12],
             ...> format: :long, locale: "th", number_system: :thai
             {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
 
         """
-        @spec to_string(Elixir.Calendar.date, Elixir.Calendar.date, Keyword.t) ::
-            {:ok, String.t} | {:error, {module, String.t}}
+        @spec to_string(Elixir.Calendar.date(), Elixir.Calendar.date(), Keyword.t()) ::
+                {:ok, String.t()} | {:error, {module, String.t()}}
 
         def to_string(unquote(date()) = from, unquote(date()) = to, options) do
           Cldr.Date.Interval.to_string(from, to, unquote(backend), options)
@@ -282,35 +283,35 @@ defmodule Cldr.Date.Interval.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-12-31])
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-12-31])
             "Jan 1 – Dec 31, 2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12])
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12])
             "Jan 1 – 12, 2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
             ...> format: :long
             "Wed, Jan 1 – Sun, Jan 12, 2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-12-01]),
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-12-01]),
             ...> format: :long, style: :year_and_month
             "January – December 2020"
 
             iex> use CalendarInterval
-            iex> #{inspect __MODULE__}.to_string! ~I"2020-01/12"
+            iex> #{inspect(__MODULE__)}.to_string! ~I"2020-01/12"
             "Jan 1 – Dec 31, 2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
             ...> format: :short
             "1/1/2020 – 1/12/2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
             ...> format: :long, locale: "fr"
             "mer. 1 – dim. 12 janv. 2020"
 
         """
-        @spec to_string!(Cldr.Interval.range, Keyword.t) ::
-            String.t | no_return
+        @spec to_string!(Cldr.Interval.range(), Keyword.t()) ::
+                String.t() | no_return
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           def to_string!(%CalendarInterval{} = interval, options) do
@@ -384,35 +385,35 @@ defmodule Cldr.Date.Interval.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-12-31])
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-12-31])
             "Jan 1 – Dec 31, 2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12])
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12])
             "Jan 1 – 12, 2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
             ...> format: :long
             "Wed, Jan 1 – Sun, Jan 12, 2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-12-01]),
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-12-01]),
             ...> format: :long, style: :year_and_month
             "January – December 2020"
 
             iex> use CalendarInterval
-            iex> #{inspect __MODULE__}.to_string! ~I"2020-01/12"
+            iex> #{inspect(__MODULE__)}.to_string! ~I"2020-01/12"
             "Jan 1 – Dec 31, 2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
             ...> format: :short
             "1/1/2020 – 1/12/2020"
 
-            iex> #{inspect __MODULE__}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
+            iex> #{inspect(__MODULE__)}.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]),
             ...> format: :long, locale: "fr"
             "mer. 1 – dim. 12 janv. 2020"
 
         """
-        @spec to_string!(Elixir.Calendar.date, Elixir.Calendar.date, Keyword.t) ::
-            String.t | no_return
+        @spec to_string!(Elixir.Calendar.date(), Elixir.Calendar.date(), Keyword.t()) ::
+                String.t() | no_return
 
         def to_string!(unquote(date()) = from, unquote(date()) = to, options) do
           locale = unquote(backend).get_locale

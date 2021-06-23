@@ -97,8 +97,8 @@ defmodule Cldr.DateTime.Interval do
         {:ok, "Jan 1, 2020, 10:00:00 AM – 12:00:00 PM"}
 
     """
-    @spec to_string(CalendarInterval.t, Cldr.backend(), Keyword.t) ::
-        {:ok, String.t} | {:error, {module, String.t}}
+    @spec to_string(CalendarInterval.t(), Cldr.backend(), Keyword.t()) ::
+            {:ok, String.t()} | {:error, {module, String.t()}}
 
     def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
         when precision in [:year, :month, :day] do
@@ -196,8 +196,8 @@ defmodule Cldr.DateTime.Interval do
       {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
 
   """
-  @spec to_string(Calendar.datetime, Calendar.datetime, Cldr.backend(), Keyword.t) ::
-      {:ok, String.t} | {:error, {module, String.t}}
+  @spec to_string(Calendar.datetime(), Calendar.datetime(), Cldr.backend(), Keyword.t()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(from, to, backend, options \\ [])
 
@@ -319,8 +319,8 @@ defmodule Cldr.DateTime.Interval do
 
     """
 
-    @spec to_string!(CalendarInterval.t, Cldr.backend(), Keyword.t) ::
-        String.t | no_return
+    @spec to_string!(CalendarInterval.t(), Cldr.backend(), Keyword.t()) ::
+            String.t() | no_return
 
     def to_string!(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
         when precision in [:year, :month, :day] do

@@ -138,7 +138,7 @@ defmodule Cldr.Time.Interval do
   ## Examples
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
-      {:ok, "10 – 10 AM"}
+      {:ok, "10 – 10"}
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
       {:ok, "10:00 – 10:03 AM"}
@@ -267,7 +267,7 @@ defmodule Cldr.Time.Interval do
   ## Examples
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
-      "10 – 10 AM"
+      "10 – 10"
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
       "10:00 – 10:03 AM"
@@ -321,8 +321,9 @@ defmodule Cldr.Time.Interval do
     {:ok, format}
   end
 
-  defp greatest_difference_format(%{hour: from}, %{hour: to}, format, :H) when from < 12 and to >= 12 do
-    case Map.get(format, :b) || Map.get(format, :a) do
+  defp greatest_difference_format(%{hour: from}, %{hour: to}, format, :H)
+       when from < 12 and to >= 12 do
+    case Map.get(format, :b) || Map.get(format, :a) || Map.get(format, :h) do
       nil -> {:error, format_error(format, format)}
       success -> {:ok, success}
     end
@@ -361,6 +362,8 @@ defmodule Cldr.Time.Interval do
 
   # Direct specification of a format
   defp validate_format(formats, _style, format_key) when is_atom(format_key) do
+    IO.inspect(format_key, label: "format key 2")
+
     case Map.fetch(formats, format_key) do
       :error -> {:error, format_error(formats, format_key)}
       success -> success

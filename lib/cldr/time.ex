@@ -281,7 +281,7 @@ defmodule Cldr.Time do
       :hour_1_12
 
   """
-  def hour_format_from_locale(%LanguageTag{locale: %{hour_cycle: hour_cycle}})
+  def hour_format_from_locale(%LanguageTag{locale: %{hc: hour_cycle}})
       when not is_nil(hour_cycle) do
     hour_cycle
   end

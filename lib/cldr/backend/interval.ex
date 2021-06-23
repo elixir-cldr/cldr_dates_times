@@ -130,8 +130,8 @@ defmodule Cldr.Interval.Backend do
             {:ok, "Wed, Jan 1 – Thu, Dec 31, 2020"}
 
         """
-        @spec to_string(Cldr.Interval.range, Keyword.t) ::
-            {:ok, String.t} | {:error, {module, String.t}}
+        @spec to_string(Cldr.Interval.range(), Keyword.t()) ::
+                {:ok, String.t()} | {:error, {module, String.t()}}
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           def to_string(%CalendarInterval{} = interval, options) do
@@ -258,8 +258,8 @@ defmodule Cldr.Interval.Backend do
             {:ok, "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"}
 
         """
-        @spec to_string(Cldr.Interval.datetime, Cldr.Interval.datetime, Keyword.t) ::
-            {:ok, String.t} | {:error, {module, String.t}}
+        @spec to_string(Cldr.Interval.datetime(), Cldr.Interval.datetime(), Keyword.t()) ::
+                {:ok, String.t()} | {:error, {module, String.t()}}
 
         def to_string(from, to, options \\ []) do
           Cldr.Interval.to_string(from, to, unquote(backend), options)
@@ -370,8 +370,8 @@ defmodule Cldr.Interval.Backend do
             "Wed, Jan 1 – Thu, Dec 31, 2020"
 
         """
-        @spec to_string!(Cldr.Interval.range, Keyword.t) ::
-            String.t | no_return
+        @spec to_string!(Cldr.Interval.range(), Keyword.t()) ::
+                String.t() | no_return
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           def to_string!(%CalendarInterval{} = interval, options) do
@@ -499,8 +499,8 @@ defmodule Cldr.Interval.Backend do
             "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"
 
         """
-        @spec to_string!(Cldr.Interval.datetime, Cldr.Interval.datetime, Keyword.t) ::
-            String.t | no_return()
+        @spec to_string!(Cldr.Interval.datetime(), Cldr.Interval.datetime(), Keyword.t()) ::
+                String.t() | no_return()
 
         def to_string!(from, to, options \\ []) do
           Cldr.Interval.to_string!(from, to, unquote(backend), options)

@@ -70,7 +70,7 @@ defmodule Cldr.Time.Interval.Backend do
         ## Examples
 
             iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], ~T[10:03:00], format: :short
-            {:ok, "10 – 10 AM"}
+            {:ok, "10 – 10"}
 
             iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], ~T[10:03:00], format: :medium
             {:ok, "10:00 – 10:03 AM"}
@@ -95,8 +95,8 @@ defmodule Cldr.Time.Interval.Backend do
             {:ok, "10:00 – 10:03 ในตอนเช้า"}
 
         """
-        @spec to_string(Elixir.Calendar.time, Elixir.Calendar.time, Keyword.t) ::
-            {:ok, String.t} | {:error, {module, String.t}}
+        @spec to_string(Elixir.Calendar.time(), Elixir.Calendar.time(), Keyword.t()) ::
+                {:ok, String.t()} | {:error, {module, String.t()}}
 
         def to_string(from, to, options \\ []) do
           locale = unquote(backend).get_locale
@@ -158,7 +158,7 @@ defmodule Cldr.Time.Interval.Backend do
         ## Examples
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[10:00:00], ~T[10:03:00], format: :short
-            "10 – 10 AM"
+            "10 – 10"
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[10:00:00], ~T[10:03:00], format: :medium
             "10:00 – 10:03 AM"
@@ -183,8 +183,8 @@ defmodule Cldr.Time.Interval.Backend do
             "10:00 – 10:03 ในตอนเช้า"
 
         """
-        @spec to_string!(Elixir.Calendar.time, Elixir.Calendar.time, Keyword.t) ::
-            String.t | no_return()
+        @spec to_string!(Elixir.Calendar.time(), Elixir.Calendar.time(), Keyword.t()) ::
+                String.t() | no_return()
 
         def to_string!(from, to, options \\ []) do
           locale = unquote(backend).get_locale

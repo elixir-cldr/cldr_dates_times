@@ -3505,9 +3505,7 @@ defmodule Cldr.DateTime.Formatter do
       |> join_requirements
 
     raise Cldr.DateTime.UnresolvedFormat,
-          "The format symbol '#{symbol}' requires at map with at least #{requirements}. Found: #{
-            inspect(map)
-          }"
+          "The format symbol '#{symbol}' requires at map with at least #{requirements}. Found: #{inspect(map)}"
   end
 
   @doc false

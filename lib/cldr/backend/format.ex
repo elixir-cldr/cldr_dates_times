@@ -44,7 +44,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Example
 
-            iex> #{__MODULE__}.calendars_for "en"
+            iex> #{inspect(__MODULE__)}.calendars_for "en"
             {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
              :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
              :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
@@ -70,7 +70,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{__MODULE__}.date_formats "en"
+            iex> #{inspect(__MODULE__)}.date_formats "en"
             {:ok, %Cldr.Date.Styles{
               full: "EEEE, MMMM d, y",
               long: "MMMM d, y",
@@ -78,7 +78,7 @@ defmodule Cldr.DateTime.Format.Backend do
               short: "M/d/yy"
             }}
 
-            iex> #{__MODULE__}.date_formats "en", :buddhist
+            iex> #{inspect(__MODULE__)}.date_formats "en", :buddhist
             {:ok, %Cldr.Date.Styles{
               full: "EEEE, MMMM d, y G",
               long: "MMMM d, y G",
@@ -111,7 +111,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{__MODULE__}.time_formats "en"
+            iex> #{inspect(__MODULE__)}.time_formats "en"
             {:ok, %Cldr.Time.Styles{
               full: "h:mm:ss a zzzz",
               long: "h:mm:ss a z",
@@ -119,7 +119,7 @@ defmodule Cldr.DateTime.Format.Backend do
               short: "h:mm a"
             }}
 
-            iex> #{__MODULE__}.time_formats "en", :buddhist
+            iex> #{inspect(__MODULE__)}.time_formats "en", :buddhist
             {:ok, %Cldr.Time.Styles{
               full: "h:mm:ss a zzzz",
               long: "h:mm:ss a z",
@@ -152,7 +152,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{__MODULE__}.date_time_formats "en"
+            iex> #{inspect(__MODULE__)}.date_time_formats "en"
             {:ok, %Cldr.DateTime.Styles{
               full: "{1} 'at' {0}",
               long: "{1} 'at' {0}",
@@ -160,7 +160,7 @@ defmodule Cldr.DateTime.Format.Backend do
               short: "{1}, {0}"
             }}
 
-            iex> #{__MODULE__}.date_time_formats "en", :buddhist
+            iex> #{inspect(__MODULE__)}.date_time_formats "en", :buddhist
             {:ok, %Cldr.DateTime.Styles{
               full: "{1} 'at' {0}",
               long: "{1} 'at' {0}",
@@ -195,55 +195,53 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{__MODULE__}.date_time_available_formats "en"
-            {
-              :ok,
-              %{
-                bh: "h B",
-                bhm: "h:mm B",
-                bhms: "h:mm:ss B",
-                d: "d",
-                e: "ccc",
-                e_bhm: "E h:mm B",
-                e_bhms: "E h:mm:ss B",
-                e_hm: "E HH:mm",
-                e_hms: "E HH:mm:ss",
-                ed: "d E",
-                ehm: "E h:mm a",
-                ehms: "E h:mm:ss a",
-                gy: "y G",
-                gy_mm_md: "MMM d, y G",
-                gy_mmm: "MMM y G",
-                gy_mmm_ed: "E, MMM d, y G",
-                h: "h a",
-                hm: "h:mm a",
-                hms: "h:mm:ss a",
-                hmsv: "h:mm:ss a v",
-                hmv: "h:mm a v",
-                m: "L",
-                m_ed: "E, M/d",
-                md: "M/d",
-                mm_md: "MMM d",
-                mmm: "LLL",
-                mmm_ed: "E, MMM d",
-                mmm_md: "MMMM d",
-                mmmmw_count_one: "'week' W 'of' MMMM",
-                mmmmw_count_other: "'week' W 'of' MMMM",
-                ms: "mm:ss",
-                y: "y",
-                y_m: "M/y",
-                y_m_ed: "E, M/d/y",
-                y_md: "M/d/y",
-                y_mm_md: "MMM d, y",
-                y_mmm: "MMM y",
-                y_mmm_ed: "E, MMM d, y",
-                y_mmmm: "MMMM y",
-                y_qqq: "QQQ y",
-                y_qqqq: "QQQQ y",
-                yw_count_one: "'week' w 'of' Y",
-                yw_count_other: "'week' w 'of' Y"
-              }
-            }
+            iex> #{inspect(__MODULE__)}.date_time_available_formats "en"
+            {:ok,
+             %{
+               d: "d",
+               mmm_ed: "E, MMM d",
+               ehm: "E h:mm a",
+               gy_mmm: "MMM y G",
+               y_mmmm: "MMMM y",
+               y: "y",
+               y_m_ed: "E, M/d/y",
+               md: "M/d",
+               e_hm: "E HH:mm",
+               mmmmw_count_other: "'week' W 'of' MMMM",
+               bh: "h B",
+               gy_mmm_ed: "E, MMM d, y G",
+               gy_mm_md: "MMM d, y G",
+               e: "ccc",
+               ehms: "E h:mm:ss a",
+               y_mm_md: "MMM d, y",
+               y_qqqq: "QQQQ y",
+               mmmmw_count_one: "'week' W 'of' MMMM",
+               h: "HH",
+               bhms: "h:mm:ss B",
+               y_md: "M/d/y",
+               y_qqq: "QQQ y",
+               mmm_md: "MMMM d",
+               y_mmm: "MMM y",
+               yw_count_one: "'week' w 'of' Y",
+               y_mmm_ed: "E, MMM d, y",
+               yw_count_other: "'week' w 'of' Y",
+               e_bhm: "E h:mm B",
+               ms: "mm:ss",
+               mmm: "LLL",
+               bhm: "h:mm B",
+               mm_md: "MMM d",
+               hms: "h:mm:ss a",
+               e_hms: "E HH:mm:ss",
+               hmv: "h:mm a v",
+               gy: "y G",
+               m: "L",
+               y_m: "M/y",
+               m_ed: "E, M/d",
+               hmsv: "h:mm:ss a v",
+               hm: "h:mm a",
+               e_bhms: "E h:mm:ss B",
+               ed: "d E"
+             }}
 
         """
         @spec date_time_available_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
@@ -304,7 +302,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{__MODULE__}.date_time_interval_fallback "en", :gregorian
+            iex> #{inspect(__MODULE__)}.date_time_interval_fallback "en", :gregorian
             [0, " – ", 1]
 
         """
@@ -333,7 +331,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Example
 
-            iex> #{__MODULE__}.hour_format "en"
+            iex> #{inspect(__MODULE__)}.hour_format "en"
             {:ok, {"+HH:mm", "-HH:mm"}}
 
         """
@@ -355,7 +353,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Example
 
-            iex> #{__MODULE__}.gmt_format "en"
+            iex> #{inspect(__MODULE__)}.gmt_format "en"
             {:ok, ["GMT", 0]}
 
         """
@@ -378,7 +376,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Example
 
-            iex> #{__MODULE__}.gmt_zero_format "en"
+            iex> #{inspect(__MODULE__)}.gmt_zero_format "en"
             {:ok, "GMT"}
 
         """
@@ -533,16 +531,16 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples
 
-            iex> #{__MODULE__}.day_period_for ~T[06:05:54.515228], "en"
+            iex> #{inspect(__MODULE__)}.day_period_for ~T[06:05:54.515228], "en"
             :morning1
 
-            iex> #{__MODULE__}.day_period_for ~T[13:05:54.515228], "en"
+            iex> #{inspect(__MODULE__)}.day_period_for ~T[13:05:54.515228], "en"
             :afternoon1
 
-            iex> #{__MODULE__}.day_period_for ~T[21:05:54.515228], "en"
+            iex> #{inspect(__MODULE__)}.day_period_for ~T[21:05:54.515228], "en"
             :night1
 
-            iex> #{__MODULE__}.day_period_for ~T[21:05:54.515228], "fr"
+            iex> #{inspect(__MODULE__)}.day_period_for ~T[21:05:54.515228], "fr"
             :evening1
 
         """
@@ -565,13 +563,13 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples
 
-            iex> #{__MODULE__}.language_has_noon_and_midnight? "fr"
+            iex> #{inspect(__MODULE__)}.language_has_noon_and_midnight? "fr"
             true
 
-            iex> #{__MODULE__}.language_has_noon_and_midnight? "en"
+            iex> #{inspect(__MODULE__)}.language_has_noon_and_midnight? "en"
             true
 
-            iex> #{__MODULE__}.language_has_noon_and_midnight? "af"
+            iex> #{inspect(__MODULE__)}.language_has_noon_and_midnight? "af"
             false
 
         """

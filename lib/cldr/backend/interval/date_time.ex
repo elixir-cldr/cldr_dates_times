@@ -17,9 +17,10 @@ defmodule Cldr.DateTime.Interval.Backend do
 
         """
 
-        import Cldr.Calendar, only: [
-          naivedatetime: 0
-        ]
+        import Cldr.Calendar,
+          only: [
+            naivedatetime: 0
+          ]
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           @doc false
@@ -76,13 +77,13 @@ defmodule Cldr.DateTime.Interval.Backend do
           ## Examples
 
               iex> use CalendarInterval
-              iex> #{inspect __MODULE__}.to_string ~I"2020-01-01 00:00/10:00"
+              iex> #{inspect(__MODULE__)}.to_string ~I"2020-01-01 00:00/10:00"
               {:ok, "Jan 1, 2020, 12:00:00 AM – 10:00:00 AM"}
 
           """
 
-          @spec to_string(CalendarInterval.t, Keyword.t) ::
-              {:ok, String.t} | {:error, {module, String.t}}
+          @spec to_string(CalendarInterval.t(), Keyword.t()) ::
+                  {:ok, String.t()} | {:error, {module, String.t()}}
 
           def to_string(%CalendarInterval{} = interval, options) do
             locale = unquote(backend).get_locale
@@ -143,14 +144,17 @@ defmodule Cldr.DateTime.Interval.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string ~U[2020-01-01 00:00:00.0Z],
+            iex> #{inspect(__MODULE__)}.to_string ~U[2020-01-01 00:00:00.0Z],
             ...> ~U[2020-12-31 10:00:00.0Z]
             {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
 
         """
-        @spec to_string(Elixir.Calendar.naive_datetime,
-            Elixir.Calendar.naive_datetime, Keyword.t) ::
-            {:ok, String.t} | {:error, {module, String.t}}
+        @spec to_string(
+                Elixir.Calendar.naive_datetime(),
+                Elixir.Calendar.naive_datetime(),
+                Keyword.t()
+              ) ::
+                {:ok, String.t()} | {:error, {module, String.t()}}
 
         def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options \\ []) do
           locale = unquote(backend).get_locale
@@ -213,13 +217,13 @@ defmodule Cldr.DateTime.Interval.Backend do
           ## Examples
 
               iex> use CalendarInterval
-              iex> #{inspect __MODULE__}.to_string! ~I"2020-01-01 00:00/10:00"
+              iex> #{inspect(__MODULE__)}.to_string! ~I"2020-01-01 00:00/10:00"
               "Jan 1, 2020, 12:00:00 AM – 10:00:59 AM"
 
           """
 
-          @spec to_string!(CalendarInterval.t, Keyword.t) ::
-              String.t | no_return
+          @spec to_string!(CalendarInterval.t(), Keyword.t()) ::
+                  String.t() | no_return
 
           def to_string!(%CalendarInterval{} = interval, options) do
             locale = unquote(backend).get_locale
@@ -277,16 +281,23 @@ defmodule Cldr.DateTime.Interval.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.to_string! ~U[2020-01-01 00:00:00.0Z],
+            iex> #{inspect(__MODULE__)}.to_string! ~U[2020-01-01 00:00:00.0Z],
             ...> ~U[2020-12-31 10:00:00.0Z]
             "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"
 
         """
-        @spec to_string!(Elixir.Calendar.naive_datetime,
-            Elixir.Calendar.naive_datetime, Keyword.t) ::
-            String.t | no_return()
+        @spec to_string!(
+                Elixir.Calendar.naive_datetime(),
+                Elixir.Calendar.naive_datetime(),
+                Keyword.t()
+              ) ::
+                String.t() | no_return()
 
-        def to_string!(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options \\ []) do
+        def to_string!(
+              unquote(naivedatetime()) = from,
+              unquote(naivedatetime()) = to,
+              options \\ []
+            ) do
           locale = unquote(backend).get_locale
           options = Keyword.put_new(options, :locale, locale)
           Cldr.DateTime.Interval.to_string!(from, to, unquote(backend), options)

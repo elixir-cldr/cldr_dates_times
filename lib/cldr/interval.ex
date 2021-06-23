@@ -315,7 +315,7 @@ defmodule Cldr.Interval do
 
   def to_string(unquote(time()) = from, unquote(time()) = to, options) when is_list(options) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
-    options =  Keyword.put_new(options, :locale, locale)
+    options = Keyword.put_new(options, :locale, locale)
     to_string(from, to, backend, options)
   end
 
@@ -415,8 +415,8 @@ defmodule Cldr.Interval do
       {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
   """
-  @spec to_string(range, Cldr.backend(), Keyword.t) ::
-      {:ok, String.t} | {:error, {module, String.t}}
+  @spec to_string(range, Cldr.backend(), Keyword.t()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(%Date.Range{first: first, last: last}, backend, options) do
     Cldr.Date.Interval.to_string(first, last, backend, options)
@@ -559,8 +559,8 @@ defmodule Cldr.Interval do
       {:ok, "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"}
 
   """
-  @spec to_string(datetime, datetime, Cldr.backend(), Keyword.t) ::
-      {:ok, String.t} | {:error, {module, String.t}}
+  @spec to_string(datetime, datetime, Cldr.backend(), Keyword.t()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(unquote(datetime()) = from, unquote(datetime()) = to, backend, options) do
     Cldr.DateTime.Interval.to_string(from, to, backend, options)

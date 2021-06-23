@@ -1,4 +1,18 @@
-# Changelog for Cldr_Dates_Times v2.7.2
+# Changelog
+
+## Cldr_Dates_Times v2.8.0
+
+This is the changelog for Cldr_Dates_Times v2.8.0 released on June 24th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug fixes
+
+* Fixes formatting time intervals that by checking for a format key of `:h` in addition to the `:a` and `:b` format keys (simialr to issue #22).
+
+### Enhancments
+
+* Updated to [ex_cldr version 2.23.0](https://hex.pm/packages/ex_cldr/2.23.0) which changes the names of some of the field in the "-u-" extension to match the CLDR canonical name. In particular the field name `hour_cycle` changes to `hc`.
+
+## Cldr_Dates_Times v2.7.2
 
 This is the changelog for Cldr_Dates_Times v2.7.2 released on May 6th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
@@ -6,7 +20,7 @@ This is the changelog for Cldr_Dates_Times v2.7.2 released on May 6th, 2021.  Fo
 
 * Fix regression time intervals where the start time is "a.m." and the end time is "p.m." and the format code is `:b` (previously assumed `:a`). Thanks to @bryanlep for the report. Closes #22.
 
-# Changelog for Cldr_Dates_Times v2.7.1
+## Cldr_Dates_Times v2.7.1
 
 This is the changelog for Cldr_Dates_Times v2.7.1 released on May 6th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
@@ -14,7 +28,7 @@ This is the changelog for Cldr_Dates_Times v2.7.1 released on May 6th, 2021.  Fo
 
 * Fix formatting time intervals where the start time is "a.m." and the end time is "p.m.". Thanks to @sfusato for the report. Closes #21.
 
-# Changelog for Cldr_Dates_Times v2.7.0
+## Cldr_Dates_Times v2.7.0
 
 This is the changelog for Cldr_Dates_Times v2.7.0 released on April 8th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
@@ -26,7 +40,7 @@ This is the changelog for Cldr_Dates_Times v2.7.0 released on April 8th, 2021.  
 
 * Add support for [CLDR 39](http://cldr.unicode.org/index/downloads/cldr-39)
 
-# Changelog for Cldr_Dates_Times v2.7.0-rc.0
+## Cldr_Dates_Times v2.7.0-rc.0
 
 This is the changelog for Cldr_Dates_Times v2.7.0-rc.0 released on March 19th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
@@ -38,7 +52,7 @@ This is the changelog for Cldr_Dates_Times v2.7.0-rc.0 released on March 19th, 2
 
 * Add support for [CLDR 39](http://cldr.unicode.org/index/downloads/cldr-39)
 
-# Changelog for Cldr_Dates_Times v2.6.4
+## Cldr_Dates_Times v2.6.4
 
 This is the changelog for Cldr_Dates_Times v2.6.4 released on December 17th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
@@ -48,7 +62,7 @@ This is the changelog for Cldr_Dates_Times v2.6.4 released on December 17th, 202
 
 * Make dependencies `eprof` and `dialyixir` optional so that they aren't dragged into host apps unnecessarily.
 
-# Changelog for Cldr_Dates_Times v2.6.3
+## Cldr_Dates_Times v2.6.3
 
 This is the changelog for Cldr_Dates_Times v2.6.3 released on December 3rd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
@@ -56,7 +70,7 @@ This is the changelog for Cldr_Dates_Times v2.6.3 released on December 3rd, 2020
 
 * [UPDATED] Fix regression whereby formatting a Date or Time via a backend with no options would raise a `Cldr.NoDefaultBackendError (No default :ex_cldr backend is configured)` exception. Closes #18 properly. Thanks to @maennchen.
 
-# Changelog for Cldr_Dates_Times v2.6.2
+## Cldr_Dates_Times v2.6.2
 
 This is the changelog for Cldr_Dates_Times v2.6.2 released on December 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
@@ -64,7 +78,7 @@ This is the changelog for Cldr_Dates_Times v2.6.2 released on December 2nd, 2020
 
 * Fix regression whereby formatting a DateTime via a backend with no options would raise a `Cldr.NoDefaultBackendError (No default :ex_cldr backend is configured)` exception. Closes #18. Thanks to @maennchen.
 
-# Changelog for Cldr_Dates_Times v2.6.1
+## Cldr_Dates_Times v2.6.1
 
 This is the changelog for Cldr_Dates_Times v2.6.1 released on November 30th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
@@ -74,7 +88,7 @@ This is the changelog for Cldr_Dates_Times v2.6.1 released on November 30th, 202
 
 * Handle default parameters more efficiently which improves performance by a further 10%.
 
-# Changelog for Cldr_Dates_Times v2.6.0
+## Cldr_Dates_Times v2.6.0
 
 This is the changelog for Cldr_Dates_Times v2.6.0 released on November 1st, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
@@ -82,7 +96,7 @@ This is the changelog for Cldr_Dates_Times v2.6.0 released on November 1st, 2020
 
 * Add support for [CLDR 38](http://cldr.unicode.org/index/downloads/cldr-38)
 
-# Changelog for Cldr_Dates_Times v2.5.4
+## Cldr_Dates_Times v2.5.4
 
 This is the changelog for Cldr_Dates_Times v2.5.4 released on September 26th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -90,7 +104,7 @@ This is the changelog for Cldr_Dates_Times v2.5.4 released on September 26th, 20
 
 * Use `Cldr.Date.default_backend/0` as a shim to provide compatibility for the upcoming `ex_cldr` version `2.18.0` where `Cldr.default_backend/0` is deprecated in favour of `Cldr.default_backend!/0`
 
-# Changelog for Cldr_Dates_Times v2.5.3
+## Cldr_Dates_Times v2.5.3
 
 This is the changelog for Cldr_Dates_Times v2.5.3 released on September 22nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -98,7 +112,7 @@ This is the changelog for Cldr_Dates_Times v2.5.3 released on September 22nd, 20
 
 * Fix compiler warns on duplicate `@doc` on Elixir 1.11
 
-# Changelog for Cldr_Dates_Times v2.5.2
+## Cldr_Dates_Times v2.5.2
 
 This is the changelog for Cldr_Dates_Times v2.5.2 released on September 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -106,7 +120,7 @@ This is the changelog for Cldr_Dates_Times v2.5.2 released on September 2nd, 202
 
 * Correct the spec for Cldr.DateTime.Relative.to_string!/3. Thanks to @loskobrakai.
 
-# Changelog for Cldr_Dates_Times v2.5.1
+## Cldr_Dates_Times v2.5.1
 
 This is the changelog for Cldr_Dates_Times v2.5.1 released on June 17th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -118,7 +132,7 @@ This is the changelog for Cldr_Dates_Times v2.5.1 released on June 17th, 2020.  
 
 * Fix links to `hex.pm` for `calendar_interval`
 
-# Changelog for Cldr_Dates_Times v2.5.0
+## Cldr_Dates_Times v2.5.0
 
 This is the changelog for Cldr_Dates_Times v2.5.0 released on June 13th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -140,7 +154,7 @@ This is the changelog for Cldr_Dates_Times v2.5.0 released on June 13th, 2020.  
 
 * Retrieve `:precompiled_date_time_formats` from the backend configuration, not the global configuration
 
-# Changelog for Cldr_Dates_Times v2.4.0
+## Cldr_Dates_Times v2.4.0
 
 This is the changelog for Cldr_Dates_Times v2.4.0 released on May 4th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -154,7 +168,7 @@ This is the changelog for Cldr_Dates_Times v2.4.0 released on May 4th, 2020.  Fo
 
 * Add protocol support for `Cldr.Chars` which is used by `Cldr.to_string/1`
 
-# Changelog for Cldr_Dates_Times v2.3.0
+## Cldr_Dates_Times v2.3.0
 
 This is the changelog for Cldr_Dates_Times v2.3.0 released on February 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -176,7 +190,7 @@ defmodule MyApp do
 end
 ```
 
-# Changelog for Cldr_Dates_Times v2.2.4
+## Cldr_Dates_Times v2.2.4
 
 This is the changelog for Cldr_Dates_Times v2.2.4 released on January 14th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -186,7 +200,7 @@ This is the changelog for Cldr_Dates_Times v2.2.4 released on January 14th, 2020
 
 * Fix dialyzer warning in generated backend
 
-# Changelog for Cldr_Dates_Times v2.2.3
+## Cldr_Dates_Times v2.2.3
 
 This is the changelog for Cldr_Dates_Times v2.2.3 released on September 14th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -194,7 +208,7 @@ This is the changelog for Cldr_Dates_Times v2.2.3 released on September 14th, 20
 
 * Correctly uses a provided `:backend` option when validating the `:locale` option to the various `to_string/3` calls.  Thanks to @lostkobrakai. Closes #108 and #109.
 
-# Changelog for Cldr_Dates_Times v2.2.2
+## Cldr_Dates_Times v2.2.2
 
 This is the changelog for Cldr_Dates_Times v2.2.2 released on August 31st, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -206,7 +220,7 @@ This is the changelog for Cldr_Dates_Times v2.2.2 released on August 31st, 2019.
 
 * Return an error tuple immediately when a format code is used but no data is available to fulfill it
 
-# Changelog for Cldr_Dates_Times v2.2.1
+## Cldr_Dates_Times v2.2.1
 
 This is the changelog for Cldr_Dates_Times v2.2.1 released on August 23rd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -214,7 +228,7 @@ This is the changelog for Cldr_Dates_Times v2.2.1 released on August 23rd, 2019.
 
 * Fix `@spec` for `Cldr.Date.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.to_string/3` as well as the `!` variants.
 
-# Changelog for Cldr_Dates_Times v2.2.0
+## Cldr_Dates_Times v2.2.0
 
 This is the changelog for Cldr_Dates_Times v2.2.0 released on August 23rd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -228,7 +242,7 @@ This is the changelog for Cldr_Dates_Times v2.2.0 released on August 23rd, 2019.
 
 * Fix dialyzer warnings
 
-# Changelog for Cldr_Dates_Times v2.1.0
+## Cldr_Dates_Times v2.1.0
 
 This is the changelog for Cldr_Dates_Times v2.1.0 released on June 16th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -238,7 +252,7 @@ This is the changelog for Cldr_Dates_Times v2.1.0 released on June 16th, 2019.  
 
 * Updates to [ex_cldr_calendars 1.0](https://hex.pm/packages/ex_cldr_calendars/1.0.0) which includes `Cldr.Calendar.week_of_month/1`. The result corresponds to the `W` format which is now implemented as well.
 
-# Changelog for Cldr_Dates_Times v2.0.2
+## Cldr_Dates_Times v2.0.2
 
 This is the changelog for Cldr_Dates_Times v2.0.2 released on June 12th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -246,7 +260,7 @@ This is the changelog for Cldr_Dates_Times v2.0.2 released on June 12th, 2019.  
 
 * Resolve the actual number system before transliterating a date, time or datetime.  Closes #9.  Thanks to @ribanez7 for the report.
 
-# Changelog for Cldr_Dates_Times v2.0.1
+## Cldr_Dates_Times v2.0.1
 
 This is the changelog for Cldr_Dates_Times v2.0.1 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 
@@ -254,7 +268,7 @@ This is the changelog for Cldr_Dates_Times v2.0.1 released on June 9th, 2019.  F
 
 * Fixes a formatter code generation error when a format is a tuple form not a string form.
 
-# Changelog for Cldr_Dates_Times v2.0.0
+## Cldr_Dates_Times v2.0.0
 
 This is the changelog for Cldr_Dates_Times v2.0 released on June 9th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
 

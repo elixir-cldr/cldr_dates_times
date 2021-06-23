@@ -1,8 +1,9 @@
 cond do
-  Version.match?(System.version, "~> 1.10") ->
+  Version.match?(System.version(), "~> 1.10") ->
     nil
-  Version.match?(System.version, "~> 1.9")
+    Version.match?(System.version(), "~> 1.9")
     ExUnit.configure(exclude: :elixir_1_10)
+
   true ->
     ExUnit.configure(exclude: [:elixir_1_9, :elixir_1_10])
 end
