@@ -272,13 +272,13 @@ defmodule Cldr.Time do
   ## Examples
 
       iex> Cldr.Time.hour_format_from_locale "en-AU"
-      :hour_1_12
+      :h12
 
       iex> Cldr.Time.hour_format_from_locale "fr"
-      :hour_0_23
+      :h23
 
       iex> Cldr.Time.hour_format_from_locale "fr-u-hc-h12"
-      :hour_1_12
+      :h12
 
   """
   def hour_format_from_locale(%LanguageTag{locale: %{hc: hour_cycle}})
@@ -309,19 +309,19 @@ defmodule Cldr.Time do
     @time_preferences
   end
 
-  # | Symbol  | Midn.  |  Morning  | Noon |  Afternoon  | Midn. |
-  # | :----:  | :---: | :-----: | :--: | :--------: | :---: |
-  # |   h      |  12    | 1...11  |  12   |   1...11   |  12   |
-  # |   K      |   0    | 1...11  |   0   |   1...11   |   0   |
-  # |   H      |   0    | 1...11  |  12   |  13...23   |   0   |
-  # |   k      |  24    | 1...11  |  12   |  13...23   |  24   |
+  # | Symbol   | Midn.  |  Morning  | Noon  | Afternoon  | Midn. | Code
+  # | :----:   | :---:  | :-----:   | :--:  | :--------: | :---: | :--:
+  # |   h      |  12    | 1...11    |  12   |   1...11   |  12   | :h12
+  # |   K      |   0    | 1...11    |   0   |   1...11   |   0   | :h11
+  # |   H      |   0    | 1...11    |  12   |  13...23   |   0   | :h23
+  # |   k      |  24    | 1...11    |  12   |  13...23   |  24   | :h24
   #
   defp time_symbols do
     %{
-      "h" => :hour_1_12,
-      "K" => :hour_0_11,
-      "H" => :hour_0_23,
-      "k" => :hour_1_24
+      "h" => :h12, # :hour_1_12,
+      "K" => :h11, # :hour_0_11,
+      "H" => :h23, # :hour_0_23,
+      "k" => :h24, # :hour_1_24.
     }
   end
 

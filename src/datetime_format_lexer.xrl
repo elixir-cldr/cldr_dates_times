@@ -91,10 +91,10 @@ Rules.
 {Period_noon_mid}+       : {token,{period_noon_midnight,TokenLine,count(TokenChars)}}.
 {Period_flex}+           : {token,{period_flex,TokenLine,count(TokenChars)}}.
 
-{Hour_1_12}+             : {token,{hour_1_12,TokenLine,count(TokenChars)}}.
-{Hour_0_11}+             : {token,{hour_0_11,TokenLine,count(TokenChars)}}.
-{Hour_1_24}+             : {token,{hour_1_24,TokenLine,count(TokenChars)}}.
-{Hour_0_23}+             : {token,{hour_0_23,TokenLine,count(TokenChars)}}.
+{Hour_1_12}+             : {token,{h12,TokenLine,count(TokenChars)}}.
+{Hour_0_11}+             : {token,{h11,TokenLine,count(TokenChars)}}.
+{Hour_1_24}+             : {token,{h24,TokenLine,count(TokenChars)}}.
+{Hour_0_23}+             : {token,{h23,TokenLine,count(TokenChars)}}.
 
 {Minute}+                : {token,{minute,TokenLine,count(TokenChars)}}.
 {Second}+                : {token,{second,TokenLine,count(TokenChars)}}.

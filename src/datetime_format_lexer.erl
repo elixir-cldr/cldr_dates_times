@@ -861,22 +861,22 @@ yyaction_22(TokenChars, TokenLine) ->
 -compile({inline,yyaction_23/2}).
 -file("src/datetime_format_lexer.xrl", 92).
 yyaction_23(TokenChars, TokenLine) ->
-     { token, { hour_1_12, TokenLine, count (TokenChars) } } .
+     { token, { h12, TokenLine, count (TokenChars) } } .
 
 -compile({inline,yyaction_24/2}).
 -file("src/datetime_format_lexer.xrl", 93).
 yyaction_24(TokenChars, TokenLine) ->
-     { token, { hour_0_11, TokenLine, count (TokenChars) } } .
+     { token, { h11, TokenLine, count (TokenChars) } } .
 
 -compile({inline,yyaction_25/2}).
 -file("src/datetime_format_lexer.xrl", 94).
 yyaction_25(TokenChars, TokenLine) ->
-     { token, { hour_1_24, TokenLine, count (TokenChars) } } .
+     { token, { h24, TokenLine, count (TokenChars) } } .
 
 -compile({inline,yyaction_26/2}).
 -file("src/datetime_format_lexer.xrl", 95).
 yyaction_26(TokenChars, TokenLine) ->
-     { token, { hour_0_23, TokenLine, count (TokenChars) } } .
+     { token, { h23, TokenLine, count (TokenChars) } } .
 
 -compile({inline,yyaction_27/2}).
 -file("src/datetime_format_lexer.xrl", 97).

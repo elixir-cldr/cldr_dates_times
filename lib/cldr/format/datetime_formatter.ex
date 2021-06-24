@@ -2082,7 +2082,7 @@ defmodule Cldr.DateTime.Formatter do
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-    `hour_1_12/4`
+    `h12/4`
 
   ## Format Symbol
 
@@ -2095,58 +2095,58 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 0}
+      iex> Cldr.DateTime.Formatter.h12 %{hour: 0}
       "12"
 
-      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 12}
+      iex> Cldr.DateTime.Formatter.h12 %{hour: 12}
       "12"
 
-      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 24}
+      iex> Cldr.DateTime.Formatter.h12 %{hour: 24}
       "12"
 
-      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 11}
+      iex> Cldr.DateTime.Formatter.h12 %{hour: 11}
       "11"
 
-      iex> Cldr.DateTime.Formatter.hour_1_12 %{hour: 23}
+      iex> Cldr.DateTime.Formatter.h12 %{hour: 23}
       "11"
 
   """
-  @spec hour_1_12(Calendar.time(), integer, Keyword.t()) ::
+  @spec h12(Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def hour_1_12(hour_1_12, n \\ @default_format, options \\ [])
+  def h12(h12, n \\ @default_format, options \\ [])
 
-  def hour_1_12(hour_1_12, options, []) when is_list(options) do
+  def h12(h12, options, []) when is_list(options) do
     {locale, backend} = extract_locale!(options)
-    hour_1_12(hour_1_12, @default_format, locale, backend, options)
+    h12(h12, @default_format, locale, backend, options)
   end
 
-  def hour_1_12(hour_1_12, n, options) do
+  def h12(h12, n, options) do
     {locale, backend} = extract_locale!(options)
-    hour_1_12(hour_1_12, n, locale, backend, options)
+    h12(h12, n, locale, backend, options)
   end
 
-  @spec hour_1_12(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
+  @spec h12(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def hour_1_12(time, n, locale, backend, options \\ [])
+  def h12(time, n, locale, backend, options \\ [])
 
-  def hour_1_12(%{hour: hour}, n, _locale, _backend, _options) when hour in [0, 12, 24] do
+  def h12(%{hour: hour}, n, _locale, _backend, _options) when hour in [0, 12, 24] do
     12
     |> pad(n)
   end
 
-  def hour_1_12(%{hour: hour}, n, _locale, _backend, _options) when hour in 1..11 do
+  def h12(%{hour: hour}, n, _locale, _backend, _options) when hour in 1..11 do
     hour
     |> pad(n)
   end
 
-  def hour_1_12(%{hour: hour}, n, _locale, _backend, _options) when hour in 13..23 do
+  def h12(%{hour: hour}, n, _locale, _backend, _options) when hour in 13..23 do
     (hour - 12)
     |> pad(n)
   end
 
-  def hour_1_12(time, _n, _locale, _backend, _options) do
+  def h12(time, _n, _locale, _backend, _options) do
     error_return(time, "h", [:hour])
   end
 
@@ -2164,7 +2164,7 @@ defmodule Cldr.DateTime.Formatter do
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-    `hour_0_11/4`
+    `h11/4`
 
   ## Format Symbol
 
@@ -2177,61 +2177,61 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 0}
+      iex> Cldr.DateTime.Formatter.h11 %{hour: 0}
       "0"
 
-      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 12}
+      iex> Cldr.DateTime.Formatter.h11 %{hour: 12}
       "0"
 
-      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 24}
+      iex> Cldr.DateTime.Formatter.h11 %{hour: 24}
       "0"
 
-      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 23}
+      iex> Cldr.DateTime.Formatter.h11 %{hour: 23}
       "11"
 
-      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 11}
+      iex> Cldr.DateTime.Formatter.h11 %{hour: 11}
       "11"
 
-      iex> Cldr.DateTime.Formatter.hour_0_11 %{hour: 9}
+      iex> Cldr.DateTime.Formatter.h11 %{hour: 9}
       "9"
 
   """
-  @spec hour_0_11(Calendar.time(), integer, Keyword.t()) ::
+  @spec h11(Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def hour_0_11(hour_0_11, n \\ @default_format, options \\ [])
+  def h11(h11, n \\ @default_format, options \\ [])
 
-  def hour_0_11(hour_0_11, options, []) when is_list(options) do
+  def h11(h11, options, []) when is_list(options) do
     {locale, backend} = extract_locale!(options)
-    hour_0_11(hour_0_11, @default_format, locale, backend, options)
+    h11(h11, @default_format, locale, backend, options)
   end
 
-  def hour_0_11(hour_0_11, n, options) do
+  def h11(h11, n, options) do
     {locale, backend} = extract_locale!(options)
-    hour_0_11(hour_0_11, n, locale, backend, options)
+    h11(h11, n, locale, backend, options)
   end
 
-  @spec hour_0_11(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
+  @spec h11(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def hour_0_11(time, n, locale, backend, options \\ [])
+  def h11(time, n, locale, backend, options \\ [])
 
-  def hour_0_11(%{hour: hour}, n, _locale, _backend, _options) when hour in [0, 12, 24] do
+  def h11(%{hour: hour}, n, _locale, _backend, _options) when hour in [0, 12, 24] do
     0
     |> pad(n)
   end
 
-  def hour_0_11(%{hour: hour}, n, _locale, _backend, _options) when hour in 1..11 do
+  def h11(%{hour: hour}, n, _locale, _backend, _options) when hour in 1..11 do
     hour
     |> pad(n)
   end
 
-  def hour_0_11(%{hour: hour}, n, _locale, _backend, _options) when hour in 13..23 do
+  def h11(%{hour: hour}, n, _locale, _backend, _options) when hour in 13..23 do
     (hour - 12)
     |> pad(n)
   end
 
-  def hour_0_11(time, _n, _locale, _backend, _options) do
+  def h11(time, _n, _locale, _backend, _options) do
     error_return(time, "K", [:hour])
   end
 
@@ -2249,7 +2249,7 @@ defmodule Cldr.DateTime.Formatter do
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-    `hour_1_24/4`
+    `h24/4`
 
   ## Format Symbol
 
@@ -2262,53 +2262,53 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex(4)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 0}
+      iex(4)> Cldr.DateTime.Formatter.h24 %{hour: 0}
       "24"
 
-      iex(5)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 12}
+      iex(5)> Cldr.DateTime.Formatter.h24 %{hour: 12}
       "12"
 
-      iex(6)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 13}
+      iex(6)> Cldr.DateTime.Formatter.h24 %{hour: 13}
       "13"
 
-      iex(7)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 9}
+      iex(7)> Cldr.DateTime.Formatter.h24 %{hour: 9}
       "9"
 
-      iex(8)> Cldr.DateTime.Formatter.hour_1_24 %{hour: 24}
+      iex(8)> Cldr.DateTime.Formatter.h24 %{hour: 24}
       "24"
 
   """
-  @spec hour_1_24(Calendar.time(), integer, Keyword.t()) ::
+  @spec h24(Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def hour_1_24(hour_1_24, n \\ @default_format, options \\ [])
+  def h24(h24, n \\ @default_format, options \\ [])
 
-  def hour_1_24(hour_1_24, options, []) when is_list(options) do
+  def h24(h24, options, []) when is_list(options) do
     {locale, backend} = extract_locale!(options)
-    hour_1_24(hour_1_24, @default_format, locale, backend, options)
+    h24(h24, @default_format, locale, backend, options)
   end
 
-  def hour_1_24(hour_1_24, n, options) do
+  def h24(h24, n, options) do
     {locale, backend} = extract_locale!(options)
-    hour_1_24(hour_1_24, n, locale, backend, options)
+    h24(h24, n, locale, backend, options)
   end
 
-  @spec hour_1_24(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
+  @spec h24(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def hour_1_24(time, n, locale, backend, options \\ [])
+  def h24(time, n, locale, backend, options \\ [])
 
-  def hour_1_24(%{hour: hour}, n, _locale, _backend, _options) when hour in [0, 24] do
+  def h24(%{hour: hour}, n, _locale, _backend, _options) when hour in [0, 24] do
     24
     |> pad(n)
   end
 
-  def hour_1_24(%{hour: hour}, n, _locale, _backend, _options) when hour in 1..23 do
+  def h24(%{hour: hour}, n, _locale, _backend, _options) when hour in 1..23 do
     hour
     |> pad(n)
   end
 
-  def hour_1_24(time, _n, _locale, _backend, _options) do
+  def h24(time, _n, _locale, _backend, _options) do
     error_return(time, "k", [:hour])
   end
 
@@ -2326,7 +2326,7 @@ defmodule Cldr.DateTime.Formatter do
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
-    `hour_0_23/4`
+    `h23/4`
 
   ## Format Symbol
 
@@ -2339,53 +2339,53 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples:
 
-      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 10}
+      iex> Cldr.DateTime.Formatter.h23 %{hour: 10}
       "10"
 
-      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 13}
+      iex> Cldr.DateTime.Formatter.h23 %{hour: 13}
       "13"
 
-      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 21}
+      iex> Cldr.DateTime.Formatter.h23 %{hour: 21}
       "21"
 
-      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 24}
+      iex> Cldr.DateTime.Formatter.h23 %{hour: 24}
       "0"
 
-      iex> Cldr.DateTime.Formatter.hour_0_23 %{hour: 0}
+      iex> Cldr.DateTime.Formatter.h23 %{hour: 0}
       "0"
 
   """
-  @spec hour_0_23(Calendar.time(), integer, Keyword.t()) ::
+  @spec h23(Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def hour_0_23(hour_0_23, n \\ @default_format, options \\ [])
+  def h23(h23, n \\ @default_format, options \\ [])
 
-  def hour_0_23(hour_0_23, options, []) when is_list(options) do
+  def h23(h23, options, []) when is_list(options) do
     {locale, backend} = extract_locale!(options)
-    hour_0_23(hour_0_23, @default_format, locale, backend, options)
+    h23(h23, @default_format, locale, backend, options)
   end
 
-  def hour_0_23(hour_0_23, n, options) do
+  def h23(h23, n, options) do
     {locale, backend} = extract_locale!(options)
-    hour_0_23(hour_0_23, n, locale, backend, options)
+    h23(h23, n, locale, backend, options)
   end
 
-  @spec hour_0_23(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
+  @spec h23(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def hour_0_23(time, n, locale, backend, options \\ [])
+  def h23(time, n, locale, backend, options \\ [])
 
-  def hour_0_23(%{hour: hour}, n, _locale, _backend, _options) when abs(hour) in [0, 24] do
+  def h23(%{hour: hour}, n, _locale, _backend, _options) when abs(hour) in [0, 24] do
     0
     |> pad(n)
   end
 
-  def hour_0_23(%{hour: hour}, n, _locale, _backend, _options) when abs(hour) in 1..23 do
+  def h23(%{hour: hour}, n, _locale, _backend, _options) when abs(hour) in 1..23 do
     abs(hour)
     |> pad(n)
   end
 
-  def hour_0_23(time, _n, _locale, _backend, _options) do
+  def h23(time, _n, _locale, _backend, _options) do
     error_return(time, "H", [:hour])
   end
 
@@ -3442,27 +3442,27 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :basic) do
-    sign(hour) <> hour_0_23(time, 2) <> minute(time, 2)
+    sign(hour) <> h23(time, 2) <> minute(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :short) do
-    sign(hour) <> hour_0_23(time, 2)
+    sign(hour) <> h23(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :long) do
-    sign(hour) <> hour_0_23(time, 2) <> ":" <> minute(time, 2)
+    sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute, second: 0} = time, :extended) do
-    sign(hour) <> hour_0_23(time, 2) <> ":" <> minute(time, 2)
+    sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute, second: _second} = time, :extended) do
-    sign(hour) <> hour_0_23(time, 2) <> ":" <> minute(time, 2) <> ":" <> second(time, 2)
+    sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2) <> ":" <> second(time, 2)
   end
 
   defp iso8601_tz_format_type(%{hour: hour, minute: _minute} = time, :extended) do
-    sign(hour) <> hour_0_23(time, 2) <> ":" <> minute(time, 2)
+    sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2)
   end
 
   defp sign(number) when number >= 0, do: "+"

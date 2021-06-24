@@ -10,7 +10,7 @@ This is the changelog for Cldr_Dates_Times v2.8.0 released on June 24th, 2021.  
 
 ### Enhancments
 
-* Updated to [ex_cldr version 2.23.0](https://hex.pm/packages/ex_cldr/2.23.0) which changes the names of some of the field in the "-u-" extension to match the CLDR canonical name. In particular the field name `hour_cycle` changes to `hc`.
+* Updated to [ex_cldr version 2.23.0](https://hex.pm/packages/ex_cldr/2.23.0) which changes the names of some of the field in the "-u-" extension to match the CLDR canonical name. In particular the field name `hour_cycle` changes to `hc`. The values for `hc` also change to the canonical forms of `:h12`, `:h11`, `:h23` and `:h24`.
 
 ## Cldr_Dates_Times v2.7.2
 
