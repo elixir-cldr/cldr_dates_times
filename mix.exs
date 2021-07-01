@@ -1,7 +1,7 @@
 defmodule CldrDatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.8.0-dev"
+  @version "2.8.0"
 
   def project do
     [
@@ -10,7 +10,7 @@ defmodule CldrDatesTimes.Mixfile do
       name: "Cldr Dates & Times",
       source_url: "https://github.com/elixir-cldr/cldr_dates_times",
       docs: docs(),
-      elixir: "~> 1.8",
+      elixir: "~> 1.10",
       description: description(),
       package: package(),
       start_permanent: Mix.env() == :prod,
@@ -68,10 +68,8 @@ defmodule CldrDatesTimes.Mixfile do
 
   defp deps do
     [
-      # {:ex_cldr_numbers, "~> 2.19"},
-      # {:ex_cldr_calendars, "~> 1.15"},
-      {:ex_cldr_numbers, path: "../cldr_numbers", override: true},
-      {:ex_cldr_calendars, path: "../cldr_calendars", override: true},
+      {:ex_cldr_numbers, "~> 2.19"},
+      {:ex_cldr_calendars, "~> 1.15"},
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_doc, "~> 0.18", optional: true, runtime: false},
       {:jason, "~> 1.0", optional: true},
