@@ -1,5 +1,16 @@
 # Changelog
 
+## Cldr_Dates_Times v2.9.2
+
+This is the changelog for Cldr_Dates_Times v2.9.2 released on August 14th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug fixes
+
+* Open interval formats can now also be called directly on the backend. For example:
+
+        iex> MyApp.Cldr.Date.Interval.to_string ~D[2020-01-01], nil
+        {:ok, "Jan 1, 2020 –"}
+
 ## Cldr_Dates_Times v2.9.1
 
 This is the changelog for Cldr_Dates_Times v2.9.1 released on August 14th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

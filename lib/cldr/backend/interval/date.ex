@@ -17,10 +17,14 @@ defmodule Cldr.Date.Interval.Backend do
 
         """
 
-        import Cldr.Calendar,
-          only: [
-            date: 0
-          ]
+        date = quote do
+          %{
+            year: _,
+            month: _,
+            day: _,
+            calendar: var!(calendar, unquote(__MODULE__))
+          }
+        end
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           @doc false
@@ -127,7 +131,15 @@ defmodule Cldr.Date.Interval.Backend do
         end
 
         @doc false
-        def to_string(unquote(date()) = from, unquote(date()) = to) do
+        def to_string(unquote(date) = from, unquote(date) = to) do
+          Cldr.Date.Interval.to_string(from, to, unquote(backend), [])
+        end
+
+        def to_string(nil = from, unquote(date) = to) do
+          Cldr.Date.Interval.to_string(from, to, unquote(backend), [])
+        end
+
+        def to_string(unquote(date) = from, nil = to) do
           Cldr.Date.Interval.to_string(from, to, unquote(backend), [])
         end
 
@@ -145,6 +157,10 @@ defmodule Cldr.Date.Interval.Backend do
           on or after `from`.
 
         * `options` is a keyword list of options. The default is `[]`.
+
+        Either `from` or `to` may also be `nil`, in which case an
+        open interval is formatted and the non-nil item is formatted
+        as a standalone date.
 
         ## Options
 
@@ -210,10 +226,18 @@ defmodule Cldr.Date.Interval.Backend do
             {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
 
         """
-        @spec to_string(Elixir.Calendar.date(), Elixir.Calendar.date(), Keyword.t()) ::
+        @spec to_string(Elixir.Calendar.date() | nil, Elixir.Calendar.date() | nil, Keyword.t()) ::
                 {:ok, String.t()} | {:error, {module, String.t()}}
 
-        def to_string(unquote(date()) = from, unquote(date()) = to, options) do
+        def to_string(unquote(date) = from, unquote(date) = to, options) do
+          Cldr.Date.Interval.to_string(from, to, unquote(backend), options)
+        end
+
+        def to_string(nil = from, unquote(date) = to, options) do
+          Cldr.Date.Interval.to_string(from, to, unquote(backend), options)
+        end
+
+        def to_string(unquote(date) = from, nil = to, options) do
           Cldr.Date.Interval.to_string(from, to, unquote(backend), options)
         end
 
@@ -348,6 +372,10 @@ defmodule Cldr.Date.Interval.Backend do
 
         * `options` is a keyword list of options. The default is `[]`.
 
+        Either `from` or `to` may also be `nil`, in which case an
+        open interval is formatted and the non-nil item is formatted
+        as a standalone date.
+
         ## Options
 
         * `:format` is one of `:short`, `:medium` or `:long` or a
@@ -412,10 +440,22 @@ defmodule Cldr.Date.Interval.Backend do
             "mer. 1 – dim. 12 janv. 2020"
 
         """
-        @spec to_string!(Elixir.Calendar.date(), Elixir.Calendar.date(), Keyword.t()) ::
+        @spec to_string!(Elixir.Calendar.date() | nil, Elixir.Calendar.date() | nil, Keyword.t()) ::
                 String.t() | no_return
 
-        def to_string!(unquote(date()) = from, unquote(date()) = to, options) do
+        def to_string!(unquote(date) = from, unquote(date) = to, options) do
+          do_to_string!(from, to, options)
+        end
+
+        def to_string!(nil = from, unquote(date) = to, options) do
+          do_to_string!(from, to, options)
+        end
+
+        def to_string!(unquote(date) = from, nil = to, options) do
+          do_to_string!(from, to, options)
+        end
+
+        def do_to_string!(from, to, options) do
           locale = unquote(backend).get_locale
           options = Keyword.put_new(options, :locale, locale)
           Cldr.Date.Interval.to_string!(from, to, unquote(backend), options)

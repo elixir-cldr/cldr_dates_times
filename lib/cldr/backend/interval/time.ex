@@ -17,6 +17,11 @@ defmodule Cldr.Time.Interval.Backend do
 
         """
 
+        import Cldr.Calendar,
+          only: [
+            time: 0
+          ]
+
         @doc """
         Returns a string representing the formatted
         interval formed by two times.
@@ -31,6 +36,10 @@ defmodule Cldr.Time.Interval.Backend do
           on or after `from`.
 
         * `options` is a keyword list of options. The default is `[]`.
+
+        Either `from` or `to` may also be `nil`, in which case an
+        open interval is formatted and the non-nil item is formatted
+        as a standalone time.
 
         ## Options
 
@@ -94,11 +103,28 @@ defmodule Cldr.Time.Interval.Backend do
             ...> format: :long, style: :flex, locale: "th"
             {:ok, "10:00 – 10:03 ในตอนเช้า"}
 
+            iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], nil
+            {:ok, "10:00:00 AM –"}
+
         """
-        @spec to_string(Elixir.Calendar.time(), Elixir.Calendar.time(), Keyword.t()) ::
+        @spec to_string(Elixir.Calendar.time() | nil, Elixir.Calendar.time() | nil, Keyword.t()) ::
                 {:ok, String.t()} | {:error, {module, String.t()}}
 
-        def to_string(from, to, options \\ []) do
+        def to_string(from, to, options \\ [])
+
+        def to_string(unquote(time()) = from, unquote(time()) = to, options) do
+          do_to_string(from, to, options)
+        end
+
+        def to_string(nil = from, unquote(time()) = to, options) do
+          do_to_string(from, to, options)
+        end
+
+        def to_string(unquote(time()) = from, nil = to, options) do
+          do_to_string(from, to, options)
+        end
+
+        def do_to_string(from, to, options) do
           locale = unquote(backend).get_locale
           options = Keyword.put_new(options, :locale, locale)
           Cldr.Time.Interval.to_string(from, to, unquote(backend), options)
@@ -119,6 +145,10 @@ defmodule Cldr.Time.Interval.Backend do
           on or after `from`.
 
         * `options` is a keyword list of options. The default is `[]`.
+
+        Either `from` or `to` may also be `nil`, in which case an
+        open interval is formatted and the non-nil item is formatted
+        as a standalone time.
 
         ## Options
 
@@ -183,10 +213,24 @@ defmodule Cldr.Time.Interval.Backend do
             "10:00 – 10:03 ในตอนเช้า"
 
         """
-        @spec to_string!(Elixir.Calendar.time(), Elixir.Calendar.time(), Keyword.t()) ::
+        @spec to_string!(Elixir.Calendar.time() | nil, Elixir.Calendar.time() | nil, Keyword.t()) ::
                 String.t() | no_return()
 
-        def to_string!(from, to, options \\ []) do
+        def to_string!(from, to, options \\ [])
+
+        def to_string!(unquote(time()) = from, unquote(time()) = to, options) do
+          do_to_string!(from, to, options)
+        end
+
+        def to_string!(nil = from, unquote(time()) = to, options) do
+          do_to_string!(from, to, options)
+        end
+
+        def to_string!(unquote(time()) = from, nil = to, options) do
+          do_to_string!(from, to, options)
+        end
+
+        def do_to_string!(from, to, options) do
           locale = unquote(backend).get_locale
           options = Keyword.put_new(options, :locale, locale)
           Cldr.Time.Interval.to_string!(from, to, unquote(backend), options)

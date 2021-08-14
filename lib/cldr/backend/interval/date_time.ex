@@ -17,10 +17,18 @@ defmodule Cldr.DateTime.Interval.Backend do
 
         """
 
-        import Cldr.Calendar,
-          only: [
-            naivedatetime: 0
-          ]
+        naivedatetime = quote do
+          %{
+            year: _,
+            month: _,
+            day: _,
+            hour: _,
+            minute: _,
+            second: _,
+            microsecond: _,
+            calendar: var!(calendar, unquote(__MODULE__))
+          }
+        end
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           @doc false
@@ -107,6 +115,10 @@ defmodule Cldr.DateTime.Interval.Backend do
 
         * `options` is a keyword list of options. The default is `[]`.
 
+        Either `from` or `to` may also be `nil`, in which case an
+        open interval is formatted and the non-nil item is formatted
+        as a standalone datetime.
+
         ## Options
 
         * `:format` is one of `:short`, `:medium` or `:long` or a
@@ -148,15 +160,31 @@ defmodule Cldr.DateTime.Interval.Backend do
             ...> ~U[2020-12-31 10:00:00.0Z]
             {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
 
+            iex> #{inspect(__MODULE__)}.to_string ~U[2020-01-01 00:00:00.0Z], nil
+            {:ok, "Jan 1, 2020, 12:00:00 AM –"}
+
         """
         @spec to_string(
-                Elixir.Calendar.naive_datetime(),
-                Elixir.Calendar.naive_datetime(),
-                Keyword.t()
+                  Elixir.Calendar.naive_datetime() | nil,
+                  Elixir.Calendar.naive_datetime() | nil, Keyword.t()
               ) ::
                 {:ok, String.t()} | {:error, {module, String.t()}}
 
-        def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options \\ []) do
+        def to_string(from, to, options \\ [])
+
+        def to_string(unquote(naivedatetime) = from, unquote(naivedatetime) = to, options) do
+          do_to_string(from, to, options)
+        end
+
+        def to_string(nil = from, unquote(naivedatetime) = to, options) do
+          do_to_string(from, to, options)
+        end
+
+        def to_string(unquote(naivedatetime) = from, nil = to, options) do
+          do_to_string(from, to, options)
+        end
+
+        def do_to_string(from, to, options) do
           locale = unquote(backend).get_locale
           options = Keyword.put_new(options, :locale, locale)
           Cldr.DateTime.Interval.to_string(from, to, unquote(backend), options)
@@ -248,6 +276,10 @@ defmodule Cldr.DateTime.Interval.Backend do
 
         * `options` is a keyword list of options. The default is `[]`.
 
+        Either `from` or `to` may also be `nil`, in which case an
+        open interval is formatted and the non-nil item is formatted
+        as a standalone datetime.
+
         ## Options
 
         * `:format` is one of `:short`, `:medium` or `:long` or a
@@ -287,17 +319,27 @@ defmodule Cldr.DateTime.Interval.Backend do
 
         """
         @spec to_string!(
-                Elixir.Calendar.naive_datetime(),
-                Elixir.Calendar.naive_datetime(),
+                Elixir.Calendar.naive_datetime() | nil,
+                Elixir.Calendar.naive_datetime() | nil,
                 Keyword.t()
               ) ::
                 String.t() | no_return()
 
-        def to_string!(
-              unquote(naivedatetime()) = from,
-              unquote(naivedatetime()) = to,
-              options \\ []
-            ) do
+        def to_string!(from, to, options \\ [])
+
+        def to_string!(unquote(naivedatetime) = from, unquote(naivedatetime) = to, options) do
+          do_to_string!(from, to, options)
+        end
+
+        def to_string!(nil = from, unquote(naivedatetime) = to, options) do
+          do_to_string!(from, to, options)
+        end
+
+        def to_string!(unquote(naivedatetime) = from, nil = to, options) do
+          do_to_string!(from, to, options)
+        end
+
+        def do_to_string!(from, to, options) do
           locale = unquote(backend).get_locale
           options = Keyword.put_new(options, :locale, locale)
           Cldr.DateTime.Interval.to_string!(from, to, unquote(backend), options)

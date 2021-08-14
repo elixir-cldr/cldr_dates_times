@@ -637,7 +637,7 @@ defmodule Cldr.Date.Interval do
 
   """
 
-  @spec to_string!(Calendar.date(), Calendar.date(), Cldr.backend(), Keyword.t()) ::
+  @spec to_string!(Calendar.date() | nil, Calendar.date() | nil, Cldr.backend(), Keyword.t()) ::
           String.t() | no_return()
 
   def to_string!(from, to, backend, options \\ []) do
