@@ -552,7 +552,7 @@ defmodule Cldr.DateTime.Format do
          acc,
          left
        ) do
-    if c in acc do
+    if already_seen?(c, acc) do
       [left, String.duplicate(c, 5) <> rest]
     else
       do_split_interval(rest, [c | acc], left <> String.duplicate(c, 5))
@@ -564,7 +564,7 @@ defmodule Cldr.DateTime.Format do
          acc,
          left
        ) do
-    if c in acc do
+    if already_seen?(c, acc) do
       [left, String.duplicate(c, 4) <> rest]
     else
       do_split_interval(rest, [c | acc], left <> String.duplicate(c, 4))
@@ -572,7 +572,7 @@ defmodule Cldr.DateTime.Format do
   end
 
   defp do_split_interval(<<c::binary-1, c::binary-1, c::binary-1, rest::binary>>, acc, left) do
-    if c in acc do
+    if already_seen?(c, acc) do
       [left, String.duplicate(c, 3) <> rest]
     else
       do_split_interval(rest, [c | acc], left <> String.duplicate(c, 3))
@@ -580,7 +580,7 @@ defmodule Cldr.DateTime.Format do
   end
 
   defp do_split_interval(<<c::binary-1, c::binary-1, rest::binary>>, acc, left) do
-    if c in acc do
+    if already_seen?(c, acc) do
       [left, String.duplicate(c, 2) <> rest]
     else
       do_split_interval(rest, [c | acc], left <> String.duplicate(c, 2))
@@ -588,10 +588,27 @@ defmodule Cldr.DateTime.Format do
   end
 
   defp do_split_interval(<<c::binary-1, rest::binary>>, acc, left) do
-    if c in acc do
+    if already_seen?(c, acc) do
       [left, c <> rest]
     else
       do_split_interval(rest, [c | acc], left <> c)
     end
   end
+
+  # Per the updated spec we treat format characters as equivalent to their
+  # standalone format for the purposes of splitting. ie we treat "L" == "M"
+  #
+  # Equivalence table:
+  # Quarter:  Q, q
+  # Month: L, M
+  # Week Day: E, e, c
+
+  defp already_seen?("Q", acc), do: ("Q" in acc) || ("q" in acc)
+  defp already_seen?("q", acc), do: ("Q" in acc) || ("q" in acc)
+  defp already_seen?("L", acc), do: ("L" in acc) || ("M" in acc)
+  defp already_seen?("M", acc), do: ("L" in acc) || ("M" in acc)
+  defp already_seen?("E", acc), do: ("E" in acc) || ("e" in acc) || ("c" in acc)
+  defp already_seen?("e", acc), do: ("E" in acc) || ("e" in acc) || ("c" in acc)
+  defp already_seen?("c", acc), do: ("E" in acc) || ("e" in acc) || ("c" in acc)
+  defp already_seen?(c, acc), do: c in acc
 end
