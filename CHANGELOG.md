@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr_Dates_Times v2.9.1
+
+This is the changelog for Cldr_Dates_Times v2.9.1 released on August 14th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug fixes
+
+* When formatting an open interval (one side is `nil`) the backend function `date_time_interval_fallback/2` is used to retrieve the format pattern. Previously this function was being called with default parameters. Now it is properly called with a locale and a calendar.
+
 ## Cldr_Dates_Times v2.9.0
 
 This is the changelog for Cldr_Dates_Times v2.9.0 released on August 14th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

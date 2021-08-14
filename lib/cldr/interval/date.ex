@@ -336,8 +336,6 @@ defmodule Cldr.Date.Interval do
   def to_string(from, to, backend, options \\ [])
 
   def to_string(unquote(date()) = from, unquote(date()) = to, options, []) when is_list(options) do
-    _ = calendar
-
     {locale, backend} = Cldr.locale_and_backend_from(options)
     to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
   end
@@ -412,10 +410,11 @@ defmodule Cldr.Date.Interval do
 
   # Open ended intervals use the `date_time_interval_fallback/0` format
   def to_string(nil, unquote(date()) = to, backend, options) do
-    _ = calendar
+    {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+    cldr_calendar = calendar.cldr_calendar_type
 
     with {:ok, formatted} <- Cldr.Date.to_string(to, backend, options) do
-      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback()
+      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)
       result =
         ["", formatted]
         |> Cldr.Substitution.substitute(pattern)
@@ -427,10 +426,11 @@ defmodule Cldr.Date.Interval do
   end
 
   def to_string(unquote(date()) = from, nil, backend, options) do
-    _ = calendar
+    {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+    cldr_calendar = calendar.cldr_calendar_type
 
     with {:ok, formatted} <- Cldr.Date.to_string(from, backend, options) do
-      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback()
+      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)
       result =
         [formatted, ""]
         |> Cldr.Substitution.substitute(pattern)
