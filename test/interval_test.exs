@@ -8,6 +8,20 @@ defmodule Cldr.DateTime.Interval.Test do
     assert Cldr.Date.Interval.to_string(~D[2020-01-01], ~D[2020-02-01], MyApp.Cldr, locale: "fr")
   end
 
+  test "right open date interval" do
+    assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil) == {:ok, "Jan 1, 2020 –"}
+    assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil, MyApp.Cldr) == {:ok, "Jan 1, 2020 –"}
+    assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil, locale: "fr") == {:ok, "1 janv. 2020 –"}
+    assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil, MyApp.Cldr, locale: "fr") == {:ok, "1 janv. 2020 –"}
+  end
+
+  test "left open date interval" do
+    assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01]) == {:ok, "– Jan 1, 2020"}
+    assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01], MyApp.Cldr) == {:ok, "– Jan 1, 2020"}
+    assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01], locale: "fr") == {:ok, "– 1 janv. 2020"}
+    assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01], MyApp.Cldr, locale: "fr") == {:ok, "– 1 janv. 2020"}
+  end
+
   test "time formatting" do
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], ~T[10:00:00.0])
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], ~T[10:00:00.0], MyApp.Cldr)
@@ -18,6 +32,20 @@ defmodule Cldr.DateTime.Interval.Test do
              format: :short,
              locale: "en-GB"
            ) == {:ok, "10 – 22"}
+  end
+
+  test "right option time interval" do
+    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil) == {:ok, "12:00:00 AM –"}
+    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, MyApp.Cldr) == {:ok, "12:00:00 AM –"}
+    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, locale: "fr") == {:ok, "00:00:00 –"}
+    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, MyApp.Cldr, locale: "fr") == {:ok, "00:00:00 –"}
+  end
+
+  test "left option time interval" do
+    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0]) == {:ok, "– 12:00:00 AM"}
+    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], MyApp.Cldr) == {:ok, "– 12:00:00 AM"}
+    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], locale: "fr") == {:ok, "– 00:00:00"}
+    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], MyApp.Cldr, locale: "fr") == {:ok, "– 00:00:00"}
   end
 
   # Just to get tests compiling. Those tests will

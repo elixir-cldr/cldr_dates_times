@@ -70,14 +70,44 @@ defmodule Cldr.Time.Interval do
     to_string(from, to, backend, locale: locale)
   end
 
+  def to_string(nil = from, unquote(time()) = to) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  def to_string(unquote(time()) = from, nil = to) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(from, to, backend, locale: locale)
+  end
+
   @doc false
   def to_string(unquote(time()) = from, unquote(time()) = to, backend) when is_atom(backend) do
     {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
     to_string(from, to, backend, locale: locale)
   end
 
+  def to_string(nil = from, unquote(time()) = to, backend) when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  def to_string(unquote(time()) = from, nil = to, backend) when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
+  end
+
   @doc false
   def to_string(unquote(time()) = from, unquote(time()) = to, options) when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
+
+  def to_string(nil = from, unquote(time()) = to, options) when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
+
+  def to_string(unquote(time()) = from, nil = to, options) when is_list(options) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
     to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
   end
@@ -99,6 +129,10 @@ defmodule Cldr.Time.Interval do
     is therefore `Cldr` backend module
 
   * `options` is a keyword list of options. The default is `[]`.
+
+  Either `from` or `to` may also be `nil` in which case the
+  interval is formatted as an open interval with the non-nil
+  side formatted as a standalone time.
 
   ## Options
 
@@ -154,6 +188,10 @@ defmodule Cldr.Time.Interval do
       ...> MyApp.Cldr, format: :long, style: :flex
       {:ok, "12:00 – 10:00 in the morning"}
 
+      iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], nil, MyApp.Cldr,
+      ...> format: :long, style: :flex
+      {:ok, "12:00:00 AM UTC –"}
+
       iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
       ...> MyApp.Cldr, format: :long, style: :zone
       {:ok, "12:00 – 10:00 AM Etc/UTC"}
@@ -163,6 +201,9 @@ defmodule Cldr.Time.Interval do
       {:ok, "10:00 – 10:03 ในตอนเช้า"}
 
   """
+  @spec to_string(Calendar.time() | nil, Calendar.time() | nil, Cldr.backend(), Keyword.t()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
+
   def to_string(from, to, backend, options \\ [])
 
   def to_string(%{calendar: calendar} = from, %{calendar: calendar} = to, backend, options)
@@ -202,6 +243,33 @@ defmodule Cldr.Time.Interval do
 
       other ->
         other
+    end
+  end
+
+  # Open ended intervals use the `date_time_interval_fallback/0` format
+  def to_string(nil, unquote(time()) = to, backend, options) do
+    with {:ok, formatted} <- Cldr.Time.to_string(to, backend, options) do
+      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback()
+      result =
+        ["", formatted]
+        |> Cldr.Substitution.substitute(pattern)
+        |> Enum.join()
+        |> String.trim_leading()
+
+      {:ok, result}
+    end
+  end
+
+  def to_string(unquote(time()) = from, nil, backend, options) do
+    with {:ok, formatted} <- Cldr.Time.to_string(from, backend, options) do
+      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback()
+      result =
+        [formatted, ""]
+        |> Cldr.Substitution.substitute(pattern)
+        |> Enum.join()
+        |> String.trim_trailing()
+
+      {:ok, result}
     end
   end
 

@@ -249,7 +249,7 @@ defmodule Cldr.DateTime.Interval do
       {:ok, "Jan 1, 2020, 12:00:00 AM –"}
 
   """
-  @spec to_string(Calendar.datetime(), Calendar.datetime(), Cldr.backend(), Keyword.t()) ::
+  @spec to_string(Calendar.datetime() | nil, Calendar.datetime() | nil, Cldr.backend(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(from, to, backend, options \\ [])

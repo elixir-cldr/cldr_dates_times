@@ -89,6 +89,20 @@ defmodule Cldr.Date.Interval do
     to_string(from, to, backend, locale: locale)
   end
 
+  def to_string(nil = from, unquote(date()) = to) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  def to_string(unquote(date()) = from, nil = to) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(from, to, backend, locale: locale)
+  end
+
   @doc false
   def to_string(%Date.Range{first: first, last: last}, backend) when is_atom(backend) do
     {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
@@ -105,6 +119,20 @@ defmodule Cldr.Date.Interval do
 
   @doc false
   def to_string(unquote(date()) = from, unquote(date()) = to, backend) when is_atom(backend) do
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  def to_string(nil = from, unquote(date()) = to, backend) when is_atom(backend) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  def to_string(unquote(date()) = from, nil = to, backend) when is_atom(backend) do
+    _ = calendar
+
     {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
     to_string(from, to, backend, locale: locale)
   end
@@ -230,6 +258,10 @@ defmodule Cldr.Date.Interval do
 
   * `options` is a keyword list of options. The default is `[]`.
 
+  Either `from` or `to` may also be `nil` in which case the
+  interval is formatted as an open interval with the non-nil
+  side formatted as a standalone date.
+
   ## Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
@@ -285,6 +317,10 @@ defmodule Cldr.Date.Interval do
       ...> format: :short
       {:ok, "1/1/2020 – 1/12/2020"}
 
+      iex> Cldr.Date.Interval.to_string ~D[2020-01-01], nil, MyApp.Cldr,
+      ...> format: :short
+      {:ok, "1/1/20 –"}
+
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long, locale: "fr"
       {:ok, "mer. 1 – dim. 12 janv. 2020"}
@@ -294,12 +330,28 @@ defmodule Cldr.Date.Interval do
       {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
 
   """
-  @spec to_string(Calendar.date(), Calendar.date(), Cldr.backend(), Keyword.t()) ::
+  @spec to_string(Calendar.date() | nil, Calendar.date() | nil, Cldr.backend(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module(), String.t()}}
 
   def to_string(from, to, backend, options \\ [])
 
   def to_string(unquote(date()) = from, unquote(date()) = to, options, []) when is_list(options) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
+
+  def to_string(nil = from, unquote(date()) = to, options, []) when is_list(options) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
+
+  def to_string(unquote(date()) = from, nil = to, options, []) when is_list(options) do
+    _ = calendar
+
     {locale, backend} = Cldr.locale_and_backend_from(options)
     to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
   end
@@ -308,6 +360,20 @@ defmodule Cldr.Date.Interval do
       when calendar == Calendar.ISO do
     from = %{from | calendar: Cldr.Calendar.Gregorian}
     to = %{to | calendar: Cldr.Calendar.Gregorian}
+
+    to_string(from, to, backend, options)
+  end
+
+  def to_string(nil = from, unquote(date()) = to, backend, options)
+      when calendar == Calendar.ISO do
+    to = %{to | calendar: Cldr.Calendar.Gregorian}
+
+    to_string(from, to, backend, options)
+  end
+
+  def to_string(unquote(date()) = from, nil = to, backend, options)
+      when calendar == Calendar.ISO do
+    from = %{from | calendar: Cldr.Calendar.Gregorian}
 
     to_string(from, to, backend, options)
   end
@@ -341,6 +407,37 @@ defmodule Cldr.Date.Interval do
 
       other ->
         other
+    end
+  end
+
+  # Open ended intervals use the `date_time_interval_fallback/0` format
+  def to_string(nil, unquote(date()) = to, backend, options) do
+    _ = calendar
+
+    with {:ok, formatted} <- Cldr.Date.to_string(to, backend, options) do
+      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback()
+      result =
+        ["", formatted]
+        |> Cldr.Substitution.substitute(pattern)
+        |> Enum.join()
+        |> String.trim_leading()
+
+      {:ok, result}
+    end
+  end
+
+  def to_string(unquote(date()) = from, nil, backend, options) do
+    _ = calendar
+
+    with {:ok, formatted} <- Cldr.Date.to_string(from, backend, options) do
+      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback()
+      result =
+        [formatted, ""]
+        |> Cldr.Substitution.substitute(pattern)
+        |> Enum.join()
+        |> String.trim_trailing()
+
+      {:ok, result}
     end
   end
 
