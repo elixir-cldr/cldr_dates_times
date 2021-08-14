@@ -48,6 +48,20 @@ defmodule Cldr.DateTime.Interval.Test do
              MyApp.Cldr,
              locale: "fr"
            )
+
+     assert Cldr.DateTime.Interval.to_string(
+              ~U[2020-01-01 00:00:00.0Z],
+              nil,
+              MyApp.Cldr,
+              locale: "fr"
+            ) == {:ok, "1 janv. 2020, 00:00:00 –"}
+
+     assert Cldr.DateTime.Interval.to_string(
+              nil,
+              ~U[2020-01-01 00:00:00.0Z],
+              MyApp.Cldr,
+              locale: "fr"
+           ) == {:ok, "– 1 janv. 2020, 00:00:00"}
   end
 
   test "backend date formatting" do

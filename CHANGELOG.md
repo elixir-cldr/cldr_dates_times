@@ -1,5 +1,17 @@
 # Changelog
 
+## Cldr_Dates_Times v2.9.0
+
+This is the changelog for Cldr_Dates_Times v2.9.0 released on August 14th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug fixes
+
+* Fix splitting interval formats when there is no repeating field. Use the principal that standalone formats are equivalent to normal formats when splitting.  ie, for this purposes "L" == "M". This means the locale "fa" no longer raises an exception.
+
+### Enhancements
+
+* Allow formatting of intervals where one side is `nil`. This will produce an open-ended interval. Only one side of the interval can be `nil`. Thanks to @woylie for the request.  Closes #23.
+
 ## Cldr_Dates_Times v2.8.0
 
 This is the changelog for Cldr_Dates_Times v2.8.0 released on July 1st, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

@@ -126,6 +126,20 @@ defmodule Cldr.DateTime.Interval do
     to_string(from, to, backend, locale: locale)
   end
 
+  def to_string(nil = from, unquote(naivedatetime()) = to) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  def to_string(unquote(naivedatetime()) = from, nil = to) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(nil, nil)
+    to_string(from, to, backend, locale: locale)
+  end
+
   @doc false
   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend)
       when is_atom(backend) do
@@ -133,9 +147,41 @@ defmodule Cldr.DateTime.Interval do
     to_string(from, to, backend, locale: locale)
   end
 
+  def to_string(nil = from, unquote(naivedatetime()) = to, backend)
+      when is_atom(backend) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  def to_string(unquote(naivedatetime()) = from, nil = to, backend)
+      when is_atom(backend) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(nil, backend)
+    to_string(from, to, backend, locale: locale)
+  end
+
   @doc false
   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options)
       when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  def to_string(nil = from, unquote(naivedatetime()) = to, options)
+      when is_list(options) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, locale: locale)
+  end
+
+  def to_string(unquote(naivedatetime()) = from, nil = to, options)
+      when is_list(options) do
+    _ = calendar
+
     {locale, backend} = Cldr.locale_and_backend_from(options)
     to_string(from, to, backend, locale: locale)
   end
@@ -157,6 +203,10 @@ defmodule Cldr.DateTime.Interval do
     is therefore a `Cldr` backend module
 
   * `options` is a keyword list of options. The default is `[]`.
+
+  Either of `from` or `to` may also be `nil` in which case the
+  result is an "open" interval and the non-nil parameter is formatted
+  using `Cldr.DateTime.to_string/3`.
 
   ## Options
 
@@ -195,6 +245,9 @@ defmodule Cldr.DateTime.Interval do
       ...> ~U[2020-12-31 10:00:00.0Z], MyApp.Cldr
       {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
 
+      iex> Cldr.DateTime.Interval.to_string ~U[2020-01-01 00:00:00.0Z], nil, MyApp.Cldr
+      {:ok, "Jan 1, 2020, 12:00:00 AM –"}
+
   """
   @spec to_string(Calendar.datetime(), Calendar.datetime(), Cldr.backend(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
@@ -209,8 +262,38 @@ defmodule Cldr.DateTime.Interval do
     to_string(from, to, backend, options)
   end
 
+  def to_string(nil = from, unquote(naivedatetime()) = to, backend, options)
+      when calendar == Calendar.ISO do
+    to = %{to | calendar: Cldr.Calendar.Gregorian}
+
+    to_string(from, to, backend, options)
+  end
+
+  def to_string(unquote(naivedatetime()) = from, nil = to, backend, options)
+      when calendar == Calendar.ISO do
+    from = %{from | calendar: Cldr.Calendar.Gregorian}
+
+    to_string(from, to, backend, options)
+  end
+
   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options, [])
       when is_list(options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
+
+  def to_string(unquote(naivedatetime()) = from, nil = to, options, [])
+      when is_list(options) do
+    _ = calendar
+
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
+  end
+
+  def to_string(nil = from, unquote(naivedatetime()) = to, options, [])
+      when is_list(options) do
+    _ = calendar
+
     {locale, backend} = Cldr.locale_and_backend_from(options)
     to_string(from, to, backend, Keyword.put_new(options, :locale, locale))
   end
@@ -242,6 +325,37 @@ defmodule Cldr.DateTime.Interval do
 
       other ->
         other
+    end
+  end
+
+  # Open ended intervals use the `date_time_interval_fallback/0` format
+  def to_string(nil, unquote(naivedatetime()) = to, backend, options) do
+    _ = calendar
+
+    with {:ok, formatted} <- Cldr.DateTime.to_string(to, backend, options) do
+      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback()
+      result =
+        ["", formatted]
+        |> Cldr.Substitution.substitute(pattern)
+        |> Enum.join()
+        |> String.trim_leading()
+
+      {:ok, result}
+    end
+  end
+
+  def to_string(unquote(naivedatetime()) = from, nil, backend, options) do
+    _ = calendar
+
+    with {:ok, formatted} <- Cldr.DateTime.to_string(from, backend, options) do
+      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback()
+      result =
+        [formatted, ""]
+        |> Cldr.Substitution.substitute(pattern)
+        |> Enum.join()
+        |> String.trim_trailing()
+
+      {:ok, result}
     end
   end
 
