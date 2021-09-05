@@ -49,7 +49,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
 
         ## Examples
 
-            iex> #{__MODULE__}.format %{year: 2017, month: 9, day: 3, hour: 10, minute: 23},
+            iex> #{__MODULE__}.format %{year: 2017, month: 9, day: 3, hour: 10, minute: 23, calendar: Calendar.ISO},
             ...> "yy/MM/dd hh:MM", "en"
             {:ok, "17/09/03 10:09"}
 
