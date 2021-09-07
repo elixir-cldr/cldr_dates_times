@@ -105,7 +105,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
           case Compiler.tokenize(format) do
             {:ok, tokens, _} ->
               number_system =
-                if is_map(format), do: format[:number_system], else: options[:number_system]
+                if is_map(format), do: format[:number_system][:all], else: options[:number_system]
 
               formatted =
                 tokens
@@ -135,6 +135,14 @@ defmodule Cldr.DateTime.Formatter.Backend do
         end
 
         defp transliterate(formatted, _locale, :latn) do
+          formatted
+        end
+
+        defp transliterate(formatted, locale, %{all: number_system}) do
+          transliterate(formatted, locale, number_system)
+        end
+
+        defp transliterate(formatted, _locale, number_system) when is_map(number_system) do
           formatted
         end
 

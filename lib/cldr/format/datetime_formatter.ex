@@ -1019,9 +1019,9 @@ defmodule Cldr.DateTime.Formatter do
     |> month(n, locale, backend, options)
   end
 
-  def month(%{month: _month} = date, n, _locale, _backend, _options) when n in 1..2 do
+  def month(%{month: _month} = date, n, locale, backend, _options) when n in 1..2 do
     date
-    |> Cldr.Calendar.month_of_year()
+    |> Cldr.Calendar.localize(:month, :numeric, :any, backend, locale)
     |> pad(n)
   end
 
@@ -1115,10 +1115,9 @@ defmodule Cldr.DateTime.Formatter do
     |> standalone_month(n, locale, backend, options)
   end
 
-  def standalone_month(%{month: _month} = date, n, _locale, _backend, _options)
-      when n in 1..2 do
+  def standalone_month(%{month: _month} = date, n, locale, backend, _options) when n in 1..2 do
     date
-    |> Cldr.Calendar.month_of_year()
+    |> Cldr.Calendar.localize(:month, :numeric, :any, backend, locale)
     |> pad(n)
   end
 
@@ -3467,7 +3466,7 @@ defmodule Cldr.DateTime.Formatter do
   defp sign(number) when number >= 0, do: "+"
   defp sign(_number), do: "-"
 
-  defp pad(integer, n) when integer >= 0 do
+  defp pad(integer, n) when is_integer(integer) and integer >= 0 do
     padding = n - number_of_digits(integer)
 
     if padding <= 0 do
@@ -3477,8 +3476,17 @@ defmodule Cldr.DateTime.Formatter do
     end
   end
 
-  defp pad(integer, n) when integer < 0 do
+  defp pad(integer, n) when is_integer(integer) and integer < 0 do
     :erlang.iolist_to_binary([?-, pad(abs(integer), n)])
+  end
+
+  defp pad(integer, n) when is_binary(integer) do
+    len = String.length(integer)
+    if len >= n do
+      integer
+    else
+      integer <> String.duplicate(" ", n - len)
+    end
   end
 
   # This should be more performant than doing

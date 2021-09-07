@@ -323,7 +323,8 @@ defmodule Cldr.DateTime.Format do
          hmsv: "h:mm:ss a v",
          hm: "h:mm a",
          e_bhms: "E h:mm:ss B",
-         ed: "d E"
+         ed: "d E",
+         gy_md: "M/d/y GGGGG"
        }}
 
   """
@@ -391,7 +392,7 @@ defmodule Cldr.DateTime.Format do
 
       iex> Cldr.DateTime.Format.common_date_time_format_names
       [:bh, :bhm, :bhms, :d, :e, :e_bhm, :e_bhms, :e_hm, :e_hms, :ed, :ehm,
-      :ehms, :gy, :gy_mm_md, :gy_mmm, :gy_mmm_ed, :h, :hm, :hms, :hmsv,
+      :ehms, :gy, :gy_md, :gy_mm_md, :gy_mmm, :gy_mmm_ed, :h, :hm, :hms, :hmsv,
       :hmv, :m, :m_ed, :md, :mm_md, :mmm, :mmm_ed, :mmm_md,
       :mmmmw_count_other, :ms, :y, :y_m, :y_m_ed, :y_md, :y_mm_md, :y_mmm,
       :y_mmm_ed, :y_mmmm, :y_qqq, :y_qqqq, :yw_count_other]

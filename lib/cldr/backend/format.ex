@@ -240,7 +240,8 @@ defmodule Cldr.DateTime.Format.Backend do
                hmsv: "h:mm:ss a v",
                hm: "h:mm a",
                e_bhms: "E h:mm:ss B",
-               ed: "d E"
+               ed: "d E",
+               gy_md: "M/d/y GGGGG"
              }}
 
         """
