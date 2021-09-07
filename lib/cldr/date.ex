@@ -96,7 +96,7 @@ defmodule Cldr.Date do
   def to_string(%{calendar: calendar} = date, backend, options) do
     options = normalize_options(backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
-    number_system = Keyword.get(options, :number_system)
+    number_system = Map.get(options, :number_system)
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
@@ -117,11 +117,15 @@ defmodule Cldr.Date do
   end
 
   # TODO deprecate :style in version 3.0
+  defp normalize_options(_backend, %{} = options) do
+    options
+  end
+
   defp normalize_options(backend, []) do
     {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
 
-    [locale: locale, number_system: number_system, format: @default_type]
+    %{locale: locale, number_system: number_system, format: @default_type}
   end
 
   defp normalize_options(backend, options) do
@@ -135,6 +139,7 @@ defmodule Cldr.Date do
     |> Keyword.put(:format, format)
     |> Keyword.delete(:style)
     |> Keyword.put_new(:number_system, number_system)
+    |> Map.new()
   end
 
   @doc """
