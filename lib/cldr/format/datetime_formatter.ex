@@ -380,26 +380,22 @@ defmodule Cldr.DateTime.Formatter do
   def year(date, n, locale, backend, options \\ [])
 
   def year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
-    %{date | calendar: Gregorian}
+    %{date | calendar: Cldr.Calendar.Gregorian}
     |> year(n, locale, backend, options)
   end
 
-  def year(%{year: _year} = date, 1, _locale, _backend, _options) do
-    date
-    |> Cldr.Calendar.calendar_year()
+  def year(%{year: year}, 1, _locale, _backend, _options) do
+    year
   end
 
-  def year(%{year: _year} = date, 2 = n, _locale, _backend, _options) do
-    date
-    |> Cldr.Calendar.calendar_year()
+  def year(%{year: year}, 2 = n, _locale, _backend, _options) do
+    year
     |> rem(100)
     |> pad(n)
   end
 
-  def year(%{year: _year} = date, n, _locale, _backend, _options) do
-    date
-    |> Cldr.Calendar.calendar_year()
-    |> pad(n)
+  def year(%{year: year}, n, _locale, _backend, _options) do
+    pad(year, n)
   end
 
   def year(date, _n, _locale, _backend, _options) do
@@ -489,7 +485,7 @@ defmodule Cldr.DateTime.Formatter do
   def week_aligned_year(date, n, locale, backend, options \\ [])
 
   def week_aligned_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
-    %{date | calendar: Gregorian}
+    %{date | calendar: Cldr.Calendar.Gregorian}
     |> week_aligned_year(n, locale, backend, options)
   end
 
@@ -576,14 +572,16 @@ defmodule Cldr.DateTime.Formatter do
   def extended_year(date, n, locale, backend, options \\ [])
 
   def extended_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
-    %{date | calendar: Gregorian}
+    %{date | calendar: Cldr.Calendar.Gregorian}
     |> extended_year(n, locale, backend, options)
   end
 
-  def extended_year(%{year: _year} = date, n, _locale, _backend, _options) do
-    date
-    |> Cldr.Calendar.extended_year()
-    |> pad(n)
+  def extended_year(%{year: year, calendar: Calendar.ISO}, n, _locale, _backend, _options) do
+    pad(year, n)
+  end
+
+  def extended_year(%{year: year}, n, _locale, _backend, _options) do
+    pad(year, n)
   end
 
   def extended_year(date, _n, _locale, _backend, _options) do
@@ -640,20 +638,12 @@ defmodule Cldr.DateTime.Formatter do
   def cyclic_year(date, n, locale, backend, options \\ [])
 
   def cyclic_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
-    %{date | calendar: Gregorian}
+    %{date | calendar: Cldr.Calendar.Gregorian}
     |> cyclic_year(n, locale, backend, options)
   end
 
-  def cyclic_year(%{year: _year} = date, n, locale, backend, _options) when n in 1..3 do
-    Cldr.Calendar.localize(date, :cyclic_year, :format, :abbreviated, backend, locale)
-  end
-
-  def cyclic_year(%{year: _year} = date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :cyclic_year, :format, :wide, backend, locale)
-  end
-
-  def cyclic_year(%{year: _year} = date, 5, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :cyclic_year, :format, :narrow, backend, locale)
+  def cyclic_year(%{year: year}, _n, _locale, _backend, _options) do
+    year
   end
 
   def cyclic_year(date, _n, _locale, _backend, _options) do
@@ -730,15 +720,23 @@ defmodule Cldr.DateTime.Formatter do
   def related_year(date, n, locale, backend, options \\ [])
 
   def related_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
-    %{date | calendar: Gregorian}
+    %{date | calendar: Cldr.Calendar.Gregorian}
     |> related_year(n, locale, backend, options)
   end
 
-  def related_year(%{year: _year} = date, n, _locale, _backend, _options)
+  def related_year(%{year: year, calendar: Calendar.ISO}, _n, _locale, _backend, _options) do
+    year
+  end
+
+  def related_year(%{year: year, calendar: Gregorian}, n, _locale, _backend, _options)
       when n in 1..5 do
+    year
+  end
+
+  def related_year(date, n, _locale, _backend, _options) when n in 1..5 do
     date
-    |> Cldr.Calendar.related_gregorian_year()
-    |> pad(n)
+    |> Date.convert!(Gregorian)
+    |> Map.get(:year)
   end
 
   def related_year(date, _n, _locale, _backend, _options) do
@@ -979,7 +977,7 @@ defmodule Cldr.DateTime.Formatter do
   ## Examples
 
       iex> Cldr.DateTime.Formatter.month ~D[2019-09-08]
-      "9"
+      9
 
       iex> Cldr.DateTime.Formatter.month ~D[2019-09-08], 2
       "09"
@@ -1019,10 +1017,12 @@ defmodule Cldr.DateTime.Formatter do
     |> month(n, locale, backend, options)
   end
 
-  def month(%{month: _month} = date, n, _locale, _backend, _options) when n in 1..2 do
-    date
-    |> Cldr.Calendar.month_of_year()
-    |> pad(n)
+  def month(%{month: month}, 1, _locale, _backend, _options) do
+    month
+  end
+
+  def month(%{month: month}, 2, _locale, _backend, _options) do
+    pad(month, 2)
   end
 
   def month(date, 3, locale, backend, _options) do
@@ -1075,7 +1075,7 @@ defmodule Cldr.DateTime.Formatter do
   ## Examples
 
       iex> Cldr.DateTime.Formatter.standalone_month ~D[2019-09-08]
-      "9"
+      9
 
       iex> Cldr.DateTime.Formatter.standalone_month ~D[2019-09-08], 2
       "09"
@@ -1115,11 +1115,12 @@ defmodule Cldr.DateTime.Formatter do
     |> standalone_month(n, locale, backend, options)
   end
 
-  def standalone_month(%{month: _month} = date, n, _locale, _backend, _options)
-      when n in 1..2 do
-    date
-    |> Cldr.Calendar.month_of_year()
-    |> pad(n)
+  def standalone_month(%{month: month}, 1, _locale, _backend, _options) do
+    month
+  end
+
+  def standalone_month(%{month: month}, 2, _locale, _backend, _options) do
+    pad(month, 2)
   end
 
   def standalone_month(date, 3, locale, backend, _options) do
