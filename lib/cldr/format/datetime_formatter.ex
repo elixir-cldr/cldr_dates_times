@@ -3493,7 +3493,7 @@ defmodule Cldr.DateTime.Formatter do
     if len >= n do
       integer
     else
-      integer <> String.duplicate(" ", n - len)
+      String.duplicate("0", n - len) <> integer
     end
   end
 
