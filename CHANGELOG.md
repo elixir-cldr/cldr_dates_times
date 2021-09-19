@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr_Dates_Times v2.9.3
+
+This is the changelog for Cldr_Dates_Times v2.9.3 released on September 20th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug fixes
+
+* Fixes relative date and date time formatting when a `:relative_to` parameter and a `:unit` parameter is specified. Thanks to @DaTrader for the report.  Closes #25.
+
 ## Cldr_Dates_Times v2.9.2
 
 This is the changelog for Cldr_Dates_Times v2.9.2 released on August 14th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
