@@ -172,7 +172,10 @@ defmodule Cldr.DateTime.Relative do
     now = (relative_to || DateTime.utc_now()) |> DateTime.to_unix()
     then = DateTime.to_unix(relative)
     relative_time = then - now
-    define_unit_and_relative_time(relative_time, unit, nil)
+    unit = unit || unit_from_relative_time(relative_time)
+
+    relative = scale_relative(relative_time, unit)
+    {relative, unit}
   end
 
   # Take two dates and calculate the days between them
@@ -193,8 +196,14 @@ defmodule Cldr.DateTime.Relative do
       |> :calendar.date_to_gregorian_days()
       |> Kernel.*(@day)
 
-    relative_time = then - today
-    define_unit_and_relative_time(relative_time, unit, nil)
+    relative_time =
+      then - today
+
+    unit =
+      unit || unit_from_relative_time(relative_time)
+
+    relative = scale_relative(relative_time, unit)
+    {relative, unit}
   end
 
   # Anything else just return the values
