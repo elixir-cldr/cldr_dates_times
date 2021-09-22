@@ -8,7 +8,11 @@ defmodule Cldr.DateTime.Relative.Test do
   @relative_datetime_to ~U[2021-09-19 12:15:00+00:00]
 
   alias MyApp.Cldr.DateTime.Relative
+
   test "Relative dates with specified unit" do
+    assert Relative.to_string(@date, relative_to: @relative_to) ==
+      {:ok, "in 2 weeks"}
+
     assert Relative.to_string(@date, relative_to: @relative_to, unit: :day) ==
       {:ok, "in 12 days"}
     assert Relative.to_string(@date, relative_to: @relative_to, unit: :month) ==
@@ -26,6 +30,9 @@ defmodule Cldr.DateTime.Relative.Test do
   end
 
   test "Relative datetime with specified unit" do
+    assert Relative.to_string(@datetime, relative_to: @relative_datetime_to) ==
+      {:ok, "in 2 weeks"}
+
     assert Relative.to_string(@datetime, relative_to: @relative_datetime_to, unit: :day) ==
       {:ok, "in 12 days"}
     assert Relative.to_string(@datetime, relative_to: @relative_datetime_to, unit: :month) ==
