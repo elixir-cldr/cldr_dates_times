@@ -31,8 +31,18 @@ defmodule Cldr.DateTime.Format do
         known_formats(&all_date_time_formats(&1, backend), locale_names) ++
         known_formats(&all_interval_formats(&1, backend), locale_names)) ++
        config.precompile_date_time_formats ++ precompile_interval_formats(config))
+    |> only_compilable_formats()
     |> Enum.uniq()
     |> Enum.reject(&is_atom/1)
+  end
+
+  defp only_compilable_formats(formats) do
+    Enum.reduce(formats, [], fn
+      f, acc when is_binary(f) -> [f | acc]
+      %{number_system: _} = format, acc -> [format | acc]
+      map, acc when is_map(map) -> Map.values(map) ++ acc
+      list, acc when is_list(list) -> acc
+    end)
   end
 
   defp precompile_interval_formats(config) do
@@ -234,18 +244,18 @@ defmodule Cldr.DateTime.Format do
 
       iex> Cldr.DateTime.Format.date_time_formats "en"
       {:ok, %Cldr.DateTime.Styles{
-        full: "{1} 'at' {0}",
-        long: "{1} 'at' {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"
+        full: [1, " 'at' ", 0],
+        long: [1, " 'at' ", 0],
+        medium: [1, ", ", 0],
+        short: [1, ", ", 0]
       }}
 
       iex> Cldr.DateTime.Format.date_time_formats "en", :buddhist, MyApp.Cldr
       {:ok, %Cldr.DateTime.Styles{
-        full: "{1} 'at' {0}",
-        long: "{1} 'at' {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"
+        full: [1, " 'at' ", 0],
+        long: [1, " 'at' ", 0],
+        medium: [1, ", ", 0],
+        short: [1, ", ", 0]
       }}
 
   """
@@ -290,7 +300,6 @@ defmodule Cldr.DateTime.Format do
          y_m_ed: "E, M/d/y",
          md: "M/d",
          e_hm: "E HH:mm",
-         mmmmw_count_other: "'week' W 'of' MMMM",
          bh: "h B",
          gy_mmm_ed: "E, MMM d, y G",
          gy_mm_md: "MMM d, y G",
@@ -298,16 +307,13 @@ defmodule Cldr.DateTime.Format do
          ehms: "E h:mm:ss a",
          y_mm_md: "MMM d, y",
          y_qqqq: "QQQQ y",
-         mmmmw_count_one: "'week' W 'of' MMMM",
          h: "HH",
          bhms: "h:mm:ss B",
          y_md: "M/d/y",
          y_qqq: "QQQ y",
          mmm_md: "MMMM d",
          y_mmm: "MMM y",
-         yw_count_one: "'week' w 'of' Y",
          y_mmm_ed: "E, MMM d, y",
-         yw_count_other: "'week' w 'of' Y",
          e_bhm: "E h:mm B",
          ms: "mm:ss",
          mmm: "LLL",
@@ -324,7 +330,9 @@ defmodule Cldr.DateTime.Format do
          hm: "h:mm a",
          e_bhms: "E h:mm:ss B",
          ed: "d E",
-         gy_md: "M/d/y GGGGG"
+         gy_md: "M/d/y GGGGG",
+         mmmmw: %{one: "'week' W 'of' MMMM", other: "'week' W 'of' MMMM"},
+         yw: %{one: "'week' w 'of' Y", other: "'week' w 'of' Y"}
        }}
 
   """
@@ -394,8 +402,8 @@ defmodule Cldr.DateTime.Format do
       [:bh, :bhm, :bhms, :d, :e, :e_bhm, :e_bhms, :e_hm, :e_hms, :ed, :ehm,
       :ehms, :gy, :gy_md, :gy_mm_md, :gy_mmm, :gy_mmm_ed, :h, :hm, :hms, :hmsv,
       :hmv, :m, :m_ed, :md, :mm_md, :mmm, :mmm_ed, :mmm_md,
-      :mmmmw_count_other, :ms, :y, :y_m, :y_m_ed, :y_md, :y_mm_md, :y_mmm,
-      :y_mmm_ed, :y_mmmm, :y_qqq, :y_qqqq, :yw_count_other]
+      :mmmmw, :ms, :y, :y_m, :y_m_ed, :y_md, :y_mm_md, :y_mmm,
+      :y_mmm_ed, :y_mmmm, :y_qqq, :y_qqqq, :yw]
 
   """
   def common_date_time_format_names(backend \\ Cldr.Date.default_backend()) do
@@ -413,45 +421,50 @@ defmodule Cldr.DateTime.Format do
 
   defp known_formats(list, locale_names) do
     locale_names
-    |> Enum.map(&list.(&1))
-    |> List.flatten()
+    |> Enum.reduce([], fn l, acc -> acc ++ list.(l) end)
     |> Enum.uniq()
   end
 
-  defp all_date_formats(locale, backend) do
+  @doc false
+  def all_date_formats(locale, backend) do
     datetime_backend = Module.concat(backend, DateTime.Format)
     all_formats_for(locale, backend, &datetime_backend.date_formats/2)
   end
 
-  defp all_time_formats(locale, backend) do
+  @doc false
+  def all_time_formats(locale, backend) do
     datetime_backend = Module.concat(backend, DateTime.Format)
     all_formats_for(locale, backend, &datetime_backend.time_formats/2)
   end
 
-  defp all_date_time_formats(locale, backend) do
+  @doc false
+  def all_date_time_formats(locale, backend) do
     datetime_backend = Module.concat(backend, DateTime.Format)
 
     all_formats_for(locale, backend, &datetime_backend.date_time_formats/2) ++
       all_formats_for(locale, backend, &datetime_backend.date_time_available_formats/2)
   end
 
-  defp all_interval_formats(locale, backend) do
+  @doc false
+  def all_interval_formats(locale, backend) do
     datetime_backend = Module.concat(backend, DateTime.Format)
     all_interval_formats_for(locale, backend, &datetime_backend.date_time_interval_formats/2)
   end
 
-  defp all_formats_for(locale, backend, type_function) do
+  @doc false
+  def all_formats_for(locale, backend, type_function) do
     with {:ok, calendars} <- calendars_for(locale, backend) do
-      Enum.map(calendars, fn calendar ->
+      Enum.reduce(calendars, [], fn calendar, acc ->
         {:ok, calendar_formats} = type_function.(locale, calendar)
-        Map.values(calendar_formats)
+        map = if is_struct(calendar_formats), do: Map.from_struct(calendar_formats), else: calendar_formats
+        acc ++ Map.values(map)
       end)
-      |> List.flatten()
       |> Enum.uniq()
     end
   end
 
-  defp all_interval_formats_for(locale, backend, type_function) do
+  @doc false
+  def all_interval_formats_for(locale, backend, type_function) do
     with {:ok, calendars} <- calendars_for(locale, backend) do
       Enum.map(calendars, fn calendar ->
         {:ok, calendar_formats} = type_function.(locale, calendar)
