@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr_Dates_Times v2.10.0-rc.0
+
+This is the changelog for Cldr_Dates_Times v2.10.0-rc.0 released on _____, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Enhancements
+
+* Improved localization in support of Chinese, Japanese and Korea calendars (era, month names, cyclic year, related gregorian year)
+
 ## Cldr_Dates_Times v2.9.2
 
 This is the changelog for Cldr_Dates_Times v2.9.2 released on August 14th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
