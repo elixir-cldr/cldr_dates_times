@@ -128,7 +128,6 @@ defmodule Cldr.DateTime.Formatter.Backend do
         # Return the number system that is applied to the whole
         # formatted string at the end of formatting
 
-        @dialyzer {:nowarn_function, number_system: 2}
         defp number_system(%{number_system: %{all: number_system}}, options) do
           number_system
         end

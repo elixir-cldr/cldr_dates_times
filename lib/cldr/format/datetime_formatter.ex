@@ -168,21 +168,25 @@ defmodule Cldr.DateTime.Formatter do
 
   def date(date, options, []) when is_list(options) do
     {locale, backend} = extract_locale!(options)
-    date(date, @default_format, locale, backend, Map.new(options))
+    date(date, @default_format, locale, backend, options)
   end
 
   def date(date, n, options) do
     {locale, backend} = extract_locale!(options)
-    date(date, n, locale, backend, Map.new(options))
+    date(date, n, locale, backend, options)
   end
 
-  @spec date(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
-          String.t() | {:error, String.t()}
+  @spec date(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t() | map()) ::
+          String.t() | {:error, {module(), String.t()}}
 
-  def date(date, _n, _locale, backend, options) do
+  def date(date, _n, _locale, backend, options) when is_list(options) do
     with {:ok, date_string} <- Cldr.Date.to_string(date, backend, options) do
       date_string
     end
+  end
+
+  def date(date, n, locale, backend, options) when is_map(options) do
+    date(date, n, locale, backend, Map.to_list(options))
   end
 
   @doc """
@@ -195,27 +199,31 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec time(Calendar.time(), integer, Keyword.t()) ::
-          String.t() | {:error, String.t()}
+          String.t() | {:error, {module(), String.t()}}
 
   def time(time, n \\ @default_format, options \\ [])
 
   def time(time, options, []) when is_list(options) do
     {locale, backend} = extract_locale!(options)
-    time(time, @default_format, locale, backend, Map.new(options))
+    time(time, @default_format, locale, backend, options)
   end
 
   def time(time, n, options) do
     {locale, backend} = extract_locale!(options)
-    time(time, n, locale, backend, Map.new(options))
+    time(time, n, locale, backend, options)
   end
 
-  @spec time(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec time(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t() | map()) ::
           String.t() | {:error, String.t()}
 
-  def time(time, _n, _locale, backend, options) do
+  def time(time, _n, _locale, backend, options) when is_list(options) do
     with {:ok, time_string} <- Cldr.Time.to_string(time, backend, options) do
       time_string
     end
+  end
+
+  def time(time, n, locale, backend, options) when is_map(options) do
+    time(time, n, locale, backend, Map.to_list(options))
   end
 
   @doc """
@@ -3416,7 +3424,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def literal(date, literal, options \\ []) do
     {locale, backend} = extract_locale!(options)
-    literal(date, literal, locale, backend, options)
+    literal(date, literal, locale, backend, Map.new(options))
   end
 
   @spec literal(any(), String.t(), locale(), Cldr.backend(), map()) :: String.t()
@@ -3499,7 +3507,7 @@ defmodule Cldr.DateTime.Formatter do
 
   # This should be more performant than doing
   # Enum.count(Integer.digits(n)) for all cases
-  defp number_of_digits(n) when n < 0, do: number_of_digits(abs(n))
+  # defp number_of_digits(n) when n < 0, do: number_of_digits(abs(n))
   defp number_of_digits(n) when n < 10, do: 1
   defp number_of_digits(n) when n < 100, do: 2
   defp number_of_digits(n) when n < 1_000, do: 3
