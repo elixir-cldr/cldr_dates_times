@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr_Dates_Times v2.10.0-rc.1
+
+This is the changelog for Cldr_Dates_Times v2.10.0-rc.1 released on October 21st, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix year formatting to account for different calendar resolvers
+
 ## Cldr_Dates_Times v2.10.0-rc.0
 
 This is the changelog for Cldr_Dates_Times v2.10.0-rc.0 released on October 20th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
