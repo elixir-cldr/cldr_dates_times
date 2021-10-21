@@ -207,7 +207,6 @@ defmodule Cldr.DateTime.Format.Backend do
                y_m_ed: "E, M/d/y",
                md: "M/d",
                e_hm: "E HH:mm",
-               mmmmw_count_other: "'week' W 'of' MMMM",
                bh: "h B",
                gy_mmm_ed: "E, MMM d, y G",
                gy_mm_md: "MMM d, y G",
@@ -215,16 +214,13 @@ defmodule Cldr.DateTime.Format.Backend do
                ehms: "E h:mm:ss a",
                y_mm_md: "MMM d, y",
                y_qqqq: "QQQQ y",
-               mmmmw_count_one: "'week' W 'of' MMMM",
                h: "HH",
                bhms: "h:mm:ss B",
                y_md: "M/d/y",
                y_qqq: "QQQ y",
                mmm_md: "MMMM d",
                y_mmm: "MMM y",
-               yw_count_one: "'week' w 'of' Y",
                y_mmm_ed: "E, MMM d, y",
-               yw_count_other: "'week' w 'of' Y",
                e_bhm: "E h:mm B",
                ms: "mm:ss",
                mmm: "LLL",
@@ -240,7 +236,10 @@ defmodule Cldr.DateTime.Format.Backend do
                hmsv: "h:mm:ss a v",
                hm: "h:mm a",
                e_bhms: "E h:mm:ss B",
-               ed: "d E"
+               ed: "d E",
+               gy_md: "M/d/y GGGGG",
+               mmmmw: %{one: "'week' W 'of' MMMM", other: "'week' W 'of' MMMM"},
+               yw: %{one: "'week' w 'of' Y", other: "'week' w 'of' Y"}
              }}
 
         """
@@ -470,10 +469,8 @@ defmodule Cldr.DateTime.Format.Backend do
               {:ok, unquote(Macro.escape(formats))}
             end
 
-            parsed_fallback = Cldr.Substitution.parse(interval_format_fallback)
-
             def date_time_interval_fallback(unquote(locale), unquote(calendar)) do
-              unquote(parsed_fallback)
+              unquote(interval_format_fallback)
             end
           end
 
