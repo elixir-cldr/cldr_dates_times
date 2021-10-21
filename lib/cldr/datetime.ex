@@ -45,7 +45,7 @@ defmodule Cldr.DateTime do
   ## Options
 
     * `format:` `:short` | `:medium` | `:long` | `:full` or a format string or
-      any of the keys returned by `Cldr.DateTime.available_format_names`.
+      any of the keys returned by `Cldr.DateTime.Format.date_time_available_formats/0`.
       The default is `:medium`
 
     * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
