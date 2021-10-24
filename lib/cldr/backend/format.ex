@@ -388,7 +388,7 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         for locale <- Cldr.Config.known_locale_names(config) do
-          locale_data = Cldr.Config.get_locale(locale, config)
+          locale_data = Cldr.Locale.Loader.get_locale(locale, config)
           calendars = Cldr.Config.calendars_for_locale(locale, config)
 
           def calendars_for(unquote(locale)), do: {:ok, unquote(calendars)}

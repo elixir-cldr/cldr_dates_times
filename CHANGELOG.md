@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr_Dates_Times v2.10.0-rc.2
+
+This is the changelog for Cldr_Dates_Times v2.10.0-rc.2 released on October 25th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Deprecations
+
+* Don't call deprecated `Cldr.Config.get_locale/2`, use `Cldr.Locale.Loader.get_config/2` instead.
+
 ## Cldr_Dates_Times v2.10.0-rc.1
 
 This is the changelog for Cldr_Dates_Times v2.10.0-rc.1 released on October 21st, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
