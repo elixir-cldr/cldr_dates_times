@@ -23,7 +23,7 @@ defmodule Cldr.DateTime.Format do
 
   @doc false
   def format_list(config) do
-    locale_names = Cldr.Config.known_locale_names(config)
+    locale_names = Cldr.Locale.Loader.known_locale_names(config)
     backend = config.backend
 
     ((known_formats(&all_date_formats(&1, backend), locale_names) ++

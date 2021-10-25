@@ -387,7 +387,7 @@ defmodule Cldr.DateTime.Format.Backend do
           gmt_zero_format(cldr_locale_name)
         end
 
-        for locale <- Cldr.Config.known_locale_names(config) do
+        for locale <- Cldr.Locale.Loader.known_locale_names(config) do
           locale_data = Cldr.Locale.Loader.get_locale(locale, config)
           calendars = Cldr.Config.calendars_for_locale(locale, config)
 

@@ -169,7 +169,7 @@ defmodule Cldr.DateTime.Relative.Backend do
           Cldr.DateTime.Relative.to_string!(time, unquote(backend), options)
         end
 
-        for locale_name <- Cldr.Config.known_locale_names(config) do
+        for locale_name <- Cldr.Locale.Loader.known_locale_names(config) do
           locale_data =
             locale_name
             |> Cldr.Locale.Loader.get_locale(config)

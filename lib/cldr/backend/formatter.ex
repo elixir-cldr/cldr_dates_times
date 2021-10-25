@@ -187,7 +187,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
         # Compile the formats used for timezones GMT format
         def gmt_tz_format(locale, offset, options \\ [])
 
-        for locale_name <- Cldr.Config.known_locale_names(config) do
+        for locale_name <- Cldr.Locale.Loader.known_locale_names(config) do
           {:ok, gmt_format} = Cldr.DateTime.Format.gmt_format(locale_name, backend)
           {:ok, gmt_zero_format} = Cldr.DateTime.Format.gmt_zero_format(locale_name, backend)
           {:ok, {pos_format, neg_format}} = Cldr.DateTime.Format.hour_format(locale_name, backend)
