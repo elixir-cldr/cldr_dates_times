@@ -1,7 +1,7 @@
 defmodule Cldr.DatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.10.0-rc.3"
+  @version "2.10.0"
 
   def project do
     [
@@ -68,12 +68,12 @@ defmodule Cldr.DatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr_numbers, "~> 2.23-rc"},
-      {:ex_cldr_calendars, "~> 1.17-rc"},
+      {:ex_cldr_numbers, "~> 2.23"},
+      {:ex_cldr_calendars, "~> 1.17"},
 
       {:calendar_interval, "~> 0.2", optional: true},
-      {:ex_doc, "~> 0.25", optional: true, runtime: false},
-      {:earmark, "1.4.14", optional: true, runtime: false},
+      {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},
+      {:earmark, "1.4.14", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
       {:benchee, "~> 1.0", optional: true, only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", optional: true, only: [:dev], runtime: false},
