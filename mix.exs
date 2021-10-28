@@ -44,6 +44,7 @@ defmodule Cldr.DatesTimes.Mixfile do
       main: "readme",
       extras: ["README.md", "CHANGELOG.md", "LICENSE.md"],
       logo: "logo.png",
+      formatters: ["html"],
       groups_for_modules: groups_for_modules(),
       skip_undefined_reference_warnings_on: ["changelog", "readme", "CHANGELOG.md"]
     ]
@@ -73,7 +74,6 @@ defmodule Cldr.DatesTimes.Mixfile do
 
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},
-      {:earmark, "1.4.14", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
       {:benchee, "~> 1.0", optional: true, only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", optional: true, only: [:dev], runtime: false},
