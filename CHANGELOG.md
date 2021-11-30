@@ -1,5 +1,15 @@
 # Changelog
 
+## Cldr_Dates_Times v2.10.1
+
+This is the changelog for Cldr_Dates_Times v2.10.1 released on December 1st, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Replace `use Mix.Config` with `import Config` in config files
+
+* Correctly call `transliterate_digits/3` not `transliterate/3` when transliterating digits for date/time formats
+
 ## Cldr_Dates_Times v2.10.0
 
 This is the changelog for Cldr_Dates_Times v2.10.0 released on October 27th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
