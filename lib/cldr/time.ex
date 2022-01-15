@@ -212,10 +212,6 @@ defmodule Cldr.Time do
 
   def to_string!(time, backend \\ Cldr.Date.default_backend(), options \\ [])
 
-  def to_string!(datetime, options, []) when is_list(options) do
-    to_string!(datetime, Cldr.Date.default_backend(), options)
-  end
-
   def to_string!(time, backend, options) do
     case to_string(time, backend, options) do
       {:ok, string} -> string
