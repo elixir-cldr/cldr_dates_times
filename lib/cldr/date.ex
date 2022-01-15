@@ -90,7 +90,9 @@ defmodule Cldr.Date do
   end
 
   def to_string(date, options, []) when is_list(options) do
-    to_string(date, Cldr.Date.default_backend(), options)
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    options = Keyword.put_new(options, :locale, locale)
+    to_string(date, backend, options)
   end
 
   def to_string(%{calendar: calendar} = date, backend, options) do
@@ -152,7 +154,7 @@ defmodule Cldr.Date do
     `year`, `month`, `day` and `calendar`
 
   * `backend` is any module that includes `use Cldr` and therefore
-    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+    is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
 
   * `options` is a keyword list of options for formatting.
 

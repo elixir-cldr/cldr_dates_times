@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr_Dates_Times v2.10.2
+
+This is the changelog for Cldr_Dates_Times v2.10.2 released on January 15th, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix `Date.to_string/2` when the second argument is a list of options and not a backend module. Previously this would ignore any `:backend` option and try to use `Cldr.default_backend!/0` which would fail if not one was configured. The same fix is applied to `Cldr.Time.to_string/2` and `Cldr.DateTime.to_string/2`.
+
 ## Cldr_Dates_Times v2.10.1
 
 This is the changelog for Cldr_Dates_Times v2.10.1 released on December 1st, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

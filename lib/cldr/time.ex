@@ -95,7 +95,9 @@ defmodule Cldr.Time do
   end
 
   def to_string(time, options, []) when is_list(options) do
-    to_string(time, Cldr.Date.default_backend(), options)
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    options = Keyword.put_new(options, :locale, locale)
+    to_string(time, backend, options)
   end
 
   def to_string(%{hour: _hour, minute: _minute} = time, backend, options) do

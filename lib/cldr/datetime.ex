@@ -95,7 +95,9 @@ defmodule Cldr.DateTime do
   end
 
   def to_string(datetime, options, []) when is_list(options) do
-    to_string(datetime, Cldr.Date.default_backend(), options)
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    options = Keyword.put_new(options, :locale, locale)
+    to_string(datetime, backend, options)
   end
 
   def to_string(%{calendar: calendar} = datetime, backend, options)
