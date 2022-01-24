@@ -52,10 +52,17 @@ defmodule Cldr.DateTime.Format.Backend do
         """
         @spec calendars_for(Locale.locale_name() | LanguageTag.t()) ::
                 {:ok, [calendar, ...]} | {:error, {module(), String.t()}}
+
         def calendars_for(locale \\ unquote(backend).get_locale())
 
         def calendars_for(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
           calendars_for(cldr_locale_name)
+        end
+
+        def calendars_for(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            calendars_for(locale)
+          end
         end
 
         @doc """
@@ -99,6 +106,12 @@ defmodule Cldr.DateTime.Format.Backend do
           date_formats(cldr_locale_name, calendar)
         end
 
+        def date_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_formats(locale, calendar)
+          end
+        end
+
         @doc """
         Returns a map of the standard time formats for a given locale and calendar.
 
@@ -140,6 +153,12 @@ defmodule Cldr.DateTime.Format.Backend do
           time_formats(cldr_locale_name, calendar)
         end
 
+        def time_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            time_formats(locale, calendar)
+          end
+        end
+
         @doc """
         Returns a map of the standard datetime formats for a given locale and calendar.
 
@@ -179,6 +198,12 @@ defmodule Cldr.DateTime.Format.Backend do
 
         def date_time_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, cldr_calendar) do
           date_time_formats(cldr_locale_name, cldr_calendar)
+        end
+
+        def date_time_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_time_formats(locale, calendar)
+          end
         end
 
         @doc """
@@ -257,6 +282,12 @@ defmodule Cldr.DateTime.Format.Backend do
           date_time_available_formats(cldr_locale_name, calendar)
         end
 
+        def date_time_available_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_time_available_formats(locale, calendar)
+          end
+        end
+
         @doc """
         Returns a map of the interval formats for a
         given locale and calendar.
@@ -273,7 +304,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
 
         """
-        @spec date_time_interval_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
+        @spec date_time_interval_formats(Locale.locale_name() | LanguageTag.t(), calendar()) ::
                 {:ok, formats}
         def date_time_interval_formats(
               locale \\ unquote(backend).get_locale(),
@@ -285,6 +316,12 @@ defmodule Cldr.DateTime.Format.Backend do
               calendar
             ) do
           date_time_interval_formats(cldr_locale_name, calendar)
+        end
+
+        def date_time_interval_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_time_interval_formats(locale, calendar)
+          end
         end
 
         @doc """
@@ -305,7 +342,7 @@ defmodule Cldr.DateTime.Format.Backend do
             [0, " – ", 1]
 
         """
-        @spec date_time_interval_fallback(Locale.locale_name() | LanguageTag.t(), atom()) ::
+        @spec date_time_interval_fallback(Locale.locale_name() | LanguageTag.t(), calendar()) ::
                 list() | {:error, {module(), String.t()}}
 
         def date_time_interval_fallback(
@@ -318,6 +355,12 @@ defmodule Cldr.DateTime.Format.Backend do
               calendar
             ) do
           date_time_interval_fallback(cldr_locale_name, calendar)
+        end
+
+        def date_time_interval_fallback(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_time_interval_fallback(locale, calendar)
+          end
         end
 
         @doc """
@@ -342,6 +385,12 @@ defmodule Cldr.DateTime.Format.Backend do
           hour_format(cldr_locale_name)
         end
 
+        def hour_format(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            hour_format(locale)
+          end
+        end
+
         @doc """
         Returns the GMT offset format list for a
         for a timezone offset for a given locale.
@@ -364,6 +413,12 @@ defmodule Cldr.DateTime.Format.Backend do
           gmt_format(cldr_locale_name)
         end
 
+        def gmt_format(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            gmt_format(locale)
+          end
+        end
+
         @doc """
         Returns the GMT format string for a
         for a timezone with an offset of zero for
@@ -375,8 +430,11 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Example
 
-            iex> #{inspect(__MODULE__)}.gmt_zero_format "en"
+            iex> #{inspect(__MODULE__)}.gmt_zero_format :en
             {:ok, "GMT"}
+
+            iex> #{inspect(__MODULE__)}.gmt_zero_format "fr"
+            {:ok, "UTC"}
 
         """
         @spec gmt_zero_format(Locale.locale_name() | LanguageTag.t()) ::
@@ -385,6 +443,12 @@ defmodule Cldr.DateTime.Format.Backend do
 
         def gmt_zero_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
           gmt_zero_format(cldr_locale_name)
+        end
+
+        def gmt_zero_format(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            gmt_zero_format(locale)
+          end
         end
 
         for locale <- Cldr.Locale.Loader.known_locale_names(config) do
@@ -545,8 +609,8 @@ defmodule Cldr.DateTime.Format.Backend do
                 atom
         def day_period_for(time, language)
 
-        def day_period_for(time, %LanguageTag{cldr_locale_name: locale_name}) do
-          day_period_for(time, locale_name)
+        def day_period_for(time, %LanguageTag{language: language}) do
+          day_period_for(time, language)
         end
 
         @doc """
@@ -610,6 +674,22 @@ defmodule Cldr.DateTime.Format.Backend do
           if Map.get(periods, "noon") && Map.get(periods, "midnight") do
             def language_has_noon_and_midnight?(unquote(language)), do: true
           end
+        end
+
+        def language_has_noon_and_midnight?(locale_name) when is_atom(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            language_has_noon_and_midnight?(locale.language)
+          end
+        end
+
+        def day_period_for(time, locale_name) when is_atom(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            day_period_for(time, locale.language)
+          end
+        end
+
+        def day_period_for(time, locale) do
+          {:error, Locale.locale_error(locale)}
         end
 
         def language_has_noon_and_midnight?(_), do: false
