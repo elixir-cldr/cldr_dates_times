@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr_Dates_Times v2.11.0
+
+This is the changelog for Cldr_Dates_Times v2.11.0 released on Feburary 21st, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Enhancements
+
+* Updates to [ex_cldr version 2.26.0](https://hex.pm/packages/ex_cldr/2.26.0) and [ex_cldr_numbers version 2.25.0](https://hex.pm/packages/ex_cldr_numbers/2.25.0) which use atoms for locale names and rbnf locale names. This is consistent with other elements of `t:Cldr.LanguageTag` where atoms are used when the cardinality of the data is fixed and relatively small and strings where the data is free format.
+
 ## Cldr_Dates_Times v2.10.2
 
 This is the changelog for Cldr_Dates_Times v2.10.2 released on January 15th, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
