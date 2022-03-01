@@ -102,7 +102,7 @@ defmodule Cldr.DateTime.Formatter do
   |                        | ss         | "03", "48"      | Two digits, zero padded            |
   | Fractional Seconds     | S          | 3, 48           | Minimim digits of fractional seconds |
   |                        | SS         | "03", "48"      | Two digits, zero padded            |
-  | Millseconds            | A+         | 4000, 63241     | Minimim digits of milliseconds since midnight |
+  | Milliseconds            | A+         | 4000, 63241     | Minimim digits of milliseconds since midnight |
   | Generic non-location TZ | v         | "Etc/UTC"       | `:time_zone` key, unlocalised      |
   |                         | vvvv      | "unk"           | Generic timezone name.  Currently returns only "unk" |
   | Specific non-location TZ | z..zzz   | "UTC"           | `:zone_abbr` key, unlocalised      |
@@ -1874,7 +1874,7 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Notes
 
-  If the langauge doesn't support "noon" or "midnight" then
+  If the language doesn't support "noon" or "midnight" then
   `am`/`pm` is used for all time periods.
 
   May be upper or lowercase depending on the locale and other options.
@@ -2625,7 +2625,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @doc """
-  Returns the `time` (format symbol `A`) as millisenconds since
+  Returns the `time` (format symbol `A`) as milliseconds since
   midnight.
 
   ## Arguments

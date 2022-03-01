@@ -125,7 +125,7 @@ Dates, Times and DateTimes can be formatted using:
     {:ok, "03:52"}
     ```
 
-* For `DateTime`s there is also a set of predefined format name.  These format names are returned by `MyApp.Cldr.DateTime.Format.date_time_available_formats/0` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` paramater to `Cldr.DateTime.to_string/2` module only.
+* For `DateTime`s there is also a set of predefined format name.  These format names are returned by `MyApp.Cldr.DateTime.Format.date_time_available_formats/0` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` parameter to `Cldr.DateTime.to_string/2` module only.
 
     ```elixir
     iex> MyApp.Cldr.DateTime.Format.date_time_available_formats
@@ -238,7 +238,7 @@ defines a wide range of format symbols.  Most - but not all - of these symbols a
 |                        | ss         | "03", "48"      | Two digits, zero padded            |
 | Fractional Seconds     | S          | 3, 48           | Minimim digits of fractional seconds |
 |                        | SS         | "03", "48"      | Two digits, zero padded            |
-| Millseconds            | A+         | 4000, 63241     | Minimim digits of milliseconds since midnight |
+| Milliseconds            | A+         | 4000, 63241     | Minimim digits of milliseconds since midnight |
 | Generic non-location TZ | v         | "Etc/UTC"       | `:time_zone` key, unlocalised      |
 |                         | vvvv      | "unk"           | Generic timezone name.  Currently returns only "unk" |
 | Specific non-location TZ | z..zzz   | "UTC"           | `:zone_abbr` key, unlocalised      |
@@ -342,7 +342,7 @@ iex> MyApp.Cldr.DateTime.Relative.to_string(~D[2017-04-29], unit: :ziggeraut)
 
 Interval formats allow for software to format intervals like "Jan 10-12, 2008" as a shorter and more natural format than "Jan 10, 2008 - Jan 12, 2008". They are designed to take a start and end date, time or datetime plus a formatting pattern and use that information to produce a localized format.
 
-An interval is expressed as either a `from` and `to` date, time or datetime. Or it can also be a `Date.Range` or `CalendarInterval` from the [calendar_interval](https://hex.pm/pacakges/calendar_interval) library.
+An interval is expressed as either a `from` and `to` date, time or datetime. Or it can also be a `Date.Range` or `CalendarInterval` from the [calendar_interval](https://hex.pm/packages/calendar_interval) library.
 
 `Cldr.Interval.to_string/3` function to format an interval based upon the type of the arguments: date, datetime or time.  The modules `Cldr.Date.Interval`, `Cldr.Time.Interval` and `Cldr.DateTime.Interval` also provide a `to_string/3` function for when the desired output format is more specific.
 
