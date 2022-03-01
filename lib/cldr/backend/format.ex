@@ -364,7 +364,7 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         @doc """
-        Returns the postive and negative hour format
+        Returns the positive and negative hour format
         for a timezone offset for a given locale.
 
         ## Arguments

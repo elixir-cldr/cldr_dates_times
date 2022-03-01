@@ -2,7 +2,7 @@
 
 ## Cldr_Dates_Times v2.11.0
 
-This is the changelog for Cldr_Dates_Times v2.11.0 released on Feburary 21st, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.11.0 released on February 21st, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Enhancements
 
@@ -146,9 +146,9 @@ This is the changelog for Cldr_Dates_Times v2.8.0 released on July 1st, 2021.  F
 
 ### Bug fixes
 
-* Fixes formatting time intervals that by checking for a format key of `:h` in addition to the `:a` and `:b` format keys (simialr to issue #22).
+* Fixes formatting time intervals that by checking for a format key of `:h` in addition to the `:a` and `:b` format keys (similar to issue #22).
 
-### Enhancments
+### Enhancements
 
 * Updated to [ex_cldr version 2.23.0](https://hex.pm/packages/ex_cldr/2.23.0) which changes the names of some of the field in the "-u-" extension to match the CLDR canonical name. In particular the field name `hour_cycle` changes to `hc`. The values for `hc` also change to the canonical forms of `:h12`, `:h11`, `:h23` and `:h24`.
 

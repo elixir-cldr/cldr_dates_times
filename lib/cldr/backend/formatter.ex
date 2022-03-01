@@ -135,7 +135,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
           options[:number_system]
         end
 
-        # Return the map that drives nummber system transliteration
+        # Return the map that drives number system transliteration
         # for individual formatting codes.
 
         defp format_number_systems(%{number_system: number_systems}) do

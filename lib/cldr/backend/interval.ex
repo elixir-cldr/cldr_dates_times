@@ -58,7 +58,7 @@ defmodule Cldr.Interval.Backend do
           styles depends on whether formatting is for a date, time or datetime.
           Since the functions in this module will make a determination as
           to which formatter to be used based upon the data passed to them
-          it is recommended the style option be ommitted. If a style is important
+          it is recommended the style option be omitted. If a style is important
           then call `to_string/3` directly on `Cldr.Date.Interval`, `Cldr.Time.Interval`
           or `Cldr.DateTime.Interval`.
 
@@ -86,7 +86,7 @@ defmodule Cldr.Interval.Backend do
         ## Notes
 
         * `to_string/2` will decide which formatter to call based upon
-          the aguments provided to it.
+          the arguments provided to it.
 
           * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
 
@@ -168,7 +168,7 @@ defmodule Cldr.Interval.Backend do
           styles depends on whether formatting is for a date, time or datetime.
           Since the functions in this module will make a determination as
           to which formatter to be used based upon the data passed to them
-          it is recommended the style option be ommitted. If styling is important
+          it is recommended the style option be omitted. If styling is important
           then call `to_string/3` directly on `Cldr.Date.Interval`, `Cldr.Time.Interval`
           or `Cldr.DateTime.Interval`.
 
@@ -196,7 +196,7 @@ defmodule Cldr.Interval.Backend do
         ## Notes
 
         * `to_string/2` will decide which formatter to call based upon
-          the aguments provided to it.
+          the arguments provided to it.
 
           * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
 
@@ -298,7 +298,7 @@ defmodule Cldr.Interval.Backend do
           styles depends on whether formatting is for a date, time or datetime.
           Since the functions in this module will make a determination as
           to which formatter to be used based upon the data passed to them
-          it is recommended the style option be ommitted. If a style is important
+          it is recommended the style option be omitted. If a style is important
           then call `to_string/3` directly on `Cldr.Date.Interval`, `Cldr.Time.Interval`
           or `Cldr.DateTime.Interval`.
 
@@ -326,7 +326,7 @@ defmodule Cldr.Interval.Backend do
         ## Notes
 
         * `to_string/3` will decide which formatter to call based upon
-          the aguments provided to it.
+          the arguments provided to it.
 
           * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
 
@@ -409,7 +409,7 @@ defmodule Cldr.Interval.Backend do
           styles depends on whether formatting is for a date, time or datetime.
           Since the functions in this module will make a determination as
           to which formatter to be used based upon the data passed to them
-          it is recommended the style option be ommitted. If styling is important
+          it is recommended the style option be omitted. If styling is important
           then call `to_string/3` directly on `Cldr.Date.Interval`, `Cldr.Time.Interval`
           or `Cldr.DateTime.Interval`.
 
@@ -437,7 +437,7 @@ defmodule Cldr.Interval.Backend do
         ## Notes
 
         * `to_string/3` will decide which formatter to call based upon
-          the aguments provided to it.
+          the arguments provided to it.
 
           * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
 
