@@ -44,7 +44,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
         string will be transliterated into this number system. Number system
         is anything returned from `#{inspect(backend)}.Number.System.number_systems_for/1`
 
-        *NOTE* This function is called by `Cldr.Date/to_string/2`, `Cldr.Time.to_string/2`
+        *NOTE* This function is called by `Cldr.Date.to_string/2`, `Cldr.Time.to_string/2`
         and `Cldr.DateTime.to_string/2` which is the preferred API.
 
         ## Examples
