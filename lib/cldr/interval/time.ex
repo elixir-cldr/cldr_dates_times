@@ -14,8 +14,7 @@ defmodule Cldr.Time.Interval do
   import Cldr.Date.Interval,
     only: [
       format_error: 2,
-      style_error: 1,
-      greatest_difference: 2
+      style_error: 1
     ]
 
   import Cldr.Calendar,
@@ -369,6 +368,41 @@ defmodule Cldr.Time.Interval do
       {:ok, string} -> string
       {:error, {exception, reason}} -> raise exception, reason
     end
+  end
+
+  @doc """
+  Returns the format code representing the date or
+  time unit that is the greatest difference between
+  two times.
+
+  Only differences in hours or minutes are considered.
+
+  ## Arguments
+
+  * `from` is any `t:Time.t/0`
+
+  * `to` is any `t:Time.t/0`
+
+  ## Returns
+
+  * `{:ok, format_code}` where `format_code` is one of
+
+    * `:H` meaning that the greatest difference is in the hour
+    * `:m` meaning that the greatest difference is in the minute
+
+  * `{:error, :no_practical_difference}`
+
+  ## Example
+
+      iex> Cldr.Time.Interval.greatest_difference ~T[10:11:00], ~T[10:12:00]
+      {:ok, :m}
+
+      iex> Cldr.Time.Interval.greatest_difference ~T[10:11:00], ~T[10:11:00]
+      {:error, :no_practical_difference}
+
+  """
+  def greatest_difference(from, to) do
+    Cldr.Date.Interval.greatest_difference(from, to)
   end
 
   defp from_less_than_or_equal_to(from, to) do

@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr_Dates_Times v2.12.0
+
+This is the changelog for Cldr_Dates_Times v2.12.0 released on May 7th, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Enhancements
+
+* Makes `Cldr.Date.Interval.greatest_difference/2` to be part of the public API. Also adds `Cldr.DateTime.Interval.greatest_difference/2` and `Cldr.Time.Interval.greatest_difference/2`.
+
 ## Cldr_Dates_Times v2.11.0
 
 This is the changelog for Cldr_Dates_Times v2.11.0 released on February 21st, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

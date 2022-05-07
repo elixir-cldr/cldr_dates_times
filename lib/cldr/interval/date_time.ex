@@ -9,11 +9,6 @@ defmodule Cldr.DateTime.Interval do
 
   """
 
-  import Cldr.Date.Interval,
-    only: [
-      greatest_difference: 2
-    ]
-
   import Cldr.Calendar,
     only: [
       naivedatetime: 0
@@ -211,7 +206,7 @@ defmodule Cldr.DateTime.Interval do
   ## Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representing of an interval
+    specific format type or a string representation of an interval
     format. The default is `:medium`.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
@@ -471,7 +466,7 @@ defmodule Cldr.DateTime.Interval do
   ## Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representing of an interval
+    specific format type or a string representation of an interval
     format. The default is `:medium`.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
@@ -511,6 +506,42 @@ defmodule Cldr.DateTime.Interval do
       {:ok, string} -> string
       {:error, {exception, reason}} -> raise exception, reason
     end
+  end
+
+  @doc """
+  Returns the format code representing the date or
+  time unit that is the greatest difference between
+  two date/times.
+
+  ## Arguments
+
+  * `from` is any `t:DateTime.t/0` or `t:NaiveDateTine.t/0`
+
+  * `to` is any `t:DateTime.t/0` or `t:NaiveDateTine.t/0`
+
+  ## Returns
+
+  * `{:ok, format_code}` where `format_code` is one of
+
+    * `:y` meaning that the greatest difference is in the year
+    * `:M` meaning that the greatest difference is in the month
+    * `:d` meaning that the greatest difference is in the day
+    * `:H` meaning that the greatest difference is in the hour
+    * `:m` meaning that the greatest difference is in the minute
+
+  * `{:error, :no_practical_difference}`
+
+  ## Example
+
+      iex> Cldr.DateTime.Interval.greatest_difference ~U[2022-04-22 02:00:00.0Z], ~U[2022-04-22 03:00:00.0Z]
+      {:ok, :H}
+
+      iex> Cldr.DateTime.Interval.greatest_difference ~U[2022-04-22 02:00:00.0Z], ~U[2022-04-22 02:00:01.0Z]
+      {:error, :no_practical_difference}
+
+  """
+  def greatest_difference(from, to) do
+    Cldr.Date.Interval.greatest_difference(from, to)
   end
 
   defp from_less_than_or_equal_to(%{time_zone: zone} = from, %{time_zone: zone} = to) do

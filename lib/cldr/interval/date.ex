@@ -762,8 +762,6 @@ defmodule Cldr.Date.Interval do
     }
   end
 
-  @doc false
-
   # Returns the map key for interval formatting
   # based upon the greatest difference between
   # two dates/times represented as a duration.
@@ -772,6 +770,36 @@ defmodule Cldr.Date.Interval do
   # no format placeholder in interval formats.
   import Cldr.Calendar, only: [date: 0, naivedatetime: 0, datetime: 0, time: 0]
 
+  @doc """
+  Returns the format code representing the date or
+  time unit that is the greatest difference between
+  two dates.
+
+  ## Arguments
+
+  * `from` is any `t:Date.t/0`
+
+  * `to` is any `t:Date.t/0`
+
+  ## Returns
+
+  * `{:ok, format_code}` where `format_code` is one of
+
+    * `:y` meaning that the greatest difference is in the year
+    * `:M` meaning that the greatest difference is in the month
+    * `:d` meaning that the greatest difference is in the day
+
+  * `{:error, :no_practical_difference}`
+
+  ## Example
+
+      iex> Cldr.Date.Interval.greatest_difference ~D[2022-04-22], ~D[2022-04-23]
+      {:ok, :d}
+
+      iex> Cldr.Date.Interval.greatest_difference ~D[2022-04-22], ~D[2022-04-22]
+      {:error, :no_practical_difference}
+
+  """
   def greatest_difference(unquote(datetime()) = from, unquote(datetime()) = to) do
     cond do
       from.year != to.year -> {:ok, :y}
