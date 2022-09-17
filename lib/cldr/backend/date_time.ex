@@ -48,15 +48,15 @@ defmodule Cldr.DateAndTime.Backend do
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
             iex> #{inspect(__MODULE__)}.to_string datetime
-            {:ok, "Jan 1, 2000, 11:59:59 PM"}
+            {:ok, "Jan 1, 2000, 11:59:59 PM"}
             iex> #{inspect(__MODULE__)}.to_string datetime, locale: "en"
-            {:ok, "Jan 1, 2000, 11:59:59 PM"}
+            {:ok, "Jan 1, 2000, 11:59:59 PM"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :long, locale: "en"
-            {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
+            {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :hms, locale: "en"
-            {:ok, "11:59:59 PM"}
+            {:ok, "11:59:59 PM"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "en"
-            {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
+            {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "fr"
             {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
@@ -110,11 +110,11 @@ defmodule Cldr.DateAndTime.Backend do
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
             iex> #{inspect(__MODULE__)}.to_string! datetime, locale: "en"
-            "Jan 1, 2000, 11:59:59 PM"
+            "Jan 1, 2000, 11:59:59 PM"
             iex> #{inspect(__MODULE__)}.to_string! datetime, format: :long, locale: "en"
-            "January 1, 2000 at 11:59:59 PM UTC"
+            "January 1, 2000 at 11:59:59 PM UTC"
             iex> #{inspect(__MODULE__)}.to_string! datetime, format: :full, locale: "en"
-            "Saturday, January 1, 2000 at 11:59:59 PM GMT"
+            "Saturday, January 1, 2000 at 11:59:59 PM GMT"
             iex> #{inspect(__MODULE__)}.to_string! datetime, format: :full, locale: "fr"
             "samedi 1 janvier 2000 à 23:59:59 UTC"
 
@@ -289,7 +289,7 @@ defmodule Cldr.DateAndTime.Backend do
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
             iex> Cldr.Time.to_string datetime, format: :long
-            {:ok, "11:59:59 PM UTC"}
+            {:ok, "11:59:59 PM UTC"}
 
         """
         @spec to_string(map, Keyword.t()) ::
@@ -353,7 +353,7 @@ defmodule Cldr.DateAndTime.Backend do
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
             iex> #{inspect(__MODULE__)}.to_string! datetime, format: :long
-            "11:59:59 PM UTC"
+            "11:59:59 PM UTC"
 
         """
         @spec to_string!(map, Keyword.t()) :: String.t() | no_return

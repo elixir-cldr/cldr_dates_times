@@ -203,18 +203,18 @@ defmodule Cldr.DateTime.Format do
 
       iex> Cldr.DateTime.Format.time_formats "en"
       {:ok, %Cldr.Time.Styles{
-        full: "h:mm:ss a zzzz",
-        long: "h:mm:ss a z",
-        medium: "h:mm:ss a",
-        short: "h:mm a"
+        full: "h:mm:ss a zzzz",
+        long: "h:mm:ss a z",
+        medium: "h:mm:ss a",
+        short: "h:mm a"
       }}
 
       iex> Cldr.DateTime.Format.time_formats "en", :buddhist
       {:ok, %Cldr.Time.Styles{
-        full: "h:mm:ss a zzzz",
-        long: "h:mm:ss a z",
-        medium: "h:mm:ss a",
-        short: "h:mm a"
+        full: "h:mm:ss a zzzz",
+        long: "h:mm:ss a z",
+        medium: "h:mm:ss a",
+        short: "h:mm a"
       }}
 
   """
@@ -292,47 +292,47 @@ defmodule Cldr.DateTime.Format do
       {:ok,
        %{
          d: "d",
-         mmm_ed: "E, MMM d",
-         ehm: "E h:mm a",
-         gy_mmm: "MMM y G",
-         y_mmmm: "MMMM y",
-         y: "y",
          y_m_ed: "E, M/d/y",
-         md: "M/d",
-         e_hm: "E HH:mm",
-         bh: "h B",
-         gy_mmm_ed: "E, MMM d, y G",
-         gy_mm_md: "MMM d, y G",
-         e: "ccc",
-         ehms: "E h:mm:ss a",
-         y_mm_md: "MMM d, y",
-         y_qqqq: "QQQQ y",
-         h: "HH",
-         bhms: "h:mm:ss B",
-         y_md: "M/d/y",
-         y_qqq: "QQQ y",
-         mmm_md: "MMMM d",
-         y_mmm: "MMM y",
          y_mmm_ed: "E, MMM d, y",
-         e_bhm: "E h:mm B",
-         ms: "mm:ss",
-         mmm: "LLL",
-         bhm: "h:mm B",
-         mm_md: "MMM d",
-         hms: "h:mm:ss a",
-         e_hms: "E HH:mm:ss",
-         hmv: "h:mm a v",
-         gy: "y G",
-         m: "L",
-         y_m: "M/y",
-         m_ed: "E, M/d",
-         hmsv: "h:mm:ss a v",
-         hm: "h:mm a",
-         e_bhms: "E h:mm:ss B",
-         ed: "d E",
-         gy_md: "M/d/y GGGGG",
          mmmmw: %{one: "'week' W 'of' MMMM", other: "'week' W 'of' MMMM"},
-         yw: %{one: "'week' w 'of' Y", other: "'week' w 'of' Y"}
+         h: "HH",
+         e_bhms: "E h:mm:ss B",
+         y_md: "M/d/y",
+         gy_mm_md: "MMM d, y G",
+         gy: "y G",
+         y_mmmm: "MMMM y",
+         ed: "d E",
+         mmm_ed: "E, MMM d",
+         hms: "h:mm:ss a",
+         e_hm: "E HH:mm",
+         mmm_md: "MMMM d",
+         mmm: "LLL",
+         bhms: "h:mm:ss B",
+         y: "y",
+         e_bhm: "E h:mm B",
+         gy_mmm: "MMM y G",
+         y_qqq: "QQQ y",
+         ms: "mm:ss",
+         e_hms: "E HH:mm:ss",
+         ehms: "E h:mm:ss a",
+         bhm: "h:mm B",
+         y_m: "M/y",
+         gy_mmm_ed: "E, MMM d, y G",
+         y_qqqq: "QQQQ y",
+         ehm: "E h:mm a",
+         y_mm_md: "MMM d, y",
+         hmv: "h:mm a v",
+         mm_md: "MMM d",
+         m_ed: "E, M/d",
+         bh: "h B",
+         hmsv: "h:mm:ss a v",
+         gy_md: "M/d/y G",
+         md: "M/d",
+         hm: "h:mm a",
+         m: "L",
+         yw: %{one: "'week' w 'of' Y", other: "'week' w 'of' Y"},
+         y_mmm: "MMM y",
+         e: "ccc"
        }}
 
   """

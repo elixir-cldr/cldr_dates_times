@@ -223,7 +223,7 @@ defmodule Cldr.Date.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string ~D[2020-01-01], ~D[2020-01-12],
             ...> format: :long, locale: "th", number_system: :thai
-            {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
+            {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
 
         """
         @spec to_string(Elixir.Calendar.date() | nil, Elixir.Calendar.date() | nil, Keyword.t()) ::

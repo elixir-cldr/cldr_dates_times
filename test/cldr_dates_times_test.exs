@@ -28,7 +28,7 @@ defmodule Cldr.DatesTimes.Test do
              },
              MyApp.Cldr,
              format: "YYYY-MMM-dd KK:mm bb"
-           ) == {:ok, "2018-Jan-01 00:01 AM"}
+           ) == {:ok, "2018-Jan-01 00:01 AM"}
   end
 
   test "That localised date doesn't transliterate" do

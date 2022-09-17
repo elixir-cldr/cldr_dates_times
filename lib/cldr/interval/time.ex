@@ -189,7 +189,7 @@ defmodule Cldr.Time.Interval do
 
       iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], nil, MyApp.Cldr,
       ...> format: :long, style: :flex
-      {:ok, "12:00:00 AM UTC –"}
+      {:ok, "12:00:00 AM UTC –"}
 
       iex> Cldr.Time.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
       ...> MyApp.Cldr, format: :long, style: :zone
@@ -197,7 +197,7 @@ defmodule Cldr.Time.Interval do
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex, locale: "th"
-      {:ok, "10:00 – 10:03 ในตอนเช้า"}
+      {:ok, "10:00 – 10:03 ในตอนเช้า"}
 
   """
   @spec to_string(Calendar.time() | nil, Calendar.time() | nil, Cldr.backend(), Keyword.t()) ::
@@ -360,7 +360,7 @@ defmodule Cldr.Time.Interval do
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex, locale: "th"
-      "10:00 – 10:03 ในตอนเช้า"
+      "10:00 – 10:03 ในตอนเช้า"
 
   """
   def to_string!(from, to, backend, options \\ []) do

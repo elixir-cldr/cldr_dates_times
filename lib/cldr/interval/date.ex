@@ -319,7 +319,7 @@ defmodule Cldr.Date.Interval do
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], nil, MyApp.Cldr,
       ...> format: :short
-      {:ok, "1/1/20 –"}
+      {:ok, "1/1/20 –"}
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long, locale: "fr"
@@ -327,7 +327,7 @@ defmodule Cldr.Date.Interval do
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long, locale: "th", number_system: :thai
-      {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
+      {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
 
   """
   @spec to_string(Calendar.date() | nil, Calendar.date() | nil, Cldr.backend(), Keyword.t()) ::
@@ -633,7 +633,7 @@ defmodule Cldr.Date.Interval do
 
       iex> Cldr.Date.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long, locale: "th", number_system: :thai
-      "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"
+      "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"
 
   """
 

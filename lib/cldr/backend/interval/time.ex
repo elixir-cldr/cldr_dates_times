@@ -101,7 +101,7 @@ defmodule Cldr.Time.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], ~T[10:03:00],
             ...> format: :long, style: :flex, locale: "th"
-            {:ok, "10:00 – 10:03 ในตอนเช้า"}
+            {:ok, "10:00 – 10:03 ในตอนเช้า"}
 
             iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], nil
             {:ok, "10:00:00 AM –"}
@@ -210,7 +210,7 @@ defmodule Cldr.Time.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[10:00:00], ~T[10:03:00],
             ...> format: :long, style: :flex, locale: "th"
-            "10:00 – 10:03 ในตอนเช้า"
+            "10:00 – 10:03 ในตอนเช้า"
 
         """
         @spec to_string!(Elixir.Calendar.time() | nil, Elixir.Calendar.time() | nil, Keyword.t()) ::

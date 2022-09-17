@@ -81,7 +81,7 @@ defmodule Cldr.Time do
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
       iex> Cldr.Time.to_string datetime, MyApp.Cldr, format: :long
-      {:ok, "11:59:59 PM UTC"}
+      {:ok, "11:59:59 PM UTC"}
 
   """
   @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
@@ -205,7 +205,7 @@ defmodule Cldr.Time do
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
       iex> Cldr.Time.to_string! datetime, MyApp.Cldr, format: :long
-      "11:59:59 PM UTC"
+      "11:59:59 PM UTC"
 
   """
   @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
