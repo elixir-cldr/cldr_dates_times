@@ -86,7 +86,7 @@ defmodule Cldr.DateTime.Interval.Backend do
 
               iex> use CalendarInterval
               iex> #{inspect(__MODULE__)}.to_string ~I"2020-01-01 00:00/10:00"
-              {:ok, "Jan 1, 2020, 12:00:00 AM – 10:00:00 AM"}
+              {:ok, "Jan 1, 2020, 12:00:00 AM – 10:00:00 AM"}
 
           """
 
@@ -158,10 +158,10 @@ defmodule Cldr.DateTime.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string ~U[2020-01-01 00:00:00.0Z],
             ...> ~U[2020-12-31 10:00:00.0Z]
-            {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
+            {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
 
             iex> #{inspect(__MODULE__)}.to_string ~U[2020-01-01 00:00:00.0Z], nil
-            {:ok, "Jan 1, 2020, 12:00:00 AM –"}
+            {:ok, "Jan 1, 2020, 12:00:00 AM –"}
 
         """
         @spec to_string(
@@ -246,7 +246,7 @@ defmodule Cldr.DateTime.Interval.Backend do
 
               iex> use CalendarInterval
               iex> #{inspect(__MODULE__)}.to_string! ~I"2020-01-01 00:00/10:00"
-              "Jan 1, 2020, 12:00:00 AM – 10:00:59 AM"
+              "Jan 1, 2020, 12:00:00 AM – 10:00:59 AM"
 
           """
 
@@ -315,7 +315,7 @@ defmodule Cldr.DateTime.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string! ~U[2020-01-01 00:00:00.0Z],
             ...> ~U[2020-12-31 10:00:00.0Z]
-            "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"
+            "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"
 
         """
         @spec to_string!(

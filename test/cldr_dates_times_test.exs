@@ -28,7 +28,7 @@ defmodule Cldr.DatesTimes.Test do
              },
              MyApp.Cldr,
              format: "YYYY-MMM-dd KK:mm bb"
-           ) == {:ok, "2018-Jan-01 00:01 AM"}
+           ) == {:ok, "2018-Jan-01 00:01 AM"}
   end
 
   test "That localised date doesn't transliterate" do
@@ -46,11 +46,11 @@ defmodule Cldr.DatesTimes.Test do
 
   test "to_string/2 when the second param is options (not backend)" do
     assert Cldr.Date.to_string(~D[2022-01-22], backend: MyApp.Cldr) == {:ok, "Jan 22, 2022"}
-    assert Cldr.DateTime.to_string(~U[2022-01-22T01:00:00.0Z], backend: MyApp.Cldr) == {:ok, "Jan 22, 2022, 1:00:00 AM"}
-    assert Cldr.Time.to_string(~T[01:23:00], backend: MyApp.Cldr) == {:ok, "1:23:00 AM"}
+    assert Cldr.DateTime.to_string(~U[2022-01-22T01:00:00.0Z], backend: MyApp.Cldr) == {:ok, "Jan 22, 2022, 1:00:00 AM"}
+    assert Cldr.Time.to_string(~T[01:23:00], backend: MyApp.Cldr) == {:ok, "1:23:00 AM"}
 
     assert Cldr.Date.to_string!(~D[2022-01-22], backend: MyApp.Cldr) == "Jan 22, 2022"
-    assert Cldr.DateTime.to_string!(~U[2022-01-22T01:00:00.0Z], backend: MyApp.Cldr) == "Jan 22, 2022, 1:00:00 AM"
-    assert Cldr.Time.to_string!(~T[01:23:00], backend: MyApp.Cldr) == "1:23:00 AM"
+    assert Cldr.DateTime.to_string!(~U[2022-01-22T01:00:00.0Z], backend: MyApp.Cldr) == "Jan 22, 2022, 1:00:00 AM"
+    assert Cldr.Time.to_string!(~T[01:23:00], backend: MyApp.Cldr) == "1:23:00 AM"
   end
 end

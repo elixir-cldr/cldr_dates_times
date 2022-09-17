@@ -339,7 +339,7 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Examples:
 
             iex> #{inspect(__MODULE__)}.date_time_interval_fallback "en", :gregorian
-            [0, " – ", 1]
+            [0, " – ", 1]
 
         """
         @spec date_time_interval_fallback(Locale.locale_name() | LanguageTag.t(), calendar()) ::

@@ -78,32 +78,32 @@ defmodule Cldr.Interval do
   => {:ok,
        %{
          ...
-         h: %{h: ["HH – ", "HH"]},
-         hm: %{h: ["HH:mm – ", "HH:mm"], m: ["HH:mm – ", "HH:mm"]},
-         hmv: %{h: ["HH:mm – ", "HH:mm v"], m: ["HH:mm – ", "HH:mm v"]},
-         hv: %{a: ["h a – ", "h a v"], h: ["h – ", "h a v"]},
-         m: %{m: ["M – ", "M"]},
-         m_ed: %{d: ["E, M/d – ", "E, M/d"], m: ["E, M/d – ", "E, M/d"]},
-         md: %{d: ["M/d – ", "M/d"], m: ["M/d – ", "M/d"]},
-         mm_md: %{d: ["MMM d – ", "d"], m: ["MMM d – ", "MMM d"]},
-         mmm: %{m: ["MMM – ", "MMM"]},
-         mmm_ed: %{d: ["E, MMM d – ", "E, MMM d"], m: ["E, MMM d – ", "E, MMM d"]},
-         y: %{y: ["y – ", "y"]},
-         y_m: %{m: ["M/y – ", "M/y"], y: ["M/y – ", "M/y"]},
+         h: %{h: ["HH – ", "HH"]},
+         hm: %{h: ["HH:mm – ", "HH:mm"], m: ["HH:mm – ", "HH:mm"]},
+         hmv: %{h: ["HH:mm – ", "HH:mm v"], m: ["HH:mm – ", "HH:mm v"]},
+         hv: %{a: ["h a – ", "h a v"], h: ["h – ", "h a v"]},
+         m: %{m: ["M – ", "M"]},
+         m_ed: %{d: ["E, M/d – ", "E, M/d"], m: ["E, M/d – ", "E, M/d"]},
+         md: %{d: ["M/d – ", "M/d"], m: ["M/d – ", "M/d"]},
+         mm_md: %{d: ["MMM d – ", "d"], m: ["MMM d – ", "MMM d"]},
+         mmm: %{m: ["MMM – ", "MMM"]},
+         mmm_ed: %{d: ["E, MMM d – ", "E, MMM d"], m: ["E, MMM d – ", "E, MMM d"]},
+         y: %{y: ["y – ", "y"]},
+         y_m: %{m: ["M/y – ", "M/y"], y: ["M/y – ", "M/y"]},
          y_m_ed: %{
-           d: ["E, M/d/y – ", "E, M/d/y"],
-           m: ["E, M/d/y – ", "E, M/d/y"],
-           y: ["E, M/d/y – ", "E, M/d/y"]
+           d: ["E, M/d/y – ", "E, M/d/y"],
+           m: ["E, M/d/y – ", "E, M/d/y"],
+           y: ["E, M/d/y – ", "E, M/d/y"]
          },
          y_md: %{
-           d: ["M/d/y – ", "M/d/y"],
-           m: ["M/d/y – ", "M/d/y"],
-           y: ["M/d/y – ", "M/d/y"]
+           d: ["M/d/y – ", "M/d/y"],
+           m: ["M/d/y – ", "M/d/y"],
+           y: ["M/d/y – ", "M/d/y"]
          },
          y_mm_md: %{
-           d: ["MMM d – ", "d, y"],
-           m: ["MMM d – ", "MMM d, y"],
-           y: ["MMM d, y – ", "MMM d, y"]
+           d: ["MMM d – ", "d, y"],
+           m: ["MMM d – ", "MMM d, y"],
+           y: ["MMM d, y – ", "MMM d, y"]
          },
          ...
        }
@@ -119,9 +119,9 @@ defmodule Cldr.Interval do
 
   ```elixir
   %{
-     d: ["MMM d – ", "d, y"],
-     m: ["MMM d – ", "MMM d, y"],
-     y: ["MMM d, y – ", "MMM d, y"]
+     d: ["MMM d – ", "d, y"],
+     m: ["MMM d – ", "MMM d, y"],
+     y: ["MMM d, y – ", "MMM d, y"]
    }
   ```
 
@@ -138,10 +138,10 @@ defmodule Cldr.Interval do
 
   Using this `greatest difference` information we can now resolve the
   final format. With the `:year` field being the greatest difference then
-  the format is `y: ["MMM d, y – ", "MMM d, y"]`.
+  the format is `y: ["MMM d, y – ", "MMM d, y"]`.
 
   Finally, formatting can proceed for the `from` date being formatted with
-  `"MMM d, y – "` and the `to` date being formatted with `"MMM d, y"` and the
+  `"MMM d, y – "` and the `to` date being formatted with `"MMM d, y"` and the
   two results then being concatenated to form the final string.
 
   ### Other ways to specify an interval format
@@ -152,14 +152,14 @@ defmodule Cldr.Interval do
 
   ```elixir
   iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr
-  {:ok, "Jan 1 – 12, 2020"}
+  {:ok, "Jan 1 – 12, 2020"}
 
   iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr, format: :long
-  {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
+  {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
   iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
   ...> style: :month_and_day
-  {:ok, "Jan 1 – 12"}
+  {:ok, "Jan 1 – 12"}
   ```
 
   ### Direct use of CLDR format types
@@ -167,7 +167,7 @@ defmodule Cldr.Interval do
   It is also possible to directly specify the CLDR format type. For example:
   ```elixir
   iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr, format: :gy_mm_md
-  {:ok, "Jan 1 – 12, 2020 AD"}
+  {:ok, "Jan 1 – 12, 2020 AD"}
   ```
 
   ### Using format strings
@@ -177,17 +177,17 @@ defmodule Cldr.Interval do
 
   ```elixir
   iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
-  ...> format: "E, M/d/y – E, M/d/y"
-  {:ok, "Wed, 1/1/2020 – Sun, 1/12/2020"}
+  ...> format: "E, M/d/y – E, M/d/y"
+  {:ok, "Wed, 1/1/2020 – Sun, 1/12/2020"}
   ```
 
   In this case, the steps to formatting are:
 
   1. Split the format string at the point at which the first repeating
   formatting code is detected. In the pattern above it is where the second `E`
-  is detected. The result in this case will be `["E, M/d/y – ", "E, M/d/y"]`
+  is detected. The result in this case will be `["E, M/d/y – ", "E, M/d/y"]`
   For the purposes of splitting, duplicate are ignored. Therefore
-  "EEE, M/d/y – E, M/d/y" will split into `["EEE, M/d/y – ", "E, M/d/y"]`.
+  "EEE, M/d/y – E, M/d/y" will split into `["EEE, M/d/y – ", "E, M/d/y"]`.
 
   2. Each part of the pattern is parsed
 
@@ -211,7 +211,7 @@ defmodule Cldr.Interval do
     use Cldr,
       locales: ["en", "fr"],
       default_locale: "en",
-      precompile_interval_formats: ["E, MMM d/y – d/y"]
+      precompile_interval_formats: ["E, MMM d/y – d/y"]
   end
   ```
 
@@ -407,12 +407,12 @@ defmodule Cldr.Interval do
 
       iex> Cldr.Interval.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
       ...> format: :long
-      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
+      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
       iex> use CalendarInterval
       iex> Cldr.Interval.to_string ~I"2020-01-01/12", MyApp.Cldr,
       ...> format: :long
-      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
+      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
   """
   @spec to_string(range, Cldr.backend(), Keyword.t()) ::
@@ -537,26 +537,26 @@ defmodule Cldr.Interval do
   ## Examples
 
       iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr
-      {:ok, "Jan 1 – Dec 31, 2020"}
+      {:ok, "Jan 1 – Dec 31, 2020"}
 
       iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr
-      {:ok, "Jan 1 – 12, 2020"}
+      {:ok, "Jan 1 – 12, 2020"}
 
       iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long
-      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
+      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
       iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
       ...> format: :long, style: :year_and_month
-      {:ok, "January – December 2020"}
+      {:ok, "January – December 2020"}
 
       iex> Cldr.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z], MyApp.Cldr,
       ...> format: :long
-      {:ok, "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"}
+      {:ok, "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"}
 
       iex> Cldr.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z], MyApp.Cldr,
       ...> format: :long
-      {:ok, "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"}
+      {:ok, "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"}
 
   """
   @spec to_string(datetime, datetime, Cldr.backend(), Keyword.t()) ::
@@ -691,11 +691,11 @@ defmodule Cldr.Interval do
       iex> use CalendarInterval
       iex> Cldr.Interval.to_string! ~I"2020-01-01/12", MyApp.Cldr,
       ...> format: :long
-      "Wed, Jan 1 – Sun, Jan 12, 2020"
+      "Wed, Jan 1 – Sun, Jan 12, 2020"
 
       iex> Cldr.Interval.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
       ...> format: :long
-      "Wed, Jan 1 – Sun, Jan 12, 2020"
+      "Wed, Jan 1 – Sun, Jan 12, 2020"
 
   """
   @spec to_string!(range, Cldr.backend(), Keyword.t()) :: String.t() | no_return()
@@ -808,26 +808,26 @@ defmodule Cldr.Interval do
   ## Examples
 
       iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr
-      "Jan 1 – Dec 31, 2020"
+      "Jan 1 – Dec 31, 2020"
 
       iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr
-      "Jan 1 – 12, 2020"
+      "Jan 1 – 12, 2020"
 
       iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long
-      "Wed, Jan 1 – Sun, Jan 12, 2020"
+      "Wed, Jan 1 – Sun, Jan 12, 2020"
 
       iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
       ...> format: :long, style: :year_and_month
-      "January – December 2020"
+      "January – December 2020"
 
       iex> Cldr.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z], MyApp.Cldr,
       ...> format: :long
-      "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"
+      "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"
 
       iex> Cldr.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z], MyApp.Cldr,
       ...> format: :long
-      "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"
+      "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"
 
   """
   @spec to_string!(datetime, datetime, Cldr.backend(), Keyword.t()) :: String.t() | no_return()

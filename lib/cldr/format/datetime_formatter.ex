@@ -86,10 +86,10 @@ defmodule Cldr.DateTime.Formatter do
   |                        | cccc       | "Tuesday"       | Wide                               |
   |                        | ccccc      | "T"             | Narrow                             |
   |                        | cccccc     | "Tu"            | Short                              |
-  | AM or PM               | a, aa, aaa | "am."           | Abbreviated                        |
+  | AM or PM               | a, aa, aaa | "am."           | Abbreviated                        |
   |                        | aaaa       | "am."           | Wide                               |
   |                        | aaaaa      | "am"            | Narrow                             |
-  | Noon, Mid, AM, PM      | b, bb, bbb | "mid."          | Abbreviated                        |
+  | Noon, Mid, AM, PM      | b, bb, bbb | "mid."          | Abbreviated                        |
   |                        | bbbb       | "midnight"      | Wide                               |
   |                        | bbbbb      | "md"            | Narrow                             |
   | Flexible time period   | B, BB, BBB | "at night"      | Abbreviated                        |
@@ -1880,7 +1880,7 @@ defmodule Cldr.DateTime.Formatter do
   May be upper or lowercase depending on the locale and other options.
   If the locale doesn't have the notion of a unique `noon == 12:00`,
   then the PM form may be substituted. Similarly for `midnight == 00:00`
-  and the AM form.
+  and the AM form.
 
   ## Format Symbol
 

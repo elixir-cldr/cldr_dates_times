@@ -89,7 +89,7 @@ defmodule Cldr.DateTime.Interval do
     ## Examples
 
         iex> Cldr.DateTime.Interval.to_string ~I"2020-01-01 10:00/12:00", MyApp.Cldr
-        {:ok, "Jan 1, 2020, 10:00:00 AM – 12:00:00 PM"}
+        {:ok, "Jan 1, 2020, 10:00:00 AM – 12:00:00 PM"}
 
     """
     @spec to_string(CalendarInterval.t(), Cldr.backend(), Keyword.t()) ::
@@ -238,10 +238,10 @@ defmodule Cldr.DateTime.Interval do
 
       iex> Cldr.DateTime.Interval.to_string ~U[2020-01-01 00:00:00.0Z],
       ...> ~U[2020-12-31 10:00:00.0Z], MyApp.Cldr
-      {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
+      {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
 
       iex> Cldr.DateTime.Interval.to_string ~U[2020-01-01 00:00:00.0Z], nil, MyApp.Cldr
-      {:ok, "Jan 1, 2020, 12:00:00 AM –"}
+      {:ok, "Jan 1, 2020, 12:00:00 AM –"}
 
   """
   @spec to_string(Calendar.datetime() | nil, Calendar.datetime() | nil, Cldr.backend(), Keyword.t()) ::
@@ -426,7 +426,7 @@ defmodule Cldr.DateTime.Interval do
 
         iex> use CalendarInterval
         iex> Cldr.DateTime.Interval.to_string! ~I"2020-01-01 00:00/10:00", MyApp.Cldr
-        "Jan 1, 2020, 12:00:00 AM – 10:00:59 AM"
+        "Jan 1, 2020, 12:00:00 AM – 10:00:59 AM"
 
     """
 
@@ -498,7 +498,7 @@ defmodule Cldr.DateTime.Interval do
 
       iex> Cldr.DateTime.Interval.to_string! ~U[2020-01-01 00:00:00.0Z],
       ...> ~U[2020-12-31 10:00:00.0Z], MyApp.Cldr
-      "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"
+      "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"
 
   """
   def to_string!(from, to, backend, options \\ []) do

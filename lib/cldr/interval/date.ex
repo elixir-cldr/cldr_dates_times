@@ -193,30 +193,30 @@ defmodule Cldr.Date.Interval do
   ## Examples
 
       iex> Cldr.Date.Interval.to_string Date.range(~D[2020-01-01], ~D[2020-12-31]), MyApp.Cldr
-      {:ok, "Jan 1 – Dec 31, 2020"}
+      {:ok, "Jan 1 – Dec 31, 2020"}
 
       iex> Cldr.Date.Interval.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr
-      {:ok, "Jan 1 – 12, 2020"}
+      {:ok, "Jan 1 – 12, 2020"}
 
       iex> Cldr.Date.Interval.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
       ...> format: :long
-      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
+      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
       iex> Cldr.Date.Interval.to_string Date.range(~D[2020-01-01], ~D[2020-12-01]), MyApp.Cldr,
       ...> format: :long, style: :year_and_month
-      {:ok, "January – December 2020"}
+      {:ok, "January – December 2020"}
 
       iex> use CalendarInterval
       iex> Cldr.Date.Interval.to_string ~I"2020-01/12", MyApp.Cldr
-      {:ok, "Jan 1 – Dec 31, 2020"}
+      {:ok, "Jan 1 – Dec 31, 2020"}
 
       iex> Cldr.Date.Interval.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
       ...> format: :short
-      {:ok, "1/1/2020 – 1/12/2020"}
+      {:ok, "1/1/2020 – 1/12/2020"}
 
       iex> Cldr.Date.Interval.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
       ...> format: :long, locale: "fr"
-      {:ok, "mer. 1 – dim. 12 janv. 2020"}
+      {:ok, "mer. 1 – dim. 12 janv. 2020"}
 
   """
   @spec to_string(Cldr.Interval.range(), Cldr.backend(), Keyword.t()) ::
@@ -300,22 +300,22 @@ defmodule Cldr.Date.Interval do
   ## Examples
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr
-      {:ok, "Jan 1 – Dec 31, 2020"}
+      {:ok, "Jan 1 – Dec 31, 2020"}
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr
-      {:ok, "Jan 1 – 12, 2020"}
+      {:ok, "Jan 1 – 12, 2020"}
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long
-      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
+      {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
       ...> format: :long, style: :year_and_month
-      {:ok, "January – December 2020"}
+      {:ok, "January – December 2020"}
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :short
-      {:ok, "1/1/2020 – 1/12/2020"}
+      {:ok, "1/1/2020 – 1/12/2020"}
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], nil, MyApp.Cldr,
       ...> format: :short
@@ -323,11 +323,11 @@ defmodule Cldr.Date.Interval do
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long, locale: "fr"
-      {:ok, "mer. 1 – dim. 12 janv. 2020"}
+      {:ok, "mer. 1 – dim. 12 janv. 2020"}
 
       iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long, locale: "th", number_system: :thai
-      {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
+      {:ok, "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"}
 
   """
   @spec to_string(Calendar.date() | nil, Calendar.date() | nil, Cldr.backend(), Keyword.t()) ::
@@ -509,30 +509,30 @@ defmodule Cldr.Date.Interval do
   ## Examples
 
       iex> Cldr.Date.Interval.to_string! Date.range(~D[2020-01-01], ~D[2020-12-31]), MyApp.Cldr
-      "Jan 1 – Dec 31, 2020"
+      "Jan 1 – Dec 31, 2020"
 
       iex> Cldr.Date.Interval.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr
-      "Jan 1 – 12, 2020"
+      "Jan 1 – 12, 2020"
 
       iex> Cldr.Date.Interval.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
       ...> format: :long
-      "Wed, Jan 1 – Sun, Jan 12, 2020"
+      "Wed, Jan 1 – Sun, Jan 12, 2020"
 
       iex> Cldr.Date.Interval.to_string! Date.range(~D[2020-01-01], ~D[2020-12-01]), MyApp.Cldr,
       ...> format: :long, style: :year_and_month
-      "January – December 2020"
+      "January – December 2020"
 
       iex> use CalendarInterval
       iex> Cldr.Date.Interval.to_string! ~I"2020-01/12", MyApp.Cldr
-      "Jan 1 – Dec 31, 2020"
+      "Jan 1 – Dec 31, 2020"
 
       iex> Cldr.Date.Interval.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
       ...> format: :short
-      "1/1/2020 – 1/12/2020"
+      "1/1/2020 – 1/12/2020"
 
       iex> Cldr.Date.Interval.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
       ...> format: :long, locale: "fr"
-      "mer. 1 – dim. 12 janv. 2020"
+      "mer. 1 – dim. 12 janv. 2020"
 
   """
 
@@ -610,30 +610,30 @@ defmodule Cldr.Date.Interval do
   ## Examples
 
       iex> Cldr.Date.Interval.to_string! ~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr
-      "Jan 1 – Dec 31, 2020"
+      "Jan 1 – Dec 31, 2020"
 
       iex> Cldr.Date.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr
-      "Jan 1 – 12, 2020"
+      "Jan 1 – 12, 2020"
 
       iex> Cldr.Date.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long
-      "Wed, Jan 1 – Sun, Jan 12, 2020"
+      "Wed, Jan 1 – Sun, Jan 12, 2020"
 
       iex> Cldr.Date.Interval.to_string! ~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
       ...> format: :long, style: :year_and_month
-      "January – December 2020"
+      "January – December 2020"
 
       iex> Cldr.Date.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :short
-      "1/1/2020 – 1/12/2020"
+      "1/1/2020 – 1/12/2020"
 
       iex> Cldr.Date.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long, locale: "fr"
-      "mer. 1 – dim. 12 janv. 2020"
+      "mer. 1 – dim. 12 janv. 2020"
 
       iex> Cldr.Date.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
       ...> format: :long, locale: "th", number_system: :thai
-      "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"
+      "พ. ๑ ม.ค. – อา. ๑๒ ม.ค. ๒๐๒๐"
 
   """
 

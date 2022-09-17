@@ -6,7 +6,7 @@ defmodule Cldr.DateTime.CharsTest do
   end
 
   test "time to_string" do
-    assert Cldr.to_string(~T[11:45:23]) == "11:45:23 AM"
+    assert Cldr.to_string(~T[11:45:23]) == "11:45:23 AM"
   end
 
   test "naive datetime to_string" do

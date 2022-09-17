@@ -35,15 +35,15 @@ defmodule Cldr.DateTime.Interval.Test do
   end
 
   test "right option time interval" do
-    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil) == {:ok, "12:00:00 AM –"}
-    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, MyApp.Cldr) == {:ok, "12:00:00 AM –"}
+    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil) == {:ok, "12:00:00 AM –"}
+    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, MyApp.Cldr) == {:ok, "12:00:00 AM –"}
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, locale: "fr") == {:ok, "00:00:00 –"}
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, MyApp.Cldr, locale: "fr") == {:ok, "00:00:00 –"}
   end
 
   test "left option time interval" do
-    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0]) == {:ok, "– 12:00:00 AM"}
-    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], MyApp.Cldr) == {:ok, "– 12:00:00 AM"}
+    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0]) == {:ok, "– 12:00:00 AM"}
+    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], MyApp.Cldr) == {:ok, "– 12:00:00 AM"}
     assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], locale: "fr") == {:ok, "– 00:00:00"}
     assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], MyApp.Cldr, locale: "fr") == {:ok, "– 00:00:00"}
   end
@@ -181,7 +181,7 @@ defmodule Cldr.DateTime.Interval.Test do
   end
 
   test "time intervals that cross midday" do
-    assert Cldr.Time.Interval.to_string!(~T[08:00:00], ~T[22:00:00]) == "8:00 AM – 10:00 PM"
+    assert Cldr.Time.Interval.to_string!(~T[08:00:00], ~T[22:00:00]) == "8:00 AM – 10:00 PM"
     assert Cldr.Time.Interval.to_string!(~T[20:00:00], ~T[22:00:00]) == "8:00 – 10:00 PM"
   end
 

@@ -276,16 +276,16 @@ defmodule Cldr.DateAndTime.Backend do
         ## Examples
 
             iex> Cldr.Time.to_string ~T[07:35:13.215217]
-            {:ok, "7:35:13 AM"}
+            {:ok, "7:35:13 AM"}
 
             iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :short
-            {:ok, "7:35 AM"}
+            {:ok, "7:35 AM"}
 
             iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :medium, locale: "fr"
             {:ok, "07:35:13"}
 
             iex> Cldr.Time.to_string ~T[07:35:13.215217], format: :medium
-            {:ok, "7:35:13 AM"}
+            {:ok, "7:35:13 AM"}
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
             iex> Cldr.Time.to_string datetime, format: :long
@@ -337,19 +337,19 @@ defmodule Cldr.DateAndTime.Backend do
         ## Examples
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[07:35:13.215217]
-            "7:35:13 AM"
+            "7:35:13 AM"
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[07:35:13.215217], format: :short
-            "7:35 AM"
+            "7:35 AM"
 
             iex> #{inspect(__MODULE__)}.to_string ~T[07:35:13.215217], format: :short, period: :variant
-            {:ok, "7:35 AM"}
+            {:ok, "7:35 AM"}
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[07:35:13.215217], format: :medium, locale: "fr"
             "07:35:13"
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[07:35:13.215217], format: :medium
-            "7:35:13 AM"
+            "7:35:13 AM"
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
             iex> #{inspect(__MODULE__)}.to_string! datetime, format: :long

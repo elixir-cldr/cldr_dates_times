@@ -68,16 +68,16 @@ defmodule Cldr.Time do
   ## Examples
 
       iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr
-      {:ok, "7:35:13 AM"}
+      {:ok, "7:35:13 AM"}
 
       iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :short
-      {:ok, "7:35 AM"}
+      {:ok, "7:35 AM"}
 
       iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :medium, locale: "fr"
       {:ok, "07:35:13"}
 
       iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :medium
-      {:ok, "7:35:13 AM"}
+      {:ok, "7:35:13 AM"}
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
       iex> Cldr.Time.to_string datetime, MyApp.Cldr, format: :long
@@ -189,19 +189,19 @@ defmodule Cldr.Time do
   ## Examples
 
       iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr
-      "7:35:13 AM"
+      "7:35:13 AM"
 
       iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr, format: :short
-      "7:35 AM"
+      "7:35 AM"
 
       iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :short, period: :variant
-      {:ok, "7:35 AM"}
+      {:ok, "7:35 AM"}
 
       iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr, format: :medium, locale: "fr"
       "07:35:13"
 
       iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr, format: :medium
-      "7:35:13 AM"
+      "7:35:13 AM"
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
       iex> Cldr.Time.to_string! datetime, MyApp.Cldr, format: :long
