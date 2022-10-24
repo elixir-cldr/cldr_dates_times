@@ -6,7 +6,7 @@ This is the changelog for Cldr_Dates_Times v2.13.0 released on October 19th, 202
 
 ### Enhancements
 
-* Updates to [CLDR 42](https://cldr.unicode.org/index/downloads/cldr-42).
+* Updates to [CLDR 42](https://cldr.unicode.org/index/downloads/cldr-42).  The data time formats for several locales have changed from "<date> at <time>" to "<date>, <time>". This is a new category of formats that retain the `at` formats but these are not yet exposed in `ex_cldr_dates_times`.
 
 ## Cldr_Dates_Times v2.12.0
 
