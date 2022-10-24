@@ -52,13 +52,13 @@ defmodule Cldr.DateAndTime.Backend do
             iex> #{inspect(__MODULE__)}.to_string datetime, locale: "en"
             {:ok, "Jan 1, 2000, 11:59:59 PM"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :long, locale: "en"
-            {:ok, "January 1, 2000 at 11:59:59 PM UTC"}
+            {:ok, "January 1, 2000, 11:59:59 PM UTC"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :hms, locale: "en"
             {:ok, "11:59:59 PM"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "en"
-            {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
+            {:ok, "Saturday, January 1, 2000, 11:59:59 PM GMT"}
             iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "fr"
-            {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
+            {:ok, "samedi 1 janvier 2000, 23:59:59 UTC"}
 
         """
         @spec to_string(map, Keyword.t()) ::
@@ -112,11 +112,11 @@ defmodule Cldr.DateAndTime.Backend do
             iex> #{inspect(__MODULE__)}.to_string! datetime, locale: "en"
             "Jan 1, 2000, 11:59:59 PM"
             iex> #{inspect(__MODULE__)}.to_string! datetime, format: :long, locale: "en"
-            "January 1, 2000 at 11:59:59 PM UTC"
+            "January 1, 2000, 11:59:59 PM UTC"
             iex> #{inspect(__MODULE__)}.to_string! datetime, format: :full, locale: "en"
-            "Saturday, January 1, 2000 at 11:59:59 PM GMT"
+            "Saturday, January 1, 2000, 11:59:59 PM GMT"
             iex> #{inspect(__MODULE__)}.to_string! datetime, format: :full, locale: "fr"
-            "samedi 1 janvier 2000 à 23:59:59 UTC"
+            "samedi 1 janvier 2000, 23:59:59 UTC"
 
         """
         @spec to_string!(map, Keyword.t()) :: String.t() | no_return

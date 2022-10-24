@@ -552,11 +552,11 @@ defmodule Cldr.Interval do
 
       iex> Cldr.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z], MyApp.Cldr,
       ...> format: :long
-      {:ok, "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"}
+      {:ok, "January 1, 2020, 12:00:00 AM UTC – December 1, 2020, 10:05:00 AM UTC"}
 
       iex> Cldr.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z], MyApp.Cldr,
       ...> format: :long
-      {:ok, "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"}
+      {:ok, "January 1, 2020, 12:00:00 AM UTC – 10:05:00 AM UTC"}
 
   """
   @spec to_string(datetime, datetime, Cldr.backend(), Keyword.t()) ::
@@ -823,11 +823,11 @@ defmodule Cldr.Interval do
 
       iex> Cldr.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z], MyApp.Cldr,
       ...> format: :long
-      "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"
+      "January 1, 2020, 12:00:00 AM UTC – December 1, 2020, 10:05:00 AM UTC"
 
       iex> Cldr.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z], MyApp.Cldr,
       ...> format: :long
-      "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"
+      "January 1, 2020, 12:00:00 AM UTC – 10:05:00 AM UTC"
 
   """
   @spec to_string!(datetime, datetime, Cldr.backend(), Keyword.t()) :: String.t() | no_return()

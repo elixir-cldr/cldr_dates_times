@@ -251,11 +251,11 @@ defmodule Cldr.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z],
             ...> format: :long
-            {:ok, "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"}
+            {:ok, "January 1, 2020, 12:00:00 AM UTC – December 1, 2020, 10:05:00 AM UTC"}
 
             iex> #{inspect(__MODULE__)}.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z],
             ...> format: :long
-            {:ok, "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"}
+            {:ok, "January 1, 2020, 12:00:00 AM UTC – 10:05:00 AM UTC"}
 
         """
         @spec to_string(Cldr.Interval.datetime(), Cldr.Interval.datetime(), Keyword.t()) ::
@@ -492,11 +492,11 @@ defmodule Cldr.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z],
             ...> format: :long
-            "January 1, 2020 at 12:00:00 AM UTC – December 1, 2020 at 10:05:00 AM UTC"
+            "January 1, 2020, 12:00:00 AM UTC – December 1, 2020, 10:05:00 AM UTC"
 
             iex> #{inspect(__MODULE__)}.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z],
             ...> format: :long
-            "January 1, 2020 at 12:00:00 AM UTC – 10:05:00 AM UTC"
+            "January 1, 2020, 12:00:00 AM UTC – 10:05:00 AM UTC"
 
         """
         @spec to_string!(Cldr.Interval.datetime(), Cldr.Interval.datetime(), Keyword.t()) ::

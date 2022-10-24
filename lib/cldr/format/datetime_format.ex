@@ -244,16 +244,16 @@ defmodule Cldr.DateTime.Format do
 
       iex> Cldr.DateTime.Format.date_time_formats "en"
       {:ok, %Cldr.DateTime.Styles{
-        full: "{1} 'at' {0}",
-        long: "{1} 'at' {0}",
+        full: "{1}, {0}",
+        long: "{1}, {0}",
         medium: "{1}, {0}",
         short: "{1}, {0}"
       }}
 
       iex> Cldr.DateTime.Format.date_time_formats "en", :buddhist, MyApp.Cldr
       {:ok, %Cldr.DateTime.Styles{
-        full: "{1} 'at' {0}",
-        long: "{1} 'at' {0}",
+        full: "{1}, {0}",
+        long: "{1}, {0}",
         medium: "{1}, {0}",
         short: "{1}, {0}"
       }}
