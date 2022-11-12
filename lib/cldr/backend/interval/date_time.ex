@@ -77,7 +77,7 @@ defmodule Cldr.DateTime.Interval.Backend do
           * The available predefined formats that can be applied are the
             keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
             where `"en"` can be replaced by any configuration locale name and `:gregorian`
-            is the underlying `CLDR` calendar type.
+            is the underlying CLDR calendar type.
 
           * In the case where `from` and `to` are equal, a single
             date is formatted instead of an interval
@@ -149,7 +149,7 @@ defmodule Cldr.DateTime.Interval.Backend do
         * The available predefined formats that can be applied are the
           keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
           where `"en"` can be replaced by any configuration locale name and `:gregorian`
-          is the underlying `CLDR` calendar type.
+          is the underlying CLDR calendar type.
 
         * In the case where `from` and `to` are equal, a single
           date is formatted instead of an interval
@@ -237,7 +237,7 @@ defmodule Cldr.DateTime.Interval.Backend do
           * The available predefined formats that can be applied are the
             keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
             where `"en"` can be replaced by any configuration locale name and `:gregorian`
-            is the underlying `CLDR` calendar type.
+            is the underlying CLDR calendar type.
 
           * In the case where `from` and `to` are equal, a single
             date is formatted instead of an interval
@@ -306,7 +306,7 @@ defmodule Cldr.DateTime.Interval.Backend do
         * The available predefined formats that can be applied are the
           keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
           where `"en"` can be replaced by any configuration locale name and `:gregorian`
-          is the underlying `CLDR` calendar type.
+          is the underlying CLDR calendar type.
 
         * In the case where `from` and `to` are equal, a single
           date is formatted instead of an interval.
