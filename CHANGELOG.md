@@ -6,6 +6,8 @@ This is the changelog for Cldr_Dates_Times v2.13.3 released on March 13th, 2023.
 
 ### Bug Fixes
 
+**This release requires (and configures) `ex_cldr` version 2.36.0 or later. This version fixes the interval format data so that formats required by locales that use 24-hour times are not overwritten by data for 12-hour formats.  As a result, formatting intervals using a format key directly (ie one of the keys in the map returned by `MyApp.Cldr.DateTime.Format.date_time_interval_formats/1`) may find the key has changed.**
+
 * Fixes localised time interval formatting to respect the locale's preference for 12-hour or 24-hour times.  Thanks to @Gladear for the report and collaboration. Closes #35.
 
 ## Cldr_Dates_Times v2.13.2
