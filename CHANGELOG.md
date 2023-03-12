@@ -1,5 +1,17 @@
 # Changelog
 
+## Cldr_Dates_Times v2.13.2
+
+This is the changelog for Cldr_Dates_Times v2.13.2 released on March 12th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fixed interval formats when the format provided is a string (rather than the normal atom-based predefined formats)
+
+* Fixed setting the number system from options (typographical error)
+
+* Removed spurious `IO.inspect/2` output when the format is a string.
+
 ## Cldr_Dates_Times v2.13.1
 
 This is the changelog for Cldr_Dates_Times v2.13.1 released on November 12th, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

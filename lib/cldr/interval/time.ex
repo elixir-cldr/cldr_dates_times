@@ -223,7 +223,7 @@ defmodule Cldr.Time.Interval do
     options =
       options
       |> Keyword.put(:locale, locale)
-      |> Keyword.put(:nunber_system, number_system)
+      |> Keyword.put(:number_system, number_system)
 
     with {:ok, _} <- from_less_than_or_equal_to(from, to),
          {:ok, backend} <- Cldr.validate_backend(backend),
@@ -423,7 +423,7 @@ defmodule Cldr.Time.Interval do
     end
   end
 
-  defp greatest_difference_format(_from, _to, format, _) when is_binary(format) do
+  defp greatest_difference_format(_from, _to, format, _) when is_list(format) do
     {:ok, format}
   end
 
@@ -468,8 +468,6 @@ defmodule Cldr.Time.Interval do
 
   # Direct specification of a format
   defp validate_format(formats, _style, format_key) when is_atom(format_key) do
-    IO.inspect(format_key, label: "format key 2")
-
     case Map.fetch(formats, format_key) do
       :error -> {:error, format_error(formats, format_key)}
       success -> success

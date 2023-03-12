@@ -295,7 +295,7 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Arguments
 
         * `locale` is any locale returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag.t()`
+          or a `t:Cldr.LanguageTag.t/0`
 
         * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
           The default is `:gregorian`

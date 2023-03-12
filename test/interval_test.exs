@@ -206,4 +206,9 @@ defmodule Cldr.DateTime.Interval.Test do
                }
              }
   end
+
+  test "Interval formatting when the format is a string" do
+    assert {:ok, "12:00:00 - 13:00:00"} =
+      MyApp.Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00], format: "HH:mm:ss - HH:mm:ss", locale: :fr)
+  end
 end
