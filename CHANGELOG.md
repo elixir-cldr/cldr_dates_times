@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr_Dates_Times v2.13.3
+
+This is the changelog for Cldr_Dates_Times v2.13.3 released on March 13th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fixes localised time interval formatting to respect the locale's preference for 12-hour or 24-hour times.  Thanks to @Gladear for the report and collaboration. Closes #35.
+
 ## Cldr_Dates_Times v2.13.2
 
 This is the changelog for Cldr_Dates_Times v2.13.2 released on March 12th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

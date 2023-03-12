@@ -26,36 +26,36 @@ defmodule Cldr.Date.Interval do
     # Can be used with any
     # date
     date: %{
-      short: :y_md,
-      medium: :y_mm_md,
-      long: :y_mmm_ed
+      short: :yMd,
+      medium: :yMMMd,
+      long: :yMMMEd
     },
 
     # Can be used when the year
     # is the same with different
     # months and days
     month_and_day: %{
-      short: :md,
-      medium: :mm_md,
-      long: :mmm_ed
+      short: :Md,
+      medium: :MMMd,
+      long: :MMMEd
     },
 
     # Can be used when the year
     # is the same and the coverage
     # is full months
     month: %{
-      short: :m,
-      medium: :mmm,
-      long: :mmm
+      short: :M,
+      medium: :MMM,
+      long: :MMM
     },
 
     # Can be used when different
     # years and the coverage is
     # full months
     year_and_month: %{
-      short: :y_m,
-      medium: :y_mmm,
-      long: :y_mmmm
+      short: :yM,
+      medium: :yMMM,
+      long: :yMMMM
     }
   }
 
@@ -681,7 +681,7 @@ defmodule Cldr.Date.Interval do
   end
 
   defp greatest_difference_format(format, :M) do
-    case Map.fetch(format, :m) do
+    case Map.fetch(format, :M) do
       :error -> greatest_difference_format(format, :y)
       success -> success
     end

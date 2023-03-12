@@ -28,33 +28,53 @@ defmodule Cldr.Time.Interval do
 
   @doc false
   @style_map %{
-    # Can be used with any
-    # time
+    # Can be used with any time
     time: %{
-      short: :h,
-      medium: :hm,
-      long: :hm
+      h12: %{
+        short: :h,
+        medium: :hm,
+        long: :hm
+        },
+      h23: %{
+        short: :H,
+        medium: :Hm,
+        long: :Hm
+      },
     },
 
     # Includes the timezone
     zone: %{
-      short: :hv,
-      medium: :hmv,
-      long: :hmv
+      h12: %{
+        short: :hv,
+        medium: :hmv,
+        long: :hmv
+      },
+      h23: %{
+        short: :Hv,
+        medium: :Hmv,
+        long: :Hmv
+      },
     },
 
     # Includes flex times
     # annotation like
     # ".. in the evening"
     flex: %{
-      short: :bh,
-      medium: :bhm,
-      long: :bhm
-    }
+      h12: %{
+        short: :Bh,
+        medium: :Bhm,
+        long: :Bhm
+      },
+      h23: %{
+        short: :Bh,
+        medium: :Bhm,
+        long: :Bhm
+      },
+    },
   }
 
   @styles Map.keys(@style_map)
-  @formats Map.keys(@style_map.time)
+  @formats Map.keys(@style_map.time.h12)
 
   @default_format :medium
   @default_style :time
@@ -171,7 +191,7 @@ defmodule Cldr.Time.Interval do
   ## Examples
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
-      {:ok, "10 – 10"}
+      {:ok, "10 – 10 AM"}
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
       {:ok, "10:00 – 10:03 AM"}
@@ -231,7 +251,7 @@ defmodule Cldr.Time.Interval do
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type, backend),
-         {:ok, [left, right]} <- resolve_format(from, to, formats, options),
+         {:ok, [left, right]} <- resolve_format(from, to, formats, locale, options),
          {:ok, left_format} <- formatter.format(from, left, locale, options),
          {:ok, right_format} <- formatter.format(to, right, locale, options) do
       {:ok, left_format <> right_format}
@@ -338,7 +358,7 @@ defmodule Cldr.Time.Interval do
   ## Examples
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
-      "10 – 10"
+      "10 – 10 AM"
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :medium
       "10:00 – 10:03 AM"
@@ -412,12 +432,12 @@ defmodule Cldr.Time.Interval do
     end
   end
 
-  defp resolve_format(from, to, formats, options) do
+  defp resolve_format(from, to, formats, locale, options) do
     format = Keyword.get(options, :format, @default_format)
     style = Keyword.get(options, :style, @default_style)
 
     with {:ok, style} <- validate_style(style),
-         {:ok, format} <- validate_format(formats, style, format),
+         {:ok, format} <- validate_format(formats, style, locale, format),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
       greatest_difference_format(from, to, format, greatest_difference)
     end
@@ -429,23 +449,23 @@ defmodule Cldr.Time.Interval do
 
   defp greatest_difference_format(%{hour: from}, %{hour: to}, format, :H)
        when from < 12 and to >= 12 do
-    case Map.get(format, :b) || Map.get(format, :a) || Map.get(format, :h) do
+    case Map.get(format, :b) || Map.get(format, :a) || Map.get(format, :H) || Map.get(format, :h) do
       nil -> {:error, format_error(format, format)}
       success -> {:ok, success}
     end
   end
 
   defp greatest_difference_format(_from, _to, format, :H) do
-    case Map.fetch(format, :h) do
-      :error -> {:error, format_error(format, format)}
-      success -> success
+    case Map.get(format, :h) || Map.get(format, :H) do
+      nil -> {:error, format_error(format, format)}
+      success -> {:ok, success}
     end
   end
 
   defp greatest_difference_format(from, to, format, :m = difference) do
-    case Map.fetch(format, difference) do
-      :error -> greatest_difference_format(from, to, format, :H)
-      success -> success
+    case Map.get(format, difference) do
+      nil -> greatest_difference_format(from, to, format, :H)
+      success -> {:ok, success}
     end
   end
 
@@ -457,17 +477,20 @@ defmodule Cldr.Time.Interval do
   defp validate_style(style), do: {:error, style_error(style)}
 
   # Using standard format terms like :short, :medium, :long
-  defp validate_format(formats, style, format) when format in @formats do
+  defp validate_format(formats, style, locale, format) when format in @formats do
+    hour_format = Cldr.Time.hour_format_from_locale(locale)
+
     format_key =
       styles()
       |> Map.fetch!(style)
+      |> Map.fetch!(hour_format)
       |> Map.fetch!(format)
 
     Map.fetch(formats, format_key)
   end
 
   # Direct specification of a format
-  defp validate_format(formats, _style, format_key) when is_atom(format_key) do
+  defp validate_format(formats, _style, _locale, format_key) when is_atom(format_key) do
     case Map.fetch(formats, format_key) do
       :error -> {:error, format_error(formats, format_key)}
       success -> success
@@ -475,7 +498,7 @@ defmodule Cldr.Time.Interval do
   end
 
   # Direct specification of a format as a string
-  defp validate_format(_formats, _style, format) when is_binary(format) do
+  defp validate_format(_formats, _style, _locale, format) when is_binary(format) do
     Cldr.DateTime.Format.split_interval(format)
   end
 end

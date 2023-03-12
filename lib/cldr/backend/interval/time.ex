@@ -79,7 +79,7 @@ defmodule Cldr.Time.Interval.Backend do
         ## Examples
 
             iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], ~T[10:03:00], format: :short
-            {:ok, "10 – 10"}
+            {:ok, "10 – 10 AM"}
 
             iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], ~T[10:03:00], format: :medium
             {:ok, "10:00 – 10:03 AM"}
@@ -188,7 +188,7 @@ defmodule Cldr.Time.Interval.Backend do
         ## Examples
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[10:00:00], ~T[10:03:00], format: :short
-            "10 – 10"
+            "10 – 10 AM"
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[10:00:00], ~T[10:03:00], format: :medium
             "10:00 – 10:03 AM"

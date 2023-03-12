@@ -25,17 +25,17 @@ defmodule Cldr.Interval do
   ```elixir
   iex> Cldr.Date.Interval.styles
   %{
-    date: %{long: :y_mmm_ed, medium: :y_mm_md, short: :y_md},
-    month: %{long: :mmm, medium: :mmm, short: :m},
-    month_and_day: %{long: :mmm_ed, medium: :mm_md, short: :md},
-    year_and_month: %{long: :y_mmmm, medium: :y_mmm, short: :y_m}
+    date: %{long: :yMMMEd, medium: :yMMMd, short: :yMd},
+    month: %{long: :MMM, medium: :MMM, short: :M},
+    month_and_day: %{long: :MMMEd, medium: :MMMd, short: :Md},
+    year_and_month: %{long: :yMMMM, medium: :yMMM, short: :yM}
   }
 
   iex> Cldr.Time.Interval.styles
   %{
-    flex: %{long: :bhm, medium: :bhm, short: :bh},
-    time: %{long: :hm, medium: :hm, short: :h},
-    zone: %{long: :hmv, medium: :hmv, short: :hv}
+    flex: %{h12: %{long: :Bhm, medium: :Bhm, short: :Bh}, h23: %{long: :Bhm, medium: :Bhm, short: :Bh}},
+    time: %{h12: %{long: :hm, medium: :hm, short: :h}, h23: %{long: :Hm, medium: :Hm, short: :H}},
+    zone: %{h12: %{long: :hmv, medium: :hmv, short: :hv}, h23: %{long: :Hmv, medium: :Hmv, short: :Hv}}
   }
   ```
 
@@ -77,33 +77,23 @@ defmodule Cldr.Interval do
   Cldr.DateTime.Format.interval_formats "en", :gregorian
   => {:ok,
        %{
-         ...
-         h: %{h: ["HH – ", "HH"]},
-         hm: %{h: ["HH:mm – ", "HH:mm"], m: ["HH:mm – ", "HH:mm"]},
-         hmv: %{h: ["HH:mm – ", "HH:mm v"], m: ["HH:mm – ", "HH:mm v"]},
-         hv: %{a: ["h a – ", "h a v"], h: ["h – ", "h a v"]},
-         m: %{m: ["M – ", "M"]},
-         m_ed: %{d: ["E, M/d – ", "E, M/d"], m: ["E, M/d – ", "E, M/d"]},
-         md: %{d: ["M/d – ", "M/d"], m: ["M/d – ", "M/d"]},
-         mm_md: %{d: ["MMM d – ", "d"], m: ["MMM d – ", "MMM d"]},
-         mmm: %{m: ["MMM – ", "MMM"]},
-         mmm_ed: %{d: ["E, MMM d – ", "E, MMM d"], m: ["E, MMM d – ", "E, MMM d"]},
-         y: %{y: ["y – ", "y"]},
-         y_m: %{m: ["M/y – ", "M/y"], y: ["M/y – ", "M/y"]},
-         y_m_ed: %{
-           d: ["E, M/d/y – ", "E, M/d/y"],
-           m: ["E, M/d/y – ", "E, M/d/y"],
-           y: ["E, M/d/y – ", "E, M/d/y"]
+         Bh: %{B: ["h B – ", "h B"], h: ["h – ", "h B"]},
+         Bhm: %{
+           B: ["h:mm B – ", "h:mm B"],
+           h: ["h:mm – ", "h:mm B"],
+           m: ["h:mm – ", "h:mm B"]
          },
-         y_md: %{
-           d: ["M/d/y – ", "M/d/y"],
-           m: ["M/d/y – ", "M/d/y"],
-           y: ["M/d/y – ", "M/d/y"]
+         Gy: %{G: ["y G – ", "y G"], y: ["y – ", "y G"]},
+         GyM: %{
+           G: ["M/y G – ", "M/y G"],
+           M: ["M/y – ", "M/y G"],
+           y: ["M/y – ", "M/y G"]
          },
-         y_mm_md: %{
-           d: ["MMM d – ", "d, y"],
-           m: ["MMM d – ", "MMM d, y"],
-           y: ["MMM d, y – ", "MMM d, y"]
+         GyMEd: %{
+           G: ["E, M/d/y G – ", "E, M/d/y G"],
+           M: ["E, M/d/y – ", "E, M/d/y G"],
+           d: ["E, M/d/y – ", "E, M/d/y G"],
+           y: ["E, M/d/y – ", "E, M/d/y G"]
          },
          ...
        }
@@ -166,7 +156,7 @@ defmodule Cldr.Interval do
 
   It is also possible to directly specify the CLDR format type. For example:
   ```elixir
-  iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr, format: :gy_mm_md
+  iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr, format: :GyMMMd
   {:ok, "Jan 1 – 12, 2020 AD"}
   ```
 

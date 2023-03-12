@@ -185,6 +185,11 @@ defmodule Cldr.DateTime.Interval.Test do
     assert Cldr.Time.Interval.to_string!(~T[20:00:00], ~T[22:00:00]) == "8:00 – 10:00 PM"
   end
 
+  test "time intervals obey locale's hour format" do
+    assert {:ok, "12:00 – 13:00"} = Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00], MyApp.Cldr, locale: :fr)
+    assert {:ok, "12:00 – 1:00 PM"} = Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00], MyApp.Cldr, locale: :en)
+  end
+
   @tag :elixir_1_10
   test "datetime intervals that cross midday" do
     assert Cldr.Time.Interval.to_string!(
