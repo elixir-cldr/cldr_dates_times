@@ -291,16 +291,19 @@ defmodule Cldr.DateTime.Formatter do
     |> era(n, locale, backend, options)
   end
 
-  def era(date, n, locale, backend, _options) when n in 1..3 do
+  def era(date, n, locale, backend, options) when n in 1..3 do
     Cldr.Calendar.localize(date, :era, :format, :abbreviated, backend, locale)
+    |> maybe_wrap(:era, options)
   end
 
-  def era(date, 4, locale, backend, _options) do
+  def era(date, 4, locale, backend, options) do
     Cldr.Calendar.localize(date, :era, :format, :wide, backend, locale)
+    |> maybe_wrap(:era, options)
   end
 
-  def era(date, 5, locale, backend, _options) do
+  def era(date, 5, locale, backend, options) do
     Cldr.Calendar.localize(date, :era, :format, :narrow, backend, locale)
+    |> maybe_wrap(:era, options)
   end
 
   def era(date, _n, _locale, _backend, _options) do
@@ -396,6 +399,7 @@ defmodule Cldr.DateTime.Formatter do
     date
     |> Cldr.Calendar.calendar_year()
     |> transliterate("y", backend, options)
+    |> maybe_wrap(:year, options)
   end
 
   def year(%{year: _year} = date, 2 = n, _locale, backend, options) do
@@ -404,6 +408,7 @@ defmodule Cldr.DateTime.Formatter do
     |> rem(100)
     |> transliterate("y", backend, options)
     |> pad(n)
+    |> maybe_wrap(:year, options)
   end
 
   def year(%{year: _year} = date, n, _locale, backend, options) do
@@ -411,6 +416,7 @@ defmodule Cldr.DateTime.Formatter do
     |> Cldr.Calendar.calendar_year()
     |> transliterate("y", backend, options)
     |> pad(n)
+    |> maybe_wrap(:year, options)
   end
 
   def year(date, _n, _locale, _backend, _options) do
@@ -504,22 +510,25 @@ defmodule Cldr.DateTime.Formatter do
     |> week_aligned_year(n, locale, backend, options)
   end
 
-  def week_aligned_year(date, 1, _locale, _backend, _options) do
+  def week_aligned_year(date, 1, _locale, _backend, options) do
     {year, _week} = Cldr.Calendar.week_of_year(date)
     to_string(year)
+    |> maybe_wrap(:week_aligned_year, options)
   end
 
-  def week_aligned_year(date, 2 = n, _locale, _backend, _options) do
+  def week_aligned_year(date, 2 = n, _locale, _backend, options) do
     {year, _week} = Cldr.Calendar.week_of_year(date)
 
     year
     |> rem(100)
     |> pad(n)
+    |> maybe_wrap(:week_aligned_year, options)
   end
 
-  def week_aligned_year(date, n, _locale, _backend, _options) when n in 3..5 do
+  def week_aligned_year(date, n, _locale, _backend, options) when n in 3..5 do
     {year, _week} = Cldr.Calendar.week_of_year(date)
     pad(year, n)
+    |> maybe_wrap(:week_aligned_year, options)
   end
 
   def week_aligned_year(date, _n, _locale, _backend, _options) do
@@ -591,12 +600,16 @@ defmodule Cldr.DateTime.Formatter do
     |> extended_year(n, locale, backend, options)
   end
 
-  def extended_year(%{year: year, calendar: Calendar.ISO}, n, _locale, _backend, _options) do
-    pad(year, n)
+  def extended_year(%{year: year, calendar: Calendar.ISO}, n, _locale, _backend, options) do
+    year
+    |> pad(n)
+    |> maybe_wrap(:extended_year, options)
   end
 
-  def extended_year(%{year: year}, n, _locale, _backend, _options) do
-    pad(year, n)
+  def extended_year(%{year: year}, n, _locale, _backend, options) do
+    year
+    |> pad(n)
+    |> maybe_wrap(:extended_year, options)
   end
 
   def extended_year(date, _n, _locale, _backend, _options) do
@@ -657,8 +670,8 @@ defmodule Cldr.DateTime.Formatter do
     |> cyclic_year(n, locale, backend, options)
   end
 
-  def cyclic_year(%{year: year}, _n, _locale, _backend, _options) do
-    year
+  def cyclic_year(%{year: year}, _n, _locale, _backend, options) do
+    maybe_wrap(year, :cyclic_year, options)
   end
 
   def cyclic_year(date, _n, _locale, _backend, _options) do
@@ -739,19 +752,16 @@ defmodule Cldr.DateTime.Formatter do
     |> related_year(n, locale, backend, options)
   end
 
-  def related_year(%{year: year, calendar: Calendar.ISO}, _n, _locale, _backend, _options) do
-    year
-  end
-
-  def related_year(%{year: year, calendar: Gregorian}, n, _locale, _backend, _options)
+  def related_year(%{year: year, calendar: Gregorian}, n, _locale, _backend, options)
       when n in 1..5 do
-    year
+    maybe_wrap(year, :related_year, options)
   end
 
-  def related_year(date, n, _locale, _backend, _options) when n in 1..5 do
+  def related_year(date, n, _locale, _backend, options) when n in 1..5 do
     date
     |> Date.convert!(Gregorian)
     |> Map.get(:year)
+    |> maybe_wrap(:related_year, options)
   end
 
   def related_year(date, _n, _locale, _backend, _options) do
@@ -832,26 +842,35 @@ defmodule Cldr.DateTime.Formatter do
     |> quarter(n, locale, backend, options)
   end
 
-  def quarter(date, 1, _locale, _backend, _options) do
-    Cldr.Calendar.quarter_of_year(date)
+  def quarter(date, 1, _locale, _backend, options) do
+    date
+    |> Cldr.Calendar.quarter_of_year()
+    |> maybe_wrap(:quarter, options)
   end
 
-  def quarter(date, 2, _locale, _backend, _options) do
+  def quarter(date, 2, _locale, _backend, options) do
     date
     |> Cldr.Calendar.quarter_of_year()
     |> pad(2)
+    |> maybe_wrap(:quarter, options)
   end
 
-  def quarter(date, 3, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :quarter, :format, :abbreviated, backend, locale)
+  def quarter(date, 3, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:quarter, :format, :abbreviated, backend, locale)
+    |> maybe_wrap(:quarter, options)
   end
 
-  def quarter(date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :quarter, :format, :wide, backend, locale)
+  def quarter(date, 4, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:quarter, :format, :wide, backend, locale)
+    |> maybe_wrap(:quarter, options)
   end
 
-  def quarter(date, 5, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :quarter, :format, :narrow, backend, locale)
+  def quarter(date, 5, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:quarter, :format, :narrow, backend, locale)
+    |> maybe_wrap(:quarter, options)
   end
 
   def quarter(date, _n, _locale, _backend, _options) do
@@ -932,26 +951,35 @@ defmodule Cldr.DateTime.Formatter do
     |> standalone_quarter(n, locale, backend, options)
   end
 
-  def standalone_quarter(date, 1, _locale, _backend, _options) do
-    Cldr.Calendar.quarter_of_year(date)
+  def standalone_quarter(date, 1, _locale, _backend, options) do
+    date
+    |> Cldr.Calendar.quarter_of_year()
+    |> maybe_wrap(:standalone_quarter, options)
   end
 
-  def standalone_quarter(date, 2, _locale, _backend, _options) do
+  def standalone_quarter(date, 2, _locale, _backend, options) do
     date
     |> Cldr.Calendar.quarter_of_year()
     |> pad(2)
+    |> maybe_wrap(:standalone_quarter, options)
   end
 
-  def standalone_quarter(date, 3, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :quarter, :stand_alone, :abbreviated, backend, locale)
+  def standalone_quarter(date, 3, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:quarter, :stand_alone, :abbreviated, backend, locale)
+    |> maybe_wrap(:standalone_quarter, options)
   end
 
-  def standalone_quarter(date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :quarter, :stand_alone, :wide, backend, locale)
+  def standalone_quarter(date, 4, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:quarter, :stand_alone, :wide, backend, locale)
+    |> maybe_wrap(:standalone_quarter, options)
   end
 
-  def standalone_quarter(date, 5, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :quarter, :stand_alone, :narrow, backend, locale)
+  def standalone_quarter(date, 5, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:quarter, :stand_alone, :narrow, backend, locale)
+    |> maybe_wrap(:standalone_quarter, options)
   end
 
   def standalone_quarter(date, _n, _locale, _backend, _options) do
@@ -1032,22 +1060,29 @@ defmodule Cldr.DateTime.Formatter do
     |> month(n, locale, backend, options)
   end
 
-  def month(%{month: _month} = date, n, locale, backend, _options) when n in 1..2 do
+  def month(%{month: _month} = date, n, locale, backend, options) when n in 1..2 do
     date
     |> Cldr.Calendar.localize(:month, :numeric, :any, backend, locale)
     |> pad(n)
+    |> maybe_wrap(:month, options)
   end
 
-  def month(date, 3, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :month, :format, :abbreviated, backend, locale)
+  def month(date, 3, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:month, :format, :abbreviated, backend, locale)
+    |> maybe_wrap(:month, options)
   end
 
-  def month(date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :month, :format, :wide, backend, locale)
+  def month(date, 4, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:month, :format, :wide, backend, locale)
+    |> maybe_wrap(:month, options)
   end
 
-  def month(date, 5, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :month, :format, :narrow, backend, locale)
+  def month(date, 5, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:month, :format, :narrow, backend, locale)
+    |> maybe_wrap(:month, options)
   end
 
   def month(date, _n, _locale, _backend, _options) do
@@ -1128,22 +1163,29 @@ defmodule Cldr.DateTime.Formatter do
     |> standalone_month(n, locale, backend, options)
   end
 
-  def standalone_month(%{month: _month} = date, n, locale, backend, _options) when n in 1..2 do
+  def standalone_month(%{month: _month} = date, n, locale, backend, options) when n in 1..2 do
     date
     |> Cldr.Calendar.localize(:month, :numeric, :any, backend, locale)
     |> pad(n)
+    |> maybe_wrap(:standalone_month, options)
   end
 
-  def standalone_month(date, 3, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :month, :stand_alone, :abbreviated, backend, locale)
+  def standalone_month(date, 3, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:month, :stand_alone, :abbreviated, backend, locale)
+    |> maybe_wrap(:standalone_month, options)
   end
 
-  def standalone_month(date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :month, :stand_alone, :wide, backend, locale)
+  def standalone_month(date, 4, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:month, :stand_alone, :wide, backend, locale)
+    |> maybe_wrap(:standalone_month, options)
   end
 
-  def standalone_month(date, 5, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :month, :stand_alone, :narrow, backend, locale)
+  def standalone_month(date, 5, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:month, :stand_alone, :narrow, backend, locale)
+    |> maybe_wrap(:standalone_month, options)
   end
 
   def standalone_month(date, _n, _locale, _backend, _options) do
@@ -1226,9 +1268,11 @@ defmodule Cldr.DateTime.Formatter do
     |> week_of_year(n, locale, backend, options)
   end
 
-  def week_of_year(date, n, _locale, _backend, _options) when n in 1..2 do
+  def week_of_year(date, n, _locale, _backend, options) when n in 1..2 do
     {_year, week} = Cldr.Calendar.week_of_year(date)
-    pad(week, n)
+    week
+    |> pad(n)
+    |> maybe_wrap(:week_of_year, options)
   end
 
   def week_of_year(date, _n, _locale, _backend, _options) do
@@ -1296,9 +1340,11 @@ defmodule Cldr.DateTime.Formatter do
     |> week_of_month(n, locale, backend, options)
   end
 
-  def week_of_month(date, n, _locale, _backend, _options) when n in 1..2 do
+  def week_of_month(date, n, _locale, _backend, options) when n in 1..2 do
     {_month, week_of_month} = Cldr.Calendar.week_of_month(date)
-    pad(week_of_month, n)
+    week_of_month
+    |> pad(n)
+    |> maybe_wrap(:week_of_month, options)
   end
 
   def week_of_month(date, _n, _locale, _backend, _options) do
@@ -1374,18 +1420,21 @@ defmodule Cldr.DateTime.Formatter do
   def day_of_month(%{day: day}, 1, _locale, backend, options) do
     day
     |> transliterate("d", backend, options)
+    |> maybe_wrap(:day, options)
   end
 
   def day_of_month(%{day: day}, 2, _locale, backend, options) do
     day
     |> transliterate("d", backend, options)
     |> pad(2)
+    |> maybe_wrap(:day, options)
   end
 
   def day_of_month(%{day: day}, 3, locale, backend, options) do
     day
     |> transliterate("d", backend, options)
     |> Cldr.Number.to_string!(backend, format: :ordinal, locale: locale)
+    |> maybe_wrap(:day, options)
   end
 
   def day_of_month(date, _n, _locale, _backend, _options) do
@@ -1458,10 +1507,11 @@ defmodule Cldr.DateTime.Formatter do
     |> day_of_year(n, locale, backend, options)
   end
 
-  def day_of_year(date, n, _locale, _backend, _options) when n in 1..3 do
+  def day_of_year(date, n, _locale, _backend, options) when n in 1..3 do
     date
     |> Cldr.Calendar.day_of_year()
     |> pad(n)
+    |> maybe_wrap(:day_of_year, options)
   end
 
   def day_of_year(date, _n, _locale, _backend, _options) do
@@ -1543,20 +1593,28 @@ defmodule Cldr.DateTime.Formatter do
     |> day_name(n, locale, backend, options)
   end
 
-  def day_name(date, n, locale, backend, _options) when n in 1..3 do
-    Cldr.Calendar.localize(date, :day_of_week, :format, :abbreviated, backend, locale)
+  def day_name(date, n, locale, backend, options) when n in 1..3 do
+    date
+    |> Cldr.Calendar.localize(:day_of_week, :format, :abbreviated, backend, locale)
+    |> maybe_wrap(:day_name, options)
   end
 
-  def day_name(date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :format, :wide, backend, locale)
+  def day_name(date, 4, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:day_of_week, :format, :wide, backend, locale)
+    |> maybe_wrap(:day_name, options)
   end
 
-  def day_name(date, 5, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :format, :narrow, backend, locale)
+  def day_name(date, 5, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:day_of_week, :format, :narrow, backend, locale)
+    |> maybe_wrap(:day_name, options)
   end
 
-  def day_name(date, 6, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :format, :short, backend, locale)
+  def day_name(date, 6, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:day_of_week, :format, :short, backend, locale)
+    |> maybe_wrap(:day_name, options)
   end
 
   def day_name(date, _n, _locale, _backend, _options) do
@@ -1647,14 +1705,17 @@ defmodule Cldr.DateTime.Formatter do
     |> day_of_week(n, locale, backend, options)
   end
 
-  def day_of_week(date, n, _locale, _backend, _options) when n in 1..2 do
+  def day_of_week(date, n, _locale, _backend, options) when n in 1..2 do
     date
     |> Cldr.Calendar.day_of_week()
     |> pad(n)
+    |> maybe_wrap(:day_of_week, options)
   end
 
   def day_of_week(date, n, locale, backend, options) when n >= 3 do
-    day_name(date, n, locale, backend, options)
+    date
+    |> day_name(n, locale, backend, options)
+    |> maybe_wrap(:day_of_week, options)
   end
 
   def day_of_week(date, _n, _locale, _backend, _options) do
@@ -1737,26 +1798,35 @@ defmodule Cldr.DateTime.Formatter do
     |> standalone_day_of_week(n, locale, backend, options)
   end
 
-  def standalone_day_of_week(date, n, _locale, _backend, _options) when n in 1..2 do
+  def standalone_day_of_week(date, n, _locale, _backend, options) when n in 1..2 do
     date
     |> Cldr.Calendar.day_of_week()
     |> pad(n)
+    |> maybe_wrap(:standalone_day_of_week, options)
   end
 
-  def standalone_day_of_week(date, 3, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :abbreviated, backend, locale)
+  def standalone_day_of_week(date, 3, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:day_of_week, :stand_alone, :abbreviated, backend, locale)
+    |> maybe_wrap(:standalone_day_of_week, options)
   end
 
-  def standalone_day_of_week(date, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :wide, backend, locale)
+  def standalone_day_of_week(date, 4, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:day_of_week, :stand_alone, :wide, backend, locale)
+    |> maybe_wrap(:standalone_day_of_week, options)
   end
 
-  def standalone_day_of_week(date, 5, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :narrow, backend, locale)
+  def standalone_day_of_week(date, 5, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:day_of_week, :stand_alone, :narrow, backend, locale)
+    |> maybe_wrap(:standalone_day_of_week, options)
   end
 
-  def standalone_day_of_week(date, 6, locale, backend, _options) do
-    Cldr.Calendar.localize(date, :day_of_week, :stand_alone, :short, backend, locale)
+  def standalone_day_of_week(date, 6, locale, backend, options) do
+    date
+    |> Cldr.Calendar.localize(:day_of_week, :stand_alone, :short, backend, locale)
+    |> maybe_wrap(:standalone_day_of_week, options)
   end
 
   def standalone_day_of_week(date, _n, _locale, _backend, _options) do
@@ -1837,16 +1907,22 @@ defmodule Cldr.DateTime.Formatter do
 
   def period_am_pm(time, n, locale, backend, options \\ %{})
 
-  def period_am_pm(time, n, locale, backend, _options) when n in 1..3 do
-    Cldr.Calendar.localize(time, :am_pm, :format, :abbreviated, backend, locale)
+  def period_am_pm(time, n, locale, backend, options) when n in 1..3 do
+    time
+    |> Cldr.Calendar.localize(:am_pm, :format, :abbreviated, backend, locale)
+    |> maybe_wrap(:period_am_pm, options)
   end
 
-  def period_am_pm(time, 4, locale, backend, _options) do
-    Cldr.Calendar.localize(time, :am_pm, :format, :wide, backend, locale)
+  def period_am_pm(time, 4, locale, backend, options) do
+    time
+    |> Cldr.Calendar.localize(:am_pm, :format, :wide, backend, locale)
+    |> maybe_wrap(:period_am_pm, options)
   end
 
-  def period_am_pm(time, 5, locale, backend, _options) do
-    Cldr.Calendar.localize(time, :am_pm, :format, :narrow, backend, locale)
+  def period_am_pm(time, 5, locale, backend, options) do
+    time
+    |> Cldr.Calendar.localize(:am_pm, :format, :narrow, backend, locale)
+    |> maybe_wrap(:period_am_pm, options)
   end
 
   def period_am_pm(time, _n, _locale, _backend, _options) do
@@ -1938,10 +2014,13 @@ defmodule Cldr.DateTime.Formatter do
     else
       period_am_pm(time, n, locale, backend, options)
     end
+    |> maybe_wrap(:period_noon_midnight, options)
   end
 
   def period_noon_midnight(%{hour: _hour, minute: _minute} = time, n, locale, backend, options) do
-    period_am_pm(time, n, locale, backend, options)
+    time
+    |> period_am_pm(n, locale, backend, options)
+    |> maybe_wrap(:period_noon_midnight, options)
   end
 
   def period_noon_midnight(time, _n, _locale, _backend, _options) do
@@ -2015,10 +2094,13 @@ defmodule Cldr.DateTime.Formatter do
 
   def period_flex(time, n, locale, backend, options \\ %{})
 
-  def period_flex(%{hour: _hour, minute: _minute} = time, n, locale, backend, _options) do
+  def period_flex(%{hour: _hour, minute: _minute} = time, n, locale, backend, options) do
     format_backend = Module.concat(backend, DateTime.Format)
     day_period = format_backend.day_period_for(time, locale)
-    Cldr.Calendar.localize(day_period, :day_periods, :format, period_format(n), backend, locale)
+
+    day_period
+    |> Cldr.Calendar.localize(:day_periods, :format, period_format(n), backend, locale)
+    |> maybe_wrap(:period_flex, options)
   end
 
   def period_flex(time, _n, _locale, _backend, _options) do
@@ -2081,7 +2163,10 @@ defmodule Cldr.DateTime.Formatter do
 
   def hour(hour, n, locale, backend, options) do
     hour_formatter = Cldr.Time.hour_format_from_locale(locale)
-    apply(__MODULE__, hour_formatter, [hour, n, locale, backend, options])
+
+    __MODULE__
+    |> apply(hour_formatter, [hour, n, locale, backend, options])
+    |> maybe_wrap(:hour, options)
   end
 
   @doc """
@@ -2147,19 +2232,22 @@ defmodule Cldr.DateTime.Formatter do
 
   def h12(time, n, locale, backend, options \\ %{})
 
-  def h12(%{hour: hour}, n, _locale, _backend, _options) when hour in [0, 12, 24] do
+  def h12(%{hour: hour}, n, _locale, _backend, options) when hour in [0, 12, 24] do
     12
     |> pad(n)
+    |> maybe_wrap(:h12, options)
   end
 
-  def h12(%{hour: hour}, n, _locale, _backend, _options) when hour in 1..11 do
+  def h12(%{hour: hour}, n, _locale, _backend, options) when hour in 1..11 do
     hour
     |> pad(n)
+    |> maybe_wrap(:h12, options)
   end
 
-  def h12(%{hour: hour}, n, _locale, _backend, _options) when hour in 13..23 do
+  def h12(%{hour: hour}, n, _locale, _backend, options) when hour in 13..23 do
     (hour - 12)
     |> pad(n)
+    |> maybe_wrap(:h12, options)
   end
 
   def h12(time, _n, _locale, _backend, _options) do
@@ -2232,19 +2320,22 @@ defmodule Cldr.DateTime.Formatter do
 
   def h11(time, n, locale, backend, options \\ %{})
 
-  def h11(%{hour: hour}, n, _locale, _backend, _options) when hour in [0, 12, 24] do
+  def h11(%{hour: hour}, n, _locale, _backend, options) when hour in [0, 12, 24] do
     0
     |> pad(n)
+    |> maybe_wrap(:h11, options)
   end
 
-  def h11(%{hour: hour}, n, _locale, _backend, _options) when hour in 1..11 do
+  def h11(%{hour: hour}, n, _locale, _backend, options) when hour in 1..11 do
     hour
     |> pad(n)
+    |> maybe_wrap(:h11, options)
   end
 
-  def h11(%{hour: hour}, n, _locale, _backend, _options) when hour in 13..23 do
+  def h11(%{hour: hour}, n, _locale, _backend, options) when hour in 13..23 do
     (hour - 12)
     |> pad(n)
+    |> maybe_wrap(:h11, options)
   end
 
   def h11(time, _n, _locale, _backend, _options) do
@@ -2314,14 +2405,16 @@ defmodule Cldr.DateTime.Formatter do
 
   def h24(time, n, locale, backend, options \\ %{})
 
-  def h24(%{hour: hour}, n, _locale, _backend, _options) when hour in [0, 24] do
+  def h24(%{hour: hour}, n, _locale, _backend, options) when hour in [0, 24] do
     24
     |> pad(n)
+    |> maybe_wrap(:h24, options)
   end
 
-  def h24(%{hour: hour}, n, _locale, _backend, _options) when hour in 1..23 do
+  def h24(%{hour: hour}, n, _locale, _backend, options) when hour in 1..23 do
     hour
     |> pad(n)
+    |> maybe_wrap(:h24, options)
   end
 
   def h24(time, _n, _locale, _backend, _options) do
@@ -2391,14 +2484,16 @@ defmodule Cldr.DateTime.Formatter do
 
   def h23(time, n, locale, backend, options \\ %{})
 
-  def h23(%{hour: hour}, n, _locale, _backend, _options) when abs(hour) in [0, 24] do
+  def h23(%{hour: hour}, n, _locale, _backend, options) when abs(hour) in [0, 24] do
     0
     |> pad(n)
+    |> maybe_wrap(:h23, options)
   end
 
-  def h23(%{hour: hour}, n, _locale, _backend, _options) when abs(hour) in 1..23 do
+  def h23(%{hour: hour}, n, _locale, _backend, options) when abs(hour) in 1..23 do
     abs(hour)
     |> pad(n)
+    |> maybe_wrap(:h23, options)
   end
 
   def h23(time, _n, _locale, _backend, _options) do
@@ -2460,13 +2555,14 @@ defmodule Cldr.DateTime.Formatter do
 
   def minute(time, n, locale, backend, options \\ %{})
 
-  def minute(%{minute: minute}, 1, _locale, _backend, _options) do
-    minute
+  def minute(%{minute: minute}, 1, _locale, _backend, options) do
+    maybe_wrap(minute, :minute, options)
   end
 
-  def minute(%{minute: minute}, 2 = n, _locale, _backend, _options) do
+  def minute(%{minute: minute}, 2 = n, _locale, _backend, options) do
     minute
     |> pad(n)
+    |> maybe_wrap(:minute, options)
   end
 
   def minute(time, _n, _locale, _backend, _options) do
@@ -2527,9 +2623,10 @@ defmodule Cldr.DateTime.Formatter do
 
   def second(time, n, locale, backend, options \\ %{})
 
-  def second(%{second: second}, n, _locale, _backend, _options) do
+  def second(%{second: second}, n, _locale, _backend, options) do
     second
     |> pad(n)
+    |> maybe_wrap(:second, options)
   end
 
   def second(time, _n, _locale, _backend, _options) do
@@ -2606,18 +2703,20 @@ defmodule Cldr.DateTime.Formatter do
         n,
         _locale,
         _backend,
-        _options
+        options
       ) do
     rounding = min(resolution, n)
 
     (second * 1.0 + fraction / @microseconds)
     |> Float.round(rounding)
     |> to_string
+    |> maybe_wrap(:fractional_second, options)
   end
 
-  def fractional_second(%{second: second}, n, _locale, _backend, _options) do
+  def fractional_second(%{second: second}, n, _locale, _backend, options) do
     second
     |> pad(n)
+    |> maybe_wrap(:fractional_second, options)
   end
 
   def fractional_second(time, _n, _locale, _backend, _options) do
@@ -2693,17 +2792,19 @@ defmodule Cldr.DateTime.Formatter do
         n,
         _locale,
         _backend,
-        _options
+        options
       ) do
     (rem(hour, 24) * @milliseconds * 60 * 60 + minute * @milliseconds * 60 +
        second * @milliseconds + div(fraction, @milliseconds))
     |> pad(n)
+    |> maybe_wrap(:millisecond, options)
   end
 
-  def millisecond(%{hour: hour, minute: minute, second: second}, n, _locale, _backend, _options) do
+  def millisecond(%{hour: hour, minute: minute, second: second}, n, _locale, _backend, options) do
     (rem(hour, 24) * @milliseconds * 60 * 60 + minute * @milliseconds * 60 +
        second * @milliseconds)
     |> pad(n)
+    |> maybe_wrap(:millisecond, options)
   end
 
   def millisecond(time, _n, _locale, _backend, _options) do
@@ -2773,12 +2874,14 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_generic(time, n, locale, backend, options \\ %{})
 
-  def zone_generic(%{time_zone: time_zone}, 1, _locale, _backend, _options) do
-    time_zone
+  def zone_generic(%{time_zone: time_zone}, 1, _locale, _backend, options) do
+    maybe_wrap(time_zone, :zone_generic, options)
   end
 
   def zone_generic(time, 4, locale, backend, options) do
-    zone_id(time, 4, locale, backend, options)
+    time
+    |> zone_id(4, locale, backend, options)
+    |> maybe_wrap(:zone_generic, options)
   end
 
   def zone_generic(time, _n, _locale, _backend, _options) do
@@ -2847,12 +2950,14 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_short(time, n, locale, backend, options \\ %{})
 
-  def zone_short(%{zone_abbr: zone_abbr}, n, _locale, _backend, _options) when n in 1..3 do
-    zone_abbr
+  def zone_short(%{zone_abbr: zone_abbr}, n, _locale, _backend, options) when n in 1..3 do
+    maybe_wrap(zone_abbr, :zone_short, options)
   end
 
   def zone_short(%{zone_abbr: _zone_abbr} = time, 4 = n, locale, backend, options) do
-    zone_gmt(time, n, locale, backend, options)
+    time
+    |> zone_gmt(n, locale, backend, options)
+    |> maybe_wrap(:zone_short, options)
   end
 
   def zone_short(time, _n, _locale, _backend, _options) do
@@ -2929,20 +3034,22 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_id(time, n, locale, backend, options \\ %{})
 
-  def zone_id(%{time_zone: _time_zone}, 1, _locale, _backend, _options) do
-    "unk"
+  def zone_id(%{time_zone: _time_zone}, 1, _locale, _backend, options) do
+    maybe_wrap("unk", :zone_id, options)
   end
 
-  def zone_id(%{time_zone: time_zone}, 2, _locale, _backend, _options) do
-    time_zone
+  def zone_id(%{time_zone: time_zone}, 2, _locale, _backend, options) do
+    maybe_wrap(time_zone, :zone_id, options)
   end
 
-  def zone_id(%{time_zone: _time_zone}, 3, _locale, _backend, _options) do
-    "Unknown City"
+  def zone_id(%{time_zone: _time_zone}, 3, _locale, _backend, options) do
+    maybe_wrap("Unknown City", :zone_id, options)
   end
 
   def zone_id(%{time_zone: _time_zone} = time, 4, locale, backend, options) do
-    zone_gmt(time, 4, locale, backend, options)
+    time
+    |> zone_gmt(4, locale, backend, options)
+    |> maybe_wrap(:zone_id, options)
   end
 
   def zone_id(time, _n, _locale, _backend, _options) do
@@ -3019,18 +3126,22 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_basic(time, n, locale, backend, options \\ %{})
 
-  def zone_basic(time, n, _locale, _backend, _options) when n in 1..3 do
+  def zone_basic(time, n, _locale, _backend, options) when n in 1..3 do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
+
     iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+    |> maybe_wrap(:zone_basic, options)
   end
 
   def zone_basic(time, 4 = n, locale, backend, options) do
     zone_gmt(time, n, locale, backend, options)
+    |> maybe_wrap(:zone_basic, options)
   end
 
-  def zone_basic(time, 5, _locale, _backend, _options) do
+  def zone_basic(time, 5, _locale, _backend, options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
     iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
+    |> maybe_wrap(:zone_basic, options)
   end
 
   def zone_basic(time, _n, _locale, _backend, _options) do
@@ -3128,7 +3239,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_iso_z(time, n, locale, backend, options \\ %{})
 
-  def zone_iso_z(time, 1, _locale, _backend, _options) do
+  def zone_iso_z(time, 1, _locale, _backend, options) do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
@@ -3137,9 +3248,10 @@ defmodule Cldr.DateTime.Formatter do
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
         |> String.replace(~r/00\Z/, "")
     end
+    |> maybe_wrap(:zone_iso_z, options)
   end
 
-  def zone_iso_z(time, 2, _locale, _backend, _options) do
+  def zone_iso_z(time, 2, _locale, _backend, options) do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
@@ -3147,9 +3259,10 @@ defmodule Cldr.DateTime.Formatter do
       {hours, minutes, seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
     end
+    |> maybe_wrap(:zone_iso_z, options)
   end
 
-  def zone_iso_z(time, 3, _locale, _backend, _options) do
+  def zone_iso_z(time, 3, _locale, _backend, options) do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
@@ -3157,9 +3270,10 @@ defmodule Cldr.DateTime.Formatter do
       {hours, minutes, seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
     end
+    |> maybe_wrap(:zone_iso_z, options)
   end
 
-  def zone_iso_z(time, 4, _locale, _backend, _options) do
+  def zone_iso_z(time, 4, _locale, _backend, options) do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
@@ -3171,9 +3285,10 @@ defmodule Cldr.DateTime.Formatter do
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic) <>
           pad(seconds, 2)
     end
+    |> maybe_wrap(:zone_iso_z, options)
   end
 
-  def zone_iso_z(time, 5, _locale, _backend, _options) do
+  def zone_iso_z(time, 5, _locale, _backend, options) do
     case Timezone.time_from_zone_offset(time) do
       {0, 0, _} ->
         "Z"
@@ -3181,6 +3296,7 @@ defmodule Cldr.DateTime.Formatter do
       {hours, minutes, seconds} ->
         iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
     end
+    |> maybe_wrap(:zone_iso_z, options)
   end
 
   def zone_iso_z(time, _n, _locale, _backend, _options) do
@@ -3283,20 +3399,22 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_iso(time, n, locale, backend, options \\ %{})
 
-  def zone_iso(time, 1, _locale, _backend, _options) do
+  def zone_iso(time, 1, _locale, _backend, options) do
     with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
       iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
       |> String.replace(~r/00\Z/, "")
+      |> maybe_wrap(:zone_iso, options)
     end
   end
 
-  def zone_iso(time, 2, _locale, _backend, _options) do
+  def zone_iso(time, 2, _locale, _backend, options) do
     with {hours, minutes, seconds} = Timezone.time_from_zone_offset(time) do
       iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+      |> maybe_wrap(:zone_iso, options)
     end
   end
 
-  def zone_iso(time, 3, _locale, _backend, _options) do
+  def zone_iso(time, 3, _locale, _backend, options) do
     with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
       case {hours, minutes, seconds} do
         {0, 0, _} ->
@@ -3305,10 +3423,11 @@ defmodule Cldr.DateTime.Formatter do
         {hours, minutes, _seconds} ->
           iso8601_tz_format(%{hour: hours, minute: minutes, second: 0}, format: :extended)
       end
+      |> maybe_wrap(:zone_iso, options)
     end
   end
 
-  def zone_iso(time, 4, _locale, _backend, _options) do
+  def zone_iso(time, 4, _locale, _backend, options) do
     with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
       case {hours, minutes, seconds} do
         {hours, minutes, 0 = seconds} ->
@@ -3318,10 +3437,11 @@ defmodule Cldr.DateTime.Formatter do
           iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic) <>
             pad(seconds, 2)
       end
+      |> maybe_wrap(:zone_iso, options)
     end
   end
 
-  def zone_iso(time, 5, _locale, _backend, _options) do
+  def zone_iso(time, 5, _locale, _backend, options) do
     with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
       case {hours, minutes, seconds} do
         {0, 0, 0} ->
@@ -3330,6 +3450,7 @@ defmodule Cldr.DateTime.Formatter do
         {hours, minutes, seconds} ->
           iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
       end
+      |> maybe_wrap(:zone_iso, options)
     end
   end
 
@@ -3395,17 +3516,18 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_gmt(time, n, locale, backend, options \\ %{})
 
-  def zone_gmt(time, 1, locale, backend, _options) do
+  def zone_gmt(time, 1, locale, backend, options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
     backend = Module.concat(backend, DateTime.Formatter)
-
     backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :short)
+    |> maybe_wrap(:zone_gmt, options)
   end
 
-  def zone_gmt(time, 4, locale, backend, _options) do
+  def zone_gmt(time, 4, locale, backend, options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
     backend = Module.concat(backend, DateTime.Formatter)
     backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :long)
+    |> maybe_wrap(:zone_gmt, options)
   end
 
   def zone_gmt(time, _n, _locale, _backend, _options) do
@@ -3433,8 +3555,9 @@ defmodule Cldr.DateTime.Formatter do
 
   def literal(_date, binary, locale, backend, options \\ %{})
 
-  def literal(_date, binary, _locale, _backend, _options) do
+  def literal(_date, binary, _locale, _backend, options) do
     binary
+    |> maybe_wrap(:literal, options)
   end
 
   # Helpers
@@ -3575,5 +3698,11 @@ defmodule Cldr.DateTime.Formatter do
     number
   end
 
+  def maybe_wrap(value, type, %{wrapper: wrapper}) when is_function(wrapper, 2) do
+    wrapper.(value, type)
+  end
 
+  def maybe_wrap(value, _type, _options) do
+    value
+  end
 end

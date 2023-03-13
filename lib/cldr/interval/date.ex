@@ -386,7 +386,7 @@ defmodule Cldr.Date.Interval do
     options =
       options
       |> Keyword.put(:locale, locale)
-      |> Keyword.put(:nunber_system, number_system)
+      |> Keyword.put(:number_system, number_system)
 
     with {:ok, _} <- from_less_than_or_equal_to(from, to),
          {:ok, backend} <- Cldr.validate_backend(backend),
