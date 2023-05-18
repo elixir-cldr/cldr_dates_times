@@ -6,7 +6,7 @@
 
 ## Installation
 
-**Note that `ex_cldr_dates_times` requires Elixir 1.8 or later.**
+**Note that `ex_cldr_dates_times` requires Elixir 1.11 or later.**
 
 Add `ex_cldr_dates_time` as a dependency to your `mix` project:
 
