@@ -1,5 +1,5 @@
 # Date and Time Localization and Formatting
-![Build Status](http://sweatbox.noexpectations.com.au:8080/buildStatus/icon?job=cldr_dates_times)
+
 [![Hex.pm](https://img.shields.io/hexpm/v/ex_cldr_dates_times.svg)](https://hex.pm/packages/ex_cldr_dates_times)
 [![Hex.pm](https://img.shields.io/hexpm/dw/ex_cldr_dates_times.svg?)](https://hex.pm/packages/ex_cldr_dates_times)
 [![Hex.pm](https://img.shields.io/hexpm/l/ex_cldr_dates_times.svg)](https://hex.pm/packages/ex_cldr_dates_times)
