@@ -26,7 +26,7 @@ defmodule Cldr.DateTime.Relative.Backend do
         }
 
         @other_units [:mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]
-        @unit_keys Map.keys(@unit) ++ @other_units
+        @unit_keys Enum.sort(Map.keys(@unit) ++ @other_units)
 
         @doc false
         def get_locale(locale \\ unquote(backend).get_locale())
@@ -123,7 +123,7 @@ defmodule Cldr.DateTime.Relative.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string(~D[2017-04-29], unit: :ziggeraut)
             {:error, {Cldr.UnknownTimeUnit,
-             "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
+             "Unknown time unit :ziggeraut.  Valid time units are [:day, :fri, :hour, :minute, :mon, :month, :quarter, :sat, :second, :sun, :thu, :tue, :wed, :week, :year]"}}
 
         """
 

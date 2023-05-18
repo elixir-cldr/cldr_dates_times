@@ -59,8 +59,8 @@ defmodule Cldr.Date.Interval do
     }
   }
 
-  @styles Map.keys(@style_map)
-  @formats Map.keys(@style_map.date)
+  @styles Map.keys(@style_map) |> Enum.sort()
+  @formats Map.keys(@style_map.date) |> Enum.sort()
 
   @default_format :medium
   @default_style :date

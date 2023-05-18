@@ -27,7 +27,7 @@ defmodule Cldr.DateTime.Relative do
   }
 
   @other_units [:mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]
-  @unit_keys Map.keys(@unit) ++ @other_units
+  @unit_keys Enum.sort(Map.keys(@unit) ++ @other_units)
   @known_styles [:default, :narrow, :short]
 
   @doc """
@@ -118,7 +118,7 @@ defmodule Cldr.DateTime.Relative do
 
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, unit: :ziggeraut)
       {:error, {Cldr.UnknownTimeUnit,
-       "Unknown time unit :ziggeraut.  Valid time units are [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]"}}
+       "Unknown time unit :ziggeraut.  Valid time units are [:day, :fri, :hour, :minute, :mon, :month, :quarter, :sat, :second, :sun, :thu, :tue, :wed, :week, :year]"}}
 
   """
 
@@ -388,8 +388,7 @@ defmodule Cldr.DateTime.Relative do
   ## Example
 
       iex> Cldr.DateTime.Relative.known_units
-      [:day, :hour, :minute, :month, :second, :week, :year, :mon, :tue, :wed, :thu,
-       :fri, :sat, :sun, :quarter]
+      [:day, :fri, :hour, :minute, :mon, :month, :quarter, :sat, :second, :sun, :thu, :tue, :wed, :week, :year]
 
   """
   def known_units do
