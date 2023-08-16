@@ -212,7 +212,7 @@ defmodule Cldr.DateTime.Relative do
   end
 
   @doc """
-  Returns a `{:ok, string}` representing a relative time (ago, in) for a given
+  Returns a string representing a relative time (ago, in) for a given
   number, Date or Datetime or raises an exception on error.
 
   ## Arguments
