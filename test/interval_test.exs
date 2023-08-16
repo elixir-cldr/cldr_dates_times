@@ -132,7 +132,7 @@ defmodule Cldr.DateTime.Interval.Test do
            ) ==
              {:error,
               {Cldr.DateTime.Compiler.ParseError,
-               "Could not tokenize \"unk\". Error detected at 'n'"}}
+               "Could not tokenize \"unk\". Error detected at " <> inspect('n')}}
 
     assert Cldr.Date.Interval.to_string(Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
              format: :unknown

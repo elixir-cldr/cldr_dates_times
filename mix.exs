@@ -75,6 +75,7 @@ defmodule Cldr.DatesTimes.Mixfile do
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
+      {:tz, "~> 0.26", optional: true},
       {:benchee, "~> 1.0", optional: true, only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", optional: true, only: [:dev, :test], runtime: false},
       {:exprof, "~> 0.2", optional: true, only: :dev, runtime: false}
