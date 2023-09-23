@@ -60,13 +60,13 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.calendars_for "en", MyApp.Cldr
+      iex> Cldr.DateTime.Format.calendars_for :en, MyApp.Cldr
       {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
        :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
        :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
 
   """
-  @spec calendars_for(Locale.locale_name() | LanguageTag.t(), Cldr.backend()) ::
+  @spec calendars_for(Locale.locale_name() | String.t() | LanguageTag.t(), Cldr.backend()) ::
           {:ok, [Cldr.Calendar.calendar(), ...]} | {:error, {atom, String.T}}
 
   def calendars_for(locale, backend \\ Cldr.Date.default_backend()) do
@@ -84,12 +84,12 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.gmt_format "en", MyApp.Cldr
+      iex> Cldr.DateTime.Format.gmt_format :en, MyApp.Cldr
       {:ok, ["GMT", 0]}
 
   """
   @spec(
-    gmt_format(Locale.locale_name() | LanguageTag.t(), Cldr.backend()) ::
+    gmt_format(Locale.locale_name() | String.t() | LanguageTag.t(), Cldr.backend()) ::
       {:ok, [non_neg_integer | String.t(), ...]},
     {:error, {atom, String.t()}}
   )
@@ -110,11 +110,11 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.gmt_zero_format "en", MyApp.Cldr
+      iex> Cldr.DateTime.Format.gmt_zero_format :en, MyApp.Cldr
       {:ok, "GMT"}
 
   """
-  @spec gmt_zero_format(Locale.locale_name() | LanguageTag.t(), Cldr.backend()) ::
+  @spec gmt_zero_format(Locale.locale_name() | String.t() | LanguageTag.t(), Cldr.backend()) ::
           {:ok, String.t()} | {:error, {atom, String.t()}}
 
   def gmt_zero_format(locale, backend \\ Cldr.Date.default_backend()) do
@@ -132,11 +132,11 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.hour_format "en", MyApp.Cldr
+      iex> Cldr.DateTime.Format.hour_format :en, MyApp.Cldr
       {:ok, {"+HH:mm", "-HH:mm"}}
 
   """
-  @spec hour_format(Locale.locale_name() | LanguageTag.t(), Cldr.backend()) ::
+  @spec hour_format(Locale.locale_name() | String.t() | LanguageTag.t(), Cldr.backend()) ::
           {:ok, {String.t(), String.t()}} | {:error, {atom, String.t()}}
 
   def hour_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
@@ -156,7 +156,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Examples:
 
-      iex> Cldr.DateTime.Format.date_formats "en", :gregorian, MyApp.Cldr
+      iex> Cldr.DateTime.Format.date_formats :en, :gregorian, MyApp.Cldr
       {:ok, %Cldr.Date.Styles{
         full: "EEEE, MMMM d, y",
         long: "MMMM d, y",
@@ -164,7 +164,7 @@ defmodule Cldr.DateTime.Format do
         short: "M/d/yy"
       }}
 
-      iex> Cldr.DateTime.Format.date_formats "en", :buddhist, MyApp.Cldr
+      iex> Cldr.DateTime.Format.date_formats :en, :buddhist, MyApp.Cldr
       {:ok, %Cldr.Date.Styles{
         full: "EEEE, MMMM d, y G",
         long: "MMMM d, y G",
@@ -174,7 +174,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_formats(
-          Locale.locale_name() | LanguageTag.t(),
+          Locale.locale_name() | String.t() | LanguageTag.t(),
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
@@ -201,7 +201,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Examples:
 
-      iex> Cldr.DateTime.Format.time_formats "en"
+      iex> Cldr.DateTime.Format.time_formats :en
       {:ok, %Cldr.Time.Styles{
         full: "h:mm:ss a zzzz",
         long: "h:mm:ss a z",
@@ -209,7 +209,7 @@ defmodule Cldr.DateTime.Format do
         short: "h:mm a"
       }}
 
-      iex> Cldr.DateTime.Format.time_formats "en", :buddhist
+      iex> Cldr.DateTime.Format.time_formats :en, :buddhist
       {:ok, %Cldr.Time.Styles{
         full: "h:mm:ss a zzzz",
         long: "h:mm:ss a z",
@@ -218,7 +218,11 @@ defmodule Cldr.DateTime.Format do
       }}
 
   """
-  @spec time_formats(Locale.locale_name() | LanguageTag, Cldr.Calendar.calendar(), Cldr.backend()) ::
+  @spec time_formats(
+          Locale.locale_name() | String.t() | LanguageTag,
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) ::
           {:ok, standard_formats} | {:error, {atom, String.t()}}
 
   def time_formats(
@@ -242,7 +246,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Examples:
 
-      iex> Cldr.DateTime.Format.date_time_formats "en"
+      iex> Cldr.DateTime.Format.date_time_formats :en
       {:ok, %Cldr.DateTime.Styles{
         full: "{1}, {0}",
         long: "{1}, {0}",
@@ -250,7 +254,7 @@ defmodule Cldr.DateTime.Format do
         short: "{1}, {0}"
       }}
 
-      iex> Cldr.DateTime.Format.date_time_formats "en", :buddhist, MyApp.Cldr
+      iex> Cldr.DateTime.Format.date_time_formats :en, :buddhist, MyApp.Cldr
       {:ok, %Cldr.DateTime.Styles{
         full: "{1}, {0}",
         long: "{1}, {0}",
@@ -260,7 +264,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_time_formats(
-          Locale.locale_name() | LanguageTag.t(),
+          Locale.locale_name() | String.t() | LanguageTag.t(),
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
@@ -288,7 +292,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Examples:
 
-      iex> Cldr.DateTime.Format.date_time_available_formats "en"
+      iex> Cldr.DateTime.Format.date_time_available_formats :en
       {
         :ok,
         %{
@@ -344,7 +348,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_time_available_formats(
-          Locale.locale_name() | LanguageTag.t(),
+          Locale.locale_name() | String.t() | LanguageTag.t(),
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) :: {:ok, map()} | {:error, {atom, String.t()}}
@@ -371,7 +375,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Examples:
 
-      Cldr.DateTime.Format.interval_formats "en", :gregorian, MyApp.Cldr
+      Cldr.DateTime.Format.interval_formats :en, :gregorian, MyApp.Cldr
       => {:ok,
        %{
          bh: %{b: ["h B", "h B"], h: ["h", "h B"]},
@@ -382,7 +386,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec interval_formats(
-          Locale.locale_name() | LanguageTag.t(),
+          Locale.locale_name() | String.t() | LanguageTag.t(),
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) :: {:ok, map()} | {:error, {atom, String.t()}}
@@ -457,6 +461,7 @@ defmodule Cldr.DateTime.Format do
       ]
 
   """
+  @spec common_date_time_format_names(backend :: Cldr.backend()) :: [atom]
   def common_date_time_format_names(backend \\ Cldr.Date.default_backend()) do
     datetime_module = Module.concat(backend, DateTime.Format)
 

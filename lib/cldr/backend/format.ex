@@ -44,13 +44,13 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Example
 
-            iex> #{inspect(__MODULE__)}.calendars_for "en"
+            iex> #{inspect(__MODULE__)}.calendars_for :en
             {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
              :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
              :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
 
         """
-        @spec calendars_for(Locale.locale_name() | LanguageTag.t()) ::
+        @spec calendars_for(Locale.locale_name() | String.t() | LanguageTag.t()) ::
                 {:ok, [calendar, ...]} | {:error, {module(), String.t()}}
 
         def calendars_for(locale \\ unquote(backend).get_locale())
@@ -77,7 +77,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{inspect(__MODULE__)}.date_formats "en"
+            iex> #{inspect(__MODULE__)}.date_formats :en
             {:ok, %Cldr.Date.Styles{
               full: "EEEE, MMMM d, y",
               long: "MMMM d, y",
@@ -85,7 +85,7 @@ defmodule Cldr.DateTime.Format.Backend do
               short: "M/d/yy"
             }}
 
-            iex> #{inspect(__MODULE__)}.date_formats "en", :buddhist
+            iex> #{inspect(__MODULE__)}.date_formats :en, :buddhist
             {:ok, %Cldr.Date.Styles{
               full: "EEEE, MMMM d, y G",
               long: "MMMM d, y G",
@@ -94,7 +94,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec date_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
+        @spec date_formats(Locale.locale_name() | String.t() | LanguageTag.t(), calendar) ::
                 {:ok, map()} | {:error, {module(), String.t()}}
 
         def date_formats(
@@ -124,7 +124,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{inspect(__MODULE__)}.time_formats "en"
+            iex> #{inspect(__MODULE__)}.time_formats :en
             {:ok, %Cldr.Time.Styles{
               full: "h:mm:ss a zzzz",
               long: "h:mm:ss a z",
@@ -132,7 +132,7 @@ defmodule Cldr.DateTime.Format.Backend do
               short: "h:mm a"
             }}
 
-            iex> #{inspect(__MODULE__)}.time_formats "en", :buddhist
+            iex> #{inspect(__MODULE__)}.time_formats :en, :buddhist
             {:ok, %Cldr.Time.Styles{
               full: "h:mm:ss a zzzz",
               long: "h:mm:ss a z",
@@ -141,7 +141,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec time_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
+        @spec time_formats(Locale.locale_name() | String.t() | LanguageTag.t(), calendar) ::
                 {:ok, map()} | {:error, {module(), String.t()}}
 
         def time_formats(
@@ -171,7 +171,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{inspect(__MODULE__)}.date_time_formats "en"
+            iex> #{inspect(__MODULE__)}.date_time_formats :en
             {:ok, %Cldr.DateTime.Styles{
               full: "{1}, {0}",
               long: "{1}, {0}",
@@ -179,7 +179,7 @@ defmodule Cldr.DateTime.Format.Backend do
               short: "{1}, {0}"
             }}
 
-            iex> #{inspect(__MODULE__)}.date_time_formats "en", :buddhist
+            iex> #{inspect(__MODULE__)}.date_time_formats :en, :buddhist
             {:ok, %Cldr.DateTime.Styles{
               full: "{1}, {0}",
               long: "{1}, {0}",
@@ -188,7 +188,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }}
 
         """
-        @spec date_time_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
+        @spec date_time_formats(Locale.locale_name() | String.t() | LanguageTag.t(), calendar) ::
                 {:ok, map()} | {:error, {module(), String.t()}}
 
         def date_time_formats(
