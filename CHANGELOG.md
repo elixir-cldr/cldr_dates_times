@@ -1,5 +1,15 @@
 # Changelog
 
+## Cldr_Dates_Times v2.14.2
+
+This is the changelog for Cldr_Dates_Times v2.14.2 released on September 24th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+**Note that `ex_cldr_dates_times` version 2.14.0 and later are supported on Elixir 1.11 and later only.**
+
+### Bug Fixes
+
+* Fix additional typespecs for various functions that allow a string-based locale identifier. Thanks to @jarrodmoldrich for the report.
+
 ## Cldr_Dates_Times v2.14.1
 
 This is the changelog for Cldr_Dates_Times v2.14.1 released on September 23rd, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
