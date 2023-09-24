@@ -275,7 +275,7 @@ defmodule Cldr.DateTime.Format.Backend do
             }
 
         """
-        @spec date_time_available_formats(Locale.locale_name() | LanguageTag.t(), calendar) ::
+        @spec date_time_available_formats(Locale.locale_name() | String.t() | LanguageTag.t(), calendar) ::
                 {:ok, formats}
         def date_time_available_formats(
               locale \\ unquote(backend).get_locale(),
@@ -311,7 +311,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
 
         """
-        @spec date_time_interval_formats(Locale.locale_name() | LanguageTag.t(), calendar()) ::
+        @spec date_time_interval_formats(Locale.locale_name() | String.t() | LanguageTag.t(), calendar()) ::
                 {:ok, formats}
         def date_time_interval_formats(
               locale \\ unquote(backend).get_locale(),
@@ -345,11 +345,11 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{inspect(__MODULE__)}.date_time_interval_fallback "en", :gregorian
+            iex> #{inspect(__MODULE__)}.date_time_interval_fallback :en, :gregorian
             [0, " – ", 1]
 
         """
-        @spec date_time_interval_fallback(Locale.locale_name() | LanguageTag.t(), calendar()) ::
+        @spec date_time_interval_fallback(Locale.locale_name() | String.t() | LanguageTag.t(), calendar()) ::
                 list() | {:error, {module(), String.t()}}
 
         def date_time_interval_fallback(
@@ -384,7 +384,7 @@ defmodule Cldr.DateTime.Format.Backend do
             {:ok, {"+HH:mm", "-HH:mm"}}
 
         """
-        @spec hour_format(Locale.locale_name() | LanguageTag.t()) ::
+        @spec hour_format(Locale.locale_name() | String.t() | LanguageTag.t()) ::
                 {:ok, {String.t(), String.t()}}
         def hour_format(locale \\ unquote(backend).get_locale())
 
@@ -408,11 +408,11 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Example
 
-            iex> #{inspect(__MODULE__)}.gmt_format "en"
+            iex> #{inspect(__MODULE__)}.gmt_format :en
             {:ok, ["GMT", 0]}
 
         """
-        @spec gmt_format(Locale.locale_name() | LanguageTag.t()) ::
+        @spec gmt_format(Locale.locale_name() | String.t() | LanguageTag.t()) ::
                 {:ok, [non_neg_integer | String.t(), ...]}
         def gmt_format(locale \\ unquote(backend).get_locale())
 
@@ -440,11 +440,11 @@ defmodule Cldr.DateTime.Format.Backend do
             iex> #{inspect(__MODULE__)}.gmt_zero_format :en
             {:ok, "GMT"}
 
-            iex> #{inspect(__MODULE__)}.gmt_zero_format "fr"
+            iex> #{inspect(__MODULE__)}.gmt_zero_format :fr
             {:ok, "UTC"}
 
         """
-        @spec gmt_zero_format(Locale.locale_name() | LanguageTag.t()) ::
+        @spec gmt_zero_format(Locale.locale_name() | String.t() | LanguageTag.t()) ::
                 {:ok, String.t()} | {:error, {module(), String.t()}}
         def gmt_zero_format(locale \\ unquote(backend).get_locale())
 
@@ -599,20 +599,20 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples
 
-            iex> #{inspect(__MODULE__)}.day_period_for ~T[06:05:54.515228], "en"
+            iex> #{inspect(__MODULE__)}.day_period_for ~T[06:05:54.515228], :en
             :morning1
 
-            iex> #{inspect(__MODULE__)}.day_period_for ~T[13:05:54.515228], "en"
+            iex> #{inspect(__MODULE__)}.day_period_for ~T[13:05:54.515228], :en
             :afternoon1
 
-            iex> #{inspect(__MODULE__)}.day_period_for ~T[21:05:54.515228], "en"
+            iex> #{inspect(__MODULE__)}.day_period_for ~T[21:05:54.515228], :en
             :night1
 
-            iex> #{inspect(__MODULE__)}.day_period_for ~T[21:05:54.515228], "fr"
+            iex> #{inspect(__MODULE__)}.day_period_for ~T[21:05:54.515228], :fr
             :evening1
 
         """
-        @spec day_period_for(:"Elixir.Calendar".time(), LanguageTag.t() | Locale.locale_name()) ::
+        @spec day_period_for(Elixir.Calendar.time(), LanguageTag.t() | String.t() | Locale.locale_name()) ::
                 atom
         def day_period_for(time, language)
 
@@ -631,17 +631,17 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples
 
-            iex> #{inspect(__MODULE__)}.language_has_noon_and_midnight? "fr"
+            iex> #{inspect(__MODULE__)}.language_has_noon_and_midnight? :fr
             true
 
-            iex> #{inspect(__MODULE__)}.language_has_noon_and_midnight? "en"
+            iex> #{inspect(__MODULE__)}.language_has_noon_and_midnight? :en
             true
 
-            iex> #{inspect(__MODULE__)}.language_has_noon_and_midnight? "af"
+            iex> #{inspect(__MODULE__)}.language_has_noon_and_midnight? :af
             false
 
         """
-        @spec language_has_noon_and_midnight?(LanguageTag.t() | Locale.locale_name()) :: boolean
+        @spec language_has_noon_and_midnight?(LanguageTag.t() | String.t() | Locale.locale_name()) :: boolean
         def language_has_noon_and_midnight?(locale)
 
         def language_has_noon_and_midnight?(%LanguageTag{language: language}) do
