@@ -147,7 +147,8 @@ defmodule Cldr.Time.Interval do
   * `backend` is any module that includes `use Cldr` and
     is therefore `Cldr` backend module
 
-  * `options` is a keyword list of options. The default is `[]`.
+  * `options` is a keyword list of options. The default is
+    `[format: :medium, style: :time]`.
 
   Either `from` or `to` may also be `nil` in which case the
   interval is formatted as an open interval with the non-nil
@@ -164,10 +165,10 @@ defmodule Cldr.Time.Interval do
     and `:flex`. The default is `:time`.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
 
   * `number_system:` a number system into which the formatted date digits should
-    be transliterated
+    be transliterated.
 
   ## Returns
 
@@ -186,7 +187,7 @@ defmodule Cldr.Time.Interval do
     is the underlying CLDR calendar type.
 
   * In the case where `from` and `to` are equal, a single
-    time is formatted instead of an interval
+    time is formatted instead of an interval.
 
   ## Examples
 
@@ -318,7 +319,8 @@ defmodule Cldr.Time.Interval do
   * `backend` is any module that includes `use Cldr` and
     is therefore `Cldr` backend module
 
-  * `options` is a keyword list of options. The default is `[]`.
+  * `options` is a keyword list of options. The default is
+    `[format: :medium, style: :time]`.
 
   ## Options
 
@@ -334,7 +336,7 @@ defmodule Cldr.Time.Interval do
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
 
   * `number_system:` a number system into which the formatted date digits should
-    be transliterated
+    be transliterated.
 
   ## Returns
 
@@ -353,7 +355,7 @@ defmodule Cldr.Time.Interval do
     is the underlying CLDR calendar type.
 
   * In the case where `from` and `to` are equal, a single
-    time is formatted instead of an interval
+    time is formatted instead of an interval.
 
   ## Examples
 
@@ -399,13 +401,13 @@ defmodule Cldr.Time.Interval do
 
   ## Arguments
 
-  * `from` is any `t:Time.t/0`
+  * `from` is any `t:Time.t/0`.
 
-  * `to` is any `t:Time.t/0`
+  * `to` is any `t:Time.t/0`.
 
   ## Returns
 
-  * `{:ok, format_code}` where `format_code` is one of
+  * `{:ok, format_code}` where `format_code` is one of:
 
     * `:H` meaning that the greatest difference is in the hour
     * `:m` meaning that the greatest difference is in the minute

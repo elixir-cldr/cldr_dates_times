@@ -170,4 +170,9 @@ defmodule Cldr.DateTime.Interval.Test do
     assert {:ok, "12:00:00 - 13:00:00"} =
       MyApp.Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00], format: "HH:mm:ss - HH:mm:ss", locale: :fr)
   end
+
+  test "Interval formatting of dates with :month_and_day where the last date is in a subsequent year" do
+    assert {:ok, "12/31 – 1/2"} =
+      MyApp.Cldr.Date.Interval.to_string(~D[2023-12-31], ~D[2024-01-02], format: :short, style: :month_and_day)
+  end
 end

@@ -5,7 +5,7 @@ defmodule Cldr.Date.Interval do
   to take a start and end date, time or datetime plus a formatting pattern
   and use that information to produce a localized format.
 
-  See `Cldr.Interval.to_string/3` and `Cldr.Date.Interval.to_string/3`
+  See `Cldr.Interval.to_string/3` and `Cldr.Date.Interval.to_string/3`.
 
   """
   alias Cldr.DateTime.Format
@@ -147,9 +147,10 @@ defmodule Cldr.Date.Interval do
     or a `CalendarInterval.t`
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore an `Cldr` backend module
+    is therefore a `Cldr` backend module.
 
-  * `options` is a keyword list of options. The default is `[]`.
+  * `options` is a keyword list of options. The default is
+    `[format: :medium, style: :date]`.
 
   ## Options
 
@@ -162,7 +163,7 @@ defmodule Cldr.Date.Interval do
     and `:year_and_month`. The default is `:date`.
 
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag/0` struct.  The default is `Cldr.get_locale/0`
 
   * `:number_system` a number system into which the formatted date digits should
     be transliterated
@@ -183,12 +184,12 @@ defmodule Cldr.Date.Interval do
     see the `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
-    where `"en"` can be replaced by any configuration locale name and `:gregorian`
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats(:en, :gregorian)`
+    where `"en"` can be replaced by any configured locale name and `:gregorian`
     is the underlying CLDR calendar type.
 
   * In the case where `from` and `to` are equal, a single
-    date is formatted instead of an interval
+    date is formatted instead of an interval.
 
   ## Examples
 
@@ -256,7 +257,8 @@ defmodule Cldr.Date.Interval do
   * `backend` is any module that includes `use Cldr` and
     is therefore an `Cldr` backend module
 
-  * `options` is a keyword list of options. The default is `[]`.
+  * `options` is a keyword list of options. The default is
+    `[format: :medium, style: :date]`.
 
   Either `from` or `to` may also be `nil` in which case the
   interval is formatted as an open interval with the non-nil
@@ -273,10 +275,10 @@ defmodule Cldr.Date.Interval do
     and `:year_and_month`. The default is `:date`.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag/0` struct.  The default is `Cldr.get_locale/0`.
 
   * `number_system:` a number system into which the formatted date digits should
-    be transliterated
+    be transliterated.
 
   ## Returns
 
@@ -290,12 +292,12 @@ defmodule Cldr.Date.Interval do
     see the `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
-    where `"en"` can be replaced by any configuration locale name and `:gregorian`
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats(:en, :gregorian)`
+    where `:en` can be replaced by any configured locale name and `:gregorian`
     is the underlying CLDR calendar type.
 
   * In the case where `from` and `to` are equal, a single
-    date is formatted instead of an interval
+    date is formatted instead of an interval.
 
   ## Examples
 
@@ -463,9 +465,10 @@ defmodule Cldr.Date.Interval do
     or a `CalendarInterval.t`
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore a `Cldr` backend module
+    is therefore a `Cldr` backend module.
 
-  * `options` is a keyword list of options. The default is `[]`.
+  * `options` is a keyword list of options. The default is
+    `[format: :medium, style: :date]`.
 
   ## Options
 
@@ -478,10 +481,10 @@ defmodule Cldr.Date.Interval do
     and `:year_and_month`. The default is `:date`.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag/0` struct.  The default is `Cldr.get_locale/0`.
 
   * `number_system:` a number system into which the formatted date digits should
-    be transliterated
+    be transliterated.
 
   ## Returns
 
@@ -499,12 +502,12 @@ defmodule Cldr.Date.Interval do
     see the `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
-    where `"en"` can be replaced by any configuration locale name and `:gregorian`
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats(:en, :gregorian)`
+    where `:en` can be replaced by any configured locale name and `:gregorian`
     is the underlying CLDR calendar type.
 
   * In the case where `from` and `to` are equal, a single
-    date is formatted instead of an interval
+    date is formatted instead of an interval.
 
   ## Examples
 
@@ -568,9 +571,10 @@ defmodule Cldr.Date.Interval do
     on or after `from`.
 
   * `backend` is any module that includes `use Cldr` and
-    is therefore an `Cldr` backend module
+    is therefore a `Cldr` backend module.
 
-  * `options` is a keyword list of options
+  * `options` is a keyword list of options. The default is
+    `[format: :medium, style: :date]`.
 
   ## Options
 
@@ -583,10 +587,10 @@ defmodule Cldr.Date.Interval do
     and `:year_and_month`. The default is `:date`.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag/0` struct.  The default is `Cldr.get_locale/0`.
 
   * `number_system:` a number system into which the formatted date digits should
-    be transliterated
+    be transliterated.
 
   ## Returns
 
@@ -600,12 +604,12 @@ defmodule Cldr.Date.Interval do
     see `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
-    where `"en"` can be replaced by any configuration locale name and `:gregorian`
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats(:en, :gregorian)`
+    where `:en` can be replaced by any configured locale name and `:gregorian`
     is the underlying CLDR calendar type.
 
   * In the case where `from` and `to` are equal, a single
-    date is formatted instead of an interval
+    date is formatted instead of an interval.
 
   ## Examples
 
@@ -655,46 +659,48 @@ defmodule Cldr.Date.Interval do
   end
 
   defp resolve_format(from, to, formats, options) do
-    format = Keyword.get(options, :format, @default_format)
-    style = Keyword.get(options, :style, @default_style)
+    requested_format = Keyword.get(options, :format, @default_format)
+    requested_style = Keyword.get(options, :style, @default_style)
 
-    with {:ok, style} <- validate_style(style),
-         {:ok, format} <- validate_format(formats, style, format),
+    with {:ok, style} <- validate_style(requested_style),
+         {:ok, format} <- validate_format(formats, style, requested_format),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
-      greatest_difference_format(format, greatest_difference)
+      greatest_difference_format(format, requested_format, requested_style, greatest_difference)
     end
   end
 
-  defp greatest_difference_format(format, _) when is_binary(format) do
+  defp greatest_difference_format(format, _requested_format, _requested_style, _) when is_binary(format) do
     {:ok, format}
   end
 
-  defp greatest_difference_format(format, _) when is_list(format) do
+  defp greatest_difference_format(format, _requested_format, _requested_style, _) when is_list(format) do
     {:ok, format}
   end
 
-  defp greatest_difference_format(format, :y = difference) do
-    case Map.fetch(format, difference) do
-      :error -> {:error, format_error(format, difference)}
-      success -> success
+  defp greatest_difference_format(format, requested_format, requested_style, :y = difference) do
+    resolved_format = Map.get(format, difference) || Map.get(format, :M) || Map.get(format, :d) || :error
+
+    case resolved_format do
+      :error -> {:error, unavailable_format_error(requested_format, requested_style, difference)}
+      success -> {:ok, success}
     end
   end
 
-  defp greatest_difference_format(format, :M) do
+  defp greatest_difference_format(format, requested_format, requested_style, :M) do
     case Map.fetch(format, :M) do
-      :error -> greatest_difference_format(format, :y)
+      :error -> greatest_difference_format(format, requested_format, requested_style, :y)
       success -> success
     end
   end
 
-  defp greatest_difference_format(format, :d = difference) do
+  defp greatest_difference_format(format, requested_format, requested_style, :d = difference) do
     case Map.fetch(format, difference) do
-      :error -> greatest_difference_format(format, :M)
+      :error -> greatest_difference_format(format, requested_format, requested_style, :M)
       success -> success
     end
   end
 
-  defp greatest_difference_format(_format, _difference) do
+  defp greatest_difference_format(_format, _requested_format, _requested_style, _difference) do
     {:error, :no_practical_difference}
   end
 
@@ -745,6 +751,15 @@ defmodule Cldr.Date.Interval do
   end
 
   @doc false
+  def unavailable_format_error(requested_format, requested_style, :y) do
+    {
+      Cldr.DateTime.UnresolvedFormat,
+      "The interval format #{inspect(requested_format)} with style #{inspect(requested_style)} " <>
+      "is invalid when the greatest difference between two dates is the year. "
+    }
+  end
+
+  @doc false
   def datetime_order_error(from, to) do
     {
       Cldr.DateTime.DateTimeOrderError,
@@ -777,9 +792,9 @@ defmodule Cldr.Date.Interval do
 
   ## Arguments
 
-  * `from` is any `t:Date.t/0`
+  * `from` is any `t:Date.t/0`.
 
-  * `to` is any `t:Date.t/0`
+  * `to` is any `t:Date.t/0`.
 
   ## Returns
 

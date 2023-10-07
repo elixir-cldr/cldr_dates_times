@@ -46,7 +46,8 @@ defmodule Cldr.Interval.Backend do
         * `range` is either a `Date.Range.t` returned from `Date.range/2`
           or a `CalendarInterval.t`
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :date | :time | nil]`.
 
         ## Options
 
@@ -156,7 +157,8 @@ defmodule Cldr.Interval.Backend do
           any one of the `Calendar` types. `to` must
           occur on or after `from`.
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :date | :time | nil]`.
 
         ## Options
 
@@ -185,7 +187,7 @@ defmodule Cldr.Interval.Backend do
           or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`
 
         * `number_system:` a number system into which the formatted date digits should
-          be transliterated
+          be transliterated.
 
         ## Returns
 
@@ -226,7 +228,7 @@ defmodule Cldr.Interval.Backend do
           is the underlying CLDR calendar type.
 
         * In the case where `from` and `to` are equal, a single
-          date, time or datetime is formatted instead of an interval
+          date, time or datetime is formatted instead of an interval.
 
         ## Examples
 
@@ -286,7 +288,8 @@ defmodule Cldr.Interval.Backend do
         * `range` is either a `Date.Range.t` returned from `Date.range/2`
           or a `CalendarInterval.t`
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :date | :time | nil]`.
 
         ## Options
 
@@ -397,7 +400,8 @@ defmodule Cldr.Interval.Backend do
           any one of the `Calendar` types. `to` must
           occur on or after `from`.
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :date | :time | nil]`.
 
         ## Options
 
@@ -467,7 +471,7 @@ defmodule Cldr.Interval.Backend do
           is the underlying CLDR calendar type.
 
         * In the case where `from` and `to` are equal, a single
-          date, time or datetime is formatted instead of an interval
+          date, time or datetime is formatted instead of an interval.
 
         ## Examples
 

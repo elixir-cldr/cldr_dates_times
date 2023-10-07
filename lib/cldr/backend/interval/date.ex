@@ -47,7 +47,8 @@ defmodule Cldr.Date.Interval.Backend do
         * `range` is either a `Date.Range.t` returned from `Date.range/2`
           or a `CalendarInterval.t`
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :date]`.
 
         ## Options
 
@@ -156,7 +157,8 @@ defmodule Cldr.Date.Interval.Backend do
           `Calendar.date` type. `to` must occur
           on or after `from`.
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :date]`.
 
         Either `from` or `to` may also be `nil`, in which case an
         open interval is formatted and the non-nil item is formatted
@@ -264,7 +266,8 @@ defmodule Cldr.Date.Interval.Backend do
         * `range` as either a`Date.Range.t` returned from `Date.range/2`
           or a `CalendarInterval.t`
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :date]`.
 
         ## Options
 
@@ -370,7 +373,8 @@ defmodule Cldr.Date.Interval.Backend do
           `Calendar.date` type. `to` must occur
           on or after `from`.
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :date]`.
 
         Either `from` or `to` may also be `nil`, in which case an
         open interval is formatted and the non-nil item is formatted

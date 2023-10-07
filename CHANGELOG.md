@@ -1,5 +1,15 @@
 # Changelog
 
+**Note that `ex_cldr_dates_times` version 2.14.0 and later are supported on Elixir 1.11 and later only.**
+
+## Cldr_Dates_Times v2.14.3
+
+This is the changelog for Cldr_Dates_Times v2.14.2 released on September 24th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix formatting date intervals with `:month_and_day` style when the last date is in a different year to the first. Thanks to @matt-glover for the report. Closes #40.
+
 ## Cldr_Dates_Times v2.14.2
 
 This is the changelog for Cldr_Dates_Times v2.14.2 released on September 24th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

@@ -35,7 +35,8 @@ defmodule Cldr.Time.Interval.Backend do
           `Calendar.time` type. `to` must occur
           on or after `from`.
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :time]`.
 
         Either `from` or `to` may also be `nil`, in which case an
         open interval is formatted and the non-nil item is formatted
@@ -144,7 +145,8 @@ defmodule Cldr.Time.Interval.Backend do
           `Calendar.time` type. `to` must occur
           on or after `from`.
 
-        * `options` is a keyword list of options. The default is `[]`.
+        * `options` is a keyword list of options. The default is
+          `[format: :medium, style: :time]`.
 
         Either `from` or `to` may also be `nil`, in which case an
         open interval is formatted and the non-nil item is formatted
