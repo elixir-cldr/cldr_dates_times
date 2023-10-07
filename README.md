@@ -1,7 +1,9 @@
 # Date and Time Localization and Formatting
 
+![Build status](https://github.com/elixir-cldr/cldr_dates_times/actions/workflows/ci.yml/badge.svg)
 [![Hex.pm](https://img.shields.io/hexpm/v/ex_cldr_dates_times.svg)](https://hex.pm/packages/ex_cldr_dates_times)
 [![Hex.pm](https://img.shields.io/hexpm/dw/ex_cldr_dates_times.svg?)](https://hex.pm/packages/ex_cldr_dates_times)
+[![Hex.pm](https://img.shields.io/hexpm/dt/ex_cldr_dates_times.svg?)](https://hex.pm/packages/ex_cldr_dates_times)
 [![Hex.pm](https://img.shields.io/hexpm/l/ex_cldr_dates_times.svg)](https://hex.pm/packages/ex_cldr_dates_times)
 
 ## Installation
