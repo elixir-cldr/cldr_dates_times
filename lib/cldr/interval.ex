@@ -348,7 +348,7 @@ defmodule Cldr.Interval do
       for each of the date and time part is used.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `t:Cldr.LanguageTag/0` struct.  The default is `Cldr.get_locale/0`.
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
   * `number_system:` a number system into which the formatted date digits should
     be transliterated.
@@ -480,7 +480,7 @@ defmodule Cldr.Interval do
       for each of the date and time part is used.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `t:Cldr.LanguageTag/0` struct.  The default is `Cldr.get_locale/0`.
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
   * `number_system:` a number system into which the formatted date digits should
     be transliterated.
@@ -633,7 +633,7 @@ defmodule Cldr.Interval do
       for each of the date and time part is used.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `t:Cldr.LanguageTag/0` struct.  The default is `Cldr.get_locale/0`.
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
   * `number_system:` a number system into which the formatted date digits should
     be transliterated.
@@ -753,7 +753,7 @@ defmodule Cldr.Interval do
       for each of the date and time part is used.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `t:Cldr.LanguageTag/0` struct.  The default is `Cldr.get_locale/0`.
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
   * `number_system:` a number system into which the formatted date digits should
     be transliterated.
