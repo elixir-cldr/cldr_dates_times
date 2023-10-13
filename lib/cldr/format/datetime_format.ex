@@ -66,7 +66,7 @@ defmodule Cldr.DateTime.Format do
        :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
 
   """
-  @spec calendars_for(Locale.locale_name() | String.t() | LanguageTag.t(), Cldr.backend()) ::
+  @spec calendars_for(Locale.locale_reference(), Cldr.backend()) ::
           {:ok, [Cldr.Calendar.calendar(), ...]} | {:error, {atom, String.T}}
 
   def calendars_for(locale, backend \\ Cldr.Date.default_backend()) do
@@ -89,7 +89,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec(
-    gmt_format(Locale.locale_name() | String.t() | LanguageTag.t(), Cldr.backend()) ::
+    gmt_format(Locale.locale_reference(), Cldr.backend()) ::
       {:ok, [non_neg_integer | String.t(), ...]},
     {:error, {atom, String.t()}}
   )
@@ -114,7 +114,7 @@ defmodule Cldr.DateTime.Format do
       {:ok, "GMT"}
 
   """
-  @spec gmt_zero_format(Locale.locale_name() | String.t() | LanguageTag.t(), Cldr.backend()) ::
+  @spec gmt_zero_format(Locale.locale_reference(), Cldr.backend()) ::
           {:ok, String.t()} | {:error, {atom, String.t()}}
 
   def gmt_zero_format(locale, backend \\ Cldr.Date.default_backend()) do
@@ -128,7 +128,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
 
   ## Example
 
@@ -136,7 +136,7 @@ defmodule Cldr.DateTime.Format do
       {:ok, {"+HH:mm", "-HH:mm"}}
 
   """
-  @spec hour_format(Locale.locale_name() | String.t() | LanguageTag.t(), Cldr.backend()) ::
+  @spec hour_format(Locale.locale_reference(), Cldr.backend()) ::
           {:ok, {String.t(), String.t()}} | {:error, {atom, String.t()}}
 
   def hour_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
@@ -149,14 +149,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
-    The default is `:gregorian`
+    The default is `:gregorian`.
 
   ## Examples:
 
-      iex> Cldr.DateTime.Format.date_formats :en, :gregorian, MyApp.Cldr
+      iex> Cldr.DateTime.Format.date_formats(:en, :gregorian, MyApp.Cldr)
       {:ok, %Cldr.Date.Styles{
         full: "EEEE, MMMM d, y",
         long: "MMMM d, y",
@@ -164,7 +164,7 @@ defmodule Cldr.DateTime.Format do
         short: "M/d/yy"
       }}
 
-      iex> Cldr.DateTime.Format.date_formats :en, :buddhist, MyApp.Cldr
+      iex> Cldr.DateTime.Format.date_formats(:en, :buddhist, MyApp.Cldr)
       {:ok, %Cldr.Date.Styles{
         full: "EEEE, MMMM d, y G",
         long: "MMMM d, y G",
@@ -174,7 +174,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_formats(
-          Locale.locale_name() | String.t() | LanguageTag.t(),
+          Locale.locale_reference(),
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
@@ -194,10 +194,10 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
-  The default is `:gregorian`
+    The default is `:gregorian`.
 
   ## Examples:
 
@@ -239,14 +239,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
-    The default is `:gregorian`
+    The default is `:gregorian`.
 
   ## Examples:
 
-      iex> Cldr.DateTime.Format.date_time_formats :en
+      iex> Cldr.DateTime.Format.date_time_formats(:en)
       {:ok, %Cldr.DateTime.Styles{
         full: "{1}, {0}",
         long: "{1}, {0}",
@@ -254,7 +254,7 @@ defmodule Cldr.DateTime.Format do
         short: "{1}, {0}"
       }}
 
-      iex> Cldr.DateTime.Format.date_time_formats :en, :buddhist, MyApp.Cldr
+      iex> Cldr.DateTime.Format.date_time_formats(:en, :buddhist, MyApp.Cldr)
       {:ok, %Cldr.DateTime.Styles{
         full: "{1}, {0}",
         long: "{1}, {0}",
@@ -264,7 +264,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_time_formats(
-          Locale.locale_name() | String.t() | LanguageTag.t(),
+          Locale.locale_reference(),
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
@@ -277,6 +277,56 @@ defmodule Cldr.DateTime.Format do
       ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.date_time_formats(locale, calendar)
+  end
+
+  @doc """
+  Returns a map of the standard datetime "at" formats for a given
+  locale and calendar.
+
+  An "at" format is one where the datetime is formatted with the
+  date part separated from the time part by a localized version
+  of "at".
+
+  ## Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+    The default is `:gregorian`.
+
+  ## Examples:
+
+      iex> Cldr.DateTime.Format.date_time_at_formats(:en)
+      {:ok, %Cldr.DateTime.Styles{
+        full: "{1} 'at' {0}",
+        long: "{1} 'at' {0}",
+        medium: "{1}, {0}",
+        short: "{1}, {0}"}
+      }
+
+      iex> Cldr.DateTime.Format.date_time_at_formats(:en, :buddhist, MyApp.Cldr)
+      {:ok, %Cldr.DateTime.Styles{
+        full: "{1} 'at' {0}",
+        long: "{1} 'at' {0}",
+        medium: "{1}, {0}",
+        short: "{1}, {0}"}
+      }
+
+  """
+  @spec date_time_at_formats(
+          Locale.locale_reference(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) ::
+          {:ok, map()} | {:error, {atom, String.t()}}
+
+  def date_time_at_formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_time_at_formats(locale, calendar)
   end
 
   @doc """
@@ -348,7 +398,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec date_time_available_formats(
-          Locale.locale_name() | String.t() | LanguageTag.t(),
+          Locale.locale_reference(),
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) :: {:ok, map()} | {:error, {atom, String.t()}}
@@ -386,7 +436,7 @@ defmodule Cldr.DateTime.Format do
 
   """
   @spec interval_formats(
-          Locale.locale_name() | String.t() | LanguageTag.t(),
+          Locale.locale_reference(),
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) :: {:ok, map()} | {:error, {atom, String.t()}}
