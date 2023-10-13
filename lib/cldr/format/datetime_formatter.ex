@@ -146,9 +146,6 @@ defmodule Cldr.DateTime.Formatter do
   alias Cldr.DateTime.Timezone
   alias Cldr.Calendar.Gregorian
   alias Cldr.Locale
-  alias Cldr.LanguageTag
-
-  @type locale :: LanguageTag.t() | Locale.locale_name()
 
   @default_format 1
 
@@ -176,7 +173,7 @@ defmodule Cldr.DateTime.Formatter do
     date(date, n, locale, backend, options)
   end
 
-  @spec date(Calendar.date(), integer, locale(), Cldr.backend(), Keyword.t() | map()) ::
+  @spec date(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), Keyword.t() | map()) ::
           String.t() | {:error, {module(), String.t()}}
 
   def date(date, _n, _locale, backend, options) when is_list(options) do
@@ -213,7 +210,7 @@ defmodule Cldr.DateTime.Formatter do
     time(time, n, locale, backend, options)
   end
 
-  @spec time(Calendar.time(), integer, locale(), Cldr.backend(), Keyword.t() | map()) ::
+  @spec time(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), Keyword.t() | map()) ::
           String.t() | {:error, String.t()}
 
   def time(time, _n, _locale, backend, options) when is_list(options) do
@@ -281,7 +278,7 @@ defmodule Cldr.DateTime.Formatter do
     era(era, n, locale, backend, Map.new(options))
   end
 
-  @spec era(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec era(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def era(date, n, locale, backend, options \\ %{})
@@ -385,7 +382,7 @@ defmodule Cldr.DateTime.Formatter do
     year(year, n, locale, backend, Map.new(options))
   end
 
-  @spec year(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def year(date, n, locale, backend, options \\ %{})
@@ -500,7 +497,7 @@ defmodule Cldr.DateTime.Formatter do
     week_aligned_year(week_aligned_year, n, locale, backend, Map.new(options))
   end
 
-  @spec week_aligned_year(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec week_aligned_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def week_aligned_year(date, n, locale, backend, options \\ %{})
@@ -590,7 +587,7 @@ defmodule Cldr.DateTime.Formatter do
     extended_year(extended_year, n, locale, backend, Map.new(options))
   end
 
-  @spec extended_year(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec extended_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def extended_year(date, n, locale, backend, options \\ %{})
@@ -660,7 +657,7 @@ defmodule Cldr.DateTime.Formatter do
     cyclic_year(cyclic_year, n, locale, backend, Map.new(options))
   end
 
-  @spec cyclic_year(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec cyclic_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def cyclic_year(date, n, locale, backend, options \\ %{})
@@ -742,7 +739,7 @@ defmodule Cldr.DateTime.Formatter do
     related_year(related_year, n, locale, backend, Map.new(options))
   end
 
-  @spec related_year(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec related_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def related_year(date, n, locale, backend, options \\ %{})
@@ -832,7 +829,7 @@ defmodule Cldr.DateTime.Formatter do
     quarter(quarter, n, locale, backend, Map.new(options))
   end
 
-  @spec quarter(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec quarter(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def quarter(date, n, locale, backend, options \\ %{})
@@ -941,7 +938,7 @@ defmodule Cldr.DateTime.Formatter do
     standalone_quarter(standalone_quarter, n, locale, backend, Map.new(options))
   end
 
-  @spec standalone_quarter(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec standalone_quarter(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def standalone_quarter(date, n, locale, backend, options \\ %{})
@@ -1050,7 +1047,7 @@ defmodule Cldr.DateTime.Formatter do
     month(month, n, locale, backend, Map.new(options))
   end
 
-  @spec month(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec month(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def month(date, n, locale, backend, options \\ %{})
@@ -1153,7 +1150,7 @@ defmodule Cldr.DateTime.Formatter do
     standalone_month(standalone_month, n, locale, backend, Map.new(options))
   end
 
-  @spec standalone_month(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec standalone_month(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def standalone_month(date, n, locale, backend, options \\ %{})
@@ -1258,7 +1255,7 @@ defmodule Cldr.DateTime.Formatter do
     week_of_year(week_of_year, n, locale, backend, Map.new(options))
   end
 
-  @spec week_of_year(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec week_of_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def week_of_year(date, n, locale, backend, options \\ %{})
@@ -1330,7 +1327,7 @@ defmodule Cldr.DateTime.Formatter do
     week_of_month(week_of_month, n, locale, backend, Map.new(options))
   end
 
-  @spec week_of_month(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec week_of_month(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def week_of_month(date, n, locale, backend, options \\ %{})
@@ -1407,7 +1404,7 @@ defmodule Cldr.DateTime.Formatter do
     day_of_month(day_of_month, n, locale, backend, Map.new(options))
   end
 
-  @spec day_of_month(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec day_of_month(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def day_of_month(date, n, locale, backend, options \\ %{})
@@ -1497,7 +1494,7 @@ defmodule Cldr.DateTime.Formatter do
     day_of_year(day_of_year, n, locale, backend, Map.new(options))
   end
 
-  @spec day_of_year(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec day_of_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def day_of_year(date, n, locale, backend, options \\ %{})
@@ -1583,7 +1580,7 @@ defmodule Cldr.DateTime.Formatter do
     day_name(day_name, n, locale, backend, Map.new(options))
   end
 
-  @spec day_name(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec day_name(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def day_name(date, n, locale, backend, options \\ %{})
@@ -1695,7 +1692,7 @@ defmodule Cldr.DateTime.Formatter do
     day_of_week(day_of_week, n, locale, backend, Map.new(options))
   end
 
-  @spec day_of_week(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec day_of_week(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def day_of_week(date, n, locale, backend, options \\ %{})
@@ -1788,7 +1785,7 @@ defmodule Cldr.DateTime.Formatter do
     standalone_day_of_week(standalone_day_of_week, n, locale, backend, Map.new(options))
   end
 
-  @spec standalone_day_of_week(Calendar.date(), integer, locale(), Cldr.backend(), map()) ::
+  @spec standalone_day_of_week(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def standalone_day_of_week(date, n, locale, backend, options \\ %{})
@@ -1902,7 +1899,7 @@ defmodule Cldr.DateTime.Formatter do
     period_am_pm(period_am_pm, n, locale, backend, Map.new(options))
   end
 
-  @spec period_am_pm(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec period_am_pm(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def period_am_pm(time, n, locale, backend, options \\ %{})
@@ -1999,7 +1996,7 @@ defmodule Cldr.DateTime.Formatter do
     period_noon_midnight(period_noon_midnight, n, locale, backend, Map.new(options))
   end
 
-  @spec period_noon_midnight(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec period_noon_midnight(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def period_noon_midnight(time, n, locale, backend, options \\ %{})
@@ -2089,7 +2086,7 @@ defmodule Cldr.DateTime.Formatter do
     period_flex(period_flex, n, locale, backend, Map.new(options))
   end
 
-  @spec period_flex(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec period_flex(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def period_flex(time, n, locale, backend, options \\ %{})
@@ -2156,7 +2153,7 @@ defmodule Cldr.DateTime.Formatter do
     hour(hour, n, locale, backend, Map.new(options))
   end
 
-  @spec hour(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec hour(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def hour(time, n, locale, backend, options \\ %{})
@@ -2227,7 +2224,7 @@ defmodule Cldr.DateTime.Formatter do
     h12(h12, n, locale, backend, Map.new(options))
   end
 
-  @spec h12(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec h12(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def h12(time, n, locale, backend, options \\ %{})
@@ -2315,7 +2312,7 @@ defmodule Cldr.DateTime.Formatter do
     h11(h11, n, locale, backend, Map.new(options))
   end
 
-  @spec h11(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec h11(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def h11(time, n, locale, backend, options \\ %{})
@@ -2400,7 +2397,7 @@ defmodule Cldr.DateTime.Formatter do
     h24(h24, n, locale, backend, Map.new(options))
   end
 
-  @spec h24(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec h24(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def h24(time, n, locale, backend, options \\ %{})
@@ -2479,7 +2476,7 @@ defmodule Cldr.DateTime.Formatter do
     h23(h23, n, locale, backend, Map.new(options))
   end
 
-  @spec h23(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec h23(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def h23(time, n, locale, backend, options \\ %{})
@@ -2550,7 +2547,7 @@ defmodule Cldr.DateTime.Formatter do
     minute(minute, n, locale, backend, Map.new(options))
   end
 
-  @spec minute(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec minute(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def minute(time, n, locale, backend, options \\ %{})
@@ -2618,7 +2615,7 @@ defmodule Cldr.DateTime.Formatter do
     second(second, n, locale, backend, Map.new(options))
   end
 
-  @spec second(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec second(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def second(time, n, locale, backend, options \\ %{})
@@ -2690,7 +2687,7 @@ defmodule Cldr.DateTime.Formatter do
     fractional_second(fractional_second, n, locale, backend, Map.new(options))
   end
 
-  @spec fractional_second(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec fractional_second(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   # Note that TR35 says we should truncate the number of decimal digits
@@ -2782,7 +2779,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @milliseconds 1_000
-  @spec millisecond(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec millisecond(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def millisecond(time, n, locale, backend, options \\ %{})
@@ -2869,7 +2866,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_generic(zone_generic, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_generic(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec zone_generic(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_generic(time, n, locale, backend, options \\ %{})
@@ -2945,7 +2942,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_short(zone_short, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_short(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec zone_short(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_short(time, n, locale, backend, options \\ %{})
@@ -3029,7 +3026,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_id(zone_id, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_id(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec zone_id(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_id(time, n, locale, backend, options \\ %{})
@@ -3121,7 +3118,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_basic(zone_basic, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_basic(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec zone_basic(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_basic(time, n, locale, backend, options \\ %{})
@@ -3234,7 +3231,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_iso_z(zone_iso_z, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_iso_z(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec zone_iso_z(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_iso_z(time, n, locale, backend, options \\ %{})
@@ -3394,7 +3391,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @iso_utc_offset_hours_minutes "+00:00"
-  @spec zone_iso(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec zone_iso(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_iso(time, n, locale, backend, options \\ %{})
@@ -3511,7 +3508,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_gmt(zone_gmt, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_gmt(Calendar.time(), integer, locale(), Cldr.backend(), map()) ::
+  @spec zone_gmt(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_gmt(time, n, locale, backend, options \\ %{})
@@ -3551,7 +3548,7 @@ defmodule Cldr.DateTime.Formatter do
     literal(date, literal, locale, backend, Map.new(options))
   end
 
-  @spec literal(any(), String.t(), locale(), Cldr.backend(), map()) :: String.t()
+  @spec literal(any(), String.t(), Locale.locale_reference(), Cldr.backend(), map()) :: String.t()
 
   def literal(_date, binary, locale, backend, options \\ %{})
 
