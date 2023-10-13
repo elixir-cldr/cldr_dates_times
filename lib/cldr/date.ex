@@ -19,12 +19,12 @@ defmodule Cldr.Date do
   alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
 
-  @style_types [:short, :medium, :long, :full]
+  @format_types [:short, :medium, :long, :full]
   @default_type :medium
 
-  defmodule Styles do
+  defmodule Formats do
     @moduledoc false
-    defstruct Module.get_attribute(Cldr.Date, :style_types)
+    defstruct Module.get_attribute(Cldr.Date, :format_types)
   end
 
   @doc """
@@ -43,14 +43,14 @@ defmodule Cldr.Date do
 
   ## Options
 
-    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
-      The default is `:medium`
+    * `:format` is on of `:short`, `:medium`, `:long`, `:full` or a format string.
+      The default is `:medium`.
 
     * `locale:` any locale returned by `Cldr.known_locale_names/1`.
-      The default is `Cldr.get_locale()`.
+      The default is `Cldr.get_locale/0`.
 
-    * `number_system:` a number system into which the formatted date digits
-      should be transliterated
+    * `:number_system` a number system into which the formatted date digits
+      should be transliterated.
 
   ## Returns
 
@@ -208,7 +208,7 @@ defmodule Cldr.Date do
   end
 
   defp format_string(format, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
-       when format in @style_types do
+       when format in @format_types do
     with {:ok, date_formats} <- Format.date_formats(locale_name, calendar, backend) do
       {:ok, Map.get(date_formats, format)}
     end
@@ -222,7 +222,7 @@ defmodule Cldr.Date do
   defp format_string(style, _locale, _calendar, _backend) when is_atom(style) do
     {:error,
      {Cldr.DateTime.InvalidStyle,
-      "Invalid date style.  " <> "The valid styles are #{inspect(@style_types)}."}}
+      "Invalid date style.  " <> "The valid styles are #{inspect(@format_types)}."}}
   end
 
   defp format_string(format_string, _locale, _calendar, _backend)

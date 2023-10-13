@@ -19,12 +19,12 @@ defmodule Cldr.Time do
   alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
 
-  @style_types [:short, :medium, :long, :full]
+  @format_types [:short, :medium, :long, :full]
   @default_type :medium
 
-  defmodule Styles do
+  defmodule Formats do
     @moduledoc false
-    defstruct Module.get_attribute(Cldr.Time, :style_types)
+    defstruct Module.get_attribute(Cldr.Time, :format_types)
   end
 
   @doc """
@@ -49,14 +49,14 @@ defmodule Cldr.Time do
 
   ## Options
 
-  * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
-     The default is `:medium`
+  * `:format` is one of `:short`, `:medium`, `:long`,`:full` or a format string.
+     The default is `:medium`.
 
-  * `locale:` any locale returned by `Cldr.known_locale_names/1`.  The default is `
-    Cldr.get_locale()`
+  * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is `
+    `Cldr.get_locale/0`.
 
-  * `number_system:` a number system into which the formatted date digits should
-    be transliterated
+  * `:number_system` a number system into which the formatted date digits should
+    be transliterated.
 
   * `era: :variant` will use a variant for the era is one is available in the locale.
     In the "en" locale, for example, `era: :variant` will return "BCE" instead of "BC".
@@ -220,7 +220,7 @@ defmodule Cldr.Time do
   end
 
   defp format_string(style, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
-       when style in @style_types do
+       when style in @format_types do
     with {:ok, styles} <- Format.time_formats(locale_name, calendar, backend) do
       {:ok, Map.get(styles, style)}
     end
@@ -234,7 +234,7 @@ defmodule Cldr.Time do
   defp format_string(style, _locale, _backend, _calendar) when is_atom(style) do
     {:error,
      {Cldr.DateTime.InvalidStyle,
-      "Invalid time format style.  " <> "The valid styles are #{inspect(@style_types)}."}}
+      "Invalid time format style.  " <> "The valid styles are #{inspect(@format_types)}."}}
   end
 
   defp format_string(format_string, _locale, _calendar, _backend)

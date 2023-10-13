@@ -13,13 +13,13 @@ defmodule Cldr.Interval do
   the greatest difference in "Jan 10 - Feb 12, 2008" is the month field. This is used to
   pick the exact pattern to be used.
 
-  ### Interval Format Styles
+  ### Interval Formats
 
-  CLDR provides a set of format types that map to a concrete format string.
+  CLDR provides a two-level mapping to a concrete format string.
   To simplify the developer experience, `ex_cldr_dates_times` groups these
-  formats into `styles` and `format types`.
+  mappings into `styles` and `formats`.
 
-  Format styles group different CLDR formats into similar types. These format
+  Styles group different CLDR formats into similar types. These
   styles can be seen by examining the output below:
 
   ```elixir
@@ -39,10 +39,10 @@ defmodule Cldr.Interval do
   }
   ```
 
-  Here the format style is the key if the map: `:date`, `:month`,
+  Here the style is the key if the map: `:date`, `:month`,
   `:month_and_day` and `year_and_month`.
 
-  These are then mapped to interval formats.
+  These are then mapped to interval formats `:short`, `:medium` or `:long`.
 
   ### Interval formats
 
@@ -63,7 +63,7 @@ defmodule Cldr.Interval do
   calendar types are also supported. For example:
 
   ```elixir
-  iex> Cldr.known_calendars
+  iex> Cldr.known_calendars()
   [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
    :gregorian, :hebrew, :indian, :islamic, :islamic_civil, :islamic_rgsa,
    :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]
@@ -74,7 +74,7 @@ defmodule Cldr.Interval do
   `to_string/3` and would not normally be called directly.
 
   ```elixir
-  Cldr.DateTime.Format.interval_formats :en, :gregorian
+  Cldr.DateTime.Format.interval_formats(:en, :gregorian)
   => {:ok,
        %{
          Bh: %{B: ["h B – ", "h B"], h: ["h – ", "h B"]},

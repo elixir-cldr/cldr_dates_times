@@ -56,11 +56,11 @@ defmodule Cldr.DateTime.Format do
   ## Arguments
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`.
 
   ## Example
 
-      iex> Cldr.DateTime.Format.calendars_for :en, MyApp.Cldr
+      iex> Cldr.DateTime.Format.calendars_for(:en, MyApp.Cldr)
       {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
        :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
        :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
@@ -84,7 +84,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.gmt_format :en, MyApp.Cldr
+      iex> Cldr.DateTime.Format.gmt_format(:en, MyApp.Cldr)
       {:ok, ["GMT", 0]}
 
   """
@@ -110,7 +110,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.gmt_zero_format :en, MyApp.Cldr
+      iex> Cldr.DateTime.Format.gmt_zero_format(:en, MyApp.Cldr)
       {:ok, "GMT"}
 
   """
@@ -132,7 +132,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Example
 
-      iex> Cldr.DateTime.Format.hour_format :en, MyApp.Cldr
+      iex> Cldr.DateTime.Format.hour_format(:en, MyApp.Cldr)
       {:ok, {"+HH:mm", "-HH:mm"}}
 
   """
@@ -157,7 +157,7 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_formats(:en, :gregorian, MyApp.Cldr)
-      {:ok, %Cldr.Date.Styles{
+      {:ok, %Cldr.Date.Formats{
         full: "EEEE, MMMM d, y",
         long: "MMMM d, y",
         medium: "MMM d, y",
@@ -165,7 +165,7 @@ defmodule Cldr.DateTime.Format do
       }}
 
       iex> Cldr.DateTime.Format.date_formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.Date.Styles{
+      {:ok, %Cldr.Date.Formats{
         full: "EEEE, MMMM d, y G",
         long: "MMMM d, y G",
         medium: "MMM d, y G",
@@ -201,16 +201,16 @@ defmodule Cldr.DateTime.Format do
 
   ## Examples:
 
-      iex> Cldr.DateTime.Format.time_formats :en
-      {:ok, %Cldr.Time.Styles{
+      iex> Cldr.DateTime.Format.time_formats(:en)
+      {:ok, %Cldr.Time.Formats{
         full: "h:mm:ss a zzzz",
         long: "h:mm:ss a z",
         medium: "h:mm:ss a",
         short: "h:mm a"
       }}
 
-      iex> Cldr.DateTime.Format.time_formats :en, :buddhist
-      {:ok, %Cldr.Time.Styles{
+      iex> Cldr.DateTime.Format.time_formats(:en, :buddhist)
+      {:ok, %Cldr.Time.Formats{
         full: "h:mm:ss a zzzz",
         long: "h:mm:ss a z",
         medium: "h:mm:ss a",
@@ -247,7 +247,7 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_time_formats(:en)
-      {:ok, %Cldr.DateTime.Styles{
+      {:ok, %Cldr.DateTime.Formats{
         full: "{1}, {0}",
         long: "{1}, {0}",
         medium: "{1}, {0}",
@@ -255,7 +255,7 @@ defmodule Cldr.DateTime.Format do
       }}
 
       iex> Cldr.DateTime.Format.date_time_formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.DateTime.Styles{
+      {:ok, %Cldr.DateTime.Formats{
         full: "{1}, {0}",
         long: "{1}, {0}",
         medium: "{1}, {0}",
@@ -297,7 +297,7 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_time_at_formats(:en)
-      {:ok, %Cldr.DateTime.Styles{
+      {:ok, %Cldr.DateTime.Formats{
         full: "{1} 'at' {0}",
         long: "{1} 'at' {0}",
         medium: "{1}, {0}",
@@ -305,7 +305,7 @@ defmodule Cldr.DateTime.Format do
       }
 
       iex> Cldr.DateTime.Format.date_time_at_formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.DateTime.Styles{
+      {:ok, %Cldr.DateTime.Formats{
         full: "{1} 'at' {0}",
         long: "{1} 'at' {0}",
         medium: "{1}, {0}",
@@ -342,7 +342,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Examples:
 
-      iex> Cldr.DateTime.Format.date_time_available_formats :en
+      iex> Cldr.DateTime.Format.date_time_available_formats(:en)
       {
         :ok,
         %{
@@ -418,14 +418,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
-    The default is `:gregorian`
+    The default is `:gregorian`.
 
   ## Examples:
 
-      Cldr.DateTime.Format.interval_formats :en, :gregorian, MyApp.Cldr
+      Cldr.DateTime.Format.interval_formats(:en, :gregorian, MyApp.Cldr)
       => {:ok,
        %{
          bh: %{b: ["h B", "h B"], h: ["h", "h B"]},
@@ -548,6 +548,7 @@ defmodule Cldr.DateTime.Format do
     datetime_backend = Module.concat(backend, DateTime.Format)
 
     all_formats_for(locale, backend, &datetime_backend.date_time_formats/2) ++
+      all_formats_for(locale, backend, &datetime_backend.date_time_at_formats/2) ++
       all_formats_for(locale, backend, &datetime_backend.date_time_available_formats/2)
   end
 

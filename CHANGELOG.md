@@ -6,6 +6,10 @@
 
 This is the changelog for Cldr_Dates_Times v2.15.0 released on _____, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
+### Deprecations
+
+* The support of `:style` as a synonym for `:format` with the functions `Cldr.Time.to_string/2`, `Cldr.Date.to_string/2` and `Cldr.DateTime.to_string/2` is now removed.  The `:style` option is now used influence the use of "at" formats in `Cldr.DateTime.to_string/2`. `:style` also remains a valid option for interval formatting.
+
 ### Enhancements
 
 * Add support for "at" style formatting for `DateTime` structs. This style is documented in [TR35](https://unicode.org/reports/tr35/tr35-dates.html#Date_Time_Combination_Examples) and was introduced in [CLDR 43](https://cldr.unicode.org/index/downloads/cldr-43). Thanks to @jueberschlag for the report and motivation to get this done.

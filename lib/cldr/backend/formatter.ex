@@ -58,7 +58,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
                 | Elixir.Calendar.time()
                 | Elixir.Calendar.datetime(),
                 String.t(),
-                Cldr.LanguageTag.t() | Cldr.Locale.locale_name(),
+                Cldr.Locale.locale_reference(),
                 Keyword.t()
               ) :: {:ok, String.t()} | {:error, {module(), String.t()}}
 
