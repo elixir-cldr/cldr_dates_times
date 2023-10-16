@@ -50,7 +50,7 @@ defmodule Cldr.DateTime do
       The default is `:medium`.
 
     * `:style` is either `:at` or `:default`. When set to `:at` the datetime is
-      formatted with a localised string representing `<date> at `<time>`. See
+      formatted with a localised string representing `<date> at <time>`. See
       `Cldr.DateTime.Format.date_time_at_formats/2`.
 
     * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
@@ -75,18 +75,22 @@ defmodule Cldr.DateTime do
   ## Examples
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.DateTime.to_string datetime
+      iex> Cldr.DateTime.to_string(datetime)
       {:ok, "Jan 1, 2000, 11:59:59 PM"}
-      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, locale: "en"
+      iex> Cldr.DateTime.to_string(datetime, MyApp.Cldr, locale: "en")
       {:ok, "Jan 1, 2000, 11:59:59 PM"}
-      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :long, locale: "en"
+      iex> Cldr.DateTime.to_string(datetime, MyApp.Cldr, format: :long, locale: "en")
       {:ok, "January 1, 2000, 11:59:59 PM UTC"}
-      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :hms, locale: "en"
+      iex> Cldr.DateTime.to_string(datetime, MyApp.Cldr, format: :hms, locale: "en")
       {:ok, "11:59:59 PM"}
-      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :full, locale: "en"
+      iex> Cldr.DateTime.to_string(datetime, MyApp.Cldr, format: :full, locale: "en")
       {:ok, "Saturday, January 1, 2000, 11:59:59 PM GMT"}
-      iex> Cldr.DateTime.to_string datetime, MyApp.Cldr, format: :full, locale: "fr"
+      iex> Cldr.DateTime.to_string(datetime, MyApp.Cldr, format: :full, locale: "fr")
       {:ok, "samedi 1 janvier 2000, 23:59:59 UTC"}
+      iex> Cldr.DateTime.to_string(datetime, MyApp.Cldr, format: :full, style: :at, locale: "en")
+      {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
+      iex> Cldr.DateTime.to_string(datetime, MyApp.Cldr, format: :full, style: :at, locale: "fr")
+      {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
 
   """
   @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
@@ -185,7 +189,7 @@ defmodule Cldr.DateTime do
       The default is `:medium`.
 
     * `:style` is either `:at` or `:default`. When set to `:at` the datetime is
-      formatted with a localised string representing `<date> at `<time>`. See
+      formatted with a localised string representing `<date> at <time>`. See
       `Cldr.DateTime.Format.date_time_at_formats/2`.
 
     * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
@@ -258,7 +262,7 @@ defmodule Cldr.DateTime do
       else
         {:error,
          {Cldr.DateTime.InvalidStyle,
-          "Invalid datetime style #{inspect(format)}. " <>
+          "Invalid datetime format #{inspect(format)}. " <>
             "The valid formaats are #{inspect(formats)}."}}
       end
     end

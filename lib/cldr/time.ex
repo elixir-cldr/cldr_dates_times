@@ -29,7 +29,7 @@ defmodule Cldr.Time do
 
   @doc """
   Formats a time according to a format string
-  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
   ## Returns
 
@@ -49,10 +49,10 @@ defmodule Cldr.Time do
 
   ## Options
 
-  * `:format` is one of `:short`, `:medium`, `:long`,`:full` or a format string.
+  * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string.
      The default is `:medium`.
 
-  * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is `
+  * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is
     `Cldr.get_locale/0`.
 
   * `:number_system` a number system into which the formatted date digits should
@@ -63,7 +63,7 @@ defmodule Cldr.Time do
 
   * `period: :variant` will use a variant for the time period and flexible time period if
     one is available in the locale.  For example, in the "en" locale `period: :variant` will
-    return "pm" instead of "PM"
+    return "pm" instead of "PM".
 
   ## Examples
 

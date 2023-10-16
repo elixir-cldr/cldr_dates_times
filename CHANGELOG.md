@@ -4,11 +4,11 @@
 
 ## Cldr_Dates_Times v2.15.0
 
-This is the changelog for Cldr_Dates_Times v2.15.0 released on _____, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.15.0 released on October 17th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Deprecations
 
-* The support of `:style` as a synonym for `:format` with the functions `Cldr.Time.to_string/2`, `Cldr.Date.to_string/2` and `Cldr.DateTime.to_string/2` is now removed.  The `:style` option is now used influence the use of "at" formats in `Cldr.DateTime.to_string/2`. `:style` also remains a valid option for interval formatting.
+* The support of `:style` as a synonym for `:format` with the functions `Cldr.Time.to_string/2`, `Cldr.Date.to_string/2` and `Cldr.DateTime.to_string/2` is now removed.  The `:style` option is now used to influence the use of "at" formats in `Cldr.DateTime.to_string/2`. `:style` also remains a valid option for interval formatting.
 
 ### Enhancements
 
