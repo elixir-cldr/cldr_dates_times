@@ -246,8 +246,7 @@ defmodule Cldr.Time.Interval do
       |> Keyword.put(:locale, locale)
       |> Keyword.put(:number_system, number_system)
 
-    with {:ok, _} <- from_less_than_or_equal_to(from, to),
-         {:ok, backend} <- Cldr.validate_backend(backend),
+    with {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
@@ -313,8 +312,7 @@ defmodule Cldr.Time.Interval do
     `Calendar.time` type.
 
   * `to` is any map that conforms to the
-    `Calendar.time` type. `to` must occur
-    on or after `from`.
+    `Calendar.time` type.
 
   * `backend` is any module that includes `use Cldr` and
     is therefore `Cldr` backend module
@@ -367,6 +365,9 @@ defmodule Cldr.Time.Interval do
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :long
       "10:00 – 10:03 AM"
+
+      iex> Cldr.Time.Interval.to_string ~T[23:00:00.0Z], ~T[01:01:00.0Z], MyApp.Cldr
+      {:ok, "11:00 PM – 1:01 AM"}
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex
@@ -427,12 +428,12 @@ defmodule Cldr.Time.Interval do
     Cldr.Date.Interval.greatest_difference(from, to)
   end
 
-  defp from_less_than_or_equal_to(from, to) do
-    case Time.compare(from, to) do
-      comp when comp in [:eq, :lt] -> {:ok, comp}
-      _other -> {:error, Cldr.Date.Interval.datetime_order_error(from, to)}
-    end
-  end
+  # defp from_less_than_or_equal_to(from, to) do
+  #   case Time.compare(from, to) do
+  #     comp when comp in [:eq, :lt] -> {:ok, comp}
+  #     _other -> {:error, Cldr.Date.Interval.datetime_order_error(from, to)}
+  #   end
+  # end
 
   defp resolve_format(from, to, formats, locale, options) do
     format = Keyword.get(options, :format, @default_format)
@@ -450,7 +451,7 @@ defmodule Cldr.Time.Interval do
   end
 
   defp greatest_difference_format(%{hour: from}, %{hour: to}, format, :H)
-       when from < 12 and to >= 12 do
+       when (from < 12 and to >= 12) or (from >= 12 and to < 12) do
     case Map.get(format, :b) || Map.get(format, :a) || Map.get(format, :H) || Map.get(format, :h) do
       nil -> {:error, format_error(format, format)}
       success -> {:ok, success}
