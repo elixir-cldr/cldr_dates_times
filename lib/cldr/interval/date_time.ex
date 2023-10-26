@@ -296,6 +296,8 @@ defmodule Cldr.DateTime.Interval do
   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     format = Keyword.get(options, :format, @default_format)
+    date_format = Keyword.get(options, :date_format)
+    time_format = Keyword.get(options, :time_format)
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
 
@@ -308,10 +310,10 @@ defmodule Cldr.DateTime.Interval do
          {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format} <- validate_format(format),
+         {:ok, format, date_format, time_format} <- validate_format(format, date_format, time_format),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
-      options = adjust_options(options, locale, format)
+      options = adjust_options(options, locale, format, date_format, time_format)
       format_date_time(from, to, locale, backend, calendar, greatest_difference, options)
     else
       {:error, :no_practical_difference} ->
@@ -563,10 +565,12 @@ defmodule Cldr.DateTime.Interval do
   end
 
   @doc false
-  def adjust_options(options, locale, format) do
+  def adjust_options(options, locale, format, date_format \\ nil, time_format \\ nil) do
     options
     |> Keyword.put(:locale, locale)
     |> Keyword.put(:format, format)
+    |> Keyword.put(:date_format, date_format)
+    |> Keyword.put(:time_format, time_format)
     |> Keyword.delete(:style)
   end
 
@@ -622,22 +626,93 @@ defmodule Cldr.DateTime.Interval do
   end
 
   # Using standard format terms like :short, :medium, :long
-  defp validate_format(format) when format in @formats do
-    {:ok, format}
+  # When there is no specific date or time format requested
+  defp validate_format(format, nil, nil) when format in @formats do
+    {:ok, format, nil, nil}
+  end
+
+  # Using standard format terms like :short, :medium, :long
+  # with date and time formats also of the same style
+  defp validate_format(format, date_format, time_format)
+      when format in @formats and date_format in @formats and time_format in @formats do
+    {:ok, format, date_format, time_format}
+  end
+
+  # Using standard format terms like :short, :medium, :long
+  # with date format specified but time format
+  # uses the interval format
+  defp validate_format(format, date_format, nil)
+      when format in @formats and date_format in @formats do
+    {:ok, format, date_format, format}
+  end
+
+  # Using standard format terms like :short, :medium, :long
+  # with time format specified but date format
+  # uses the interval format
+  defp validate_format(format, nil, time_format)
+      when format in @formats and time_format in @formats do
+    {:ok, format, format, time_format}
   end
 
   # Direct specification of a format as a string
   @doc false
-  defp validate_format(format) when is_binary(format) do
-    Cldr.DateTime.Format.split_interval(format)
+  defp validate_format(format, nil, nil) when is_binary(format) do
+    with {:ok, format} <- Cldr.DateTime.Format.split_interval(format) do
+      {:ok, format, nil, nil}
+    end
+  end
+
+  # If the format is binary then neither date or time format can be
+  # specified.
+  defp validate_format(format, date_format, time_format) when is_binary(format) do
+    format_error(format, date_format, time_format)
+  end
+
+  defp validate_format(format, date_format, time_format) do
+    format_error(format, date_format, time_format)
   end
 
   @doc false
-  def format_error(format) do
+  def format_error(format, date_format \\ nil, time_format \\ nil)
+
+  def format_error(format, nil, nil) do
     {
       Cldr.DateTime.UnresolvedFormat,
       "The interval format #{inspect(format)} is invalid. " <>
         "Valid formats are #{inspect(@formats)} or an interval format string.}"
     }
   end
+
+  def format_error(format, date_format, time_format) when format in @formats do
+    {
+      Cldr.DateTime.UnresolvedFormat,
+      ":date_format and :time_format must be one of " <> inspect(@formats) <>
+      " if :format is also one of #{inspect @formats}. Found #{inspect date_format} and #{inspect time_format}."
+    }
+  end
+
+  def format_error(format, date_format, time_format)
+      when is_binary(format) when not is_nil(date_format) and not is_nil(time_format) do
+    {
+      Cldr.DateTime.UnresolvedFormat, ":date_format and :time_format " <> error_string(format) <> "."
+    }
+  end
+
+  def format_error(format, date_format, nil) when is_binary(format) and not is_nil(date_format) do
+    {
+      Cldr.DateTime.UnresolvedFormat, ":date_format " <> error_string(format) <> "."
+    }
+  end
+
+  def format_error(format, nil, time_format) when is_binary(format) and not is_nil(time_format) do
+    {
+      Cldr.DateTime.UnresolvedFormat, ":time_format " <> error_string(format) <> "."
+    }
+  end
+
+  defp error_string(format) do
+    "cannot be specified when the interval format is a binary, Found: #{inspect(format)}"
+  end
+
+
 end

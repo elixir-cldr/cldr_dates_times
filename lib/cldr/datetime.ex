@@ -49,6 +49,18 @@ defmodule Cldr.DateTime do
       any of the keys returned by `Cldr.DateTime.Format.date_time_available_formats/0`.
       The default is `:medium`.
 
+    * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+      this option is used to format the date part of the date time. This option is
+      only acceptable if the `:format` option is not specified, or is specified as either
+      `:short`, `:medium`, `:long`, `:full`. If `:date_format` is not specified
+      then the date format is defined by the `:format` option.
+
+    * `:time_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+      this option is used to format the time part of the date time. This option is
+      only acceptable if the `:format` option is not specified, or is specified as either
+      `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
+      then the time format is defined by the `:format` option.
+
     * `:style` is either `:at` or `:default`. When set to `:at` the datetime is
       formatted with a localised string representing `<date> at <time>`. See
       `Cldr.DateTime.Format.date_time_at_formats/2`.
@@ -111,13 +123,12 @@ defmodule Cldr.DateTime do
 
   def to_string(%{calendar: calendar} = datetime, backend, options)
       when is_atom(backend) and is_list(options) do
-    options = normalize_options(backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
-    number_system = Keyword.get(options, :number_system)
 
-    with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
+    with {:ok, options} <- normalize_options(backend, options),
+         {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
          {:ok, cldr_calendar} <- type_from_calendar(calendar),
-         {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
+         {:ok, _} <- Cldr.Number.validate_number_system(locale, options[:number_system], backend),
          {:ok, format_string} <- format_string(options[:format], options[:style], locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(datetime, format_string, locale, options) do
       {:ok, formatted}
@@ -135,21 +146,78 @@ defmodule Cldr.DateTime do
     {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
 
-    [locale: locale, number_system: number_system, format: @default_type, style: @default_style]
+    options = [
+      locale: locale,
+      number_system: number_system,
+      format: @default_type,
+      date_format: @default_type,
+      time_format: @default_type,
+      style: @default_style
+    ]
+
+    {:ok, options}
   end
 
   defp normalize_options(backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     format = options[:format] || @default_type
     style = options[:style] || @default_style
+    date_format = options[:date_format]
+    time_format = options[:time_format]
+
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
 
-    options
-    |> Keyword.put(:locale, locale)
-    |> Keyword.put(:format, format)
-    |> Keyword.put(:style, style)
-    |> Keyword.put_new(:number_system, number_system)
+    with {:ok, date_format, time_format} <- extract_formats(format, date_format, time_format) do
+      options =
+        options
+        |> Keyword.put(:locale, locale)
+        |> Keyword.put(:format, format)
+        |> Keyword.put(:date_format, date_format)
+        |> Keyword.put(:time_format, time_format)
+        |> Keyword.put(:style, style)
+        |> Keyword.put(:number_system, number_system)
+
+      {:ok, options}
+    end
+  end
+
+  defp extract_formats(format, nil, nil) when format in @format_types do
+    {:ok, format, format}
+  end
+
+  defp extract_formats(format, nil, nil) when is_binary(format) do
+    {:ok, nil, nil}
+  end
+
+  defp extract_formats(format, nil, nil) when is_atom(format) do
+    {:ok, nil, nil}
+  end
+
+  defp extract_formats(format, date_format, time_format)
+      when format in @format_types and date_format in @format_types and time_format in @format_types do
+    {:ok, date_format, time_format}
+  end
+
+  defp extract_formats(nil, date_format, time_format)
+      when not is_nil(date_format) or not is_nil(time_format) do
+    {:error,
+      {
+        Cldr.DateTime.InvalidFormat,
+        "The :date_format and :time_format options must be one of #{inspect @format_types}. " <>
+        "Found #{inspect date_format} and #{inspect time_format}."
+      }
+    }
+  end
+
+  defp extract_formats(format, date_format, time_format)
+      when not is_nil(date_format) or not is_nil(time_format) do
+    {:error,
+      {
+        Cldr.DateTime.InvalidFormat,
+        "The :date_format and :time_format options cannot be specified with the :format #{inspect format}."
+      }
+    }
   end
 
   @doc false
@@ -261,7 +329,7 @@ defmodule Cldr.DateTime do
         {:ok, format_string}
       else
         {:error,
-         {Cldr.DateTime.InvalidStyle,
+         {Cldr.DateTime.InvalidFormat,
           "Invalid datetime format #{inspect(format)}. " <>
             "The valid formaats are #{inspect(formats)}."}}
       end
