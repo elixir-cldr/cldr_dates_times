@@ -57,6 +57,18 @@ defmodule Cldr.DateTime.Interval do
       specific format type or a string representing of an interval
       format. The default is `:medium`.
 
+    * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+      this option is used to format the date part of the date time. This option is
+      only acceptable if the `:format` option is not specified, or is specified as either
+      `:short`, `:medium`, `:long`, `:full`. If `:date_format` is not specified
+      then the date format is defined by the `:format` option.
+
+    * `:time_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+      this option is used to format the time part of the date time. This option is
+      only acceptable if the `:format` option is not specified, or is specified as either
+      `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
+      then the time format is defined by the `:format` option.
+
     * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
       or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
 
@@ -208,6 +220,18 @@ defmodule Cldr.DateTime.Interval do
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representation of an interval
     format. The default is `:medium`.
+  
+  * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+    this option is used to format the date part of the date time. This option is
+    only acceptable if the `:format` option is not specified, or is specified as either
+    `:short`, `:medium`, `:long`, `:full`. If `:date_format` is not specified
+    then the date format is defined by the `:format` option.
+
+  * `:time_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+    this option is used to format the time part of the date time. This option is
+    only acceptable if the `:format` option is not specified, or is specified as either
+    `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
+    thenthe time format is defined by the `:format` option.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
@@ -398,6 +422,18 @@ defmodule Cldr.DateTime.Interval do
     * `:format` is one of `:short`, `:medium` or `:long` or a
       specific format type or a string representing of an interval
       format. The default is `:medium`.
+    
+    * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+      this option is used to format the date part of the date time. This option is
+      only acceptable if the `:format` option is not specified, or is specified as either
+      `:short`, `:medium`, `:long`, `:full`. If `:date_format` is not specified
+      then the date format is defined by the `:format` option.
+
+    * `:time_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+      this option is used to format the time part of the date time. This option is
+      only acceptable if the `:format` option is not specified, or is specified as either
+      `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
+      then the time format is defined by the `:format` option.
 
     * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
       or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
@@ -470,6 +506,18 @@ defmodule Cldr.DateTime.Interval do
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representation of an interval
     format. The default is `:medium`.
+  
+  * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+    this option is used to format the date part of the date time. This option is
+    only acceptable if the `:format` option is not specified, or is specified as either
+    `:short`, `:medium`, `:long`, `:full`. If `:date_format` is not specified
+    then the date format is defined by the `:format` option.
+
+  * `:time_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+    this option is used to format the time part of the date time. This option is
+    only acceptable if the `:format` option is not specified, or is specified as either
+    `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
+    then the time format is defined by the `:format` option.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.

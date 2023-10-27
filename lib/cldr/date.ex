@@ -99,11 +99,13 @@ defmodule Cldr.Date do
     options = normalize_options(backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
     number_system = Map.get(options, :number_system)
+    format = options[:date_format] || options[:format]
+    locale = options[:locale]
 
-    with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
+    with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format_string} <- format_string(options[:format], locale, cldr_calendar, backend),
+         {:ok, format_string} <- format_string(format, locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(date, format_string, locale, options) do
       {:ok, formatted}
     else

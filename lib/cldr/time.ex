@@ -105,11 +105,12 @@ defmodule Cldr.Time do
     calendar = Map.get(time, :calendar) || Cldr.Calendar.Gregorian
     format_backend = Module.concat(backend, DateTime.Formatter)
     number_system = Map.get(options, :number_system)
+    format = options[:time_format] || options[:format]
 
     with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format_string} <- format_string(options[:format], locale, cldr_calendar, backend),
+         {:ok, format_string} <- format_string(format, locale, cldr_calendar, backend),
          {:ok, formatted} <- format_backend.format(time, format_string, locale, options) do
       {:ok, formatted}
     end
