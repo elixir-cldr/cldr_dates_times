@@ -2,13 +2,17 @@
 
 **Note that `ex_cldr_dates_times` version 2.14.0 and later are supported on Elixir 1.11 and later only.**
 
-## Cldr_Dates_Times v2.15.1
+## Cldr_Dates_Times v2.16.0
 
 This is the changelog for Cldr_Dates_Times v2.15.1 released on October 26th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Bug Fixes
 
 * Fix formatting time intervals when the `to` time is not greater than the `from` time. This allows time intervals that cross midnight to be formatted correctly. Thanks to @larshei  for the report. Closes #42.
+
+### Enhancements
+
+* Adds options `:date_format` and `:time_format` to `Cldr.DateTime.Interval.to_string/2` and `Cldr.DateTime.to_string/2`. These options allow separate formatting of the date and time parts of a datetime, including those that are part of an interval. Thanks to @jmoldrich2b for the report (and patience). Closes #33.
 
 ## Cldr_Dates_Times v2.15.0
 
