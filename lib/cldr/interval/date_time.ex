@@ -220,7 +220,7 @@ defmodule Cldr.DateTime.Interval do
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representation of an interval
     format. The default is `:medium`.
-  
+
   * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
     this option is used to format the date part of the date time. This option is
     only acceptable if the `:format` option is not specified, or is specified as either
@@ -422,7 +422,7 @@ defmodule Cldr.DateTime.Interval do
     * `:format` is one of `:short`, `:medium` or `:long` or a
       specific format type or a string representing of an interval
       format. The default is `:medium`.
-    
+
     * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
       this option is used to format the date part of the date time. This option is
       only acceptable if the `:format` option is not specified, or is specified as either
@@ -506,7 +506,7 @@ defmodule Cldr.DateTime.Interval do
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representation of an interval
     format. The default is `:medium`.
-  
+
   * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
     this option is used to format the date part of the date time. This option is
     only acceptable if the `:format` option is not specified, or is specified as either
@@ -713,11 +713,11 @@ defmodule Cldr.DateTime.Interval do
   # If the format is binary then neither date or time format can be
   # specified.
   defp validate_format(format, date_format, time_format) when is_binary(format) do
-    format_error(format, date_format, time_format)
+    {:error, format_error(format, date_format, time_format)}
   end
 
   defp validate_format(format, date_format, time_format) do
-    format_error(format, date_format, time_format)
+    {:error, format_error(format, date_format, time_format)}
   end
 
   @doc false
@@ -725,7 +725,7 @@ defmodule Cldr.DateTime.Interval do
 
   def format_error(format, nil, nil) do
     {
-      Cldr.DateTime.UnresolvedFormat,
+      Cldr.DateTime.InvalidFormat,
       "The interval format #{inspect(format)} is invalid. " <>
         "Valid formats are #{inspect(@formats)} or an interval format string.}"
     }
@@ -733,7 +733,7 @@ defmodule Cldr.DateTime.Interval do
 
   def format_error(format, date_format, time_format) when format in @formats do
     {
-      Cldr.DateTime.UnresolvedFormat,
+      Cldr.DateTime.InvalidFormat,
       ":date_format and :time_format must be one of " <> inspect(@formats) <>
       " if :format is also one of #{inspect @formats}. Found #{inspect date_format} and #{inspect time_format}."
     }
@@ -742,25 +742,24 @@ defmodule Cldr.DateTime.Interval do
   def format_error(format, date_format, time_format)
       when is_binary(format) when not is_nil(date_format) and not is_nil(time_format) do
     {
-      Cldr.DateTime.UnresolvedFormat, ":date_format and :time_format " <> error_string(format) <> "."
+      Cldr.DateTime.InvalidFormat, ":date_format and :time_format " <> error_string(format) <> "."
     }
   end
 
   def format_error(format, date_format, nil) when is_binary(format) and not is_nil(date_format) do
     {
-      Cldr.DateTime.UnresolvedFormat, ":date_format " <> error_string(format) <> "."
+      Cldr.DateTime.InvalidFormat, ":date_format " <> error_string(format) <> "."
     }
   end
 
   def format_error(format, nil, time_format) when is_binary(format) and not is_nil(time_format) do
     {
-      Cldr.DateTime.UnresolvedFormat, ":time_format " <> error_string(format) <> "."
+      Cldr.DateTime.InvalidFormat, ":time_format " <> error_string(format) <> "."
     }
   end
 
   defp error_string(format) do
-    "cannot be specified when the interval format is a binary, Found: #{inspect(format)}"
+    "cannot be specified when the interval format is a binary or atom other than one of #{inspect @formats}. Found: #{inspect(format)}"
   end
-
 
 end
