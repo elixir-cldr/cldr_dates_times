@@ -33,7 +33,7 @@ defmodule Cldr.DateTime.Interval.Backend do
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           @doc false
           def to_string(%CalendarInterval{} = interval) do
-            locale = unquote(backend).get_locale
+            locale = unquote(backend).get_locale()
             Cldr.DateTime.Interval.to_string(interval, unquote(backend), locale: locale)
           end
 
@@ -95,7 +95,7 @@ defmodule Cldr.DateTime.Interval.Backend do
                   {:ok, String.t()} | {:error, {module, String.t()}}
 
           def to_string(%CalendarInterval{} = interval, options) do
-            locale = unquote(backend).get_locale
+            locale = unquote(backend).get_locale()
             options = Keyword.put_new(options, :locale, locale)
             Cldr.DateTime.Interval.to_string(interval, unquote(backend), options)
           end
@@ -187,7 +187,7 @@ defmodule Cldr.DateTime.Interval.Backend do
         end
 
         def do_to_string(from, to, options) do
-          locale = unquote(backend).get_locale
+          locale = unquote(backend).get_locale()
           options = Keyword.put_new(options, :locale, locale)
           Cldr.DateTime.Interval.to_string(from, to, unquote(backend), options)
         end
@@ -195,7 +195,7 @@ defmodule Cldr.DateTime.Interval.Backend do
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           @doc false
           def to_string!(%CalendarInterval{} = interval) do
-            locale = unquote(backend).get_locale
+            locale = unquote(backend).get_locale()
             Cldr.DateTime.Interval.to_string!(interval, unquote(backend), locale: locale)
           end
 
@@ -257,7 +257,7 @@ defmodule Cldr.DateTime.Interval.Backend do
                   String.t() | no_return
 
           def to_string!(%CalendarInterval{} = interval, options) do
-            locale = unquote(backend).get_locale
+            locale = unquote(backend).get_locale()
             options = Keyword.put_new(options, :locale, locale)
             Cldr.DateTime.Interval.to_string!(interval, unquote(backend), options)
           end
@@ -344,7 +344,7 @@ defmodule Cldr.DateTime.Interval.Backend do
         end
 
         def do_to_string!(from, to, options) do
-          locale = unquote(backend).get_locale
+          locale = unquote(backend).get_locale()
           options = Keyword.put_new(options, :locale, locale)
           Cldr.DateTime.Interval.to_string!(from, to, unquote(backend), options)
         end

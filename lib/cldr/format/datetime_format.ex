@@ -459,7 +459,7 @@ defmodule Cldr.DateTime.Format do
 
   ## Example:
 
-      iex> Cldr.DateTime.Format.common_date_time_format_names
+      iex> Cldr.DateTime.Format.common_date_time_format_names()
       [
         :Bh,
         :Bhm,

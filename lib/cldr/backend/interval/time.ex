@@ -126,7 +126,7 @@ defmodule Cldr.Time.Interval.Backend do
         end
 
         def do_to_string(from, to, options) do
-          locale = unquote(backend).get_locale
+          locale = unquote(backend).get_locale()
           options = Keyword.put_new(options, :locale, locale)
           Cldr.Time.Interval.to_string(from, to, unquote(backend), options)
         end
@@ -233,7 +233,7 @@ defmodule Cldr.Time.Interval.Backend do
         end
 
         def do_to_string!(from, to, options) do
-          locale = unquote(backend).get_locale
+          locale = unquote(backend).get_locale()
           options = Keyword.put_new(options, :locale, locale)
           Cldr.Time.Interval.to_string!(from, to, unquote(backend), options)
         end

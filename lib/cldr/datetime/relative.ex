@@ -387,7 +387,7 @@ defmodule Cldr.DateTime.Relative do
 
   ## Example
 
-      iex> Cldr.DateTime.Relative.known_units
+      iex> Cldr.DateTime.Relative.known_units()
       [:day, :fri, :hour, :minute, :mon, :month, :quarter, :sat, :second, :sun, :thu, :tue, :wed, :week, :year]
 
   """

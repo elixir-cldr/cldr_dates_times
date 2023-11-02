@@ -15,7 +15,7 @@ defmodule Cldr.DatesTimes.Mixfile do
       package: package(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      compilers: Mix.compilers(),
+      compilers: [:leex, :yecc] ++ Mix.compilers(),
       elixirc_paths: elixirc_paths(Mix.env()),
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore_warnings",
