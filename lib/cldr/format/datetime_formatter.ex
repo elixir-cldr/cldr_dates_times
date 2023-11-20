@@ -12,7 +12,7 @@ defmodule Cldr.DateTime.Formatter do
   Variations of each format are defined by repeating the
   format symbol one or more times.  CLDR typically defines
   an `:abbreviated`, `:wide` and `:narrow` format that is
-  reprented by a sequence of 3, 4 or 5 format symbols but
+  represented by a sequence of 3, 4 or 5 format symbols but
   this can vary depending on the format symbol.
 
   The [CLDR standard](http://unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
@@ -437,7 +437,7 @@ defmodule Cldr.DateTime.Formatter do
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-    used in `weeK_aligned_year/4`
+    used in `week_aligned_year/4`
 
   ## Format Symbol
 
@@ -547,7 +547,7 @@ defmodule Cldr.DateTime.Formatter do
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
-    used in `weeK_aligned_year/4`
+    used in `week_aligned_year/4`
 
   **NOTE: This current implementation always returns
   the year provided in the supplied date.  This means
