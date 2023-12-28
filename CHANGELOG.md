@@ -4,7 +4,7 @@
 
 ## Cldr_Dates_Times v2.16.0
 
-This is the changelog for Cldr_Dates_Times v2.15.1 released on November 2nd, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.16.0 released on November 2nd, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Bug Fixes
 
