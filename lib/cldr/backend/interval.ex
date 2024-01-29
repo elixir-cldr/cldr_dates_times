@@ -92,7 +92,7 @@ defmodule Cldr.Interval.Backend do
           * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
 
           * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
-            if its `:precision` is `:year`, `:month` or `:day`. Othersie
+            if its `:precision` is `:year`, `:month` or `:day`. Otherwise
             it will call `Cldr.Time.Interval.to_string/3`
 
           * If `from` and `to` both conform to the `Calendar.datetime()`
@@ -203,7 +203,7 @@ defmodule Cldr.Interval.Backend do
           * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
 
           * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
-            if its `:precision` is `:year`, `:month` or `:day`. Othersie
+            if its `:precision` is `:year`, `:month` or `:day`. Otherwise
             it will call `Cldr.Time.Interval.to_string/3`
 
           * If `from` and `to` both conform to the `Calendar.datetime()`
@@ -446,7 +446,7 @@ defmodule Cldr.Interval.Backend do
           * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
 
           * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
-            if its `:precision` is `:year`, `:month` or `:day`. Othersie
+            if its `:precision` is `:year`, `:month` or `:day`. Otherwise
             it will call `Cldr.Time.Interval.to_string/3`
 
           * If `from` and `to` both conform to the `Calendar.datetime()`
