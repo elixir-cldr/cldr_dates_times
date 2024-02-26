@@ -346,15 +346,6 @@ defmodule Cldr.DateTime.Format do
       {
         :ok,
         %{
-          d: "d",
-          h: "h a",
-          hm: "h:mm a",
-          hms: "h:mm:ss a",
-          hmsv: "h:mm:ss a v",
-          hmv: "h:mm a v",
-          ms: "mm:ss",
-          y: "y",
-          yw: %{one: "'week' w 'of' Y", other: "'week' w 'of' Y"},
           Bh: "h B",
           Bhm: "h:mm B",
           Bhms: "h:mm:ss B",
@@ -364,8 +355,8 @@ defmodule Cldr.DateTime.Format do
           EHm: "E HH:mm",
           EHms: "E HH:mm:ss",
           Ed: "d E",
-          Ehm: "E h:mm a",
-          Ehms: "E h:mm:ss a",
+          Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
+          Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
           Gy: "y G",
           GyMMM: "MMM y G",
           GyMMMEd: "E, MMM d, y G",
@@ -384,6 +375,14 @@ defmodule Cldr.DateTime.Format do
           MMMMd: "MMMM d",
           MMMd: "MMM d",
           Md: "M/d",
+          d: "d",
+          h: %{unicode: "h a", ascii: "h a"},
+          hm: %{unicode: "h:mm a", ascii: "h:mm a"},
+          hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+          hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
+          hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
+          ms: "mm:ss",
+          y: "y",
           yM: "M/y",
           yMEd: "E, M/d/y",
           yMMM: "MMM y",
@@ -392,7 +391,8 @@ defmodule Cldr.DateTime.Format do
           yMMMd: "MMM d, y",
           yMd: "M/d/y",
           yQQQ: "QQQ y",
-          yQQQQ: "QQQQ y"
+          yQQQQ: "QQQQ y",
+          yw: %{one: "'week' w 'of' Y", other: "'week' w 'of' Y"}
         }
       }
 

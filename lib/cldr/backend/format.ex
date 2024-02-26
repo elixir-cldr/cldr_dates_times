@@ -276,15 +276,6 @@ defmodule Cldr.DateTime.Format.Backend do
             {
               :ok,
               %{
-                d: "d",
-                h: "h a",
-                hm: "h:mm a",
-                hms: "h:mm:ss a",
-                hmsv: "h:mm:ss a v",
-                hmv: "h:mm a v",
-                ms: "mm:ss",
-                y: "y",
-                yw: %{one: "'week' w 'of' Y", other: "'week' w 'of' Y"},
                 Bh: "h B",
                 Bhm: "h:mm B",
                 Bhms: "h:mm:ss B",
@@ -294,8 +285,8 @@ defmodule Cldr.DateTime.Format.Backend do
                 EHm: "E HH:mm",
                 EHms: "E HH:mm:ss",
                 Ed: "d E",
-                Ehm: "E h:mm a",
-                Ehms: "E h:mm:ss a",
+                Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
+                Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
                 Gy: "y G",
                 GyMMM: "MMM y G",
                 GyMMMEd: "E, MMM d, y G",
@@ -314,6 +305,14 @@ defmodule Cldr.DateTime.Format.Backend do
                 MMMMd: "MMMM d",
                 MMMd: "MMM d",
                 Md: "M/d",
+                d: "d",
+                h: %{unicode: "h a", ascii: "h a"},
+                hm: %{unicode: "h:mm a", ascii: "h:mm a"},
+                hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+                hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
+                hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
+                ms: "mm:ss",
+                y: "y",
                 yM: "M/y",
                 yMEd: "E, M/d/y",
                 yMMM: "MMM y",
@@ -322,7 +321,8 @@ defmodule Cldr.DateTime.Format.Backend do
                 yMMMd: "MMM d, y",
                 yMd: "M/d/y",
                 yQQQ: "QQQ y",
-                yQQQQ: "QQQQ y"
+                yQQQQ: "QQQQ y",
+                yw: %{one: "'week' w 'of' Y", other: "'week' w 'of' Y"}
               }
             }
 
@@ -569,7 +569,23 @@ defmodule Cldr.DateTime.Format.Backend do
               {:ok, unquote(Macro.escape(date_time_at_formats))}
             end
 
-            available_formats = get_in(calendar_data, [:date_time_formats, :available_formats])
+            # For available formats we need to check for formats that have
+            # pluralization rules. For those rules we capture the field that
+            # is pluralizad at runtime - its the last token in the tokenized
+            # name of the format.
+
+            available_formats =
+              calendar_data
+              |> get_in([:date_time_formats, :available_formats])
+              |> Enum.map(fn
+                {name, %{other: _other} = plurals} ->
+                  {:ok, tokens, _} = Cldr.DateTime.Compiler.tokenize(to_string(name))
+                  [{pluralize, _, _} | _rest] = Enum.reverse(tokens)
+                  {name, Map.put(plurals, :pluralize, pluralize)}
+                other ->
+                  other
+              end)
+              |> Map.new()
 
             def date_time_available_formats(unquote(locale), unquote(calendar)) do
               {:ok, unquote(Macro.escape(available_formats))}
