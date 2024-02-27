@@ -7,6 +7,7 @@ defmodule Cldr.DateTime.Format do
   primarily concerned with encapsulating the
   data from CLDR in functions that are used
   during the formatting process.
+
   """
 
   alias Cldr.Locale
@@ -58,6 +59,9 @@ defmodule Cldr.DateTime.Format do
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`.
 
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
   ## Example
 
       iex> Cldr.DateTime.Format.calendars_for(:en, MyApp.Cldr)
@@ -69,7 +73,7 @@ defmodule Cldr.DateTime.Format do
   @spec calendars_for(Locale.locale_reference(), Cldr.backend()) ::
           {:ok, [Cldr.Calendar.calendar(), ...]} | {:error, {atom, String.T}}
 
-  def calendars_for(locale, backend \\ Cldr.Date.default_backend()) do
+  def calendars_for(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.calendars_for(locale)
   end
@@ -81,6 +85,10 @@ defmodule Cldr.DateTime.Format do
   ## Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   ## Example
 
@@ -94,7 +102,7 @@ defmodule Cldr.DateTime.Format do
     {:error, {atom, String.t()}}
   )
 
-  def gmt_format(locale, backend \\ Cldr.Date.default_backend()) do
+  def gmt_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.gmt_format(locale)
   end
@@ -107,6 +115,10 @@ defmodule Cldr.DateTime.Format do
   ## Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   ## Example
 
@@ -117,7 +129,7 @@ defmodule Cldr.DateTime.Format do
   @spec gmt_zero_format(Locale.locale_reference(), Cldr.backend()) ::
           {:ok, String.t()} | {:error, {atom, String.t()}}
 
-  def gmt_zero_format(locale, backend \\ Cldr.Date.default_backend()) do
+  def gmt_zero_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.gmt_zero_format(locale)
   end
@@ -128,7 +140,11 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   ## Example
 
@@ -149,10 +165,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
     The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   ## Examples:
 
@@ -194,10 +214,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
     The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   ## Examples:
 
@@ -239,10 +263,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
     The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   ## Examples:
 
@@ -289,10 +317,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
     The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   ## Examples:
 
@@ -336,65 +368,75 @@ defmodule Cldr.DateTime.Format do
   ## Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
-  The default is `:gregorian`
+    The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_time_available_formats(:en)
-      {
-        :ok,
-        %{
-          Bh: "h B",
-          Bhm: "h:mm B",
-          Bhms: "h:mm:ss B",
-          E: "ccc",
-          EBhm: "E h:mm B",
-          EBhms: "E h:mm:ss B",
-          EHm: "E HH:mm",
-          EHms: "E HH:mm:ss",
-          Ed: "d E",
-          Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
-          Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
-          Gy: "y G",
-          GyMMM: "MMM y G",
-          GyMMMEd: "E, MMM d, y G",
-          GyMMMd: "MMM d, y G",
-          GyMd: "M/d/y G",
-          H: "HH",
-          Hm: "HH:mm",
-          Hms: "HH:mm:ss",
-          Hmsv: "HH:mm:ss v",
-          Hmv: "HH:mm v",
-          M: "L",
-          MEd: "E, M/d",
-          MMM: "LLL",
-          MMMEd: "E, MMM d",
-          MMMMW: %{one: "'week' W 'of' MMMM", other: "'week' W 'of' MMMM"},
-          MMMMd: "MMMM d",
-          MMMd: "MMM d",
-          Md: "M/d",
-          d: "d",
-          h: %{unicode: "h a", ascii: "h a"},
-          hm: %{unicode: "h:mm a", ascii: "h:mm a"},
-          hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-          hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
-          hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
-          ms: "mm:ss",
-          y: "y",
-          yM: "M/y",
-          yMEd: "E, M/d/y",
-          yMMM: "MMM y",
-          yMMMEd: "E, MMM d, y",
-          yMMMM: "MMMM y",
-          yMMMd: "MMM d, y",
-          yMd: "M/d/y",
-          yQQQ: "QQQ y",
-          yQQQQ: "QQQQ y",
-          yw: %{one: "'week' w 'of' Y", other: "'week' w 'of' Y"}
-        }
-      }
+      {:ok,
+       %{
+         yw: %{
+           other: "'week' w 'of' Y",
+           one: "'week' w 'of' Y",
+           pluralize: :week_of_year
+         },
+         GyMMMEd: "E, MMM d, y G",
+         Hms: "HH:mm:ss",
+         MMMMW: %{
+           other: "'week' W 'of' MMMM",
+           one: "'week' W 'of' MMMM",
+           pluralize: :week_of_month
+         },
+         E: "ccc",
+         MMMd: "MMM d",
+         yMEd: "E, M/d/y",
+         yQQQ: "QQQ y",
+         Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
+         M: "L",
+         hm: %{unicode: "h:mm a", ascii: "h:mm a"},
+         yM: "M/y",
+         GyMMMd: "MMM d, y G",
+         GyMd: "M/d/y G",
+         Gy: "y G",
+         Hm: "HH:mm",
+         EBhms: "E h:mm:ss B",
+         d: "d",
+         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+         Ed: "d E",
+         Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
+         EHms: "E HH:mm:ss",
+         Bh: "h B",
+         h: %{unicode: "h a", ascii: "h a"},
+         Bhms: "h:mm:ss B",
+         Hmv: "HH:mm v",
+         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
+         yMd: "M/d/y",
+         ms: "mm:ss",
+         MMM: "LLL",
+         y: "y",
+         Bhm: "h:mm B",
+         yMMM: "MMM y",
+         yQQQQ: "QQQQ y",
+         yMMMEd: "E, MMM d, y",
+         yMMMM: "MMMM y",
+         EBhm: "E h:mm B",
+         Hmsv: "HH:mm:ss v",
+         yMMMd: "MMM d, y",
+         MEd: "E, M/d",
+         EHm: "E HH:mm",
+         GyMMM: "MMM y G",
+         hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
+         H: "HH",
+         Md: "M/d",
+         MMMEd: "E, MMM d",
+         MMMMd: "MMMM d"
+       }}
 
   """
   @spec date_time_available_formats(
@@ -418,10 +460,14 @@ defmodule Cldr.DateTime.Format do
 
   ## Arguments
 
-  * `locale` is any locale returned by `Cldr.known_locale_names/0`.
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
 
   * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
     The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   ## Examples:
 
@@ -452,7 +498,7 @@ defmodule Cldr.DateTime.Format do
 
   @doc """
   Returns a list of the date_time format types that are
-  available in all locales.
+  available in all known locales.
 
   The format types returned by `common_date_time_format_names`
   are guaranteed to be available in all known locales,

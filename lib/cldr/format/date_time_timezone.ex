@@ -1,4 +1,6 @@
 defmodule Cldr.DateTime.Timezone do
+  @moduledoc false
+
   @doc """
   Converts the time zone offset of a `Time` or `DateTime` into
   seconds.

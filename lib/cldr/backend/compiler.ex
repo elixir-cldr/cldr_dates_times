@@ -52,7 +52,7 @@ defmodule Cldr.DateTime.Compiler do
   def tokenize(definition) when is_binary(definition) do
     definition
     |> String.to_charlist()
-    |> :datetime_format_lexer.string()
+    |> :date_time_format_lexer.string()
   end
 
   def tokenize(%{number_system: _numbers, format: value}) do

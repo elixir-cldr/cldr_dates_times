@@ -383,4 +383,4 @@ iex> Cldr.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.
 
 Although largely complete (with respect to the CLDR data), there are some known limitations as of release 2.0.
 
-* *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V`, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `DateTime` struct is used to format timezone data.
+* *Timezones*  Although the timezone format codes are supported (formatting symbols `v`, `V`, `x`, `X`, `z`, `Z`, `O`) not all localisations are performed.  Only that data available within a `t:DateTime.t/0` struct is used to format timezone data.

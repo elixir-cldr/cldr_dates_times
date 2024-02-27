@@ -117,7 +117,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
 
               {:ok, formatted}
 
-            {:error, {_, :datetime_format_lexer, {_, error}}, _} ->
+            {:error, {_, :date_time_format_lexer, {_, error}}, _} ->
               {:error,
                {Cldr.DateTime.Compiler.ParseError,
                 "Could not tokenize #{inspect(format)}. Error detected at #{inspect(error)}"}}

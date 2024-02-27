@@ -2,6 +2,20 @@
 
 **Note that `ex_cldr_dates_times` version 2.14.0 and later are supported on Elixir 1.11 and later only.**
 
+## Cldr_Dates_Times v2.17.0
+
+This is the changelog for Cldr_Dates_Times v2.17.0 released on _____, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix formatting with formats that have may have pluralization like the `:MMMMW` and `:yw` formats.
+
+* Fix `:underspecs` for dialyzer.
+
+### Enhancements
+
+* Update to [CLDR 44.1](https://cldr.unicode.org/index/downloads/cldr-44) data. This includes support for formats that have both unicode whitespace and ascii whitespace versions. The option `:prefer` is added to `Cldr.DateTime.to_string/3`. The default is `prefer: :unicode`. The option `prefer: :ascii` is included for backwards compatibility of older applications. The formats that provide both `:unicode` and `:ascii` versions can be seen from the results of `Cldr.DateTime.Format.date_time_available_formats/2`.
+
 ## Cldr_Dates_Times v2.16.0
 
 This is the changelog for Cldr_Dates_Times v2.16.0 released on November 2nd, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
