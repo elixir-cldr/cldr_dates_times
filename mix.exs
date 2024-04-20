@@ -1,7 +1,7 @@
 defmodule Cldr.DatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.17.0-dev"
+  @version "2.17.0"
 
   def project do
     [
@@ -70,10 +70,10 @@ defmodule Cldr.DatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr_numbers, path: "../cldr_numbers", override: true},
-      {:ex_cldr_calendars, path: "../cldr_calendars"},
-      # {:ex_cldr_numbers, "~> 2.31"},
-      # {:ex_cldr_calendars, "~> 1.22"},
+      # {:ex_cldr_numbers, path: "../cldr_numbers", override: true},
+      # {:ex_cldr_calendars, path: "../cldr_calendars"},
+      {:ex_cldr_numbers, "~> 2.33"},
+      {:ex_cldr_calendars, "~> 1.23"},
 
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},
@@ -92,7 +92,7 @@ defmodule Cldr.DatesTimes.Mixfile do
       links: links(),
       files: [
         "lib",
-        "src/datetime_format_lexer.xrl",
+        "src/date_time_format_lexer.xrl",
         "config",
         "mix.exs",
         "README*",
