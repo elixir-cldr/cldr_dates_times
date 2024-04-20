@@ -6,6 +6,10 @@
 
 This is the changelog for Cldr_Dates_Times v2.17.0 released on _____, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
+### Enhancements
+
+* Update to [CLDR 45.0](https://cldr.unicode.org/index/downloads/cldr-45) data.
+
 ### Bug Fixes
 
 * Fix formatting with formats that have may have pluralization like the `:MMMMW` and `:yw` formats.
