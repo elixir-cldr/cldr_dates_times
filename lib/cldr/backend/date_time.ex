@@ -44,7 +44,7 @@ defmodule Cldr.DateAndTime.Backend do
           * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of datetime
             formats have two variants - one using Unicode spaces (typically non-breaking space) and
             another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-            use cases and is not recommended. See `Cldr.DateTime.Format.date_time_avaialable_formats/2`
+            use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/2`
             to see which formats have these variants.
 
           * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
@@ -128,7 +128,7 @@ defmodule Cldr.DateAndTime.Backend do
         * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of datetime
           formats have two variants - one using Unicode spaces (typically non-breaking space) and
           another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-          use cases and is not recommended. See `Cldr.DateTime.Format.date_time_avaialable_formats/2`
+          use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/2`
           to see which formats have these variants.
 
         * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
