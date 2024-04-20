@@ -6,17 +6,17 @@
 
 This is the changelog for Cldr_Dates_Times v2.17.0 released on April 21st, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
-### Enhancements
-
-* Update to [CLDR 45.0](https://cldr.unicode.org/index/downloads/cldr-45) data.
-
-* Adds support for formats that have both unicode whitespace and ascii whitespace versions. The option `:prefer` is added to `Cldr.DateTime.to_string/3`. The default is `prefer: :unicode`. The option `prefer: :ascii` is included for backwards compatibility of older applications. The formats that provide both `:unicode` and `:ascii` versions can be seen from the results of `Cldr.DateTime.Format.date_time_available_formats/2`.
-
 ### Bug Fixes
 
 * Fix formatting with formats that have may have pluralization like the `:MMMMW` and `:yw` formats.
 
 * Fix `:underspecs` for dialyzer.
+
+### Enhancements
+
+* Update to [CLDR 45.0](https://cldr.unicode.org/index/downloads/cldr-45) data.
+
+* Adds support for formats that have both unicode whitespace and ascii whitespace versions. The option `:prefer` is added to `Cldr.DateTime.to_string/3`. The default is `prefer: :unicode`. The option `prefer: :ascii` is included for backwards compatibility of older applications. The formats that provide both `:unicode` and `:ascii` versions can be seen from the results of `Cldr.DateTime.Format.date_time_available_formats/2`.
 
 ## Cldr_Dates_Times v2.16.0
 
