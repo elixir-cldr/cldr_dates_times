@@ -2,6 +2,14 @@
 
 **Note that `ex_cldr_dates_times` version 2.14.0 and later are supported on Elixir 1.11 and later only.**
 
+## Cldr_Dates_Times v2.17.1
+
+This is the changelog for Cldr_Dates_Times v2.17.1 released on May 2nd, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Add `config/prod.exs` so that the library can be compiled with `MIX_ENV=prod`. Thanks to @camelpunch for the PR. Closes #45.
+
 ## Cldr_Dates_Times v2.17.0
 
 This is the changelog for Cldr_Dates_Times v2.17.0 released on April 21st, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
