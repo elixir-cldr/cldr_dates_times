@@ -41,7 +41,7 @@ defmodule Cldr.DateTime.Formatter do
   | Cyclic Year            | U, UU, UUU | "甲子"           | Abbreviated                        |
   |                        | UUUU       | "甲子" (for now) | Wide                               |
   |                        | UUUUU      | "甲子" (for now) | Narrow                             |
-  | Extended Year          | u+         | 4601            | Minimim necessary digits           |
+  | Extended Year          | u+         | 4601            | Minimum necessary digits           |
   | Quarter                | Q          | 2               | Single digit                       |
   |                        | QQ         | "02"            | Two digits                         |
   |                        | QQQ        | "Q2"            | Abbreviated                        |
@@ -96,13 +96,13 @@ defmodule Cldr.DateTime.Formatter do
   |                        | BBBB       | "at night"      | Wide                               |
   |                        | BBBBB      | "at night"      | Narrow                             |
   | Hour                   | h, K, H, k |                 | See the table below                |
-  | Minute                 | m          | 3, 10           | Minimim digits of minutes          |
+  | Minute                 | m          | 3, 10           | Minimum digits of minutes          |
   |                        | mm         | "03", "12"      | Two digits, zero padded            |
-  | Second                 | s          | 3, 48           | Minimim digits of seconds          |
+  | Second                 | s          | 3, 48           | Minimum digits of seconds          |
   |                        | ss         | "03", "48"      | Two digits, zero padded            |
-  | Fractional Seconds     | S          | 3, 48           | Minimim digits of fractional seconds |
+  | Fractional Seconds     | S          | 3, 48           | Minimum digits of fractional seconds |
   |                        | SS         | "03", "48"      | Two digits, zero padded            |
-  | Milliseconds            | A+         | 4000, 63241     | Minimim digits of milliseconds since midnight |
+  | Milliseconds            | A+         | 4000, 63241     | Minimum digits of milliseconds since midnight |
   | Generic non-location TZ | v         | "Etc/UTC"       | `:time_zone` key, unlocalised      |
   |                         | vvvv      | "unk"           | Generic timezone name.  Currently returns only "unk" |
   | Specific non-location TZ | z..zzz   | "UTC"           | `:zone_abbr` key, unlocalised      |
@@ -557,7 +557,7 @@ defmodule Cldr.DateTime.Formatter do
 
   | Symbol     | Example         | Cldr Format               |
   | :--------  | :-------------- | :------------------------ |
-  | u+         | 4601            | Minimim necessary digits  |
+  | u+         | 4601            | Minimum necessary digits  |
 
   This is a single number designating the year of this
   calendar system, encompassing all supra-year fields.
@@ -2520,7 +2520,7 @@ defmodule Cldr.DateTime.Formatter do
 
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
-  | m      | 3, 10      | Minimim digits of minutes                             |
+  | m      | 3, 10      | Minimum digits of minutes                             |
   | mm     | "03", "12" | Number of minutes zero-padded to 2 digits             |
 
   ## Examples
@@ -2589,7 +2589,7 @@ defmodule Cldr.DateTime.Formatter do
 
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
-  | s      | 3, 48      | Minimim digits of seconds                             |
+  | s      | 3, 48      | Minimum digits of seconds                             |
   | ss     | "03", "48" | Number of seconds zero-padded to 2 digits             |
 
   ## Examples
@@ -2656,7 +2656,7 @@ defmodule Cldr.DateTime.Formatter do
 
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
-  | S      | "4.0"      | Minimim digits of fractional seconds                  |
+  | S      | "4.0"      | Minimum digits of fractional seconds                  |
   | SS     | "4.00"     | Number of seconds zero-padded to 2 fractional digits  |
   | SSS    | "4.002"    | Number of seconds zero-padded to 3 fractional digits  |
 
