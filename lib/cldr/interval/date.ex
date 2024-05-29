@@ -395,7 +395,7 @@ defmodule Cldr.Date.Interval do
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
-         {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type, backend),
+         {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type(), backend),
          {:ok, [left, right]} <- resolve_format(from, to, formats, options),
          {:ok, left_format} <- formatter.format(from, left, locale, options),
          {:ok, right_format} <- formatter.format(to, right, locale, options) do
@@ -413,7 +413,7 @@ defmodule Cldr.Date.Interval do
   # Open ended intervals use the `date_time_interval_fallback/0` format
   def to_string(nil, unquote(date()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    cldr_calendar = calendar.cldr_calendar_type
+    cldr_calendar = calendar.cldr_calendar_type()
 
     with {:ok, formatted} <- Cldr.Date.to_string(to, backend, options) do
       pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)
@@ -429,7 +429,7 @@ defmodule Cldr.Date.Interval do
 
   def to_string(unquote(date()) = from, nil, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    cldr_calendar = calendar.cldr_calendar_type
+    cldr_calendar = calendar.cldr_calendar_type()
 
     with {:ok, formatted} <- Cldr.Date.to_string(from, backend, options) do
       pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)

@@ -1,7 +1,7 @@
 defmodule Cldr.DatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.17.1"
+  @version "2.18.0"
 
   def project do
     [
@@ -10,7 +10,7 @@ defmodule Cldr.DatesTimes.Mixfile do
       name: "Cldr Dates & Times",
       source_url: "https://github.com/elixir-cldr/cldr_dates_times",
       docs: docs(),
-      elixir: "~> 1.11",
+      elixir: "~> 1.12",
       description: description(),
       package: package(),
       start_permanent: Mix.env() == :prod,

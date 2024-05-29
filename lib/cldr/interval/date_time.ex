@@ -352,7 +352,7 @@ defmodule Cldr.DateTime.Interval do
   # Open ended intervals use the `date_time_interval_fallback/0` format
   def to_string(nil, unquote(naivedatetime()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    cldr_calendar = calendar.cldr_calendar_type
+    cldr_calendar = calendar.cldr_calendar_type()
 
     with {:ok, formatted} <- Cldr.DateTime.to_string(to, backend, options) do
       pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)
@@ -368,7 +368,7 @@ defmodule Cldr.DateTime.Interval do
 
   def to_string(unquote(naivedatetime()) = from, nil, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    cldr_calendar = calendar.cldr_calendar_type
+    cldr_calendar = calendar.cldr_calendar_type()
 
     with {:ok, formatted} <- Cldr.DateTime.to_string(from, backend, options) do
       pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)

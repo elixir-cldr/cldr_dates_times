@@ -1,6 +1,16 @@
 # Changelog
 
-**Note that `ex_cldr_dates_times` version 2.14.0 and later are supported on Elixir 1.11 and later only.**
+**Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
+
+## Cldr_Dates_Times v2.18.0
+
+This is the changelog for Cldr_Dates_Times v2.18.0 released on May 29th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Clarify format compiler documentation. Thanks to @tjchambers for the issue. Closes #46.
+
+* Fix typos. Thanks to @tjchambers for the PR. Closes #47.
 
 ## Cldr_Dates_Times v2.17.1
 

@@ -37,7 +37,7 @@ defmodule Cldr.DateTime.Compiler do
   ## Returns
 
   A list of 3-tuples which represent the tokens
-  of the format definition
+  of the format definition.
 
   ## Example
 

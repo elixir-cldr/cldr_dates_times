@@ -250,7 +250,7 @@ defmodule Cldr.Time.Interval do
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
-         {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type, backend),
+         {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type(), backend),
          {:ok, [left, right]} <- resolve_format(from, to, formats, locale, options),
          {:ok, left_format} <- formatter.format(from, left, locale, options),
          {:ok, right_format} <- formatter.format(to, right, locale, options) do
