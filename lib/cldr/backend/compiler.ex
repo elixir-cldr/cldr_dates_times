@@ -24,17 +24,15 @@ defmodule Cldr.DateTime.Compiler do
   """
 
   @doc """
-  Scan a number format definition and return
-  the tokens of a date/time/datetime format
-  string.
+  Tpkenize a date, time or datetime format string.
 
   This function is designed to produce output
   that is fed into `Cldr.DateTime.Compiler.compile/3`.
 
   ## Arguments
 
-  * `definition` is a date, datetime or time format
-    string
+  * `format_string` is a date, datetime or time format
+    string.
 
   ## Returns
 
@@ -43,24 +41,24 @@ defmodule Cldr.DateTime.Compiler do
 
   ## Example
 
-      iex> Cldr.DateTime.Compiler.tokenize "yyyy/MM/dd"
+      iex> Cldr.DateTime.Compiler.tokenize("yyyy/MM/dd")
       {:ok,
        [{:year, 1, 4}, {:literal, 1, "/"}, {:month, 1, 2}, {:literal, 1, "/"},
         {:day_of_month, 1, 2}], 1}
 
   """
-  def tokenize(definition) when is_binary(definition) do
-    definition
+  def tokenize(format_string) when is_binary(format_string) do
+    format_string
     |> String.to_charlist()
     |> :date_time_format_lexer.string()
   end
 
-  def tokenize(%{number_system: _numbers, format: value}) do
-    tokenize(value)
+  def tokenize(%{number_system: _numbers, format: format_string}) do
+    tokenize(format_string)
   end
 
   @doc """
-  Parse a number format definition
+  Parse a date, time or datetime format string.
 
   ## Arguments
 
