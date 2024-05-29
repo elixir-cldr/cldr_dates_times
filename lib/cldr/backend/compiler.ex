@@ -24,7 +24,7 @@ defmodule Cldr.DateTime.Compiler do
   """
 
   @doc """
-  Tpkenize a date, time or datetime format string.
+  Tokenize a date, time or datetime format string.
 
   This function is designed to produce output
   that is fed into `Cldr.DateTime.Compiler.compile/3`.
