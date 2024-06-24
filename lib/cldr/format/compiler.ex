@@ -115,4 +115,26 @@ defmodule Cldr.DateTime.Compiler do
   def compile(arg, _, _) do
     raise ArgumentError, message: "No idea how to compile format: #{inspect(arg)}"
   end
+
+  @doc false
+  def tokenize_skeleton(token_id) when is_atom(token_id) do
+    token_id
+    |> Atom.to_string()
+    |> tokenize_skeleton()
+  end
+
+  def tokenize_skeleton(token_id) when is_binary(token_id) do
+    tokenized =
+      token_id
+      |> String.to_charlist()
+      |> :skeleton_tokenizer.string()
+
+    case tokenized do
+      {:ok, tokens, _} ->
+        {:ok, tokens}
+
+      {:error, {_, _, {:illegal, content}}} ->
+        {:error, "Illegal format string content found at: #{inspect(content)}"}
+    end
+  end
 end

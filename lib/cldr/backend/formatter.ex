@@ -49,7 +49,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.format ~U[2017-09-03 10:23:00.0Z], "yy/MM/dd hh:MM", "en"
+            iex> #{inspect(__MODULE__)}.format ~U[2017-09-03 10:23:00.0Z], "yy/MM/dd hh:MM", "en"
             {:ok, "17/09/03 10:09"}
 
         """

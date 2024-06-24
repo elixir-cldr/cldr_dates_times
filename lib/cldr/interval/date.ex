@@ -416,7 +416,9 @@ defmodule Cldr.Date.Interval do
     cldr_calendar = calendar.cldr_calendar_type()
 
     with {:ok, formatted} <- Cldr.Date.to_string(to, backend, options) do
-      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)
+      pattern =
+        Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)
+
       result =
         ["", formatted]
         |> Cldr.Substitution.substitute(pattern)
@@ -432,7 +434,9 @@ defmodule Cldr.Date.Interval do
     cldr_calendar = calendar.cldr_calendar_type()
 
     with {:ok, formatted} <- Cldr.Date.to_string(from, backend, options) do
-      pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)
+      pattern =
+        Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale, cldr_calendar)
+
       result =
         [formatted, ""]
         |> Cldr.Substitution.substitute(pattern)
@@ -669,16 +673,19 @@ defmodule Cldr.Date.Interval do
     end
   end
 
-  defp greatest_difference_format(format, _requested_format, _requested_style, _) when is_binary(format) do
+  defp greatest_difference_format(format, _requested_format, _requested_style, _)
+       when is_binary(format) do
     {:ok, format}
   end
 
-  defp greatest_difference_format(format, _requested_format, _requested_style, _) when is_list(format) do
+  defp greatest_difference_format(format, _requested_format, _requested_style, _)
+       when is_list(format) do
     {:ok, format}
   end
 
   defp greatest_difference_format(format, requested_format, requested_style, :y = difference) do
-    resolved_format = Map.get(format, difference) || Map.get(format, :M) || Map.get(format, :d) || :error
+    resolved_format =
+      Map.get(format, difference) || Map.get(format, :M) || Map.get(format, :d) || :error
 
     case resolved_format do
       :error -> {:error, unavailable_format_error(requested_format, requested_style, difference)}
@@ -755,7 +762,7 @@ defmodule Cldr.Date.Interval do
     {
       Cldr.DateTime.UnresolvedFormat,
       "The interval format #{inspect(requested_format)} with style #{inspect(requested_style)} " <>
-      "is invalid when the greatest difference between two dates is the year. "
+        "is invalid when the greatest difference between two dates is the year. "
     }
   end
 

@@ -173,7 +173,13 @@ defmodule Cldr.DateTime.Formatter do
     date(date, n, locale, backend, options)
   end
 
-  @spec date(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), Keyword.t() | map()) ::
+  @spec date(
+          Calendar.date(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          Keyword.t() | map()
+        ) ::
           String.t() | {:error, {module(), String.t()}}
 
   def date(date, _n, _locale, backend, options) when is_list(options) do
@@ -210,7 +216,13 @@ defmodule Cldr.DateTime.Formatter do
     time(time, n, locale, backend, options)
   end
 
-  @spec time(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), Keyword.t() | map()) ::
+  @spec time(
+          Calendar.time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          Keyword.t() | map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def time(time, _n, _locale, backend, options) when is_list(options) do
@@ -497,7 +509,13 @@ defmodule Cldr.DateTime.Formatter do
     week_aligned_year(week_aligned_year, n, locale, backend, Map.new(options))
   end
 
-  @spec week_aligned_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec week_aligned_year(
+          Calendar.date(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def week_aligned_year(date, n, locale, backend, options \\ %{})
@@ -509,6 +527,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def week_aligned_year(date, 1, _locale, _backend, options) do
     {year, _week} = Cldr.Calendar.week_of_year(date)
+
     to_string(year)
     |> maybe_wrap(:week_aligned_year, options)
   end
@@ -524,6 +543,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def week_aligned_year(date, n, _locale, _backend, options) when n in 3..5 do
     {year, _week} = Cldr.Calendar.week_of_year(date)
+
     pad(year, n)
     |> maybe_wrap(:week_aligned_year, options)
   end
@@ -938,7 +958,13 @@ defmodule Cldr.DateTime.Formatter do
     standalone_quarter(standalone_quarter, n, locale, backend, Map.new(options))
   end
 
-  @spec standalone_quarter(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec standalone_quarter(
+          Calendar.date(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def standalone_quarter(date, n, locale, backend, options \\ %{})
@@ -1267,6 +1293,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def week_of_year(date, n, _locale, _backend, options) when n in 1..2 do
     {_year, week} = Cldr.Calendar.week_of_year(date)
+
     week
     |> pad(n)
     |> maybe_wrap(:week_of_year, options)
@@ -1339,6 +1366,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def week_of_month(date, n, _locale, _backend, options) when n in 1..2 do
     {_month, week_of_month} = Cldr.Calendar.week_of_month(date)
+
     week_of_month
     |> pad(n)
     |> maybe_wrap(:week_of_month, options)
@@ -1777,7 +1805,14 @@ defmodule Cldr.DateTime.Formatter do
 
   def standalone_day_of_week(standalone_day_of_week, options, []) when is_list(options) do
     {locale, backend} = extract_locale!(options)
-    standalone_day_of_week(standalone_day_of_week, @default_format, locale, backend, Map.new(options))
+
+    standalone_day_of_week(
+      standalone_day_of_week,
+      @default_format,
+      locale,
+      backend,
+      Map.new(options)
+    )
   end
 
   def standalone_day_of_week(standalone_day_of_week, n, options) do
@@ -1785,7 +1820,13 @@ defmodule Cldr.DateTime.Formatter do
     standalone_day_of_week(standalone_day_of_week, n, locale, backend, Map.new(options))
   end
 
-  @spec standalone_day_of_week(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec standalone_day_of_week(
+          Calendar.date(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def standalone_day_of_week(date, n, locale, backend, options \\ %{})
@@ -1996,7 +2037,13 @@ defmodule Cldr.DateTime.Formatter do
     period_noon_midnight(period_noon_midnight, n, locale, backend, Map.new(options))
   end
 
-  @spec period_noon_midnight(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec period_noon_midnight(
+          Calendar.time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def period_noon_midnight(time, n, locale, backend, options \\ %{})
@@ -2687,7 +2734,13 @@ defmodule Cldr.DateTime.Formatter do
     fractional_second(fractional_second, n, locale, backend, Map.new(options))
   end
 
-  @spec fractional_second(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec fractional_second(
+          Calendar.time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   # Note that TR35 says we should truncate the number of decimal digits
@@ -3137,6 +3190,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_basic(time, 5, _locale, _backend, options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
+
     iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
     |> maybe_wrap(:zone_basic, options)
   end
@@ -3516,6 +3570,7 @@ defmodule Cldr.DateTime.Formatter do
   def zone_gmt(time, 1, locale, backend, options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
     backend = Module.concat(backend, DateTime.Formatter)
+
     backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :short)
     |> maybe_wrap(:zone_gmt, options)
   end
@@ -3523,6 +3578,7 @@ defmodule Cldr.DateTime.Formatter do
   def zone_gmt(time, 4, locale, backend, options) do
     {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
     backend = Module.concat(backend, DateTime.Formatter)
+
     backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :long)
     |> maybe_wrap(:zone_gmt, options)
   end
@@ -3620,6 +3676,7 @@ defmodule Cldr.DateTime.Formatter do
 
   defp pad(integer, n) when is_binary(integer) do
     len = String.length(integer)
+
     if len >= n do
       integer
     else

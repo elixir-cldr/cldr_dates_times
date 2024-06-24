@@ -46,11 +46,17 @@ defmodule Cldr.DatesTimes.Test do
 
   test "to_string/2 when the second param is options (not backend)" do
     assert Cldr.Date.to_string(~D[2022-01-22], backend: MyApp.Cldr) == {:ok, "Jan 22, 2022"}
-    assert Cldr.DateTime.to_string(~U[2022-01-22T01:00:00.0Z], backend: MyApp.Cldr) == {:ok, "Jan 22, 2022, 1:00:00 AM"}
+
+    assert Cldr.DateTime.to_string(~U[2022-01-22T01:00:00.0Z], backend: MyApp.Cldr) ==
+             {:ok, "Jan 22, 2022, 1:00:00 AM"}
+
     assert Cldr.Time.to_string(~T[01:23:00], backend: MyApp.Cldr) == {:ok, "1:23:00 AM"}
 
     assert Cldr.Date.to_string!(~D[2022-01-22], backend: MyApp.Cldr) == "Jan 22, 2022"
-    assert Cldr.DateTime.to_string!(~U[2022-01-22T01:00:00.0Z], backend: MyApp.Cldr) == "Jan 22, 2022, 1:00:00 AM"
+
+    assert Cldr.DateTime.to_string!(~U[2022-01-22T01:00:00.0Z], backend: MyApp.Cldr) ==
+             "Jan 22, 2022, 1:00:00 AM"
+
     assert Cldr.Time.to_string!(~T[01:23:00], backend: MyApp.Cldr) == "1:23:00 AM"
   end
 
@@ -58,15 +64,15 @@ defmodule Cldr.DatesTimes.Test do
     date_time = ~U[2023-09-08 15:50:00Z]
 
     assert Cldr.DateTime.to_string(date_time, format: :full, style: :at) ==
-      {:ok, "Friday, September 8, 2023 at 3:50:00 PM GMT"}
+             {:ok, "Friday, September 8, 2023 at 3:50:00 PM GMT"}
 
     assert Cldr.DateTime.to_string(date_time, format: :long, style: :at) ==
-      {:ok, "September 8, 2023 at 3:50:00 PM UTC"}
+             {:ok, "September 8, 2023 at 3:50:00 PM UTC"}
 
     assert Cldr.DateTime.to_string(date_time, format: :full, style: :at, locale: :fr) ==
-      {:ok, "vendredi 8 septembre 2023 à 15:50:00 UTC"}
+             {:ok, "vendredi 8 septembre 2023 à 15:50:00 UTC"}
 
     assert Cldr.DateTime.to_string(date_time, format: :long, style: :at, locale: :fr) ==
-      {:ok, "8 septembre 2023 à 15:50:00 UTC"}
+             {:ok, "8 septembre 2023 à 15:50:00 UTC"}
   end
 end

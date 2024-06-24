@@ -322,10 +322,14 @@ defmodule Cldr.Time do
   #
   defp time_symbols do
     %{
-      "h" => :h12, # :hour_1_12,
-      "K" => :h11, # :hour_0_11,
-      "H" => :h23, # :hour_0_23,
-      "k" => :h24, # :hour_1_24.
+      # :hour_1_12,
+      "h" => :h12,
+      # :hour_0_11,
+      "K" => :h11,
+      # :hour_0_23,
+      "H" => :h23,
+      # :hour_1_24.
+      "k" => :h24
     }
   end
 

@@ -12,7 +12,14 @@ defmodule Cldr.DateTime.Format do
 
   alias Cldr.Locale
   alias Cldr.LanguageTag
+  alias Cldr.DateTime.Compiler
 
+  @typedoc """
+  The standard formats of `:full`,
+  `:long`, :medium` and `:short` are used
+  to resolve standard formats in a locale independent
+  way.
+  """
   @type standard_formats :: %{
           full: String.t(),
           long: String.t(),
@@ -20,7 +27,20 @@ defmodule Cldr.DateTime.Format do
           short: String.t()
         }
 
-  @type formats :: Cldr.Calendar.calendar()
+  @typedoc """
+  A format skeleton is a string consisting of [format
+  symbols](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
+  which is used to find the best match from the list of
+  formats returned by `Cldr.DateTime.Format.date_time_available_formats/3`
+  """
+  @type format_skeleton :: String.t()
+
+  @typedoc """
+  A format_id is an atom that indexes into the map returned by
+  `Cldr.DateTime.Format.date_time_available_formats/3` to
+  resolve a format string.
+  """
+  @type format_id :: atom()
 
   @doc false
   def format_list(config) do
@@ -454,6 +474,20 @@ defmodule Cldr.DateTime.Format do
     backend.date_time_available_formats(locale, calendar)
   end
 
+  @spec date_time_available_format_tokens(
+          locale :: Locale.locale_reference(),
+          calendar :: Cldr.Calendar.calendar(),
+          backend :: Cldr.backend()
+        ) :: {:ok, map()} | {:error, {atom, String.t()}}
+  def date_time_available_format_tokens(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_time_available_format_tokens(locale, calendar)
+  end
+
   @doc """
   Returns a map of the interval formats for a
   given locale and calendar.
@@ -506,55 +540,10 @@ defmodule Cldr.DateTime.Format do
   ## Example:
 
       iex> Cldr.DateTime.Format.common_date_time_format_names()
-      [
-        :Bh,
-        :Bhm,
-        :Bhms,
-        :E,
-        :EBhm,
-        :EBhms,
-        :EHm,
-        :EHms,
-        :Ed,
-        :Ehm,
-        :Ehms,
-        :Gy,
-        :GyMMM,
-        :GyMMMEd,
-        :GyMMMd,
-        :GyMd,
-        :H,
-        :Hm,
-        :Hms,
-        :Hmsv,
-        :Hmv,
-        :M,
-        :MEd,
-        :MMM,
-        :MMMEd,
-        :MMMMW,
-        :MMMMd,
-        :MMMd,
-        :Md,
-        :d,
-        :h,
-        :hm,
-        :hms,
-        :hmsv,
-        :hmv,
-        :ms,
-        :y,
-        :yM,
-        :yMEd,
-        :yMMM,
-        :yMMMEd,
-        :yMMMM,
-        :yMMMd,
-        :yMd,
-        :yQQQ,
-        :yQQQQ,
-        :yw
-      ]
+      [:Bh, :Bhm, :Bhms, :E, :EBhm, :EBhms, :EHm, :EHms, :Ed, :Ehm, :Ehms, :Gy,
+       :GyMMM, :GyMMMEd, :GyMMMd, :GyMd, :H, :Hm, :Hms, :Hmsv, :Hmv, :M, :MEd, :MMM,
+       :MMMEd, :MMMMW, :MMMMd, :MMMd, :Md, :d, :h, :hm, :hms, :hmsv, :hmv, :ms, :y,
+       :yM, :yMEd, :yMMM, :yMMMEd, :yMMMM, :yMMMd, :yMd, :yQQQ, :yQQQQ, :yw]
 
   """
   @spec common_date_time_format_names(backend :: Cldr.backend()) :: [atom]
@@ -609,7 +598,12 @@ defmodule Cldr.DateTime.Format do
     with {:ok, calendars} <- calendars_for(locale, backend) do
       Enum.reduce(calendars, [], fn calendar, acc ->
         {:ok, calendar_formats} = type_function.(locale, calendar)
-        map = if is_struct(calendar_formats), do: Map.from_struct(calendar_formats), else: calendar_formats
+
+        map =
+          if is_struct(calendar_formats),
+            do: Map.from_struct(calendar_formats),
+            else: calendar_formats
+
         acc ++ Map.values(map)
       end)
       |> Enum.uniq()
@@ -640,6 +634,8 @@ defmodule Cldr.DateTime.Format do
     intersect_mapsets([MapSet.intersection(a, b) | tail])
   end
 
+  @doc false
+
   # All locales define an hour_format that have the following characteristics:
   #  >  :hour and :minute only (and always both)
   #  >  :minute is always 2 digits: "mm"
@@ -665,6 +661,243 @@ defmodule Cldr.DateTime.Format do
   # The case when there is no separator
   def gmt_format_type([sign, hour, minute], format_type) do
     gmt_format_type([sign, hour, "", minute], format_type)
+  end
+
+  @doc """
+  Find the best match for a requested format.
+
+  """
+
+  # Date/Time format symbols are defined at
+  # https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table
+
+  @doc since: "2.19.0"
+  @spec best_match(
+          skeleton :: format_skeleton(),
+          locale :: Locale.locale_reference(),
+          calendar :: Cldr.Calendar.calendar(),
+          backend :: Cldr.backend()
+        ) :: {:ok, format_id()} | {:error, {module(), String.t()}}
+
+  def best_match(
+        skeleton,
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    with {:ok, locale} <- Cldr.validate_locale(locale, backend),
+         {:ok, skeleton} <- put_preferred_time_symbols(skeleton, locale),
+         {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton) do
+      # match_with_day_periods? =
+      #   !String.contains?(skeleton, "J")
+
+      available_format_tokens =
+        date_time_available_format_tokens(locale, calendar, backend)
+
+      skeleton_keys =
+        skeleton_tokens
+        |> :proplists.get_keys()
+        |> canonical_keys()
+
+      skeleton_ordered =
+        sort_tokens(skeleton_tokens)
+
+      candidates =
+        available_format_tokens
+        |> Enum.filter(&filter_candidates(&1, skeleton_keys))
+        |> Enum.map(&distance_from(&1, skeleton_ordered))
+        |> Enum.sort(&compare_counts/2)
+
+      case candidates do
+        [] ->
+          {:error,
+           {
+             Cldr.DateTime.UnresolvedFormat,
+             "No available format for #{inspect(skeleton)}"
+           }}
+
+        [{format_id, _} | _rest] ->
+          {:ok, format_id}
+      end
+    end
+  end
+
+  # https://www.unicode.org/reports/tr35/tr35-dates.html#Matching_Skeletons
+  # For skeleton and id fields with symbols representing the same type (year, month, day, etc):
+  # Most symbols have a small distance from each other.
+  #   M ≅ L; E ≅ c; a ≅ b ≅ B; H ≅ k ≅ h ≅ K; ...
+  # Width differences among fields, other than those marking text vs numeric, are given small
+  # distance from each other.
+  #   MMM ≅ MMMM
+  #   MM ≅ M
+  # Numeric and text fields are given a larger distance from each other.
+  #   MMM ≈ MM
+  # Symbols representing substantial differences (week of year vs week of month) are given a much
+  # larger distance from each other.
+  #   ≋ D; ...
+
+  defp filter_candidates({_format_id, tokens}, skeleton_keys) do
+    token_keys =
+      tokens
+      |> :proplists.get_keys()
+      |> canonical_keys()
+
+    token_keys == skeleton_keys
+  end
+
+  # Sort the tokesn in canonical order, using
+  # the substiturion table.
+  defp sort_tokens(tokens) do
+    Enum.sort(tokens, fn {symbol_a, _}, {symbol_b, _} ->
+      canonical_key(symbol_a) < canonical_key(symbol_b)
+    end)
+  end
+
+  defp compare_counts({_, count_a}, {_, count_b}) do
+    count_a < count_b
+  end
+
+  # These are all considered matchable since they are
+  # similar. But they will have different distance weights
+  # when sorting to find the best match.
+
+  defp canonical_keys(keys) do
+    keys
+    |> Enum.map(&canonical_key/1)
+    |> Enum.sort()
+  end
+
+  defp canonical_key(key) do
+    case key do
+      "L" -> "M"
+      "c" -> "E"
+      s when s in ["b", "B"] -> "a"
+      s when s in ["k", "h", "K"] -> "H"
+      other -> other
+    end
+  end
+
+  # When comparing distances we want the smallest difference in each
+  # token as long as we don't allow numeric symbols (like M and MM) to
+  # become alpha tokens (like MMM and MMMM).
+
+  # Note the guarantees at this point:
+  # 1. The token list and the skeleton list are the same length
+  # 2. The two lists are in the same semnatic order. They may not
+  #    have the same symbol - but both symbols are considered
+  #    substitutable for each other.
+
+  defguard different_but_compatible(token_a, token_b)
+           when (elem(token_a, 0) in ["L", "M"] and elem(token_b, 0) in ["L", "M"]) or
+                  (elem(token_a, 0) in ["c", "E"] and elem(token_b, 0) in ["c", "E"]) or
+                  (elem(token_a, 0) in ["a", "b", "B"] and elem(token_b, 0) in ["a", "b", "B"]) or
+                  (elem(token_a, 0) in ["k", "h", "K", "H"] and
+                     elem(token_b, 0) in ["k", "h", "K", "H"])
+
+  defguard same_types(token_a, token_b)
+           when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) in [1, 2]) or
+                  (elem(token_a, 1) in [3, 4] and elem(token_b, 1) in [3, 4])
+
+  defguard different_types(token_a, token_b)
+           when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) in [3, 4]) or
+                  (elem(token_a, 1) in [3, 4] and elem(token_b, 1) in [1, 2])
+
+  defp distance_from({token_id, tokens}, skeleton) do
+    sorted_tokens = sort_tokens(tokens)
+
+    distance =
+      Enum.zip_reduce(sorted_tokens, skeleton, 0, fn
+        # Same symbol, both numeric forms so the distance is
+        # just the different in their counts
+        {symbol_a, count_a}, {symbol_a, count_b}, acc
+        when same_types({symbol_a, count_a}, {symbol_a, count_b}) ->
+          acc + abs(count_a - count_b)
+
+        # Same symbol, but one is numeric form, the other
+        # is alpha form. Assgn a difference of 5.
+        {symbol_a, count_a}, {symbol_a, count_b}, acc
+        when different_types({symbol_a, count_a}, {symbol_a, count_b}) ->
+          acc + 10
+
+        # Different but compatible symbols, both of numeric
+        # form.
+        {symbol_a, count_a}, {symbol_b, count_b}, acc
+        when different_but_compatible({symbol_a, count_a}, {symbol_b, count_b}) and
+               same_types({symbol_a, count_a}, {symbol_b, count_b}) ->
+          acc + abs(count_a - count_b) + 5
+
+        # Different but compatible symbols, one numeric
+        # and one alphbetic form.
+        {symbol_a, count_a}, {symbol_b, count_b}, acc
+        when different_but_compatible({symbol_a, count_a}, {symbol_b, count_b}) and
+               different_types({symbol_a, count_a}, {symbol_b, count_b}) ->
+          acc + abs(count_a - count_b) + 10
+      end)
+
+    {token_id, distance}
+  end
+
+  # The time preferences are defined in
+  # https://www.unicode.org/reports/tr35/tr35-dates.html#Time_Data
+
+  defp put_preferred_time_symbols(skeleton, locale) do
+    preferred_time_symbol = preferred_time_symbol(locale)
+    allowed_time_symbol = hd(allowed_time_symbols(locale))
+
+    {:ok, replace_time_symbols(skeleton, preferred_time_symbol, allowed_time_symbol)}
+  end
+
+  defp replace_time_symbols("", _preferred, _allowed) do
+    ""
+  end
+
+  defp replace_time_symbols(<<"j", rest::binary>>, preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"J", rest::binary>>, preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"C", rest::binary>>, preferred, allowed) do
+    allowed <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<symbol::utf8, rest::binary>>, preferred, allowed) do
+    <<symbol::utf8>> <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  @locale_preferred_time_symbol %{
+    h11: "K",
+    h12: "h",
+    h23: "H",
+    h24: "k"
+  }
+
+  # Locale's time preference takes priority
+  defp preferred_time_symbol(%LanguageTag{locale: %{hc: hc}}) when is_atom(hc) do
+    Map.fetch!(@locale_preferred_time_symbol, hc)
+  end
+
+  # The lookup path is:
+  # 1. cldr_locale_name
+  # 2. territory
+  # 3. 001 ("The world")
+
+  defp preferred_time_symbol(%LanguageTag{} = locale) do
+    time_preferences(locale).preferred
+  end
+
+  defp allowed_time_symbols(locale) do
+    time_preferences(locale).allowed
+  end
+
+  defp time_preferences(locale) do
+    time_preferences = Cldr.Config.time_preferences()
+
+    Map.get(time_preferences, locale.cldr_locale_name) ||
+      Map.get(time_preferences, locale.territory) ||
+      Map.fetch!(time_preferences, :"001")
   end
 
   ### Helpers
@@ -770,12 +1003,12 @@ defmodule Cldr.DateTime.Format do
   # Month: L, M
   # Week Day: E, e, c
 
-  defp already_seen?("Q", acc), do: ("Q" in acc) || ("q" in acc)
-  defp already_seen?("q", acc), do: ("Q" in acc) || ("q" in acc)
-  defp already_seen?("L", acc), do: ("L" in acc) || ("M" in acc)
-  defp already_seen?("M", acc), do: ("L" in acc) || ("M" in acc)
-  defp already_seen?("E", acc), do: ("E" in acc) || ("e" in acc) || ("c" in acc)
-  defp already_seen?("e", acc), do: ("E" in acc) || ("e" in acc) || ("c" in acc)
-  defp already_seen?("c", acc), do: ("E" in acc) || ("e" in acc) || ("c" in acc)
+  defp already_seen?("Q", acc), do: "Q" in acc || "q" in acc
+  defp already_seen?("q", acc), do: "Q" in acc || "q" in acc
+  defp already_seen?("L", acc), do: "L" in acc || "M" in acc
+  defp already_seen?("M", acc), do: "L" in acc || "M" in acc
+  defp already_seen?("E", acc), do: "E" in acc || "e" in acc || "c" in acc
+  defp already_seen?("e", acc), do: "E" in acc || "e" in acc || "c" in acc
+  defp already_seen?("c", acc), do: "E" in acc || "e" in acc || "c" in acc
   defp already_seen?(c, acc), do: c in acc
 end

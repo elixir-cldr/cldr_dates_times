@@ -210,29 +210,28 @@ defmodule Cldr.DateTime do
   end
 
   defp extract_formats(format, date_format, time_format)
-      when format in @format_types and date_format in @format_types and time_format in @format_types do
+       when format in @format_types and date_format in @format_types and
+              time_format in @format_types do
     {:ok, date_format, time_format}
   end
 
   defp extract_formats(nil, date_format, time_format)
-      when not is_nil(date_format) or not is_nil(time_format) do
+       when not is_nil(date_format) or not is_nil(time_format) do
     {:error,
-      {
-        Cldr.DateTime.InvalidFormat,
-        "The :date_format and :time_format options must be one of #{inspect @format_types}. " <>
-        "Found #{inspect date_format} and #{inspect time_format}."
-      }
-    }
+     {
+       Cldr.DateTime.InvalidFormat,
+       "The :date_format and :time_format options must be one of #{inspect(@format_types)}. " <>
+         "Found #{inspect(date_format)} and #{inspect(time_format)}."
+     }}
   end
 
   defp extract_formats(format, date_format, time_format)
-      when not is_nil(date_format) or not is_nil(time_format) do
+       when not is_nil(date_format) or not is_nil(time_format) do
     {:error,
-      {
-        Cldr.DateTime.InvalidFormat,
-        "The :date_format and :time_format options cannot be specified with the :format #{inspect format}."
-      }
-    }
+     {
+       Cldr.DateTime.InvalidFormat,
+       "The :date_format and :time_format options cannot be specified with the :format #{inspect(format)}."
+     }}
   end
 
   @doc false
@@ -330,7 +329,7 @@ defmodule Cldr.DateTime do
 
   # Standard format, at style
   defp format_string(format, calendar, backend, %{style: :at} = options)
-      when format in @format_types do
+       when format in @format_types do
     %LanguageTag{cldr_locale_name: locale_name} = options.locale
 
     with {:ok, formats} <- Format.date_time_at_formats(locale_name, calendar, backend) do
@@ -351,7 +350,7 @@ defmodule Cldr.DateTime do
   defp format_string(format, calendar, backend, options) when is_atom(format) do
     %LanguageTag{cldr_locale_name: locale_name} = options.locale
 
-    with {:ok, formats} <-  Format.date_time_available_formats(locale_name, calendar, backend) do
+    with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend) do
       preferred_format(formats, format, options.prefer)
     end
   end
@@ -372,6 +371,7 @@ defmodule Cldr.DateTime do
     case Map.fetch(formats, format) do
       {:ok, format} ->
         {:ok, apply_preference(format, prefer)}
+
       :error ->
         {:error,
          {Cldr.DateTime.InvalidFormat,
@@ -390,6 +390,7 @@ defmodule Cldr.DateTime do
     case apply(Cldr.Calendar, field, [date_time]) do
       {_year_or_month, month_or_week} ->
         {:ok, pluralizer.pluralize(month_or_week, options.locale, format)}
+
       other ->
         {:ok, pluralizer.pluralize(other, options.locale, format)}
     end
