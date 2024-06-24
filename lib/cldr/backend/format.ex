@@ -28,6 +28,11 @@ defmodule Cldr.DateTime.Format.Backend do
 
         @standard_formats [:short, :medium, :long, :full]
 
+        @date_symbols [
+          "Y", "y", "G", "M", "L", "D", "d", "U", "u", "Q",
+          "q", "F", "g", "W", "w", "E", "e", "c"
+        ]
+
         @doc "A struct of the format types and formats"
         @type formats :: map()
 
@@ -263,7 +268,7 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         @doc """
-        Returns a map of the available non-standard datetime formats for a
+        Returns a map of the available datetime formats for a
         given locale and calendar.
 
         ## Arguments
@@ -353,6 +358,42 @@ defmodule Cldr.DateTime.Format.Backend do
         def date_time_available_formats(locale_name, calendar) when is_binary(locale_name) do
           with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
             date_time_available_formats(locale, calendar)
+          end
+        end
+
+        @doc """
+        Returns a map of the available date formats for a
+        given locale and calendar.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+          The default is `:gregorian`.
+
+        ## Examples:
+
+            iex> #{inspect(__MODULE__)}.date_available_formats "en"
+
+        """
+        @spec date_available_formats(Locale.locale_reference(), calendar) :: {:ok, formats}
+        def date_available_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
+
+        def date_available_formats(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
+          date_available_formats(cldr_locale_name, calendar)
+        end
+
+        def date_available_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_available_formats(locale, calendar)
           end
         end
 
@@ -717,6 +758,21 @@ defmodule Cldr.DateTime.Format.Backend do
 
             def date_time_available_formats(unquote(locale), unquote(calendar)) do
               {:ok, unquote(Macro.escape(available_formats))}
+            end
+
+            date_available_formats =
+              Enum.filter(available_formats, fn {format_id, _} ->
+                remaining =
+                  format_id
+                  |> to_string()
+                  |> String.replace(@date_symbols, "")
+
+                remaining == ""
+              end)
+              |> Map.new()
+
+            def date_available_formats(unquote(locale), unquote(calendar)) do
+              {:ok, unquote(Macro.escape(date_available_formats))}
             end
 
             available_format_tokens =

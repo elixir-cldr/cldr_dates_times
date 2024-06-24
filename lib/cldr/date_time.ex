@@ -1,17 +1,18 @@
 defmodule Cldr.DateTime do
   @moduledoc """
-  Provides localization and formatting of a `DateTime`
-  struct or any map with the keys `:year`, `:month`,
-  `:day`, `:calendar`, `:hour`, `:minute`, `:second` and optionally `:microsecond`.
+  Provides localization and formatting of a `t:DateTime.t/0`
+  struct or any map that contains
+  one or more of the keys `:year`, `:month`, `:day`, ``:hour`, `:minute` and `:second` or
+  `:microsecond` with an optional `:calendar`.
 
   `Cldr.DateTime` provides support for the built-in calendar
   `Calendar.ISO` or any calendars defined with
   [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars)
 
-  CLDR provides standard format strings for `DateTime` which
-  are reresented by the names `:short`, `:medium`, `:long`
+  CLDR provides standard format strings for `t:DateTime.t/0` which
+  are represented by the names `:short`, `:medium`, `:long`
   and `:full`.  This allows for locale-independent
-  formatting since each locale will define the underlying
+  formatting since each locale and calendar will define the underlying
   format string as appropriate.
 
   """
@@ -35,9 +36,9 @@ defmodule Cldr.DateTime do
 
   ## Arguments
 
-  * `datetime` is a `%DateTime{}` `or %NaiveDateTime{}`struct or any map that contains the keys
-    `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
-    `:microsecond`.
+  * `datetime` is a `t:DateTime.t/0` `or t:NaiveDateTime.t/0`struct or any map that contains
+    one or more of the keys `:year`, `:month`, `:day`, ``:hour`, `:minute` and `:second` or
+    `:microsecond` with an optional `:calendar`.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
@@ -255,9 +256,9 @@ defmodule Cldr.DateTime do
 
   ## Arguments
 
-  * `datetime` is a `%DateTime{}` `or %NaiveDateTime{}`struct or any map that contains the keys
-    `:year`, `:month`, `:day`, `:calendar`. `:hour`, `:minute` and `:second` with optional
-    `:microsecond`.
+  * `datetime` is a `t:DateTime.t/0` `or t:NaiveDateTime.t/0`struct or any map that contains
+    one or more of the keys `:year`, `:month`, `:day`, ``:hour`, `:minute` and `:second` or
+    `:microsecond` with an optional `:calendar`.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.

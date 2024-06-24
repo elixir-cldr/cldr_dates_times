@@ -32,21 +32,21 @@ defmodule Cldr.DatesTimes.Dialyzer do
     _ = Cldr.DateTime.Format.hour_format("en", MyApp.Cldr)
     _ = MyApp.Cldr.DateTime.Format.hour_format("en")
 
-    _ = Cldr.DateTime.Format.date_formats(:en, :buddhist, MyApp.Cldr)
-    _ = Cldr.DateTime.Format.date_formats("en", :buddhist, MyApp.Cldr)
+    _ = Cldr.Date.formats(:en, :buddhist, MyApp.Cldr)
+    _ = Cldr.Date.formats("en", :buddhist, MyApp.Cldr)
     _ = MyApp.Cldr.DateTime.Format.date_formats("en", :buddhist)
 
     _ = Cldr.DateTime.Format.time_formats(:en, :buddhist)
     _ = Cldr.DateTime.Format.time_formats("en", :buddhist)
     _ = MyApp.Cldr.DateTime.Format.time_formats("en")
 
-    _ = Cldr.DateTime.Format.date_formats(:en, :buddhist)
-    _ = Cldr.DateTime.Format.date_formats("en", :buddhist)
+    _ = Cldr.Date.formats(:en, :buddhist)
+    _ = Cldr.Date.formats("en", :buddhist)
     _ = MyApp.Cldr.DateTime.Format.date_formats("en", :buddhist)
 
     _ = Cldr.DateTime.Format.date_time_formats(:en, :buddhist)
     _ = Cldr.DateTime.Format.date_time_formats("en", :buddhist)
-    _ = MyApp.Cldr.DateTime.Format.date_formats("en", :buddhist)
+    _ = MyApp.Cldr.DateTime.Format.date_time_formats("en", :buddhist)
 
     _ = Cldr.DateTime.Format.date_time_available_formats(:en)
     _ = Cldr.DateTime.Format.date_time_available_formats("en")

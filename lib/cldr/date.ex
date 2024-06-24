@@ -11,12 +11,11 @@ defmodule Cldr.Date do
   CLDR provides standard format strings for `t:Date.t/0` which
   are reresented by the formats `:short`, `:medium`, `:long`
   and `:full`.  This abstraction allows for locale-independent
-  formatting since each locale may define the underlying
+  formatting since each locale and calendar may define the underlying
   format string as appropriate.
 
   """
 
-  alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
 
   @format_types [:short, :medium, :long, :full]
@@ -39,7 +38,7 @@ defmodule Cldr.Date do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
 
-  * `options` is a keyword list of options for formatting.  The valid options are:
+  * `options` is a keyword list of options for formatting.
 
   ## Options
 
@@ -201,9 +200,132 @@ defmodule Cldr.Date do
     end
   end
 
+  @doc """
+  Returns a map of the standard date formats for a given
+  locale and calendar.
+
+  ## Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+    The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  ## Examples:
+
+      iex> Cldr.Date.formats(:en, :gregorian, MyApp.Cldr)
+      {:ok, %Cldr.Date.Formats{
+        full: "EEEE, MMMM d, y",
+        long: "MMMM d, y",
+        medium: "MMM d, y",
+        short: "M/d/yy"
+      }}
+
+      iex> Cldr.Date.formats(:en, :buddhist, MyApp.Cldr)
+      {:ok, %Cldr.Date.Formats{
+        full: "EEEE, MMMM d, y G",
+        long: "MMMM d, y G",
+        medium: "MMM d, y G",
+        short: "M/d/y GGGGG"
+      }}
+
+  """
+  @spec formats(
+          Locale.locale_reference(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) ::
+          {:ok, DateTime.standard_formats()} | {:error, {atom, String.t()}}
+
+  def formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_formats(locale, calendar)
+  end
+
+  @doc """
+  Returns a map of the available date formats for a
+  given locale and calendar.
+
+  ## Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+    The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  ## Examples:
+
+      iex> Cldr.Date.available_formats(:en)
+      {:ok,
+       %{
+         d: "d",
+         y: "y",
+         E: "ccc",
+         M: "L",
+         MMMEd: "E, MMM d",
+         Ed: "d E",
+         Md: "M/d",
+         GyMMMd: "MMM d, y G",
+         Gy: "y G",
+         GyMMM: "MMM y G",
+         GyMMMEd: "E, MMM d, y G",
+         MMMd: "MMM d",
+         GyMd: "M/d/y G",
+         MMMMd: "MMMM d",
+         MEd: "E, M/d",
+         MMM: "LLL",
+         yMd: "M/d/y",
+         yMMMd: "MMM d, y",
+         yMMMM: "MMMM y",
+         yMMM: "MMM y",
+         yMMMEd: "E, MMM d, y",
+         yMEd: "E, M/d/y",
+         yM: "M/y",
+         yQQQQ: "QQQQ y",
+         yQQQ: "QQQ y",
+         yw: %{
+           other: "'week' w 'of' Y",
+           pluralize: :week_of_year,
+           one: "'week' w 'of' Y"
+         },
+         MMMMW: %{
+           other: "'week' W 'of' MMMM",
+           pluralize: :week_of_month,
+           one: "'week' W 'of' MMMM"
+         }
+       }}
+
+  """
+  @spec available_formats(
+          Locale.locale_reference(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) :: {:ok, map()} | {:error, {atom, String.t()}}
+
+  def available_formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_available_formats(locale, calendar)
+  end
+
   defp format_string(format, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
        when format in @format_types do
-    with {:ok, date_formats} <- Format.date_formats(locale_name, calendar, backend) do
+    with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
       {:ok, Map.fetch!(date_formats, format)}
     end
   end
