@@ -281,6 +281,9 @@ defmodule Cldr.DateTime.Formatter do
       iex> Cldr.DateTime.Formatter.era(~D[2017-12-01], 4, "fr", MyApp.Cldr)
       "après Jésus-Christ"
 
+      iex> Cldr.DateTime.Formatter.era(~D[2017-12-01], 4, "fr", MyApp.Cldr, era: :variant)
+      "de l’ère commune"
+
   """
   @spec era(Cldr.Calendar.date(), pos_integer(), Keyword.t()) ::
           String.t() | {:error, String.t()}
@@ -308,17 +311,17 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   def era(date, n, locale, backend, options) when is_date(date) and n in 1..3 do
-    Cldr.Calendar.localize(date, :era, :format, :abbreviated, backend, locale)
+    Cldr.Calendar.localize(date, :era, :format, :abbreviated, backend, locale, options)
     |> maybe_wrap(:era, options)
   end
 
   def era(date, 4, locale, backend, options) when is_date(date) do
-    Cldr.Calendar.localize(date, :era, :format, :wide, backend, locale)
+    Cldr.Calendar.localize(date, :era, :format, :wide, backend, locale, options)
     |> maybe_wrap(:era, options)
   end
 
   def era(date, 5, locale, backend, options) when is_date(date) do
-    Cldr.Calendar.localize(date, :era, :format, :narrow, backend, locale)
+    Cldr.Calendar.localize(date, :era, :format, :narrow, backend, locale, options)
     |> maybe_wrap(:era, options)
   end
 

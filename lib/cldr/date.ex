@@ -45,18 +45,22 @@ defmodule Cldr.Date do
 
   ## Options
 
-    * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
-      or a format string. The default is `:medium` for full dates (that is,
-      dates having `:year`, `:month`, `day` and `:calendar` fields). The
-      default for partial dates is to derive a candidate format ID and
-      find the best match from the formats returned by
-      `Cldr.DateTime.Format.date_time_available_formats/2`.
+  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+    or a format string. The default is `:medium` for full dates (that is,
+    dates having `:year`, `:month`, `day` and `:calendar` fields). The
+    default for partial dates is to derive a candidate format id from the date and
+    find the best match from the formats returned by
+    `Cldr.DateTime.Format.date_time_available_formats/2`.
 
-    * `locale:` any locale returned by `Cldr.known_locale_names/1`.
-      The default is `Cldr.get_locale/0`.
+  * `:locale:` any locale returned by `Cldr.known_locale_names/1`.
+    The default is `Cldr.get_locale/0`.
 
-    * `:number_system` a number system into which the formatted date digits
-      should be transliterated.
+  * `:number_system` a number system into which the formatted date digits
+    should be transliterated.
+
+  * `:era` which, if set to :variant`, will use a variant for the era if one
+    is available in the requested locale. In the `:en` locale, for example, `era: :variant`
+    will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
   ## Returns
 
@@ -155,14 +159,22 @@ defmodule Cldr.Date do
 
   ## Options
 
-    * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string.
-      The default is `:medium`.
+  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+    or a format string. The default is `:medium` for full dates (that is,
+    dates having `:year`, `:month`, `day` and `:calendar` fields). The
+    default for partial dates is to derive a candidate format from the date and
+    find the best match from the formats returned by
+    `Cldr.DateTime.Format.date_time_available_formats/2`.
 
-  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
 
-  * `number_system:` a number system into which the formatted date digits should
+  * `:number_system` a number system into which the formatted date digits should
     be transliterated.
+
+  * `:era` which, if set to :variant`, will use a variant for the era if one
+    is available in the requested locale. In the `:en` locale, for example, `era: :variant`
+    will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
   ## Returns
 

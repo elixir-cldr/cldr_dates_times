@@ -6,11 +6,15 @@
 
 This is the changelog for Cldr_Dates_Times v2.19.0 released on _____, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
+### Bug Fixes
+
+* Fix `Cldr.Date.to_string/2` with the option `era: :variant` to correctly render the variant text.
+
 ### Enhancements
 
-* Adds support for partial dates in `Cldr.Date.to_string/2`
+* Adds support for partial dates in `Cldr.Date.to_string/2`. Partial dates are maps with one or more of the fields `:year`, `:month`, `:day` and `:calendar`.
 
-* Adds support for deriving the "best match" format for a date based upon the users requested format or deriving from the provided date.
+* Adds support for deriving the "best match" format for a date based upon the users requested format or deriving from the available date fields.
 
 ## Cldr_Dates_Times v2.18.0
 
