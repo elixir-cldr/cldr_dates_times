@@ -149,6 +149,13 @@ defmodule Cldr.DateTime.Formatter do
 
   @default_format 1
 
+  @doc false
+  defguard is_date(date)
+    when is_map_key(date, :year) and is_map_key(date, :month) and is_map_key(date, :day)
+
+  defguard has_year_and_month(date)
+    when is_map_key(date, :year) and is_map_key(date, :month)
+
   @doc """
   Returns a formatted date.
 
@@ -268,29 +275,29 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.era ~D[2017-12-01], 1
+      iex> Cldr.DateTime.Formatter.era(~D[2017-12-01], 1)
       "AD"
 
-      iex> Cldr.DateTime.Formatter.era ~D[2017-12-01], 4, "fr", MyApp.Cldr
+      iex> Cldr.DateTime.Formatter.era(~D[2017-12-01], 4, "fr", MyApp.Cldr)
       "après Jésus-Christ"
 
   """
-  @spec era(Calendar.date(), integer, Keyword.t()) ::
+  @spec era(Cldr.Calendar.date(), pos_integer(), Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def era(era, n \\ @default_format, options \\ [])
+  def era(date, n \\ @default_format, options \\ [])
 
-  def era(era, options, []) when is_list(options) do
+  def era(date, options, []) when is_list(options) do
     {locale, backend} = extract_locale!(options)
-    era(era, @default_format, locale, backend, Map.new(options))
+    era(date, @default_format, locale, backend, Map.new(options))
   end
 
-  def era(era, n, options) do
+  def era(date, n, options) do
     {locale, backend} = extract_locale!(options)
-    era(era, n, locale, backend, Map.new(options))
+    era(date, n, locale, backend, Map.new(options))
   end
 
-  @spec era(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec era(Cldr.Calendar.date(), pos_integer(), Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def era(date, n, locale, backend, options \\ %{})
@@ -300,17 +307,17 @@ defmodule Cldr.DateTime.Formatter do
     |> era(n, locale, backend, options)
   end
 
-  def era(date, n, locale, backend, options) when n in 1..3 do
+  def era(date, n, locale, backend, options) when is_date(date) and n in 1..3 do
     Cldr.Calendar.localize(date, :era, :format, :abbreviated, backend, locale)
     |> maybe_wrap(:era, options)
   end
 
-  def era(date, 4, locale, backend, options) do
+  def era(date, 4, locale, backend, options) when is_date(date) do
     Cldr.Calendar.localize(date, :era, :format, :wide, backend, locale)
     |> maybe_wrap(:era, options)
   end
 
-  def era(date, 5, locale, backend, options) do
+  def era(date, 5, locale, backend, options) when is_date(date) do
     Cldr.Calendar.localize(date, :era, :format, :narrow, backend, locale)
     |> maybe_wrap(:era, options)
   end
@@ -379,7 +386,7 @@ defmodule Cldr.DateTime.Formatter do
       "02017"
 
   """
-  @spec year(Calendar.date(), integer, Keyword.t()) ::
+  @spec year(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def year(year, n \\ @default_format, options \\ [])
@@ -394,7 +401,7 @@ defmodule Cldr.DateTime.Formatter do
     year(year, n, locale, backend, Map.new(options))
   end
 
-  @spec year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec year(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def year(date, n, locale, backend, options \\ %{})
@@ -494,7 +501,7 @@ defmodule Cldr.DateTime.Formatter do
       "02017"
 
   """
-  @spec week_aligned_year(Calendar.date(), integer, Keyword.t()) ::
+  @spec week_aligned_year(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def week_aligned_year(week_aligned_year, n \\ @default_format, options \\ [])
@@ -510,7 +517,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec week_aligned_year(
-          Calendar.date(),
+          Cldr.Calendar.date(),
           integer,
           Locale.locale_reference(),
           Cldr.backend(),
@@ -525,14 +532,14 @@ defmodule Cldr.DateTime.Formatter do
     |> week_aligned_year(n, locale, backend, options)
   end
 
-  def week_aligned_year(date, 1, _locale, _backend, options) do
+  def week_aligned_year(date, 1, _locale, _backend, options) when is_date(date) do
     {year, _week} = Cldr.Calendar.week_of_year(date)
 
     to_string(year)
     |> maybe_wrap(:week_aligned_year, options)
   end
 
-  def week_aligned_year(date, 2 = n, _locale, _backend, options) do
+  def week_aligned_year(date, 2 = n, _locale, _backend, options) when is_date(date) do
     {year, _week} = Cldr.Calendar.week_of_year(date)
 
     year
@@ -541,7 +548,7 @@ defmodule Cldr.DateTime.Formatter do
     |> maybe_wrap(:week_aligned_year, options)
   end
 
-  def week_aligned_year(date, n, _locale, _backend, options) when n in 3..5 do
+  def week_aligned_year(date, n, _locale, _backend, options) when is_date(date) and n in 3..5 do
     {year, _week} = Cldr.Calendar.week_of_year(date)
 
     pad(year, n)
@@ -592,7 +599,7 @@ defmodule Cldr.DateTime.Formatter do
   digits; there is no special interpretation for `uu`.
 
   """
-  @spec extended_year(Calendar.date(), integer, Keyword.t()) ::
+  @spec extended_year(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def extended_year(extended_year, n \\ @default_format, options \\ [])
@@ -662,7 +669,7 @@ defmodule Cldr.DateTime.Formatter do
   which will be used for all requested name widths.
 
   """
-  @spec cyclic_year(Calendar.date(), integer, Keyword.t()) ::
+  @spec cyclic_year(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def cyclic_year(cyclic_year, n \\ @default_format, options \\ [])
@@ -677,7 +684,7 @@ defmodule Cldr.DateTime.Formatter do
     cyclic_year(cyclic_year, n, locale, backend, Map.new(options))
   end
 
-  @spec cyclic_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec cyclic_year(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def cyclic_year(date, n, locale, backend, options \\ %{})
@@ -744,7 +751,7 @@ defmodule Cldr.DateTime.Formatter do
   is no special interpretation for “rr”.
 
   """
-  @spec related_year(Calendar.date(), integer, Keyword.t()) ::
+  @spec related_year(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def related_year(related_year, n \\ @default_format, options \\ [])
@@ -759,7 +766,7 @@ defmodule Cldr.DateTime.Formatter do
     related_year(related_year, n, locale, backend, Map.new(options))
   end
 
-  @spec related_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec related_year(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def related_year(date, n, locale, backend, options \\ %{})
@@ -834,7 +841,7 @@ defmodule Cldr.DateTime.Formatter do
       "2"
 
   """
-  @spec quarter(Calendar.date(), integer, Keyword.t()) ::
+  @spec quarter(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def quarter(quarter, n \\ @default_format, options \\ [])
@@ -849,42 +856,42 @@ defmodule Cldr.DateTime.Formatter do
     quarter(quarter, n, locale, backend, Map.new(options))
   end
 
-  @spec quarter(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec quarter(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def quarter(date, n, locale, backend, options \\ %{})
 
-  def quarter(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+  def quarter(%{calendar: Calendar.ISO} = date, n, locale, backend, options) when has_year_and_month(date) do
     %{date | calendar: Cldr.Calendar.Gregorian}
     |> quarter(n, locale, backend, options)
   end
 
-  def quarter(date, 1, _locale, _backend, options) do
+  def quarter(date, 1, _locale, _backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.quarter_of_year()
     |> maybe_wrap(:quarter, options)
   end
 
-  def quarter(date, 2, _locale, _backend, options) do
+  def quarter(date, 2, _locale, _backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.quarter_of_year()
     |> pad(2)
     |> maybe_wrap(:quarter, options)
   end
 
-  def quarter(date, 3, locale, backend, options) do
+  def quarter(date, 3, locale, backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.localize(:quarter, :format, :abbreviated, backend, locale)
     |> maybe_wrap(:quarter, options)
   end
 
-  def quarter(date, 4, locale, backend, options) do
+  def quarter(date, 4, locale, backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.localize(:quarter, :format, :wide, backend, locale)
     |> maybe_wrap(:quarter, options)
   end
 
-  def quarter(date, 5, locale, backend, options) do
+  def quarter(date, 5, locale, backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.localize(:quarter, :format, :narrow, backend, locale)
     |> maybe_wrap(:quarter, options)
@@ -943,7 +950,7 @@ defmodule Cldr.DateTime.Formatter do
       "2"
 
   """
-  @spec standalone_quarter(Calendar.date(), integer, Keyword.t()) ::
+  @spec standalone_quarter(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def standalone_quarter(standalone_quarter, n \\ @default_format, options \\ [])
@@ -959,7 +966,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec standalone_quarter(
-          Calendar.date(),
+          Cldr.Calendar.date(),
           integer,
           Locale.locale_reference(),
           Cldr.backend(),
@@ -969,37 +976,37 @@ defmodule Cldr.DateTime.Formatter do
 
   def standalone_quarter(date, n, locale, backend, options \\ %{})
 
-  def standalone_quarter(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+  def standalone_quarter(%{calendar: Calendar.ISO} = date, n, locale, backend, options) when has_year_and_month(date) do
     %{date | calendar: Cldr.Calendar.Gregorian}
     |> standalone_quarter(n, locale, backend, options)
   end
 
-  def standalone_quarter(date, 1, _locale, _backend, options) do
+  def standalone_quarter(date, 1, _locale, _backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.quarter_of_year()
     |> maybe_wrap(:standalone_quarter, options)
   end
 
-  def standalone_quarter(date, 2, _locale, _backend, options) do
+  def standalone_quarter(date, 2, _locale, _backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.quarter_of_year()
     |> pad(2)
     |> maybe_wrap(:standalone_quarter, options)
   end
 
-  def standalone_quarter(date, 3, locale, backend, options) do
+  def standalone_quarter(date, 3, locale, backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.localize(:quarter, :stand_alone, :abbreviated, backend, locale)
     |> maybe_wrap(:standalone_quarter, options)
   end
 
-  def standalone_quarter(date, 4, locale, backend, options) do
+  def standalone_quarter(date, 4, locale, backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.localize(:quarter, :stand_alone, :wide, backend, locale)
     |> maybe_wrap(:standalone_quarter, options)
   end
 
-  def standalone_quarter(date, 5, locale, backend, options) do
+  def standalone_quarter(date, 5, locale, backend, options) when has_year_and_month(date) do
     date
     |> Cldr.Calendar.localize(:quarter, :stand_alone, :narrow, backend, locale)
     |> maybe_wrap(:standalone_quarter, options)
@@ -1058,7 +1065,7 @@ defmodule Cldr.DateTime.Formatter do
       "S"
 
   """
-  @spec month(Calendar.date(), integer, Keyword.t()) ::
+  @spec month(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def month(month, n \\ @default_format, options \\ [])
@@ -1073,7 +1080,7 @@ defmodule Cldr.DateTime.Formatter do
     month(month, n, locale, backend, Map.new(options))
   end
 
-  @spec month(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec month(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def month(date, n, locale, backend, options \\ %{})
@@ -1090,19 +1097,19 @@ defmodule Cldr.DateTime.Formatter do
     |> maybe_wrap(:month, options)
   end
 
-  def month(date, 3, locale, backend, options) do
+  def month(%{month: _month} = date, 3, locale, backend, options) do
     date
     |> Cldr.Calendar.localize(:month, :format, :abbreviated, backend, locale)
     |> maybe_wrap(:month, options)
   end
 
-  def month(date, 4, locale, backend, options) do
+  def month(%{month: _month} = date, 4, locale, backend, options) do
     date
     |> Cldr.Calendar.localize(:month, :format, :wide, backend, locale)
     |> maybe_wrap(:month, options)
   end
 
-  def month(date, 5, locale, backend, options) do
+  def month(%{month: _month} = date, 5, locale, backend, options) do
     date
     |> Cldr.Calendar.localize(:month, :format, :narrow, backend, locale)
     |> maybe_wrap(:month, options)
@@ -1161,7 +1168,7 @@ defmodule Cldr.DateTime.Formatter do
       "S"
 
   """
-  @spec standalone_month(Calendar.date(), integer, Keyword.t()) ::
+  @spec standalone_month(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def standalone_month(standalone_month, n \\ @default_format, options \\ [])
@@ -1176,7 +1183,7 @@ defmodule Cldr.DateTime.Formatter do
     standalone_month(standalone_month, n, locale, backend, Map.new(options))
   end
 
-  @spec standalone_month(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec standalone_month(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def standalone_month(date, n, locale, backend, options \\ %{})
@@ -1193,19 +1200,19 @@ defmodule Cldr.DateTime.Formatter do
     |> maybe_wrap(:standalone_month, options)
   end
 
-  def standalone_month(date, 3, locale, backend, options) do
+  def standalone_month(%{month: _month} = date, 3, locale, backend, options) do
     date
     |> Cldr.Calendar.localize(:month, :stand_alone, :abbreviated, backend, locale)
     |> maybe_wrap(:standalone_month, options)
   end
 
-  def standalone_month(date, 4, locale, backend, options) do
+  def standalone_month(%{month: _month} = date, 4, locale, backend, options) do
     date
     |> Cldr.Calendar.localize(:month, :stand_alone, :wide, backend, locale)
     |> maybe_wrap(:standalone_month, options)
   end
 
-  def standalone_month(date, 5, locale, backend, options) do
+  def standalone_month(%{month: _month} = date, 5, locale, backend, options) do
     date
     |> Cldr.Calendar.localize(:month, :stand_alone, :narrow, backend, locale)
     |> maybe_wrap(:standalone_month, options)
@@ -1266,7 +1273,7 @@ defmodule Cldr.DateTime.Formatter do
       "04"
 
   """
-  @spec week_of_year(Calendar.date(), integer, Keyword.t()) ::
+  @spec week_of_year(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def week_of_year(week_of_year, n \\ @default_format, options \\ [])
@@ -1281,17 +1288,17 @@ defmodule Cldr.DateTime.Formatter do
     week_of_year(week_of_year, n, locale, backend, Map.new(options))
   end
 
-  @spec week_of_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec week_of_year(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def week_of_year(date, n, locale, backend, options \\ %{})
 
-  def week_of_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) do
+  def week_of_year(%{calendar: Calendar.ISO} = date, n, locale, backend, options) when is_date(date) do
     %{date | calendar: Cldr.Calendar.Gregorian}
     |> week_of_year(n, locale, backend, options)
   end
 
-  def week_of_year(date, n, _locale, _backend, options) when n in 1..2 do
+  def week_of_year(date, n, _locale, _backend, options) when is_date(date) and n in 1..2 do
     {_year, week} = Cldr.Calendar.week_of_year(date)
 
     week
@@ -1339,7 +1346,7 @@ defmodule Cldr.DateTime.Formatter do
       "4"
 
   """
-  @spec week_of_month(Calendar.date(), integer, Keyword.t()) ::
+  @spec week_of_month(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def week_of_month(week_of_month, n \\ @default_format, options \\ [])
@@ -1354,7 +1361,7 @@ defmodule Cldr.DateTime.Formatter do
     week_of_month(week_of_month, n, locale, backend, Map.new(options))
   end
 
-  @spec week_of_month(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec week_of_month(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def week_of_month(date, n, locale, backend, options \\ %{})
@@ -1364,7 +1371,7 @@ defmodule Cldr.DateTime.Formatter do
     |> week_of_month(n, locale, backend, options)
   end
 
-  def week_of_month(date, n, _locale, _backend, options) when n in 1..2 do
+  def week_of_month(date, n, _locale, _backend, options) when is_date(date) and n in 1..2 do
     {_month, week_of_month} = Cldr.Calendar.week_of_month(date)
 
     week_of_month
@@ -1417,7 +1424,7 @@ defmodule Cldr.DateTime.Formatter do
       "4th"
 
   """
-  @spec day_of_month(Calendar.date(), integer, Keyword.t()) ::
+  @spec day_of_month(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def day_of_month(day_of_month, n \\ @default_format, options \\ [])
@@ -1432,7 +1439,7 @@ defmodule Cldr.DateTime.Formatter do
     day_of_month(day_of_month, n, locale, backend, Map.new(options))
   end
 
-  @spec day_of_month(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec day_of_month(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def day_of_month(date, n, locale, backend, options \\ %{})
@@ -1507,7 +1514,7 @@ defmodule Cldr.DateTime.Formatter do
       "015"
 
   """
-  @spec day_of_year(Calendar.date(), integer, Keyword.t()) ::
+  @spec day_of_year(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def day_of_year(day_of_year, n \\ @default_format, options \\ [])
@@ -1522,7 +1529,7 @@ defmodule Cldr.DateTime.Formatter do
     day_of_year(day_of_year, n, locale, backend, Map.new(options))
   end
 
-  @spec day_of_year(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec day_of_year(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def day_of_year(date, n, locale, backend, options \\ %{})
@@ -1532,7 +1539,7 @@ defmodule Cldr.DateTime.Formatter do
     |> day_of_year(n, locale, backend, options)
   end
 
-  def day_of_year(date, n, _locale, _backend, options) when n in 1..3 do
+  def day_of_year(date, n, _locale, _backend, options) when is_date(date) and n in 1..3 do
     date
     |> Cldr.Calendar.day_of_year()
     |> pad(n)
@@ -1593,7 +1600,7 @@ defmodule Cldr.DateTime.Formatter do
       "Tue"
 
   """
-  @spec day_name(Calendar.date(), integer, Keyword.t()) ::
+  @spec day_name(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def day_name(day_name, n \\ @default_format, options \\ [])
@@ -1608,7 +1615,7 @@ defmodule Cldr.DateTime.Formatter do
     day_name(day_name, n, locale, backend, Map.new(options))
   end
 
-  @spec day_name(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec day_name(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def day_name(date, n, locale, backend, options \\ %{})
@@ -1618,25 +1625,25 @@ defmodule Cldr.DateTime.Formatter do
     |> day_name(n, locale, backend, options)
   end
 
-  def day_name(date, n, locale, backend, options) when n in 1..3 do
+  def day_name(date, n, locale, backend, options)  when is_date(date) and n in 1..3 do
     date
     |> Cldr.Calendar.localize(:day_of_week, :format, :abbreviated, backend, locale)
     |> maybe_wrap(:day_name, options)
   end
 
-  def day_name(date, 4, locale, backend, options) do
+  def day_name(date, 4, locale, backend, options) when is_date(date) do
     date
     |> Cldr.Calendar.localize(:day_of_week, :format, :wide, backend, locale)
     |> maybe_wrap(:day_name, options)
   end
 
-  def day_name(date, 5, locale, backend, options) do
+  def day_name(date, 5, locale, backend, options) when is_date(date) do
     date
     |> Cldr.Calendar.localize(:day_of_week, :format, :narrow, backend, locale)
     |> maybe_wrap(:day_name, options)
   end
 
-  def day_name(date, 6, locale, backend, options) do
+  def day_name(date, 6, locale, backend, options) when is_date(date) do
     date
     |> Cldr.Calendar.localize(:day_of_week, :format, :short, backend, locale)
     |> maybe_wrap(:day_name, options)
@@ -1705,7 +1712,7 @@ defmodule Cldr.DateTime.Formatter do
       "02"
 
   """
-  @spec day_of_week(Calendar.date(), integer, Keyword.t()) ::
+  @spec day_of_week(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def day_of_week(day_of_week, n \\ @default_format, options \\ [])
@@ -1720,7 +1727,7 @@ defmodule Cldr.DateTime.Formatter do
     day_of_week(day_of_week, n, locale, backend, Map.new(options))
   end
 
-  @spec day_of_week(Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec day_of_week(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def day_of_week(date, n, locale, backend, options \\ %{})
@@ -1730,14 +1737,14 @@ defmodule Cldr.DateTime.Formatter do
     |> day_of_week(n, locale, backend, options)
   end
 
-  def day_of_week(date, n, _locale, _backend, options) when n in 1..2 do
+  def day_of_week(date, n, _locale, _backend, options) when is_date(date) and n in 1..2 do
     date
     |> Cldr.Calendar.day_of_week()
     |> pad(n)
     |> maybe_wrap(:day_of_week, options)
   end
 
-  def day_of_week(date, n, locale, backend, options) when n >= 3 do
+  def day_of_week(date, n, locale, backend, options) when is_date(date) and n >= 3 do
     date
     |> day_name(n, locale, backend, options)
     |> maybe_wrap(:day_of_week, options)
@@ -1798,7 +1805,7 @@ defmodule Cldr.DateTime.Formatter do
       "Tu"
 
   """
-  @spec standalone_day_of_week(Calendar.date(), integer, Keyword.t()) ::
+  @spec standalone_day_of_week(Cldr.Calendar.date(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def standalone_day_of_week(standalone_day_of_week, n \\ @default_format, options \\ [])
@@ -1821,7 +1828,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec standalone_day_of_week(
-          Calendar.date(),
+          Cldr.Calendar.date(),
           integer,
           Locale.locale_reference(),
           Cldr.backend(),
@@ -1836,32 +1843,32 @@ defmodule Cldr.DateTime.Formatter do
     |> standalone_day_of_week(n, locale, backend, options)
   end
 
-  def standalone_day_of_week(date, n, _locale, _backend, options) when n in 1..2 do
+  def standalone_day_of_week(date, n, _locale, _backend, options) when is_date(date) and n in 1..2 do
     date
     |> Cldr.Calendar.day_of_week()
     |> pad(n)
     |> maybe_wrap(:standalone_day_of_week, options)
   end
 
-  def standalone_day_of_week(date, 3, locale, backend, options) do
+  def standalone_day_of_week(date, 3, locale, backend, options) when is_date(date) do
     date
     |> Cldr.Calendar.localize(:day_of_week, :stand_alone, :abbreviated, backend, locale)
     |> maybe_wrap(:standalone_day_of_week, options)
   end
 
-  def standalone_day_of_week(date, 4, locale, backend, options) do
+  def standalone_day_of_week(date, 4, locale, backend, options) when is_date(date) do
     date
     |> Cldr.Calendar.localize(:day_of_week, :stand_alone, :wide, backend, locale)
     |> maybe_wrap(:standalone_day_of_week, options)
   end
 
-  def standalone_day_of_week(date, 5, locale, backend, options) do
+  def standalone_day_of_week(date, 5, locale, backend, options) when is_date(date) do
     date
     |> Cldr.Calendar.localize(:day_of_week, :stand_alone, :narrow, backend, locale)
     |> maybe_wrap(:standalone_day_of_week, options)
   end
 
-  def standalone_day_of_week(date, 6, locale, backend, options) do
+  def standalone_day_of_week(date, 6, locale, backend, options) when is_date(date) do
     date
     |> Cldr.Calendar.localize(:day_of_week, :stand_alone, :short, backend, locale)
     |> maybe_wrap(:standalone_day_of_week, options)

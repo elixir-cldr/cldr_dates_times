@@ -42,8 +42,12 @@ defmodule Cldr.Date do
 
   ## Options
 
-    * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string.
-      The default is `:medium`.
+    * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+      or a format string. The default is `:medium` for full dates (that is,
+      dates having `:year`, `:month`, `day` and `:calendar` fields). The
+      default for partial dates is to derive a candidate format ID and
+      find the best match from the formats returned by
+      `Cldr.DateTime.Format.date_time_available_formats/2`.
 
     * `locale:` any locale returned by `Cldr.known_locale_names/1`.
       The default is `Cldr.get_locale/0`.
@@ -59,6 +63,7 @@ defmodule Cldr.Date do
 
   ## Examples
 
+      # Full dates have the default format `:medium`
       iex> Cldr.Date.to_string(~D[2017-07-10], MyApp.Cldr, locale: :en)
       {:ok, "Jul 10, 2017"}
 
@@ -73,6 +78,20 @@ defmodule Cldr.Date do
 
       iex> Cldr.Date.to_string(~D[2017-07-10], MyApp.Cldr, format: :short, locale: "fr")
       {:ok, "10/07/2017"}
+
+      # A partial date with a derived "best match" format
+      iex> Cldr.Date.to_string(%{year: 2024, month: 6}, MyApp.Cldr, locale: "fr")
+      {:ok, "06/2024"}
+
+      # A partial date with a best match CLDR-defined format
+      iex> Cldr.Date.to_string(%{year: 2024, month: 6}, MyApp.Cldr, format: :yMMM, locale: "fr")
+      {:ok, "juin 2024"}
+
+      # Sometimes the available data doesn't map to an available
+      # Cldr defined format.
+      iex> Cldr.Date.to_string(%{year: 2024, day: 3}, MyApp.Cldr, locale: "fr")
+      {:error,
+       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"dy\\""}}
 
   """
   @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
@@ -188,6 +207,14 @@ defmodule Cldr.Date do
 
       iex> Cldr.Date.to_string!(~D[2017-07-10], MyApp.Cldr, format: :short, locale: "fr")
       "10/07/2017"
+
+      # A partial date with a derived "best match" format
+      iex> Cldr.Date.to_string!(%{year: 2024, month: 6}, MyApp.Cldr, locale: "fr")
+      "06/2024"
+
+      # A partial date with a best match CLDR-defined format
+      iex> Cldr.Date.to_string!(%{year: 2024, month: 6}, MyApp.Cldr, format: :yMMM, locale: "fr")
+      "juin 2024"
 
   """
   @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return

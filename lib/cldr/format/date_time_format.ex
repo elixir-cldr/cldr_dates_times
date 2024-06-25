@@ -666,7 +666,7 @@ defmodule Cldr.DateTime.Format do
           {:error,
            {
              Cldr.DateTime.UnresolvedFormat,
-             "No available format resolvedfor #{inspect(skeleton)}"
+             "No available format resolved for #{inspect(skeleton)}"
            }}
 
         [{format_id, _} | _rest] ->
