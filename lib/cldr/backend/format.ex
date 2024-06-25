@@ -33,10 +33,10 @@ defmodule Cldr.DateTime.Format.Backend do
           "q", "F", "g", "W", "w", "E", "e", "c"
         ]
 
-        @doc "A struct of the format types and formats"
+        @doc "A struct from a format id as an atom to a format string"
         @type formats :: map()
 
-        @doc "The CLDR calendar type as an atome"
+        @doc "The CLDR calendar type as an atom"
         @type calendar :: atom()
 
         @doc """

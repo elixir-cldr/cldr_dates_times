@@ -94,6 +94,7 @@ defmodule Cldr.Date do
   def to_string(%{} = date, backend, options) do
     options = normalize_options(backend, options)
     calendar = Map.get(date, :calendar, Cldr.Calendar.Gregorian)
+    date = Map.put_new(date, :calendar, calendar)
     format_backend = Module.concat(backend, DateTime.Formatter)
     number_system = Map.get(options, :number_system)
     format = options[:date_format] || options[:format]
@@ -102,7 +103,7 @@ defmodule Cldr.Date do
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format_string} <- format_string(format, locale, cldr_calendar, backend) do
+         {:ok, format_string} <- format_string(date, format, locale, cldr_calendar, backend) do
       format_backend.format(date, format_string, locale, options)
     end
   rescue
@@ -323,27 +324,55 @@ defmodule Cldr.Date do
     backend.date_available_formats(locale, calendar)
   end
 
-  defp format_string(format, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
-       when format in @format_types do
+  defguard is_full_date(date)
+    when is_map_key(date, :year) and is_map_key(date, :month) and is_map_key(date, :day)
+
+  defp format_string(date, format, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
+       when format in @format_types and is_full_date(date) do
     with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
       {:ok, Map.fetch!(date_formats, format)}
     end
   end
 
-  defp format_string(%{number_system: number_system, format: format}, locale, calendar, backend) do
-    {:ok, format_string} = format_string(format, locale, calendar, backend)
+  defp format_string(date, format, locale, calendar, backend)
+       when format in @format_types and not is_full_date(date) do
+    format = derive_format_id(date)
+    format_string(date, format, locale, calendar, backend)
+  end
+
+  defp format_string(date, %{number_system: number_system, format: format}, locale, calendar, backend) do
+    {:ok, format_string} = format_string(date, format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
-  defp format_string(format, _locale, _calendar, _backend) when is_atom(format) do
-    {:error,
-     {Cldr.DateTime.InvalidFormat,
-      "Invalid date format.  " <> "The valid formats are #{inspect(@format_types)}."}}
+  defp format_string(_date, format, locale, calendar, backend) when is_atom(format) do
+    {:ok, available_formats} = available_formats(locale, calendar, backend)
+
+    if Map.has_key?(available_formats, format) do
+      Map.fetch(available_formats, format)
+    else
+      with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend) do
+        {:ok, Map.fetch!(available_formats, match)}
+      end
+    end
   end
 
-  defp format_string(format_string, _locale, _calendar, _backend)
+  defp format_string(_date, format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
+  end
+
+  defp derive_format_id(date) do
+    date
+    |> Map.take([:year, :month, :day])
+    |> Map.keys()
+    |> Enum.map(fn
+        :year -> "y"
+        :month -> "M"
+        :day -> "d"
+      end)
+    |> Enum.join()
+    |> String.to_atom()
   end
 
   defp error_return(map, requirements) do

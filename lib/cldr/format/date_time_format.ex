@@ -638,6 +638,7 @@ defmodule Cldr.DateTime.Format do
         backend \\ Cldr.Date.default_backend()
       ) do
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
+         skeleton = to_string(skeleton),
          {:ok, skeleton} <- put_preferred_time_symbols(skeleton, locale),
          {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton) do
       # match_with_day_periods? =
@@ -665,7 +666,7 @@ defmodule Cldr.DateTime.Format do
           {:error,
            {
              Cldr.DateTime.UnresolvedFormat,
-             "No available format for #{inspect(skeleton)}"
+             "No available format resolvedfor #{inspect(skeleton)}"
            }}
 
         [{format_id, _} | _rest] ->
@@ -748,11 +749,11 @@ defmodule Cldr.DateTime.Format do
 
   defguard same_types(token_a, token_b)
            when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) in [1, 2]) or
-                  (elem(token_a, 1) in [3, 4] and elem(token_b, 1) in [3, 4])
+                  (elem(token_a, 1) > 2 and elem(token_b, 1) > 2)
 
   defguard different_types(token_a, token_b)
-           when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) in [3, 4]) or
-                  (elem(token_a, 1) in [3, 4] and elem(token_b, 1) in [1, 2])
+           when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) > 2) or
+                  (elem(token_a, 1) > 2 and elem(token_b, 1) in [1, 2])
 
   defp distance_from({token_id, tokens}, skeleton) do
     sorted_tokens = sort_tokens(tokens)
