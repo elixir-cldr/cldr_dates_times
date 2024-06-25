@@ -22,7 +22,7 @@ defmodule Cldr.Date do
   @default_format_type :medium
 
   defguard is_full_date(date)
-    when is_map_key(date, :year) and is_map_key(date, :month) and is_map_key(date, :day)
+           when is_map_key(date, :year) and is_map_key(date, :month) and is_map_key(date, :day)
 
   defmodule Formats do
     @moduledoc false
@@ -114,14 +114,15 @@ defmodule Cldr.Date do
   end
 
   def to_string(%{} = date, backend, options) do
-    options = normalize_options(backend, options)
+    options = normalize_options(date, backend, options)
+    format_backend = Module.concat(backend, DateTime.Formatter)
+
     calendar = Map.get(date, :calendar, Cldr.Calendar.Gregorian)
     date = Map.put_new(date, :calendar, calendar)
-    format_option = options[:date_format] || options[:format]
-    format = format_from_options(date, format_option, @default_format_type)
-    format_backend = Module.concat(backend, DateTime.Formatter)
     number_system = Map.get(options, :number_system)
+
     locale = options[:locale]
+    format = options[:format]
 
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
@@ -136,44 +137,6 @@ defmodule Cldr.Date do
 
   def to_string(date, _backend, _options) do
     error_return(date, [:year, :month, :day, :calendar])
-  end
-
-  defp format_from_options(date, nil, default_format) when is_full_date(date) do
-    default_format
-  end
-
-  defp format_from_options(date, nil, _default_format) do
-    derive_format_id(date)
-  end
-
-  defp format_from_options(_date, format, _default_format) do
-    format
-  end
-
-  # TODO deprecate :style in version 3.0
-  defp normalize_options(_backend, %{} = options) do
-    options
-  end
-
-  defp normalize_options(backend, []) do
-    {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
-    number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
-
-    %{locale: locale, number_system: number_system}
-  end
-
-  defp normalize_options(backend, options) do
-    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
-    number_system = Keyword.get(options, :number_system, locale_number_system)
-    format = options[:format] || options[:style]
-
-    options
-    |> Keyword.put(:locale, locale)
-    |> Keyword.put(:format, format)
-    |> Keyword.delete(:style)
-    |> Keyword.put_new(:number_system, number_system)
-    |> Map.new()
   end
 
   @doc """
@@ -242,6 +205,49 @@ defmodule Cldr.Date do
       {:ok, string} -> string
       {:error, {exception, message}} -> raise exception, message
     end
+  end
+
+  # TODO deprecate :style in version 3.0
+  defp normalize_options(_date, _backend, %{} = options) do
+    options
+  end
+
+  defp normalize_options(date, backend, []) do
+    {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
+    number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+    format = format_from_options(date, nil, @default_format_type)
+
+    %{locale: locale, number_system: number_system, format: format}
+  end
+
+  defp normalize_options(date, backend, options) do
+    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+    number_system = Keyword.get(options, :number_system, locale_number_system)
+    format_option = options[:date_format] || options[:format] || options[:style]
+    format = format_from_options(date, format_option, @default_format_type)
+
+    options
+    |> Keyword.put(:locale, locale)
+    |> Keyword.put(:format, format)
+    |> Keyword.delete(:style)
+    |> Keyword.put_new(:number_system, number_system)
+    |> Map.new()
+  end
+
+  # Full date, no option, use the default format
+  defp format_from_options(date, nil, default_format) when is_full_date(date) do
+    default_format
+  end
+
+  # Partial date, no option, derive the format from the date
+  defp format_from_options(date, nil, _default_format) do
+    derive_format_id(date)
+  end
+
+  # If a format is requested, use it
+  defp format_from_options(_date, format, _default_format) do
+    format
   end
 
   @doc """
@@ -367,6 +373,10 @@ defmodule Cldr.Date do
     backend.date_available_formats(locale, calendar)
   end
 
+  # If its a full date we can use one of the standard formats (:short, :medium, :long)
+  # and if its a full date and no format is specified then the default :medium will be
+  # applied.
+
   defp format_string(date, format, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
        when format in @format_types and is_full_date(date) do
     with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
@@ -374,15 +384,32 @@ defmodule Cldr.Date do
     end
   end
 
+  # If its a partial date and a standard format is requested, its an error
+
   defp format_string(date, format, _locale, _calendar, _backend)
        when format in @format_types and not is_full_date(date) do
-    {:error, {Cldr.DateTime.UnresolvedFormat, "Standard formats are not available for partial dates"}}
+    {:error,
+     {
+       Cldr.DateTime.UnresolvedFormat,
+       "Standard formats are not available for partial dates"
+     }}
   end
 
-  defp format_string(date, %{number_system: number_system, format: format}, locale, calendar, backend) do
+  defp format_string(
+         date,
+         %{number_system: number_system, format: format},
+         locale,
+         calendar,
+         backend
+       ) do
     {:ok, format_string} = format_string(date, format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
   end
+
+  # If its an atom format it means we want to use one of the available formats. Since
+  # these are map keys they can be used in a locale-independent way. If the requested
+  # format is a direct match, use it. If not - try to find the best match between the
+  # requested format and available formats.
 
   defp format_string(_date, format, locale, calendar, backend) when is_atom(format) do
     {:ok, available_formats} = available_formats(locale, calendar, backend)
@@ -396,20 +423,26 @@ defmodule Cldr.Date do
     end
   end
 
+  # If its a binary then its considered a format string so we use
+  # it directly.
+
   defp format_string(_date, format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
   end
+
+  # Given the fields in the (maybe partial) date, derive
+  # format id (atom map key into available formats)
 
   defp derive_format_id(date) do
     date
     |> Map.take([:year, :month, :day])
     |> Map.keys()
     |> Enum.map(fn
-        :year -> "y"
-        :month -> "M"
-        :day -> "d"
-      end)
+      :year -> "y"
+      :month -> "M"
+      :day -> "d"
+    end)
     |> Enum.join()
     |> String.to_atom()
   end
@@ -422,7 +455,7 @@ defmodule Cldr.Date do
 
     {:error,
      {ArgumentError,
-      "Invalid date. Date is a map that contains at least #{requirements}. " <>
+      "Missing required date fields. The function requires a map with at least #{requirements}. " <>
         "Found: #{inspect(map)}"}}
   end
 

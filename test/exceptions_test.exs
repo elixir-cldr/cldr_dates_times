@@ -10,7 +10,7 @@ defmodule Cldr.Exceptions.Test do
   end
 
   test "that an invalid date raises" do
-    assert_raise ArgumentError, ~r/Invalid date. Date is a map that contains at least .*/, fn ->
+    assert_raise ArgumentError, ~r/Missing required date fields. .*/, fn ->
       Cldr.Date.to_string!("not a date")
     end
   end

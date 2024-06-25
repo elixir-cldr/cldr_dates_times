@@ -29,8 +29,24 @@ defmodule Cldr.DateTime.Format.Backend do
         @standard_formats [:short, :medium, :long, :full]
 
         @date_symbols [
-          "Y", "y", "G", "M", "L", "D", "d", "U", "u", "Q",
-          "q", "F", "g", "W", "w", "E", "e", "c"
+          "Y",
+          "y",
+          "G",
+          "M",
+          "L",
+          "D",
+          "d",
+          "U",
+          "u",
+          "Q",
+          "q",
+          "F",
+          "g",
+          "W",
+          "w",
+          "E",
+          "e",
+          "c"
         ]
 
         @doc "A struct from a format id as an atom to a format string"

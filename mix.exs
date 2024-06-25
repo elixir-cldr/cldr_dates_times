@@ -70,7 +70,8 @@ defmodule Cldr.DatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr_calendars, github: "elixir-cldr/cldr_calendars", branch: "partial_date", override: true},
+      {:ex_cldr_calendars,
+       github: "elixir-cldr/cldr_calendars", branch: "partial_date", override: true},
       # {:ex_cldr_calendars, "~> 1.25"},
 
       {:calendar_interval, "~> 0.2", optional: true},
