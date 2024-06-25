@@ -2,6 +2,16 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.19.0
+
+This is the changelog for Cldr_Dates_Times v2.19.0 released on _____, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Enhancements
+
+* Adds support for partial dates in `Cldr.Date.to_string/2`
+
+* Adds support for deriving the "best match" format for a date based upon the users requested format or deriving from the provided date.
+
 ## Cldr_Dates_Times v2.18.0
 
 This is the changelog for Cldr_Dates_Times v2.18.0 released on May 29th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
