@@ -846,7 +846,7 @@ defmodule Cldr.DateTime.Format do
   end
 
   defp time_preferences(locale) do
-    time_preferences = Cldr.Config.time_preferences()
+    time_preferences = Cldr.Time.time_preferences()
 
     Map.get(time_preferences, locale.cldr_locale_name) ||
       Map.get(time_preferences, locale.territory) ||

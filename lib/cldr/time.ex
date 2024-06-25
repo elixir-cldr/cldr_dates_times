@@ -58,9 +58,6 @@ defmodule Cldr.Time do
   * `:number_system` a number system into which the formatted date digits should
     be transliterated.
 
-  * `era: :variant` will use a variant for the era is one is available in the locale.
-    In the "en" locale, for example, `era: :variant` will return "BCE" instead of "BC".
-
   * `period: :variant` will use a variant for the time period and flexible time period if
     one is available in the locale.  For example, in the "en" locale `period: :variant` will
     return "pm" instead of "PM".
@@ -308,8 +305,9 @@ defmodule Cldr.Time do
     end
   end
 
+  @doc false
   @time_preferences Cldr.Config.time_preferences()
-  defp time_preferences do
+  def time_preferences do
     @time_preferences
   end
 
