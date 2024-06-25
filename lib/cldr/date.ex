@@ -19,7 +19,10 @@ defmodule Cldr.Date do
   alias Cldr.LanguageTag
 
   @format_types [:short, :medium, :long, :full]
-  @default_type :medium
+  @default_format_type :medium
+
+  defguard is_full_date(date)
+    when is_map_key(date, :year) and is_map_key(date, :month) and is_map_key(date, :day)
 
   defmodule Formats do
     @moduledoc false
@@ -114,9 +117,10 @@ defmodule Cldr.Date do
     options = normalize_options(backend, options)
     calendar = Map.get(date, :calendar, Cldr.Calendar.Gregorian)
     date = Map.put_new(date, :calendar, calendar)
+    format_option = options[:date_format] || options[:format]
+    format = format_from_options(date, format_option, @default_format_type)
     format_backend = Module.concat(backend, DateTime.Formatter)
     number_system = Map.get(options, :number_system)
-    format = options[:date_format] || options[:format]
     locale = options[:locale]
 
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
@@ -134,6 +138,18 @@ defmodule Cldr.Date do
     error_return(date, [:year, :month, :day, :calendar])
   end
 
+  defp format_from_options(date, nil, default_format) when is_full_date(date) do
+    default_format
+  end
+
+  defp format_from_options(date, nil, _default_format) do
+    derive_format_id(date)
+  end
+
+  defp format_from_options(_date, format, _default_format) do
+    format
+  end
+
   # TODO deprecate :style in version 3.0
   defp normalize_options(_backend, %{} = options) do
     options
@@ -143,14 +159,14 @@ defmodule Cldr.Date do
     {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
 
-    %{locale: locale, number_system: number_system, format: @default_type}
+    %{locale: locale, number_system: number_system}
   end
 
   defp normalize_options(backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
-    format = options[:format] || options[:style] || @default_type
+    format = options[:format] || options[:style]
 
     options
     |> Keyword.put(:locale, locale)
@@ -351,9 +367,6 @@ defmodule Cldr.Date do
     backend.date_available_formats(locale, calendar)
   end
 
-  defguard is_full_date(date)
-    when is_map_key(date, :year) and is_map_key(date, :month) and is_map_key(date, :day)
-
   defp format_string(date, format, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
        when format in @format_types and is_full_date(date) do
     with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
@@ -361,10 +374,9 @@ defmodule Cldr.Date do
     end
   end
 
-  defp format_string(date, format, locale, calendar, backend)
+  defp format_string(date, format, _locale, _calendar, _backend)
        when format in @format_types and not is_full_date(date) do
-    format = derive_format_id(date)
-    format_string(date, format, locale, calendar, backend)
+    {:error, {Cldr.DateTime.UnresolvedFormat, "Standard formats are not available for partial dates"}}
   end
 
   defp format_string(date, %{number_system: number_system, format: format}, locale, calendar, backend) do

@@ -36,7 +36,7 @@ end
 defmodule Cldr.DateTime.InvalidFormat do
   @moduledoc """
   Exception raised when formatting and there is no
-  data for the given style.
+  data for the given format.
   """
   defexception [:message]
 
