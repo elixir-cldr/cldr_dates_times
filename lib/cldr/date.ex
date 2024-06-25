@@ -94,7 +94,7 @@ defmodule Cldr.Date do
       iex> Cldr.Date.to_string(%{year: 2024, month: 6}, MyApp.Cldr, format: :yMMM, locale: "fr")
       {:ok, "juin 2024"}
 
-      # Sometimes the available data doesn't map to an available
+      # Sometimes the available date fields can't be mapped to an available
       # Cldr defined format.
       iex> Cldr.Date.to_string(%{year: 2024, day: 3}, MyApp.Cldr, locale: "fr")
       {:error,
@@ -389,8 +389,9 @@ defmodule Cldr.Date do
   # and if its a full date and no format is specified then the default :medium will be
   # applied.
 
-  defp format_string(date, format, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
+  defp format_string(date, format, locale, calendar, backend)
        when format in @format_types and is_full_date(date) do
+    %LanguageTag{cldr_locale_name: locale_name} = locale
     with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
       {:ok, Map.fetch!(date_formats, format)}
     end
@@ -407,13 +408,8 @@ defmodule Cldr.Date do
      }}
   end
 
-  defp format_string(
-         date,
-         %{number_system: number_system, format: format},
-         locale,
-         calendar,
-         backend
-       ) do
+  defp format_string(date, %{} = format_map, locale, calendar, backend) do
+    %{number_system: number_system, format: format} = format_map
     {:ok, format_string} = format_string(date, format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
   end
