@@ -51,67 +51,68 @@ ZoneID              = V
 ISO_ZoneZ           = X
 ISO_Zone            = x
 
-Skeleton_a          = a
-Skeleton_b          = b
-Skeleton_B          = B
+Skeleton_j          = j
+Skeleton_J          = J
+Skeleton_C          = C
 
 Rules.
 
-{Era}+                   : {token, {symbol(TokenChars), count(TokenChars)}}.
+{Era}+                   : {token,{era,symbol(TokenChars),count(TokenChars)}}.
 
-{YearNumeric}+           : {token, {symbol(TokenChars), count(TokenChars)}}.
-{YearWeek}+              : {token, {symbol(TokenChars), count(TokenChars)}}.
-{YearExtended}+          : {token, {symbol(TokenChars), count(TokenChars)}}.
-{CyclicYear}+            : {token, {symbol(TokenChars), count(TokenChars)}}.
-{RelatedYear}+           : {token, {symbol(TokenChars), count(TokenChars)}}.
+{YearNumeric}+           : {token,{year,symbol(TokenChars),count(TokenChars)}}.
+{YearWeek}+              : {token,{week_aligned_year,symbol(TokenChars),count(TokenChars)}}.
+{YearExtended}+          : {token,{extended_year,symbol(TokenChars),count(TokenChars)}}.
+{CyclicYear}+            : {token,{cyclic_year,symbol(TokenChars),count(TokenChars)}}.
+{RelatedYear}+           : {token,{related_year,symbol(TokenChars),count(TokenChars)}}.
 
-{Quarter}+               : {token, {symbol(TokenChars), count(TokenChars)}}.
-{StandAloneQuarter}+     : {token, {symbol(TokenChars), count(TokenChars)}}.
+{Quarter}+               : {token,{quarter,symbol(TokenChars),count(TokenChars)}}.
+{StandAloneQuarter}+     : {token,{standalone_quarter,symbol(TokenChars),count(TokenChars)}}.
 
-{Month}+                 : {token, {symbol(TokenChars), count(TokenChars)}}.
-{StandAloneMonth}+       : {token, {symbol(TokenChars), count(TokenChars)}}.
+{Time}                   : {token,{time,symbol(TokenChars),0}}.
+{Date}                   : {token,{date,symbol(TokenChars),0}}.
 
-{WeekOfYear}+            : {token, {symbol(TokenChars), count(TokenChars)}}.
-{WeekOfMonth}+           : {token, {symbol(TokenChars), count(TokenChars)}}.
-{DayOfMonth}+            : {token, {symbol(TokenChars), count(TokenChars)}}.
-{DayOfYear}+             : {token, {symbol(TokenChars), count(TokenChars)}}.
-{DayOfWeekInMonth}+      : {token, {symbol(TokenChars), count(TokenChars)}}.
+{Month}+                 : {token,{month,symbol(TokenChars),count(TokenChars)}}.
+{StandAloneMonth}+       : {token,{standalone_month,symbol(TokenChars),count(TokenChars)}}.
 
-{WeekdayName}+           : {token, {symbol(TokenChars), count(TokenChars)}}.
-{WeekdayNumber}+         : {token, {symbol(TokenChars), count(TokenChars)}}.
-{StandAloneDayOfWeek}+   : {token, {symbol(TokenChars), count(TokenChars)}}.
+{WeekOfYear}+            : {token,{week_of_year,symbol(TokenChars),count(TokenChars)}}.
+{WeekOfMonth}+           : {token,{week_of_month,symbol(TokenChars),count(TokenChars)}}.
+{DayOfMonth}+            : {token,{day_of_month,symbol(TokenChars),count(TokenChars)}}.
+{DayOfYear}+             : {token,{day_of_year,symbol(TokenChars),count(TokenChars)}}.
+{DayOfWeekInMonth}+      : {token,{day_of_week_in_month,symbol(TokenChars),count(TokenChars)}}.
 
-{Period_am_pm}+          : {token, {symbol(TokenChars), count(TokenChars)}}.
-{Period_noon_mid}+       : {token, {symbol(TokenChars), count(TokenChars)}}.
-{Period_flex}+           : {token, {symbol(TokenChars), count(TokenChars)}}.
+{WeekdayName}+           : {token,{day_name,symbol(TokenChars),count(TokenChars)}}.
+{WeekdayNumber}+         : {token,{day_of_week,symbol(TokenChars),count(TokenChars)}}.
+{StandAloneDayOfWeek}+   : {token,{standalone_day_of_week,symbol(TokenChars),count(TokenChars)}}.
 
-{Hour_1_12}+             : {token, {symbol(TokenChars), count(TokenChars)}}.
-{Hour_0_11}+             : {token, {symbol(TokenChars), count(TokenChars)}}.
-{Hour_1_24}+             : {token, {symbol(TokenChars), count(TokenChars)}}.
-{Hour_0_23}+             : {token, {symbol(TokenChars), count(TokenChars)}}.
+{Period_am_pm}+          : {token,{period_am_pm,symbol(TokenChars),count(TokenChars)}}.
+{Period_noon_mid}+       : {token,{period_noon_midnight,symbol(TokenChars),count(TokenChars)}}.
+{Period_flex}+           : {token,{period_flex,symbol(TokenChars),count(TokenChars)}}.
 
-{Minute}+                : {token, {symbol(TokenChars), count(TokenChars)}}.
-{Second}+                : {token, {symbol(TokenChars), count(TokenChars)}}.
-{FractionalSecond}+      : {token, {symbol(TokenChars), count(TokenChars)}}.
-{Millisecond}+           : {token, {symbol(TokenChars), count(TokenChars)}}.
+{Hour_1_12}+             : {token,{h12,symbol(TokenChars),count(TokenChars)}}.
+{Hour_0_11}+             : {token,{h11,symbol(TokenChars),count(TokenChars)}}.
+{Hour_1_24}+             : {token,{h24,symbol(TokenChars),count(TokenChars)}}.
+{Hour_0_23}+             : {token,{h23,symbol(TokenChars),count(TokenChars)}}.
 
-{ShortZone}+             : {token, {symbol(TokenChars), count(TokenChars)}}.
-{BasicZone}+             : {token, {symbol(TokenChars), count(TokenChars)}}.
-{GMT_Zone}+              : {token, {symbol(TokenChars), count(TokenChars)}}.
-{GenericZone}+           : {token, {symbol(TokenChars), count(TokenChars)}}.
-{ZoneID}+                : {token, {symbol(TokenChars), count(TokenChars)}}.
-{ISO_ZoneZ}+             : {token, {symbol(TokenChars), count(TokenChars)}}.
-{ISO_Zone}+              : {token, {symbol(TokenChars), count(TokenChars)}}.
+{Minute}+                : {token,{minute,symbol(TokenChars),count(TokenChars)}}.
+{Second}+                : {token,{second,symbol(TokenChars),count(TokenChars)}}.
+{FractionalSecond}+      : {token,{fractional_second,symbol(TokenChars),count(TokenChars)}}.
+{Millisecond}+           : {token,{millisecond,symbol(TokenChars),count(TokenChars)}}.
 
-{Skeleton_a}+            : {token, {symbol(TokenChars), count(TokenChars)}}.
-{Skeleton_b}+            : {token, {symbol(TokenChars), count(TokenChars)}}.
-{Skeleton_B}+            : {token, {symbol(TokenChars), count(TokenChars)}}.
+{ShortZone}+             : {token,{zone_short,symbol(TokenChars),count(TokenChars)}}.
+{BasicZone}+             : {token,{zone_basic,symbol(TokenChars),count(TokenChars)}}.
+{GMT_Zone}+              : {token,{zone_gmt,symbol(TokenChars),count(TokenChars)}}.
+{GenericZone}+           : {token,{zone_generic,symbol(TokenChars),count(TokenChars)}}.
+{ZoneID}+                : {token,{zone_id,symbol(TokenChars),count(TokenChars)}}.
+{ISO_ZoneZ}+             : {token,{zone_iso_z,symbol(TokenChars),count(TokenChars)}}.
+{ISO_Zone}+              : {token,{zone_iso,symbol(TokenChars),count(TokenChars)}}.
+
+{Skeleton_j}+            : {token, {skeleton_j, symbol(TokenChars), count(TokenChars)}}.
+{Skeleton_J}+            : {token, {skeleton_J, symbol(TokenChars), count(TokenChars)}}.
+{Skeleton_C}+            : {token, {skeleton_C, symbol(TokenChars), count(TokenChars)}}.
 
 Erlang code.
 
--import('Elixir.List', [to_string/1]).
-
 count(Chars) -> string:len(Chars).
 
-symbol(Chars) -> to_string([hd(Chars)]).
+symbol(Chars) -> list_to_binary([hd(Chars)]).
 
