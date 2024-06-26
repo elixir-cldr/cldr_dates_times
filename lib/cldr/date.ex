@@ -18,6 +18,9 @@ defmodule Cldr.Date do
 
   alias Cldr.LanguageTag
 
+  import Cldr.DateTime,
+    only: [resolve_plural_format: 4, apply_unicode_or_ascii_preference: 2]
+
   @format_types [:short, :medium, :long, :full]
   @default_format_type :medium
 
@@ -57,6 +60,13 @@ defmodule Cldr.Date do
 
   * `:number_system` a number system into which the formatted date digits
     should be transliterated.
+
+  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
+    formats have two variants - one using Unicode spaces (typically non-breaking space) and
+    another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+    use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/1`
+    to see which formats have these variants. Currently no date-specific
+    formats have such variants but they may in the future.
 
   * `:era` which, if set to :variant`, will use a variant for the era if one
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
@@ -131,7 +141,9 @@ defmodule Cldr.Date do
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format_string} <- format_string(date, format, locale, cldr_calendar, backend) do
+         {:ok, format} <- find_format(date, format, locale, cldr_calendar, backend),
+         {:ok, format} <- apply_unicode_or_ascii_preference(format, options[:prefer]),
+         {:ok, format_string} <- resolve_plural_format(format, date, backend, options) do
       format_backend.format(date, format_string, locale, options)
     end
   rescue
@@ -172,6 +184,13 @@ defmodule Cldr.Date do
 
   * `:number_system` a number system into which the formatted date digits should
     be transliterated.
+
+  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
+    formats have two variants - one using Unicode spaces (typically non-breaking space) and
+    another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+    use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/1`
+    to see which formats have these variants. Currently no date-specific
+    formats have such variants but they may in the future.
 
   * `:era` which, if set to :variant`, will use a variant for the era if one
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
@@ -390,7 +409,7 @@ defmodule Cldr.Date do
   # and if its a full date and no format is specified then the default :medium will be
   # applied.
 
-  defp format_string(date, format, locale, calendar, backend)
+  defp find_format(date, format, locale, calendar, backend)
        when format in @format_types and is_full_date(date) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
     with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
@@ -400,7 +419,7 @@ defmodule Cldr.Date do
 
   # If its a partial date and a standard format is requested, its an error
 
-  defp format_string(date, format, _locale, _calendar, _backend)
+  defp find_format(date, format, _locale, _calendar, _backend)
        when format in @format_types and not is_full_date(date) do
     {:error,
      {
@@ -409,9 +428,9 @@ defmodule Cldr.Date do
      }}
   end
 
-  defp format_string(date, %{} = format_map, locale, calendar, backend) do
+  defp find_format(date, %{} = format_map, locale, calendar, backend) do
     %{number_system: number_system, format: format} = format_map
-    {:ok, format_string} = format_string(date, format, locale, calendar, backend)
+    {:ok, format_string} = find_format(date, format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
@@ -420,7 +439,7 @@ defmodule Cldr.Date do
   # format is a direct match, use it. If not - try to find the best match between the
   # requested format and available formats.
 
-  defp format_string(_date, format, locale, calendar, backend) when is_atom(format) do
+  defp find_format(_date, format, locale, calendar, backend) when is_atom(format) do
     {:ok, available_formats} = available_formats(locale, calendar, backend)
 
     if Map.has_key?(available_formats, format) do
@@ -435,7 +454,7 @@ defmodule Cldr.Date do
   # If its a binary then its considered a format string so we use
   # it directly.
 
-  defp format_string(_date, format_string, _locale, _calendar, _backend)
+  defp find_format(_date, format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
   end

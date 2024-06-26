@@ -371,21 +371,31 @@ defmodule Cldr.DateTime do
   defp preferred_format(formats, format, prefer) do
     case Map.fetch(formats, format) do
       {:ok, format} ->
-        {:ok, apply_preference(format, prefer)}
+        apply_unicode_or_ascii_preference(format, prefer)
 
       :error ->
         {:error,
          {Cldr.DateTime.InvalidFormat,
           "Invalid datetime format #{inspect(format)}. " <>
-            "The valid formaats are #{inspect(formats)}."}}
+            "The valid formats are #{inspect(formats)}."}}
     end
   end
 
-  defp apply_preference(%{unicode: unicode}, :unicode), do: unicode
-  defp apply_preference(%{ascii: ascii}, :ascii), do: ascii
-  defp apply_preference(format, _prefer), do: format
+  @doc false
+  def apply_unicode_or_ascii_preference(%{unicode: _unicode, ascii: ascii}, :ascii) do
+    {:ok, ascii}
+  end
 
-  defp resolve_plural_format(%{other: _, pluralize: field} = format, date_time, backend, options) do
+  def apply_unicode_or_ascii_preference(%{unicode: unicode, ascii: _ascii}, _) do
+    {:ok, unicode}
+  end
+
+  def apply_unicode_or_ascii_preference(format, _) do
+    {:ok, format}
+  end
+
+  @doc false
+  def resolve_plural_format(%{other: _, pluralize: field} = format, date_time, backend, options) do
     pluralizer = Module.concat(backend, Number.Cardinal)
 
     case apply(Cldr.Calendar, field, [date_time]) do
@@ -397,7 +407,7 @@ defmodule Cldr.DateTime do
     end
   end
 
-  defp resolve_plural_format(format, _date_time, _backend, _options) do
+  def resolve_plural_format(format, _date_time, _backend, _options) do
     {:ok, format}
   end
 

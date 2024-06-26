@@ -197,6 +197,13 @@ defmodule Cldr.DateAndTime.Backend do
         * `:number_system` a number system into which the formatted date digits
           should be transliterated.
 
+        * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
+          formats have two variants - one using Unicode spaces (typically non-breaking space) and
+          another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+          use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/1`
+          to see which formats have these variants. Currently no date-specific
+          formats have such variants but they may in the future.
+
         * `:era` which, if set to :variant`, will use a variant for the era if one
           is available in the requested locale. In the `:en` locale, for example, `era: :variant`
           will return `CE` instead of `AD` and `BCE` instead of `BC`.
@@ -273,6 +280,13 @@ defmodule Cldr.DateAndTime.Backend do
 
         * `:number_system` a number system into which the formatted date digits should
           be transliterated.
+
+        * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
+          formats have two variants - one using Unicode spaces (typically non-breaking space) and
+          another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+          use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/1`
+          to see which formats have these variants. Currently no date-specific
+          formats have such variants but they may in the future.
 
         * `:era` which, if set to :variant`, will use a variant for the era if one
           is available in the requested locale. In the `:en` locale, for example, `era: :variant`
