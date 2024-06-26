@@ -107,6 +107,16 @@ defmodule Cldr.Time.Interval.Backend do
             iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], nil
             {:ok, "10:00:00 AM –"}
 
+            # A partial time with a best match CLDR-defined format
+            iex> #{inspect(__MODULE__)}.to_string(%{hour: 23, minute: 11})
+            {:ok, "11:11 PM"}
+
+            # Sometimes the available time fields can't be mapped to an available
+            # CLDR-defined format.
+            iex> #{inspect(__MODULE__)}.to_string(%{minute: 11})
+            {:error,
+             {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"m\\""}}
+
         """
         @spec to_string(Elixir.Calendar.time() | nil, Elixir.Calendar.time() | nil, Keyword.t()) ::
                 {:ok, String.t()} | {:error, {module, String.t()}}

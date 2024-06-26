@@ -103,7 +103,7 @@ defmodule Cldr.Time do
       {:ok, "11:11 PM"}
 
       # Sometimes the available time fields can't be mapped to an available
-      # Cldr defined format.
+      # CLDR-defined format.
       iex> Cldr.Time.to_string(%{minute: 11})
       {:error,
        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"m\\""}}
@@ -365,21 +365,23 @@ defmodule Cldr.Time do
 
   ## Examples:
 
-      iex> Cldr.Date.formats(:en, :gregorian, MyApp.Cldr)
-      {:ok, %Cldr.Date.Formats{
-        full: "EEEE, MMMM d, y",
-        long: "MMMM d, y",
-        medium: "MMM d, y",
-        short: "M/d/yy"
-      }}
+      iex> Cldr.Time.formats(:en, :gregorian, MyApp.Cldr)
+      {:ok,
+       %Cldr.Time.Formats{
+         short: "h:mm a",
+         medium: "h:mm:ss a",
+         long: "h:mm:ss a z",
+         full: "h:mm:ss a zzzz"
+       }}
 
-      iex> Cldr.Date.formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.Date.Formats{
-        full: "EEEE, MMMM d, y G",
-        long: "MMMM d, y G",
-        medium: "MMM d, y G",
-        short: "M/d/y GGGGG"
-      }}
+      iex> Cldr.Time.formats(:en, :buddhist, MyApp.Cldr)
+      {:ok,
+       %Cldr.Time.Formats{
+         short: "h:mm a",
+         medium: "h:mm:ss a",
+         long: "h:mm:ss a z",
+         full: "h:mm:ss a zzzz"
+       }}
 
   """
   @spec formats(
@@ -479,13 +481,13 @@ defmodule Cldr.Time do
 
   ## Examples
 
-      iex> Cldr.Time.hour_format_from_locale "en-AU"
+      iex> Cldr.Time.hour_format_from_locale("en-AU")
       :h12
 
-      iex> Cldr.Time.hour_format_from_locale "fr"
+      iex> Cldr.Time.hour_format_from_locale("fr")
       :h23
 
-      iex> Cldr.Time.hour_format_from_locale "fr-u-hc-h12"
+      iex> Cldr.Time.hour_format_from_locale("fr-u-hc-h12")
       :h12
 
   """

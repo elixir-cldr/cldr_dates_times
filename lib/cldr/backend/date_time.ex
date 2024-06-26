@@ -241,7 +241,7 @@ defmodule Cldr.DateAndTime.Backend do
             {:ok, "juin 2024"}
 
             # Sometimes the available date fields can't be mapped to an available
-            # Cldr defined format.
+            # CLDR defined format.
             iex> #{inspect(__MODULE__)}.to_string(%{year: 2024, day: 3}, locale: "fr")
             {:error,
              {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"dy\\""}}
@@ -399,7 +399,7 @@ defmodule Cldr.DateAndTime.Backend do
             {:ok, "11:11 PM"}
 
             # Sometimes the available time fields can't be mapped to an available
-            # Cldr defined format.
+            # CLDR defined format.
             iex> #{inspect(__MODULE__)}.to_string(%{minute: 11})
             {:error,
              {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"m\\""}}

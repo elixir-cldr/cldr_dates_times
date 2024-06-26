@@ -105,7 +105,7 @@ defmodule Cldr.Date do
       {:ok, "juin 2024"}
 
       # Sometimes the available date fields can't be mapped to an available
-      # Cldr defined format.
+      # CLDR-defined format.
       iex> Cldr.Date.to_string(%{year: 2024, day: 3}, MyApp.Cldr, locale: "fr")
       {:error,
        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"dy\\""}}
