@@ -8,7 +8,9 @@ This is the changelog for Cldr_Dates_Times v2.19.0 released on _____, 2024.  For
 
 ### Bug Fixes
 
-* Fix `Cldr.Date.to_string/2` with the option `era: :variant` to correctly render the variant text.
+* Fix `Cldr.Date.to_string/2` with the option `era: :variant` to correctly render the variant "AD"/"CE"/"BC"/"BCE" text.
+
+* Fix `Cldr.Date.to_string/2` with the option `period: :variant` to correctly render the variant "am"/"pm" text.
 
 ### Enhancements
 
