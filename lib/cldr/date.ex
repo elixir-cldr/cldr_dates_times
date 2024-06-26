@@ -50,10 +50,10 @@ defmodule Cldr.Date do
 
   * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
     or a format string. The default is `:medium` for full dates (that is,
-    dates having `:year`, `:month`, `day` and `:calendar` fields). The
+    dates having `:year`, `:month`, `:day` and `:calendar` fields). The
     default for partial dates is to derive a candidate format id from the date and
     find the best match from the formats returned by
-    `Cldr.DateTime.Format.date_time_available_formats/2`.
+    `Cldr.Date.available_formats/3`.
 
   * `:locale:` any locale returned by `Cldr.known_locale_names/1`.
     The default is `Cldr.get_locale/0`.
@@ -64,7 +64,7 @@ defmodule Cldr.Date do
   * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
     formats have two variants - one using Unicode spaces (typically non-breaking space) and
     another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-    use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/1`
+    use cases and is not recommended. See `Cldr.Date.available_formats/3`
     to see which formats have these variants. Currently no date-specific
     formats have such variants but they may in the future.
 
@@ -174,10 +174,10 @@ defmodule Cldr.Date do
 
   * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
     or a format string. The default is `:medium` for full dates (that is,
-    dates having `:year`, `:month`, `day` and `:calendar` fields). The
+    dates having `:year`, `:month`, `:day` and `:calendar` fields). The
     default for partial dates is to derive a candidate format from the date and
     find the best match from the formats returned by
-    `Cldr.DateTime.Format.date_time_available_formats/2`.
+    `Cldr.Date.available_formats/3`.
 
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
@@ -188,7 +188,7 @@ defmodule Cldr.Date do
   * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
     formats have two variants - one using Unicode spaces (typically non-breaking space) and
     another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-    use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/1`
+    use cases and is not recommended. See `Cldr.Date.available_formats/3`
     to see which formats have these variants. Currently no date-specific
     formats have such variants but they may in the future.
 

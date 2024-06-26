@@ -16,11 +16,16 @@ defmodule Cldr.Time do
 
   """
 
-  alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
 
+  import Cldr.DateTime,
+    only: [resolve_plural_format: 4, apply_unicode_or_ascii_preference: 2]
+
   @format_types [:short, :medium, :long, :full]
-  @default_type :medium
+  @default_format_type :medium
+
+  defguard is_full_time(time)
+           when is_map_key(time, :hour) and is_map_key(time, :minute) and is_map_key(time, :second)
 
   defmodule Formats do
     @moduledoc false
@@ -39,18 +44,22 @@ defmodule Cldr.Time do
 
   ## Arguments
 
-  * `time` is a `%DateTime{}` or `%NaiveDateTime{}` struct or any map that contains the keys
-    `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
+  * `time` is a `t:DateTime.t/0`,`t:NaiveDateTime/0` struct or any map that contains
+    one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`.
 
   * `backend` is any module that includes `use Cldr` and therefore
-    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+    is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
 
   * `options` is a keyword list of options for formatting.
 
   ## Options
 
-  * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string.
-     The default is `:medium`.
+  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+    or a format string. The default is `:medium` for full times (that is,
+    times having `:hour`, `:minute` and `:second` fields). The
+    default for partial times is to derive a candidate format from the time and
+    find the best match from the formats returned by
+    `Cldr.Time.available_formats/2`.
 
   * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is
     `Cldr.get_locale/0`.
@@ -58,27 +67,46 @@ defmodule Cldr.Time do
   * `:number_system` a number system into which the formatted date digits should
     be transliterated.
 
+  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
+    formats have two variants - one using Unicode spaces (typically non-breaking space) and
+    another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+    use cases and is not recommended. See `Cldr.Time.available_formats/3`
+    to see which formats have these variants.
+
   * `period: :variant` will use a variant for the time period and flexible time period if
-    one is available in the locale.  For example, in the "en" locale `period: :variant` will
+    one is available in the locale.  For example, in the `:en` locale `period: :variant` will
     return "pm" instead of "PM".
 
   ## Examples
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr
+      iex> Cldr.Time.to_string(~T[07:35:13.215217], MyApp.Cldr)
       {:ok, "7:35:13 AM"}
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :short
+      iex> Cldr.Time.to_string(~T[07:35:13.215217], MyApp.Cldr, format: :short)
       {:ok, "7:35 AM"}
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :medium, locale: "fr"
+      iex> Cldr.Time.to_string(~T[07:35:13.215217], MyApp.Cldr, format: :short, period: :variant)
+      {:ok, "7:35 am"}
+
+      iex> Cldr.Time.to_string(~T[07:35:13.215217], MyApp.Cldr, format: :medium, locale: "fr")
       {:ok, "07:35:13"}
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :medium
+      iex> Cldr.Time.to_string(~T[07:35:13.215217], MyApp.Cldr, format: :medium)
       {:ok, "7:35:13 AM"}
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
       iex> Cldr.Time.to_string datetime, MyApp.Cldr, format: :long
       {:ok, "11:59:59 PM UTC"}
+
+      # A partial time with a best match CLDR-defined format
+      iex> Cldr.Time.to_string(%{hour: 23, minute: 11})
+      {:ok, "11:11 PM"}
+
+      # Sometimes the available time fields can't be mapped to an available
+      # Cldr defined format.
+      iex> Cldr.Time.to_string(%{minute: 11})
+      {:error,
+       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"m\\""}}
 
   """
   @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
@@ -97,19 +125,24 @@ defmodule Cldr.Time do
     to_string(time, backend, options)
   end
 
-  def to_string(%{hour: _hour, minute: _minute} = time, backend, options) do
-    options = normalize_options(backend, options)
-    calendar = Map.get(time, :calendar) || Cldr.Calendar.Gregorian
+  def to_string(%{} = time, backend, options) do
+    options = normalize_options(time, backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
-    number_system = Map.get(options, :number_system)
-    format = options[:time_format] || options[:format]
 
-    with {:ok, locale} <- Cldr.validate_locale(options[:locale], backend),
+    calendar = Map.get(time, :calendar, Cldr.Calendar.Gregorian)
+    time = Map.put_new(time, :calendar, calendar)
+    number_system = Map.get(options, :number_system)
+
+    locale = options[:locale]
+    format = options[:format]
+
+    with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format_string} <- format_string(format, locale, cldr_calendar, backend),
-         {:ok, formatted} <- format_backend.format(time, format_string, locale, options) do
-      {:ok, formatted}
+         {:ok, format} <- find_format(time, format, locale, cldr_calendar, backend),
+         {:ok, format} <- apply_unicode_or_ascii_preference(format, options[:prefer]),
+         {:ok, format_string} <- resolve_plural_format(format, time, backend, options) do
+      format_backend.format(time, format_string, locale, options)
     end
   rescue
     e in [Cldr.DateTime.UnresolvedFormat] ->
@@ -120,40 +153,14 @@ defmodule Cldr.Time do
     error_return(time, [:hour, :minute, :second])
   end
 
-  # TODO deprecate :style in version 3.0
-  defp normalize_options(_backend, %{} = options) do
-    options
-  end
-
-  defp normalize_options(backend, []) do
-    {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
-    number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
-
-    %{locale: locale, number_system: number_system, format: @default_type}
-  end
-
-  defp normalize_options(backend, options) do
-    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    format = options[:format] || options[:stylet] || @default_type
-    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
-    number_system = Keyword.get(options, :number_system, locale_number_system)
-
-    options
-    |> Keyword.put(:locale, locale)
-    |> Keyword.put(:format, format)
-    |> Keyword.delete(:style)
-    |> Keyword.put_new(:number_system, number_system)
-    |> Map.new()
-  end
-
   @doc """
   Formats a time according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
   ## Arguments
 
-  * `time` is a `%DateTime{}` or `%NaiveDateTime{}` struct or any map that contains the keys
-    `hour`, `minute`, `second` and optionally `calendar` and `microsecond`
+  * `time` is a `t:DateTime.t/0`,`t:NaiveDateTime/0` struct or any map that contains
+    one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
@@ -162,21 +169,28 @@ defmodule Cldr.Time do
 
   ## Options
 
-    * `format:` `:short` | `:medium` | `:long` | `:full` or a format string.
-       The default is `:medium`
+  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+    or a format string. The default is `:medium` for full times (that is,
+    times having `:hour`, `:minute` and `:second` fields). The
+    default for partial times is to derive a candidate format from the time and
+    find the best match from the formats returned by
+    `Cldr.Time.available_formats/1`.
 
-    * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-      or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
 
-    * `number_system:` a number system into which the formatted date digits should
-      be transliterated
+  * `number_system:` a number system into which the formatted date digits should
+    be transliterated.
 
-    * `era: :variant` will use a variant for the era is one is available in the locale.
-      In the "en" locale, for example, `era: :variant` will return "BCE" instead of "BC".
+  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
+    formats have two variants - one using Unicode spaces (typically non-breaking space) and
+    another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+    use cases and is not recommended. See `Cldr.Time.available_formats/3`
+    to see which formats have these variants.
 
-    * `period: :variant` will use a variant for the time period and flexible time period if
-      one is available in the locale.  For example, in the "en" locale `period: :variant` will
-      return "pm" instead of "PM"
+  * `period: :variant` will use a variant for the time period and flexible time period if
+    one is available in the locale.  For example, in the `:en` locale `period: :variant` will
+    return "pm" instead of "PM"
 
   ## Returns
 
@@ -186,24 +200,28 @@ defmodule Cldr.Time do
 
   ## Examples
 
-      iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr
+      iex> Cldr.Time.to_string!(~T[07:35:13.215217], MyApp.Cldr)
       "7:35:13 AM"
 
-      iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr, format: :short
+      iex> Cldr.Time.to_string!(~T[07:35:13.215217], MyApp.Cldr, format: :short)
       "7:35 AM"
 
-      iex> Cldr.Time.to_string ~T[07:35:13.215217], MyApp.Cldr, format: :short, period: :variant
-      {:ok, "7:35 AM"}
+      iex> Cldr.Time.to_string!(~T[07:35:13.215217], MyApp.Cldr, format: :short, period: :variant)
+      "7:35 am"
 
-      iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr, format: :medium, locale: "fr"
+      iex> Cldr.Time.to_string!(~T[07:35:13.215217], MyApp.Cldr, format: :medium, locale: "fr")
       "07:35:13"
 
-      iex> Cldr.Time.to_string! ~T[07:35:13.215217], MyApp.Cldr, format: :medium
+      iex> Cldr.Time.to_string!(~T[07:35:13.215217], MyApp.Cldr, format: :medium)
       "7:35:13 AM"
 
       iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-      iex> Cldr.Time.to_string! datetime, MyApp.Cldr, format: :long
+      iex> Cldr.Time.to_string!(datetime, MyApp.Cldr, format: :long)
       "11:59:59 PM UTC"
+
+      # A partial time with a best match CLDR-defined format
+      iex> Cldr.Time.to_string!(%{hour: 23, minute: 11})
+      "11:11 PM"
 
   """
   @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
@@ -217,27 +235,216 @@ defmodule Cldr.Time do
     end
   end
 
-  defp format_string(style, %LanguageTag{cldr_locale_name: locale_name}, calendar, backend)
-       when style in @format_types do
-    with {:ok, styles} <- Format.time_formats(locale_name, calendar, backend) do
-      {:ok, Map.get(styles, style)}
+  # TODO deprecate :style in version 3.0
+  defp normalize_options(_time, _backend, %{} = options) do
+    options
+  end
+
+  defp normalize_options(time, backend, []) do
+    {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
+    number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+    format = format_from_options(time, nil, @default_format_type)
+
+    %{locale: locale, number_system: number_system, format: format}
+  end
+
+  defp normalize_options(time, backend, options) do
+    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+    number_system = Keyword.get(options, :number_system, locale_number_system)
+    format_option = options[:time_format] || options[:format] || options[:style]
+    format = format_from_options(time, format_option, @default_format_type)
+
+    options
+    |> Keyword.put(:locale, locale)
+    |> Keyword.put(:format, format)
+    |> Keyword.delete(:style)
+    |> Keyword.put_new(:number_system, number_system)
+    |> Map.new()
+  end
+
+  # Full date, no option, use the default format
+  defp format_from_options(time, nil, default_format) when is_full_time(time) do
+    default_format
+  end
+
+  # Partial date, no option, derive the format from the date
+  defp format_from_options(time, nil, _default_format) do
+    derive_format_id(time)
+  end
+
+  # If a format is requested, use it
+  defp format_from_options(_time, format, _default_format) do
+    format
+  end
+
+  # If its a full time we can use one of the standard formats (:short, :medium, :long)
+  # and if its a full date and no format is specified then the default :medium will be
+  # applied.
+
+  defp find_format(time, format, locale, calendar, backend)
+       when format in @format_types and is_full_time(time) do
+    %LanguageTag{cldr_locale_name: locale_name} = locale
+    with {:ok, time_formats} <- formats(locale_name, calendar, backend) do
+      {:ok, Map.fetch!(time_formats, format)}
     end
   end
 
-  defp format_string(%{number_system: number_system, format: style}, locale, calendar, backend) do
-    {:ok, format_string} = format_string(style, locale, calendar, backend)
+  # If its a partial date and a standard format is requested, its an error
+
+  defp find_format(time, format, _locale, _calendar, _backend)
+       when format in @format_types and not is_full_time(time) do
+    {:error,
+     {
+       Cldr.DateTime.UnresolvedFormat,
+       "Standard formats are not available for partial times"
+     }}
+  end
+
+  defp find_format(time, %{} = format_map, locale, calendar, backend) do
+    %{number_system: number_system, format: format} = format_map
+    {:ok, format_string} = find_format(time, format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
-  defp format_string(style, _locale, _backend, _calendar) when is_atom(style) do
-    {:error,
-     {Cldr.DateTime.InvalidStyle,
-      "Invalid time format style.  " <> "The valid styles are #{inspect(@format_types)}."}}
+  # If its an atom format it means we want to use one of the available formats. Since
+  # these are map keys they can be used in a locale-independent way. If the requested
+  # format is a direct match, use it. If not - try to find the best match between the
+  # requested format and available formats.
+
+  defp find_format(_time, format, locale, calendar, backend) when is_atom(format) do
+    {:ok, available_formats} = available_formats(locale, calendar, backend)
+
+    if Map.has_key?(available_formats, format) do
+      Map.fetch(available_formats, format)
+    else
+      with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend) do
+        {:ok, Map.fetch!(available_formats, match)}
+      end
+    end
   end
 
-  defp format_string(format_string, _locale, _calendar, _backend)
+  # If its a binary then its considered a format string so we use
+  # it directly.
+
+  defp find_format(_time, format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
+  end
+
+  # Given the fields in the (maybe partial) date, derive
+  # format id (atom map key into available formats)
+
+  defp derive_format_id(time) do
+    time
+    |> Map.take([:hour, :minute, :second])
+    |> Map.keys()
+    |> Enum.map(fn
+      :hour -> "h"
+      :minute -> "m"
+      :second -> "s"
+    end)
+    |> Enum.join()
+    |> String.to_atom()
+  end
+
+  @doc """
+  Returns a map of the standard time formats for a given
+  locale and calendar.
+
+  ## Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+    The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  ## Examples:
+
+      iex> Cldr.Date.formats(:en, :gregorian, MyApp.Cldr)
+      {:ok, %Cldr.Date.Formats{
+        full: "EEEE, MMMM d, y",
+        long: "MMMM d, y",
+        medium: "MMM d, y",
+        short: "M/d/yy"
+      }}
+
+      iex> Cldr.Date.formats(:en, :buddhist, MyApp.Cldr)
+      {:ok, %Cldr.Date.Formats{
+        full: "EEEE, MMMM d, y G",
+        long: "MMMM d, y G",
+        medium: "MMM d, y G",
+        short: "M/d/y GGGGG"
+      }}
+
+  """
+  @spec formats(
+          Locale.locale_reference(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) ::
+          {:ok, DateTime.standard_formats()} | {:error, {atom, String.t()}}
+
+  def formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.time_formats(locale, calendar)
+  end
+
+  @doc """
+  Returns a map of the available date formats for a
+  given locale and calendar.
+
+  ## Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+    The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  ## Examples:
+
+      iex> Cldr.Time.available_formats(:en)
+      {:ok,
+       %{
+         h: %{unicode: "h a", ascii: "h a"},
+         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+         ms: "mm:ss",
+         H: "HH",
+         Hm: "HH:mm",
+         Hms: "HH:mm:ss",
+         Hmsv: "HH:mm:ss v",
+         Hmv: "HH:mm v",
+         hm: %{unicode: "h:mm a", ascii: "h:mm a"},
+         hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
+         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"}
+       }}
+
+  """
+  @spec available_formats(
+          Locale.locale_reference(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) :: {:ok, map()} | {:error, {atom, String.t()}}
+
+  def available_formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.time_available_formats(locale, calendar)
   end
 
   @doc """

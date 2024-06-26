@@ -153,6 +153,9 @@ defmodule Cldr.DateTime.Formatter do
   defguard is_date(date)
            when is_map_key(date, :year) and is_map_key(date, :month) and is_map_key(date, :day)
 
+  defguard is_time(time)
+           when is_map_key(time, :hour) and is_map_key(time, :minute) and is_map_key(time, :second)
+
   defguard has_year_and_month(date)
            when is_map_key(date, :year) and is_map_key(date, :month)
 
@@ -1989,21 +1992,22 @@ defmodule Cldr.DateTime.Formatter do
 
   def period_am_pm(time, n, locale, backend, options \\ %{})
 
-  def period_am_pm(time, n, locale, backend, options) when n in 1..3 do
+  def period_am_pm(time, n, locale, backend, options)
+      when is_map_key(time, :hour) and n in 1..3 do
     time
-    |> Cldr.Calendar.localize(:am_pm, :format, :abbreviated, backend, locale)
+    |> Cldr.Calendar.localize(:am_pm, :format, :abbreviated, backend, locale, options)
     |> maybe_wrap(:period_am_pm, options)
   end
 
-  def period_am_pm(time, 4, locale, backend, options) do
+  def period_am_pm(time, 4, locale, backend, options) when is_map_key(time, :hour) do
     time
-    |> Cldr.Calendar.localize(:am_pm, :format, :wide, backend, locale)
+    |> Cldr.Calendar.localize(:am_pm, :format, :wide, backend, locale, options)
     |> maybe_wrap(:period_am_pm, options)
   end
 
-  def period_am_pm(time, 5, locale, backend, options) do
+  def period_am_pm(time, 5, locale, backend, options) when is_map_key(time, :hour) do
     time
-    |> Cldr.Calendar.localize(:am_pm, :format, :narrow, backend, locale)
+    |> Cldr.Calendar.localize(:am_pm, :format, :narrow, backend, locale, options)
     |> maybe_wrap(:period_am_pm, options)
   end
 

@@ -49,6 +49,11 @@ defmodule Cldr.DateTime.Format.Backend do
           "c"
         ]
 
+        @time_symbols [
+          "H", "h", "K", "k", "C", "m", "s", "S", "A", "Z", "z", "V", "v",
+          "X", "x", "O"
+        ]
+
         @doc "A struct from a format id as an atom to a format string"
         @type formats :: map()
 
@@ -408,6 +413,42 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         def date_available_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_available_formats(locale, calendar)
+          end
+        end
+
+        @doc """
+        Returns a map of the available time formats for a
+        given locale and calendar.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+          The default is `:gregorian`.
+
+        ## Examples:
+
+            iex> #{inspect(__MODULE__)}.time_available_formats "en"
+
+        """
+        @spec time_available_formats(Locale.locale_reference(), calendar) :: {:ok, formats}
+        def time_available_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
+
+        def time_available_formats(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
+          time_available_formats(cldr_locale_name, calendar)
+        end
+
+        def time_available_formats(locale_name, calendar) when is_binary(locale_name) do
           with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
             date_available_formats(locale, calendar)
           end
@@ -789,6 +830,21 @@ defmodule Cldr.DateTime.Format.Backend do
 
             def date_available_formats(unquote(locale), unquote(calendar)) do
               {:ok, unquote(Macro.escape(date_available_formats))}
+            end
+
+            time_available_formats =
+              Enum.filter(available_formats, fn {format_id, _} ->
+                remaining =
+                  format_id
+                  |> to_string()
+                  |> String.replace(@time_symbols, "")
+
+                remaining == ""
+              end)
+              |> Map.new()
+
+            def time_available_formats(unquote(locale), unquote(calendar)) do
+              {:ok, unquote(Macro.escape(time_available_formats))}
             end
 
             available_format_tokens =

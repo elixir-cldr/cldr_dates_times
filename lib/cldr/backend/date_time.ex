@@ -189,7 +189,7 @@ defmodule Cldr.DateAndTime.Backend do
           dates having `:year`, `:month`, `day` and `:calendar` fields). The
           default for partial dates is to derive a candidate format id from the date and
           find the best match from the formats returned by
-          `Cldr.DateTime.Format.date_time_available_formats/2`.
+          `Cldr.Date.available_formats/3`.
 
         * `:locale:` any locale returned by `Cldr.known_locale_names/1`.
           The default is `Cldr.get_locale/0`.
@@ -200,7 +200,7 @@ defmodule Cldr.DateAndTime.Backend do
         * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
           formats have two variants - one using Unicode spaces (typically non-breaking space) and
           another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-          use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/1`
+          use cases and is not recommended. See `Cldr.Date.available_formats/3`
           to see which formats have these variants. Currently no date-specific
           formats have such variants but they may in the future.
 
@@ -273,7 +273,7 @@ defmodule Cldr.DateAndTime.Backend do
           dates having `:year`, `:month`, `day` and `:calendar` fields). The
           default for partial dates is to derive a candidate format from the date and
           find the best match from the formats returned by
-          `Cldr.DateTime.Format.date_time_available_formats/2`.
+          `Cldr.Date.available_formats/3`.
 
         * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
           or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
@@ -284,7 +284,7 @@ defmodule Cldr.DateAndTime.Backend do
         * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
           formats have two variants - one using Unicode spaces (typically non-breaking space) and
           another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-          use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/1`
+          use cases and is not recommended. See `Cldr.Date.available_formats/3`
           to see which formats have these variants. Currently no date-specific
           formats have such variants but they may in the future.
 
@@ -343,15 +343,19 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Arguments
 
-        * `time` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that
-           contains the keys `hour`, `minute`, `second` and optionally `calendar` and `microsecond`.
+        * `time` is a `t:DateTime.t/0`,`t:NaiveDateTime/0` struct or any map that contains
+          one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`.
 
         * `options` is a keyword list of options for formatting.
 
         ## Options
 
-        * `:format` is one of `:short` | `:medium` | `:long` | `:full` or a format string.
-           The default is `:medium`.
+        * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+          or a format string. The default is `:medium` for full times (that is,
+          times having `:hour`, `:minute` and `:second` fields). The
+          default for partial times is to derive a candidate format from the time and
+          find the best match from the formats returned by
+          `Cldr.Time.available_formats/3`.
 
         * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
           or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`
@@ -359,9 +363,11 @@ defmodule Cldr.DateAndTime.Backend do
         * `:number_system` a number system into which the formatted date digits should
           be transliterated.
 
-        * `:era` which, if set to :variant`, will use a variant for the era if one
-          is available in the requested locale. In the `:en` locale, for example, `era: :variant`
-          will return `CE` instead of `AD` and `BCE` instead of `BC`.
+        * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
+          formats have two variants - one using Unicode spaces (typically non-breaking space) and
+          another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+          use cases and is not recommended. See `Cldr.Time.available_formats/3`
+          to see which formats have these variants.
 
         * `period: :variant` will use a variant for the time period and flexible time period if
           one is available in the locale.  For example, in the "en" locale `period: :variant` will
@@ -369,21 +375,34 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Examples
 
-            iex> Cldr.Time.to_string(~T[07:35:13.215217])
+            iex> #{inspect(__MODULE__)}.to_string(~T[07:35:13.215217])
             {:ok, "7:35:13 AM"}
 
-            iex> Cldr.Time.to_string(~T[07:35:13.215217], format: :short)
+            iex> #{inspect(__MODULE__)}.to_string(~T[07:35:13.215217], format: :short)
             {:ok, "7:35 AM"}
 
-            iex> Cldr.Time.to_string(~T[07:35:13.215217], format: :medium, locale: :fr)
+            iex> #{inspect(__MODULE__)}.to_string(~T[07:35:13.215217], format: :short, period: :variant)
+            {:ok, "7:35 am"}
+
+            iex> #{inspect(__MODULE__)}.to_string(~T[07:35:13.215217], format: :medium, locale: :fr)
             {:ok, "07:35:13"}
 
-            iex> Cldr.Time.to_string(~T[07:35:13.215217], format: :medium)
+            iex> #{inspect(__MODULE__)}.to_string(~T[07:35:13.215217], format: :medium)
             {:ok, "7:35:13 AM"}
 
             iex> {:ok, date_time} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-            iex> Cldr.Time.to_string(date_time, format: :long)
+            iex> #{inspect(__MODULE__)}.to_string(date_time, format: :long)
             {:ok, "11:59:59 PM UTC"}
+
+            # A partial time with a best match CLDR-defined format
+            iex> #{inspect(__MODULE__)}.to_string(%{hour: 23, minute: 11})
+            {:ok, "11:11 PM"}
+
+            # Sometimes the available time fields can't be mapped to an available
+            # Cldr defined format.
+            iex> #{inspect(__MODULE__)}.to_string(%{minute: 11})
+            {:error,
+             {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"m\\""}}
 
         """
         @spec to_string(map, Keyword.t()) ::
@@ -395,19 +414,24 @@ defmodule Cldr.DateAndTime.Backend do
 
         @doc """
         Formats a time according to a format string
-        as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
+        as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+        or raises an exception.
 
         ## Arguments
 
-        * `time` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that
-           contains the keys `hour`, `minute`, `second` and optionally `calendar` and `microsecond`.
+        * `time` is a `t:DateTime.t/0`,`t:NaiveDateTime/0` struct or any map that contains
+          one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`.
 
         * `options` is a keyword list of options for formatting.
 
         ## Options
 
-        * `:format` is one of `:short` | `:medium` | `:long` | `:full` or a format string.
-           The default is `:medium`.
+        * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+          or a format string. The default is `:medium` for full times (that is,
+          times having `:hour`, `:minute` and `:second` fields). The
+          default for partial times is to derive a candidate format from the time and
+          find the best match from the formats returned by
+          `Cldr.Time.available_formats/3`.
 
         * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
           or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`
@@ -415,8 +439,11 @@ defmodule Cldr.DateAndTime.Backend do
         * `:number_system` a number system into which the formatted date digits should
           be transliterated.
 
-        * `era: :variant` will use a variant for the era is one is available in the locale.
-          In the "en" locale, for example, `era: :variant` will return "BCE" instead of "BC".
+        * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
+          formats have two variants - one using Unicode spaces (typically non-breaking space) and
+          another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+          use cases and is not recommended. See `Cldr.Time.available_formats/3`
+          to see which formats have these variants.
 
         * `period: :variant` will use a variant for the time period and flexible time period if
           one is available in the locale.  For example, in the `:en` locale `period: :variant` will
@@ -436,8 +463,8 @@ defmodule Cldr.DateAndTime.Backend do
             iex> #{inspect(__MODULE__)}.to_string!(~T[07:35:13.215217], format: :short)
             "7:35 AM"
 
-            iex> #{inspect(__MODULE__)}.to_string(~T[07:35:13.215217], format: :short, period: :variant)
-            {:ok, "7:35 AM"}
+            iex> #{inspect(__MODULE__)}.to_string!(~T[07:35:13.215217], format: :short, period: :variant)
+            "7:35 am"
 
             iex> #{inspect(__MODULE__)}.to_string!(~T[07:35:13.215217], format: :medium, locale: :fr)
             "07:35:13"
@@ -448,6 +475,10 @@ defmodule Cldr.DateAndTime.Backend do
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
             iex> #{inspect(__MODULE__)}.to_string! datetime, format: :long
             "11:59:59 PM UTC"
+
+            # A partial time with a best match CLDR-defined format
+            iex> #{inspect(__MODULE__)}.to_string!(%{hour: 23, minute: 11})
+            "11:11 PM"
 
         """
         @spec to_string!(map, Keyword.t()) :: String.t() | no_return
