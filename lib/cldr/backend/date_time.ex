@@ -53,8 +53,9 @@ defmodule Cldr.DateAndTime.Backend do
           * `:number_system` a number system into which the formatted date digits should
             be transliterated.
 
-          * `era: :variant` will use a variant for the era is one is available in the locale.
-            In the "en" for example, the locale `era: :variant` will return "BCE" instead of "BC".
+          * `:era` which, if set to :variant`, will use a variant for the era if one
+            is available in the requested locale. In the `:en` locale, for example, `era: :variant`
+            will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
           * `period: :variant` will use a variant for the time period and flexible time period if
             one is available in the locale.  For example, in the "en" locale `period: :variant` will
@@ -172,25 +173,33 @@ defmodule Cldr.DateAndTime.Backend do
       defmodule Date do
         @doc """
         Formats a date according to a format string
-        as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+        as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
         ## Arguments
 
-        * `date` is a `t:Date.t/0` or any map that contains the keys
-          `year`, `month`, `day` and `calendar`
+        * `date` is a `t:Date.t/0` struct or any map that contains one or more
+          of the keys `:year`, `:month`, `:day` and optionally `:calendar`.
 
         * `options` is a keyword list of options for formatting.
 
         ## Options
 
-        * `:format` is one of `:short` | `:medium` | `:long` | `:full` or a format string.
-           The default is `:medium`.
+        * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+          or a format string. The default is `:medium` for full dates (that is,
+          dates having `:year`, `:month`, `day` and `:calendar` fields). The
+          default for partial dates is to derive a candidate format id from the date and
+          find the best match from the formats returned by
+          `Cldr.DateTime.Format.date_time_available_formats/2`.
 
-        * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`
+        * `:locale:` any locale returned by `Cldr.known_locale_names/1`.
+          The default is `Cldr.get_locale/0`.
 
-        * `:number_system` a number system into which the formatted date digits should
-          be transliterated.
+        * `:number_system` a number system into which the formatted date digits
+          should be transliterated.
+
+        * `:era` which, if set to :variant`, will use a variant for the era if one
+          is available in the requested locale. In the `:en` locale, for example, `era: :variant`
+          will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
         ## Returns
 
@@ -200,10 +209,11 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Examples
 
-            iex> #{inspect(__MODULE__)}.to_string(~D[2017-07-10], format: :medium, locale: :en)
+            # Full dates have the default format `:medium`
+            iex> #{inspect(__MODULE__)}.to_string(~D[2017-07-10], locale: :en)
             {:ok, "Jul 10, 2017"}
 
-            iex> #{inspect(__MODULE__)}.to_string(~D[2017-07-10], locale: :en)
+            iex> #{inspect(__MODULE__)}.to_string(~D[2017-07-10], format: :medium, locale: :en)
             {:ok, "Jul 10, 2017"}
 
             iex> #{inspect(__MODULE__)}.to_string(~D[2017-07-10], format: :full, locale: :en)
@@ -212,11 +222,22 @@ defmodule Cldr.DateAndTime.Backend do
             iex> #{inspect(__MODULE__)}.to_string(~D[2017-07-10], format: :short, locale: :en)
             {:ok, "7/10/17"}
 
-            iex> #{inspect(__MODULE__)}.to_string(~D[2017-07-10], format: :short, locale: :fr)
+            iex> #{inspect(__MODULE__)}.to_string(~D[2017-07-10], format: :short, locale: "fr")
             {:ok, "10/07/2017"}
 
-            iex> #{inspect(__MODULE__)}.to_string(~D[2017-07-10], format: :long, locale: :af)
-            {:ok, "10 Julie 2017"}
+            # A partial date with a derived "best match" format
+            iex> #{inspect(__MODULE__)}.to_string(%{year: 2024, month: 6}, locale: "fr")
+            {:ok, "06/2024"}
+
+            # A partial date with a best match CLDR-defined format
+            iex> #{inspect(__MODULE__)}.to_string(%{year: 2024, month: 6}, format: :yMMM, locale: "fr")
+            {:ok, "juin 2024"}
+
+            # Sometimes the available date fields can't be mapped to an available
+            # Cldr defined format.
+            iex> #{inspect(__MODULE__)}.to_string(%{year: 2024, day: 3}, locale: "fr")
+            {:error,
+             {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"dy\\""}}
 
         """
         @spec to_string(map, Keyword.t()) ::
@@ -228,25 +249,34 @@ defmodule Cldr.DateAndTime.Backend do
 
         @doc """
         Formats a date according to a format string
-        as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
+        as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+        or raises an exception.
 
         ## Arguments
 
-        * `date` is a `t:Date.t/0` or any map that contains the keys
-          `year`, `month`, `day` and `calendar`.
+        * `date` is a `t:Date.t/0` struct or any map that contains one or more
+          of the keys `:year`, `:month`, `:day` and optionally `:calendar`.
 
         * `options` is a keyword list of options for formatting.
 
         ## Options
 
-        * `:format` is one of `:short` | `:medium` | `:long` | `:full` or a format string.
-           The default is `:medium`.
+        * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+          or a format string. The default is `:medium` for full dates (that is,
+          dates having `:year`, `:month`, `day` and `:calendar` fields). The
+          default for partial dates is to derive a candidate format from the date and
+          find the best match from the formats returned by
+          `Cldr.DateTime.Format.date_time_available_formats/2`.
 
         * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`
+          or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
 
         * `:number_system` a number system into which the formatted date digits should
           be transliterated.
+
+        * `:era` which, if set to :variant`, will use a variant for the era if one
+          is available in the requested locale. In the `:en` locale, for example, `era: :variant`
+          will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
         ## Returns
 
@@ -256,23 +286,28 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Examples
 
-            iex> #{inspect(__MODULE__)}.to_string!(~D[2017-07-10], format: :medium, locale: :en)
-            "Jul 10, 2017"
-
             iex> #{inspect(__MODULE__)}.to_string!(~D[2017-07-10], locale: :en)
             "Jul 10, 2017"
 
-            iex> #{inspect(__MODULE__)}.to_string!(~D[2017-07-10], format: :full,locale: :en)
+            iex> #{inspect(__MODULE__)}.to_string!(~D[2017-07-10], format: :medium, locale: :en)
+            "Jul 10, 2017"
+
+            iex> #{inspect(__MODULE__)}.to_string!(~D[2017-07-10], format: :full, locale: :en)
             "Monday, July 10, 2017"
 
             iex> #{inspect(__MODULE__)}.to_string!(~D[2017-07-10], format: :short, locale: :en)
             "7/10/17"
 
-            iex> #{inspect(__MODULE__)}.to_string!(~D[2017-07-10], format: :short, locale: :fr)
+            iex> #{inspect(__MODULE__)}.to_string!(~D[2017-07-10], format: :short, locale: "fr")
             "10/07/2017"
 
-            iex> #{inspect(__MODULE__)}.to_string!(~D[2017-07-10], format: :long, locale: "af")
-            "10 Julie 2017"
+            # A partial date with a derived "best match" format
+            iex> #{inspect(__MODULE__)}.to_string!(%{year: 2024, month: 6}, locale: "fr")
+            "06/2024"
+
+            # A partial date with a best match CLDR-defined format
+            iex> #{inspect(__MODULE__)}.to_string!(%{year: 2024, month: 6}, format: :yMMM, locale: "fr")
+            "juin 2024"
 
         """
         @spec to_string!(map, Keyword.t()) :: String.t() | no_return
@@ -310,8 +345,9 @@ defmodule Cldr.DateAndTime.Backend do
         * `:number_system` a number system into which the formatted date digits should
           be transliterated.
 
-        * `era: :variant` will use a variant for the era is one is available in the locale.
-          In the "en" locale, for example, `era: :variant` will return "BCE" instead of "BC".
+        * `:era` which, if set to :variant`, will use a variant for the era if one
+          is available in the requested locale. In the `:en` locale, for example, `era: :variant`
+          will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
         * `period: :variant` will use a variant for the time period and flexible time period if
           one is available in the locale.  For example, in the "en" locale `period: :variant` will

@@ -31,7 +31,7 @@ defmodule Cldr.Date do
 
   @doc """
   Formats a date according to a format string
-  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
   ## Arguments
 
@@ -146,6 +146,7 @@ defmodule Cldr.Date do
   @doc """
   Formats a date according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+  or raises an exception.
 
   ## Arguments
 
