@@ -131,9 +131,6 @@ defmodule Cldr.DateTime.Compiler do
 
     case tokenized do
       {:ok, tokens, _} ->
-        tokens =
-          Enum.map(tokens, fn {_token, symbol, count} -> {symbol, count} end)
-
         {:ok, tokens}
 
       {:error, {_, :skeleton_tokenizer, {:illegal, content}}, _} ->
