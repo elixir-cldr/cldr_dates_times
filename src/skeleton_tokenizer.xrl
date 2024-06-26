@@ -1,6 +1,7 @@
 % Tokenizes CLDR date and time formats which are described at
 % http://unicode.org/reports/tr35/tr35-dates.html
 
+
 Definitions.
 
 Era                 = G
@@ -68,9 +69,6 @@ Rules.
 {Quarter}+               : {token,{quarter,symbol(TokenChars),count(TokenChars)}}.
 {StandAloneQuarter}+     : {token,{standalone_quarter,symbol(TokenChars),count(TokenChars)}}.
 
-{Time}                   : {token,{time,symbol(TokenChars),0}}.
-{Date}                   : {token,{date,symbol(TokenChars),0}}.
-
 {Month}+                 : {token,{month,symbol(TokenChars),count(TokenChars)}}.
 {StandAloneMonth}+       : {token,{standalone_month,symbol(TokenChars),count(TokenChars)}}.
 
@@ -109,6 +107,11 @@ Rules.
 {Skeleton_j}+            : {token, {skeleton_j, symbol(TokenChars), count(TokenChars)}}.
 {Skeleton_J}+            : {token, {skeleton_J, symbol(TokenChars), count(TokenChars)}}.
 {Skeleton_C}+            : {token, {skeleton_C, symbol(TokenChars), count(TokenChars)}}.
+
+% These will never match. But without them, Dialyzer will report
+% a pattern_match error
+{Time}                   : {token,{time,symbol(TokenChars),0}}.
+{Date}                   : {token,{date,symbol(TokenChars),0}}.
 
 Erlang code.
 
