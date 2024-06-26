@@ -18,6 +18,8 @@ This is the changelog for Cldr_Dates_Times v2.19.0 released on _____, 2024.  For
 
 * Adds support for deriving the "best match" format for a date based upon the users requested format or deriving from the available date fields.
 
+* Adds support for formatting using format IDs (atoms that are keys to locale-independent formats) in `Cldr.Date.to_string/2` and `Cldr.Time.to_string/2`. They have been previously supported in `Cldr.DateTime.to_string/2` only.
+
 ## Cldr_Dates_Times v2.18.0
 
 This is the changelog for Cldr_Dates_Times v2.18.0 released on May 29th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
