@@ -33,7 +33,7 @@ defmodule Cldr.DateTime.Format do
   which is used to find the best match from the list of
   formats returned by `Cldr.DateTime.Format.date_time_available_formats/3`
   """
-  @type format_skeleton :: String.t()
+  @type format_skeleton :: atom()
 
   @typedoc """
   A format_id is an atom that indexes into the map returned by

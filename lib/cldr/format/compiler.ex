@@ -133,7 +133,7 @@ defmodule Cldr.DateTime.Compiler do
       {:ok, tokens, _} ->
         {:ok, tokens}
 
-      {:error, {_, _, {:illegal, content}}} ->
+      {:error, {_, :skeleton_tokenizer, {:illegal, content}}, _} ->
         {:error, "Illegal format string content found at: #{inspect(content)}"}
     end
   end

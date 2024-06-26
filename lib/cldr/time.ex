@@ -17,6 +17,7 @@ defmodule Cldr.Time do
   """
 
   alias Cldr.LanguageTag
+  alias Cldr.Locale
 
   import Cldr.DateTime,
     only: [resolve_plural_format: 4, apply_unicode_or_ascii_preference: 2]
@@ -389,7 +390,7 @@ defmodule Cldr.Time do
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
-          {:ok, DateTime.standard_formats()} | {:error, {atom, String.t()}}
+          {:ok, Cldr.DateTime.Format.standard_formats()} | {:error, {atom, String.t()}}
 
   def formats(
         locale \\ Cldr.get_locale(),
