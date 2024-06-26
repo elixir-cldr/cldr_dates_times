@@ -13,7 +13,7 @@ defmodule Cldr.Time.Interval.Backend do
         to take a start and end date, time or datetime plus a formatting pattern
         and use that information to produce a localized format.
 
-        See `Cldr.Interval.to_string/3` and `Cldr.Time.Interval.to_string/3`
+        See `Cldr.Interval.to_string/3` and `Cldr.Time.Interval.to_string/3`.
 
         """
 
@@ -53,10 +53,10 @@ defmodule Cldr.Time.Interval.Backend do
           and `:flex`. The default is `:time`.
 
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`
+          or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`.
 
         * `number_system:` a number system into which the formatted date digits should
-          be transliterated
+          be transliterated.
 
         ## Returns
 
@@ -75,7 +75,7 @@ defmodule Cldr.Time.Interval.Backend do
           is the underlying CLDR calendar type.
 
         * In the case where `from` and `to` are equal, a single
-          time is formatted instead of an interval
+          time is formatted instead of an interval.
 
         ## Examples
 
@@ -106,16 +106,6 @@ defmodule Cldr.Time.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], nil
             {:ok, "10:00:00 AM –"}
-
-            # A partial time with a best match CLDR-defined format
-            iex> #{inspect(__MODULE__)}.to_string(%{hour: 23, minute: 11})
-            {:ok, "11:11 PM"}
-
-            # Sometimes the available time fields can't be mapped to an available
-            # CLDR-defined format.
-            iex> #{inspect(__MODULE__)}.to_string(%{minute: 11})
-            {:error,
-             {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"m\\""}}
 
         """
         @spec to_string(Elixir.Calendar.time() | nil, Elixir.Calendar.time() | nil, Keyword.t()) ::
@@ -173,10 +163,10 @@ defmodule Cldr.Time.Interval.Backend do
           and `:flex`. The default is `:time`.
 
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`
+          or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`.
 
         * `number_system:` a number system into which the formatted date digits should
-          be transliterated
+          be transliterated.
 
         ## Returns
 
@@ -195,7 +185,7 @@ defmodule Cldr.Time.Interval.Backend do
           is the underlying CLDR calendar type.
 
         * In the case where `from` and `to` are equal, a single
-          time is formatted instead of an interval
+          time is formatted instead of an interval.
 
         ## Examples
 
