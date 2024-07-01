@@ -2,6 +2,14 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.18.1
+
+This is the changelog for Cldr_Dates_Times v2.18.1 released on July 1st, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix formatting `am/pm` with format `:narrow` or `:wide`. Thanks to @sysashi for the report. Closes #48.
+
 ## Cldr_Dates_Times v2.18.0
 
 This is the changelog for Cldr_Dates_Times v2.18.0 released on May 29th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

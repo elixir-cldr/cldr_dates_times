@@ -1883,6 +1883,9 @@ defmodule Cldr.DateTime.Formatter do
       iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 21, minute: 0}
       "PM"
 
+      iex> Cldr.DateTime.Formatter.period_am_pm %{hour: 21, minute: 0}, 5
+      "p"
+
   """
   @spec period_am_pm(Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
@@ -1903,6 +1906,11 @@ defmodule Cldr.DateTime.Formatter do
           String.t() | {:error, String.t()}
 
   def period_am_pm(time, n, locale, backend, options \\ %{})
+
+  def period_am_pm(%{calendar: Calendar.ISO} = time, n, locale, backend, options) do
+    %{time | calendar: Cldr.Calendar.Gregorian}
+    |> period_am_pm(n, locale, backend, options)
+  end
 
   def period_am_pm(time, n, locale, backend, options) when n in 1..3 do
     time
