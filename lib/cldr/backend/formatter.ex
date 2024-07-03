@@ -36,7 +36,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
           or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
-        * `options` is a keyword list of options.  The valid options are:
+        * `options` is a keyword list of options.
 
         ## Options
 

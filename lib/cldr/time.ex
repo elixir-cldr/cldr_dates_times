@@ -25,6 +25,10 @@ defmodule Cldr.Time do
   @format_types [:short, :medium, :long, :full]
   @default_format_type :medium
 
+  # TODO Do we need microseconds here too? Are there any standard formats that use it?
+  # have we got the formatting right for fractional seconds?
+  # have we got derived formats working for microseconds?
+
   defguard is_full_time(time)
            when is_map_key(time, :hour) and is_map_key(time, :minute) and is_map_key(time, :second)
 
@@ -134,14 +138,14 @@ defmodule Cldr.Time do
     time = Map.put_new(time, :calendar, calendar)
     number_system = Map.get(options, :number_system)
 
-    locale = options[:locale]
-    format = options[:format]
+    locale = options.locale
+    format = options.format
 
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, format} <- find_format(time, format, locale, cldr_calendar, backend),
-         {:ok, format} <- apply_unicode_or_ascii_preference(format, options[:prefer]),
+         {:ok, format} <- apply_unicode_or_ascii_preference(format, options.prefer),
          {:ok, format_string} <- resolve_plural_format(format, time, backend, options) do
       format_backend.format(time, format_string, locale, options)
     end

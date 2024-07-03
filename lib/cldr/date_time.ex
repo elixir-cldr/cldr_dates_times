@@ -21,7 +21,7 @@ defmodule Cldr.DateTime do
   alias Cldr.LanguageTag
 
   @format_types [:short, :medium, :long, :full]
-  @default_type :medium
+  @default_format_type :medium
   @default_style :default
   @default_prefer :unicode
 
@@ -48,7 +48,7 @@ defmodule Cldr.DateTime do
   ## Options
 
     * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
-      any of the keys returned by `Cldr.DateTime.Format.date_time_available_formats/0`.
+      any of the keys in the map returned by `Cldr.DateTime.date_time_available_formats/3`.
       The default is `:medium`.
 
     * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
@@ -67,10 +67,10 @@ defmodule Cldr.DateTime do
       formatted with a localised string representing `<date> at <time>`. See
       `Cldr.DateTime.Format.date_time_at_formats/2`.
 
-    * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of datetime
+    * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
       formats have two variants - one using Unicode spaces (typically non-breaking space) and
       another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-      use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/1`
+      use cases and is not recommended. See `Cldr.DateTime.available_formats/3`
       to see which formats have these variants.
 
     * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
@@ -79,8 +79,9 @@ defmodule Cldr.DateTime do
     * `:number_system` a number system into which the formatted date digits should
       be transliterated.
 
-    * `era: :variant` will use a variant for the era is one is available in the locale.
-      In the "en" for example, the locale `era: :variant` will return "BCE" instead of "BC".
+    * `:era` which, if set to :variant`, will use a variant for the era if one
+      is available in the requested locale. In the `:en` locale, for example, `era: :variant`
+      will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
     * `period: :variant` will use a variant for the time period and flexible time period if
       one is available in the locale.  For example, in the "en" locale `period: :variant` will
@@ -133,15 +134,27 @@ defmodule Cldr.DateTime do
     to_string(datetime, backend, options)
   end
 
-  def to_string(%{calendar: calendar} = date_time, backend, options)
+  def to_string(%{} = datetime, backend, options)
       when is_atom(backend) and is_list(options) do
+    options = normalize_options(datetime, backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
 
-    with {:ok, options} <- normalize_options(backend, options),
-         {:ok, cldr_calendar} <- type_from_calendar(calendar),
-         {:ok, format} <- format_string(options.format, cldr_calendar, backend, options),
-         {:ok, format_string} <- resolve_plural_format(format, date_time, backend, options) do
-      format_backend.format(date_time, format_string, options.locale, options)
+    calendar = Map.get(datetime, :calendar, Cldr.Calendar.Gregorian)
+    date = Map.put_new(datetime, :calendar, calendar)
+
+    number_system = options.number_system
+    locale = options.locale
+    format = options.format
+    date_format = options.date_format
+    time_format = optiomns.time_format
+
+    with {:ok, locale} <- Cldr.validate_locale(locale, backend),
+         {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
+         {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
+         # {:ok, format} <- find_format(datetime, format, locale, cldr_calendar, backend),
+         {:ok, format} <- apply_unicode_or_ascii_preference(format, options.prefer),
+         {:ok, format_string} <- resolve_plural_format(format, date, backend, options) do
+      format_backend.format(datetime, format_string, locale, options)
     end
   rescue
     e in [Cldr.DateTime.UnresolvedFormat] ->
@@ -152,16 +165,15 @@ defmodule Cldr.DateTime do
     error_return(datetime, [:year, :month, :day, :hour, :minute, :second, :calendar])
   end
 
-  defp normalize_options(backend, []) do
+  defp normalize_options(datetime, backend, []) do
     {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+    format = formats_from_options(datetime, nil, nil, nil, @default_format_type)
 
     options = %{
       locale: locale,
       number_system: number_system,
-      format: @default_type,
-      date_format: @default_type,
-      time_format: @default_type,
+      format: format,
       style: @default_style,
       prefer: @default_prefer
     }
@@ -169,71 +181,72 @@ defmodule Cldr.DateTime do
     {:ok, options}
   end
 
-  defp normalize_options(backend, options) do
-    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    format = options[:format] || @default_type
+  defp normalize_options(datetime, backend, options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+
     style = options[:style] || @default_style
     prefer = options[:prefer] || @default_prefer
+
+    format = options[:format]
     date_format = options[:date_format]
     time_format = options[:time_format]
 
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
 
-    with {:ok, date_format, time_format} <- extract_formats(format, date_format, time_format),
-         {:ok, locale} <- Cldr.validate_locale(locale, backend),
-         {:ok, number_system} <- Cldr.Number.validate_number_system(locale, number_system, backend) do
-      options =
-        options
-        |> Map.new()
-        |> Map.put(:locale, locale)
-        |> Map.put(:format, format)
-        |> Map.put(:date_format, date_format)
-        |> Map.put(:time_format, time_format)
-        |> Map.put(:style, style)
-        |> Map.put(:prefer, prefer)
-        |> Map.put(:number_system, number_system)
+    {date_format, time_format} =
+      formats_from_options(datetime, format, date_format, time_format, @default_format_type)
 
-      {:ok, options}
-    end
+    options
+    |> Map.new()
+    |> Map.put(:locale, locale)
+    |> Map.put(:format, format)
+    |> Map.put(:date_format, date_format)
+    |> Map.put(:time_format, time_format)
+    |> Map.put(:style, style)
+    |> Map.put(:prefer, prefer)
+    |> Map.put(:number_system, number_system)
+
   end
 
-  defp extract_formats(format, nil, nil) when format in @format_types do
-    {:ok, format, format}
+  defp formats_from_options(_datetime, format, nil, nil, _default)
+      when format in @format_types do
+    {format, format}
   end
 
-  defp extract_formats(format, nil, nil) when is_binary(format) do
-    {:ok, nil, nil}
+  defp formats_from_options(_datetime, format, nil, nil, _default)
+      when is_binary(format) do
+    {nil, nil}
   end
 
-  defp extract_formats(format, nil, nil) when is_atom(format) do
-    {:ok, nil, nil}
+  defp formats_from_options(_datetime, format, nil, nil, _default)
+      when is_atom(format) do
+    {nil, nil}
   end
 
-  defp extract_formats(format, date_format, time_format)
-       when format in @format_types and date_format in @format_types and
-              time_format in @format_types do
-    {:ok, date_format, time_format}
+  defp formats_from_options(_datetime, _format, date_format, time_format, _default)
+       when date_format in @format_types and time_format in @format_types do
+    {date_format, time_format}
   end
-
-  defp extract_formats(nil, date_format, time_format)
-       when not is_nil(date_format) or not is_nil(time_format) do
-    {:error,
-     {
-       Cldr.DateTime.InvalidFormat,
-       "The :date_format and :time_format options must be one of #{inspect(@format_types)}. " <>
-         "Found #{inspect(date_format)} and #{inspect(time_format)}."
-     }}
-  end
-
-  defp extract_formats(format, date_format, time_format)
-       when not is_nil(date_format) or not is_nil(time_format) do
-    {:error,
-     {
-       Cldr.DateTime.InvalidFormat,
-       "The :date_format and :time_format options cannot be specified with the :format #{inspect(format)}."
-     }}
-  end
+  #
+  # defp formats_from_options(datetime, nil, date_format, time_format, default)
+  #      when not is_nil(date_format) or not is_nil(time_format) do
+  #   {:error,
+  #    {
+  #      Cldr.DateTime.InvalidFormat,
+  #      "The :date_format and :time_format options must be one of #{inspect(@format_types)}. " <>
+  #        "Found #{inspect(date_format)} and #{inspect(time_format)}."
+  #    }}
+  # end
+  #
+  # defp formats_from_options(datetime, format, date_format, time_format, default)
+  #      when not is_nil(date_format) or not is_nil(time_format) do
+  #   {:error,
+  #    {
+  #      Cldr.DateTime.InvalidFormat,
+  #      "The :date_format and :time_format options cannot be specified with the :format #{inspect(format)}."
+  #    }}
+  # end
 
   @doc false
 

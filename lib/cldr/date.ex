@@ -136,14 +136,14 @@ defmodule Cldr.Date do
     date = Map.put_new(date, :calendar, calendar)
     number_system = Map.get(options, :number_system)
 
-    locale = options[:locale]
-    format = options[:format]
+    locale = options.locale
+    format = options.format
 
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, format} <- find_format(date, format, locale, cldr_calendar, backend),
-         {:ok, format} <- apply_unicode_or_ascii_preference(format, options[:prefer]),
+         {:ok, format} <- apply_unicode_or_ascii_preference(format, options.prefer),
          {:ok, format_string} <- resolve_plural_format(format, date, backend, options) do
       format_backend.format(date, format_string, locale, options)
     end
