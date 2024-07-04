@@ -146,7 +146,7 @@ defmodule Cldr.DateTime do
     locale = options.locale
     format = options.format
     date_format = options.date_format
-    time_format = optiomns.time_format
+    time_format = options.time_format
 
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),

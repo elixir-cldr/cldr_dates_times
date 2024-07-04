@@ -12,7 +12,7 @@ defmodule Cldr.DateTime.Format do
 
   alias Cldr.Locale
   alias Cldr.LanguageTag
-  alias Cldr.DateTime.Compiler
+  alias Cldr.DateTime.Format.Compiler
 
   @typedoc """
   The standard formats of `:full`,

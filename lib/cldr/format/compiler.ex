@@ -1,4 +1,4 @@
-defmodule Cldr.DateTime.Compiler do
+defmodule Cldr.DateTime.Format.Compiler do
   @moduledoc """
   Tokenizes and parses `Date`, `Time` and `DateTime` format strings.
 
@@ -27,7 +27,7 @@ defmodule Cldr.DateTime.Compiler do
   Tokenize a date, time or datetime format string.
 
   This function is designed to produce output
-  that is fed into `Cldr.DateTime.Compiler.compile/3`.
+  that is fed into `Cldr.DateTime.Format.Compiler.compile/3`.
 
   ## Arguments
 
@@ -41,7 +41,7 @@ defmodule Cldr.DateTime.Compiler do
 
   ## Example
 
-      iex> Cldr.DateTime.Compiler.tokenize("yyyy/MM/dd")
+      iex> Cldr.DateTime.Format.Compiler.tokenize("yyyy/MM/dd")
       {:ok,
        [{:year, 1, 4}, {:literal, 1, "/"}, {:month, 1, 2}, {:literal, 1, "/"},
         {:day_of_month, 1, 2}], 1}

@@ -17,7 +17,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
           """
         end
 
-        alias Cldr.DateTime.Compiler
+        alias Cldr.DateTime.Format.Compiler
         alias Cldr.DateTime.Formatter
         alias Cldr.Number
 

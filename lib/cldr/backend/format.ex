@@ -804,7 +804,7 @@ defmodule Cldr.DateTime.Format.Backend do
               |> get_in([:date_time_formats, :available_formats])
               |> Enum.map(fn
                 {name, %{other: _other} = plurals} ->
-                  {:ok, tokens, _} = Cldr.DateTime.Compiler.tokenize(to_string(name))
+                  {:ok, tokens, _} = Cldr.DateTime.Format.Compiler.tokenize(to_string(name))
                   [{pluralize, _, _} | _rest] = Enum.reverse(tokens)
                   {name, Map.put(plurals, :pluralize, pluralize)}
 
@@ -849,7 +849,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
             available_format_tokens =
               Enum.map(available_formats, fn {format_id, format} ->
-                {:ok, tokens} = Cldr.DateTime.Compiler.tokenize_skeleton(format_id)
+                {:ok, tokens} = Cldr.DateTime.Format.Compiler.tokenize_skeleton(format_id)
                 {format_id, tokens}
               end)
               |> Map.new()
