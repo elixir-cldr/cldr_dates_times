@@ -24,6 +24,7 @@ defmodule Cldr.Time do
 
   @format_types [:short, :medium, :long, :full]
   @default_format_type :medium
+  @default_prefer :unicode
 
   # TODO Do we need microseconds here too? Are there any standard formats that use it?
   # have we got the formatting right for fractional seconds?
@@ -250,19 +251,21 @@ defmodule Cldr.Time do
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     format = format_from_options(time, nil, @default_format_type)
 
-    %{locale: locale, number_system: number_system, format: format}
+    %{locale: locale, number_system: number_system, format: format, prefer: @default_prefer}
   end
 
   defp normalize_options(time, backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
+    prefer = Keyword.get(options, :prefer, @default_prefer)
     format_option = options[:time_format] || options[:format] || options[:style]
     format = format_from_options(time, format_option, @default_format_type)
 
     options
     |> Keyword.put(:locale, locale)
     |> Keyword.put(:format, format)
+    |> Keyword.put(:prefer, prefer)
     |> Keyword.delete(:style)
     |> Keyword.put_new(:number_system, number_system)
     |> Map.new()

@@ -71,20 +71,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
           case Compiler.compile(format, backend, Cldr.DateTime.Formatter.Backend) do
             {:ok, transforms} ->
               def format(date, unquote(Macro.escape(format)) = f, locale, options) do
-                number_system =
-                  number_system(f, options)
-
-                options =
-                  options
-                  |> Map.new()
-                  |> Map.put(:_number_systems, format_number_systems(f))
-
-                formatted =
-                  unquote(transforms)
-                  |> Enum.join()
-                  |> transliterate(locale, number_system)
-
-                {:ok, formatted}
+                format_transforms(date, f, unquote(transforms), locale, options)
               end
 
             {:error, message} ->
@@ -101,26 +88,36 @@ defmodule Cldr.DateTime.Formatter.Backend do
         def format(date, format, locale, options) do
           case Compiler.tokenize(format) do
             {:ok, tokens, _} ->
-              number_system =
-                number_system(format, options)
-
-              options =
-                options
-                |> Map.new()
-                |> Map.put(:_number_systems, format_number_systems(format))
-
-              formatted =
-                tokens
-                |> apply_transforms(date, locale, options)
-                |> Enum.join()
-                |> transliterate(locale, number_system)
-
-              {:ok, formatted}
+              transforms = apply_transforms(tokens, date, locale, options)
+              format_transforms(date, format, transforms, locale, options)
 
             {:error, {_, :date_time_format_lexer, {_, error}}, _} ->
               {:error,
                {Cldr.DateTime.Compiler.ParseError,
                 "Could not tokenize #{inspect(format)}. Error detected at #{inspect(error)}"}}
+          end
+        end
+
+        @doc false
+        def format_transforms(date, format, transforms, locale, options) do
+          number_system =
+            number_system(format, options)
+
+          formatted =
+            Enum.reduce_while(transforms, "", fn
+              {:error, reason}, acc -> {:halt, {:error, reason}}
+              string, acc when is_binary(string) -> {:cont, acc <> string}
+              number, acc when is_number(number) -> {:cont, acc <> to_string(number)}
+              list, acc when is_list(list) -> {:cont, acc <> Enum.join(list)}
+            end)
+
+          case formatted do
+            {:error, reason} ->
+              {:error, reason}
+
+            string ->
+              transliterated = transliterate(string, locale, number_system)
+              {:ok, transliterated}
           end
         end
 

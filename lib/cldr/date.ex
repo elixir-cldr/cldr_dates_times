@@ -24,6 +24,7 @@ defmodule Cldr.Date do
 
   @format_types [:short, :medium, :long, :full]
   @default_format_type :medium
+  @default_prefer :unicode
 
   defguard is_full_date(date)
            when is_map_key(date, :year) and is_map_key(date, :month) and is_map_key(date, :day)
@@ -250,19 +251,21 @@ defmodule Cldr.Date do
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     format = format_from_options(date, nil, @default_format_type)
 
-    %{locale: locale, number_system: number_system, format: format}
+    %{locale: locale, number_system: number_system, format: format, prefer: @default_prefer}
   end
 
   defp normalize_options(date, backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
+    prefer = options[:prefer] || @default_prefer
     format_option = options[:date_format] || options[:format] || options[:style]
     format = format_from_options(date, format_option, @default_format_type)
 
     options
     |> Keyword.put(:locale, locale)
     |> Keyword.put(:format, format)
+    |> Keyword.put(:prefer, prefer)
     |> Keyword.delete(:style)
     |> Keyword.put_new(:number_system, number_system)
     |> Map.new()
