@@ -442,8 +442,11 @@ defmodule Cldr.DateTime do
 
   # We need to derive the format, or maybe even date_format and time_format
   defp find_format(datetime, nil, locale, calendar, backend, options) do
-    with {:ok, date_format} <- extract_or_derive(datetime, :date, options.date_format, locale, calendar, backend),
-         {:ok, time_format} <- extract_or_derive(datetime, :time, options.time_format, locale, calendar, backend),
+    date_format = options.date_format
+    time_format = options.time_format
+
+    with {:ok, date_format} <- date_format(datetime, date_format, locale, calendar, backend),
+         {:ok, time_format} <- time_format(datetime, time_format, locale, calendar, backend),
          {:ok, format} <- resolve_format(date_format, locale, calendar, backend) do
       options =
         options
@@ -481,6 +484,31 @@ defmodule Cldr.DateTime do
     end
   end
 
+  # We need to derive the date format now since that data
+  # is used to establish what datetime format we derive.
+
+  defp date_format(datetime, nil, locale, calendar, backend) do
+    format = Cldr.Date.derive_format_id(datetime)
+    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
+  end
+
+  defp date_format(datetime, format, locale, calendar, backend) do
+    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
+  end
+
+  defp time_format(datetime, nil, locale, calendar, backend) do
+    format = Cldr.Time.derive_format_id(datetime)
+    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
+  end
+
+  defp time_format(datetime, format, locale, calendar, backend) do
+    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
+  end
+
+  # FIXME These functions don't consider the impace
+  # of literals in the format. For now, the only known
+  # literal is a "," or "at" so we are safe for the moment.
+
   defp has_wide_month?(format) do
     String.contains?(format, "MMMM") || String.contains?(format, "LLLL")
   end
@@ -493,26 +521,9 @@ defmodule Cldr.DateTime do
     String.contains?(format, "E") || String.contains?(format, "c")
   end
 
-  defp extract_or_derive(datetime, :date, nil, locale, calendar, backend) do
-    format = Cldr.Date.derive_format_id(datetime)
-    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
-  end
-
-  defp extract_or_derive(datetime, :date, format, locale, calendar, backend) do
-    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
-  end
-
-  defp extract_or_derive(datetime, :time, nil, locale, calendar, backend) do
-    format = Cldr.Time.derive_format_id(datetime)
-    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
-  end
-
-  defp extract_or_derive(datetime, :time, format, locale, calendar, backend) do
-    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
-  end
-
   # Given the fields in the (maybe partial) date, derive
   # format id (atom map key into available formats)
+
   @doc false
   def derive_format_id(datetime, field_map, field_names) do
     datetime
