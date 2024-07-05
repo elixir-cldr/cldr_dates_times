@@ -303,7 +303,13 @@ defmodule Cldr.DateTime.Formatter do
     era(date, n, locale, backend, Map.new(options))
   end
 
-  @spec era(Cldr.Calendar.any_date_time(), pos_integer(), Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec era(
+          Cldr.Calendar.any_date_time(),
+          pos_integer(),
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def era(date, n, locale, backend, options \\ %{})
@@ -407,7 +413,13 @@ defmodule Cldr.DateTime.Formatter do
     year(year, n, locale, backend, Map.new(options))
   end
 
-  @spec year(Cldr.Calendar.any_date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec year(
+          Cldr.Calendar.any_date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def year(date, n, locale, backend, options \\ %{})
@@ -690,7 +702,13 @@ defmodule Cldr.DateTime.Formatter do
     cyclic_year(cyclic_year, n, locale, backend, Map.new(options))
   end
 
-  @spec cyclic_year(Cldr.Calendar.any_date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec cyclic_year(
+          Cldr.Calendar.any_date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def cyclic_year(date, n, locale, backend, options \\ %{})
@@ -868,7 +886,13 @@ defmodule Cldr.DateTime.Formatter do
     quarter(quarter, n, locale, backend, Map.new(options))
   end
 
-  @spec quarter(Cldr.Calendar.any_date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec quarter(
+          Cldr.Calendar.any_date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def quarter(date, n, locale, backend, options \\ %{})
@@ -1094,7 +1118,13 @@ defmodule Cldr.DateTime.Formatter do
     month(month, n, locale, backend, Map.new(options))
   end
 
-  @spec month(Cldr.Calendar.any_date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec month(
+          Cldr.Calendar.any_date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def month(date, n, locale, backend, options \\ %{})
@@ -1568,7 +1598,13 @@ defmodule Cldr.DateTime.Formatter do
     day_of_year(day_of_year, n, locale, backend, Map.new(options))
   end
 
-  @spec day_of_year(Cldr.Calendar.any_date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec day_of_year(
+          Cldr.Calendar.any_date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def day_of_year(date, n, locale, backend, options \\ %{})
@@ -1654,7 +1690,13 @@ defmodule Cldr.DateTime.Formatter do
     day_name(day_name, n, locale, backend, Map.new(options))
   end
 
-  @spec day_name(Cldr.Calendar.any_date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec day_name(
+          Cldr.Calendar.any_date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def day_name(date, n, locale, backend, options \\ %{})
@@ -1766,7 +1808,13 @@ defmodule Cldr.DateTime.Formatter do
     day_of_week(day_of_week, n, locale, backend, Map.new(options))
   end
 
-  @spec day_of_week(Cldr.Calendar.any_date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec day_of_week(
+          Cldr.Calendar.any_date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def day_of_week(date, n, locale, backend, options \\ %{})

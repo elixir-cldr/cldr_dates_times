@@ -416,6 +416,7 @@ defmodule Cldr.Date do
   defp find_format(date, format, locale, calendar, backend)
        when format in @format_types and is_full_date(date) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
+
     with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
       {:ok, Map.fetch!(date_formats, format)}
     end

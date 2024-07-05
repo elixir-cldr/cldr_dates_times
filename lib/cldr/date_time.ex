@@ -25,28 +25,28 @@ defmodule Cldr.DateTime do
   @default_style :default
   @default_prefer :unicode
 
-  defguard is_date_time(datetime) when
-    is_map_key(datetime, :year) and
-    is_map_key(datetime, :month) and
-    is_map_key(datetime, :day) and
-    is_map_key(datetime, :hour) and
-    is_map_key(datetime, :minute) and
-    is_map_key(datetime, :second) and
-    is_map_key(datetime, :time_zone) and
-    is_map_key(datetime, :zone_abbr)
+  defguard is_date_time(datetime)
+           when is_map_key(datetime, :year) and
+                  is_map_key(datetime, :month) and
+                  is_map_key(datetime, :day) and
+                  is_map_key(datetime, :hour) and
+                  is_map_key(datetime, :minute) and
+                  is_map_key(datetime, :second) and
+                  is_map_key(datetime, :time_zone) and
+                  is_map_key(datetime, :zone_abbr)
 
-  defguard is_naive_date_time(datetime) when
-    is_map_key(datetime, :year) and
-    is_map_key(datetime, :month) and
-    is_map_key(datetime, :day) and
-    is_map_key(datetime, :hour) and
-    is_map_key(datetime, :minute) and
-    is_map_key(datetime, :second) and
-    not is_map_key(datetime, :time_zone)
-    and not is_map_key(datetime, :zone_abbr)
+  defguard is_naive_date_time(datetime)
+           when is_map_key(datetime, :year) and
+                  is_map_key(datetime, :month) and
+                  is_map_key(datetime, :day) and
+                  is_map_key(datetime, :hour) and
+                  is_map_key(datetime, :minute) and
+                  is_map_key(datetime, :second) and
+                  not is_map_key(datetime, :time_zone) and
+                  not is_map_key(datetime, :zone_abbr)
 
-  defguard is_any_date_time(datetime) when
-    is_date_time(datetime) or is_naive_date_time(datetime)
+  defguard is_any_date_time(datetime)
+           when is_date_time(datetime) or is_naive_date_time(datetime)
 
   defmodule Formats do
     @moduledoc false
@@ -306,7 +306,6 @@ defmodule Cldr.DateTime do
     |> Map.put(:style, style)
     |> Map.put(:prefer, prefer)
     |> Map.put(:number_system, number_system)
-
   end
 
   # There are three formats required to format a date time:
@@ -321,36 +320,36 @@ defmodule Cldr.DateTime do
   # When we have a standard format then we use the same format name for
   # the date and the time.
   defp formats_from_options(datetime, nil, nil, nil, _default)
-      when is_any_date_time(datetime) do
+       when is_any_date_time(datetime) do
     {@default_format_type, @default_format_type, @default_format_type}
   end
 
   defp formats_from_options(_datetime, format, nil, nil, _default)
-      when format in @format_types do
+       when format in @format_types do
     {format, format, format}
   end
 
   # When we have a string or atom format then it controls everything and there
   # should be no separate date format or time format
   defp formats_from_options(_datetime, format, nil, nil, _default)
-      when is_binary(format) do
+       when is_binary(format) do
     {format, nil, nil}
   end
 
   defp formats_from_options(_datetime, format, nil, nil, _default)
-      when is_atom(format) do
+       when is_atom(format) do
     {format, nil, nil}
   end
 
   # Replace nil date and time formats with the format iff format is
   # one of the standard types.
   defp formats_from_options(_datetime, format, date_format, nil, _default)
-      when format in @format_types do
+       when format in @format_types do
     {format, date_format, format}
   end
 
   defp formats_from_options(_datetime, format, nil, time_format, _default)
-      when format in @format_types do
+       when format in @format_types do
     {format, format, time_format}
   end
 
@@ -391,7 +390,7 @@ defmodule Cldr.DateTime do
 
   # Standard format, standard style
   defp find_format(_datetime, format, locale, calendar, backend, options)
-      when format in @format_types do
+       when format in @format_types do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
     with {:ok, formats} <- Format.date_time_formats(locale_name, calendar, backend) do
@@ -401,7 +400,7 @@ defmodule Cldr.DateTime do
 
   # Look up for the format in :available_formats
   defp find_format(_datetime, format, locale, calendar, backend, options)
-      when is_atom(format) do
+       when is_atom(format) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
     with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend) do
@@ -411,7 +410,7 @@ defmodule Cldr.DateTime do
 
   # Straight up format string
   defp find_format(_datetime, format, _locale, _calendar, _backend, _options)
-      when is_binary(format) do
+       when is_binary(format) do
     {:ok, format}
   end
 

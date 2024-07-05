@@ -50,8 +50,22 @@ defmodule Cldr.DateTime.Format.Backend do
         ]
 
         @time_symbols [
-          "H", "h", "K", "k", "C", "m", "s", "S", "A", "Z", "z", "V", "v",
-          "X", "x", "O"
+          "H",
+          "h",
+          "K",
+          "k",
+          "C",
+          "m",
+          "s",
+          "S",
+          "A",
+          "Z",
+          "z",
+          "V",
+          "v",
+          "X",
+          "x",
+          "O"
         ]
 
         @doc "A struct from a format id as an atom to a format string"

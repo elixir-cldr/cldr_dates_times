@@ -293,6 +293,7 @@ defmodule Cldr.Time do
   defp find_format(time, format, locale, calendar, backend)
        when format in @format_types and is_full_time(time) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
+
     with {:ok, time_formats} <- formats(locale_name, calendar, backend) do
       {:ok, Map.fetch!(time_formats, format)}
     end
