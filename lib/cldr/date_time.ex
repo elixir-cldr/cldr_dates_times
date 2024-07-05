@@ -25,38 +25,18 @@ defmodule Cldr.DateTime do
   @default_style :default
   @default_prefer :unicode
 
-  @field_map %{
-    year: "y",
-    month: "M",
-    day: "d",
-    hour: "h",
-    minute: "m",
-    second: "s",
-    time_zone: "v",
-    zone_abbr: "V"
-  }
-
-  @field_names Map.keys(@field_map)
-
-  defguard is_date_time(datetime)
-           when is_map_key(datetime, :year) and
-                  is_map_key(datetime, :month) and
-                  is_map_key(datetime, :day) and
-                  is_map_key(datetime, :hour) and
-                  is_map_key(datetime, :minute) and
-                  is_map_key(datetime, :second) and
-                  is_map_key(datetime, :time_zone) and
-                  is_map_key(datetime, :zone_abbr)
-
   defguard is_naive_date_time(datetime)
            when is_map_key(datetime, :year) and
                   is_map_key(datetime, :month) and
                   is_map_key(datetime, :day) and
                   is_map_key(datetime, :hour) and
                   is_map_key(datetime, :minute) and
-                  is_map_key(datetime, :second) and
-                  not is_map_key(datetime, :time_zone) and
-                  not is_map_key(datetime, :zone_abbr)
+                  is_map_key(datetime, :second)
+
+  defguard is_date_time(datetime)
+           when is_naive_date_time(datetime) and
+                  is_map_key(datetime, :time_zone) and
+                  is_map_key(datetime, :zone_abbr)
 
   defguard is_any_date_time(datetime)
            when is_date_time(datetime) or is_naive_date_time(datetime)
@@ -450,23 +430,85 @@ defmodule Cldr.DateTime do
     {:ok, %{number_system: number_system, format: format_string}, options}
   end
 
+  # If its a partial datetime and a standard format is requested, its an error
+  defp find_format(datetime, format, _locale, _calendar, _backend, _options)
+       when format in @format_types and not is_any_date_time(datetime) do
+    {:error,
+     {
+       Cldr.DateTime.UnresolvedFormat,
+       "Standard formats are not available for partial date times"
+     }}
+  end
+
   # We need to derive the format, or maybe even date_format and time_format
   defp find_format(datetime, nil, locale, calendar, backend, options) do
-    # with {:ok, date_format} <- extract_or_derive(:date, options.date_format),
-    #      {:ok, time_format} <- extract_or_derive(:time, options.time_format),
-    #    {:ok, format} <- derive_format_id(datetime, @field_map, @field_names)
-    #      {:ok, available_formats} = available_formats(locale, calendar, backend) do
-    #
-    #   if Map.has_key?(available_formats, format) do
-    #     Map.fetch(available_formats, format)
-    #   else
-    #     with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend) do
-    #       {:ok, Map.fetch!(available_formats, match)}
-    #     end
-    #   end
-    # end
-    #
-    # {:ok, format, options}
+    with {:ok, date_format} <- extract_or_derive(datetime, :date, options.date_format, locale, calendar, backend),
+         {:ok, time_format} <- extract_or_derive(datetime, :time, options.time_format, locale, calendar, backend),
+         {:ok, format} <- resolve_format(date_format, locale, calendar, backend) do
+      options =
+        options
+        |> Map.put(:date_format, date_format)
+        |> Map.put(:time_format, time_format)
+
+      {:ok, format, options}
+    end
+  end
+
+  # From https://www.unicode.org/reports/tr35/tr35-dates.html#Missing_Skeleton_Fields
+  # Combine the patterns for the two dateFormatItems using the appropriate dateTimeFormat pattern, determined as follows from the requested date
+  # fields:
+  #  If the requested date fields include wide month (MMMM, LLLL) and weekday name of any length (e.g. E, EEEE, c, cccc), use <dateTimeFormatLength
+  #  type="full">
+  #  Otherwise, if the requested date fields include wide month, use <dateTimeFormatLength type="long">
+  #  Otherwise, if the requested date fields include abbreviated month (MMM, LLL), use <dateTimeFormatLength type="medium">
+  #  Otherwise use <dateTimeFormatLength type="short">
+
+  defp resolve_format(date_format, locale, calendar, backend) do
+    {:ok, formats} = Cldr.DateTime.Format.date_time_formats(locale, calendar, backend)
+
+    cond do
+      has_wide_month?(date_format) && has_weekday_name?(date_format) ->
+        {:ok, formats.full}
+
+      has_wide_month?(date_format) ->
+        {:ok, formats.long}
+
+      has_abbreviated_month?(date_format) ->
+        {:ok, formats.medium}
+
+      true ->
+        {:ok, formats.short}
+    end
+  end
+
+  defp has_wide_month?(format) do
+    String.contains?(format, "MMMM") || String.contains?(format, "LLLL")
+  end
+
+  defp has_abbreviated_month?(format) do
+    String.contains?(format, "MMM") || String.contains?(format, "LLL")
+  end
+
+  defp has_weekday_name?(format) do
+    String.contains?(format, "E") || String.contains?(format, "c")
+  end
+
+  defp extract_or_derive(datetime, :date, nil, locale, calendar, backend) do
+    format = Cldr.Date.derive_format_id(datetime)
+    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
+  end
+
+  defp extract_or_derive(datetime, :date, format, locale, calendar, backend) do
+    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
+  end
+
+  defp extract_or_derive(datetime, :time, nil, locale, calendar, backend) do
+    format = Cldr.Time.derive_format_id(datetime)
+    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
+  end
+
+  defp extract_or_derive(datetime, :time, format, locale, calendar, backend) do
+    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
   end
 
   # Given the fields in the (maybe partial) date, derive

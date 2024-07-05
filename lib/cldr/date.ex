@@ -286,12 +286,17 @@ defmodule Cldr.Date do
 
   # Partial date, no option, derive the format from the date
   defp format_from_options(date, nil, _default_format) do
-    Cldr.DateTime.derive_format_id(date, @field_map, @field_names)
+    derive_format_id(date)
   end
 
   # If a format is requested, use it
   defp format_from_options(_date, format, _default_format) do
     format
+  end
+
+  @doc false
+  def derive_format_id(date) do
+    Cldr.DateTime.derive_format_id(date, @field_map, @field_names)
   end
 
   @doc """
@@ -420,8 +425,8 @@ defmodule Cldr.Date do
   # If its a full date we can use one of the standard formats (:short, :medium, :long)
   # and if its a full date and no format is specified then the default :medium will be
   # applied.
-
-  defp find_format(date, format, locale, calendar, backend)
+  @doc false
+  def find_format(date, format, locale, calendar, backend)
        when format in @format_types and is_full_date(date) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
@@ -432,7 +437,7 @@ defmodule Cldr.Date do
 
   # If its a partial date and a standard format is requested, its an error
 
-  defp find_format(date, format, _locale, _calendar, _backend)
+  def find_format(date, format, _locale, _calendar, _backend)
        when format in @format_types and not is_full_date(date) do
     {:error,
      {
@@ -441,7 +446,7 @@ defmodule Cldr.Date do
      }}
   end
 
-  defp find_format(date, %{} = format_map, locale, calendar, backend) do
+  def find_format(date, %{} = format_map, locale, calendar, backend) do
     %{number_system: number_system, format: format} = format_map
     {:ok, format_string} = find_format(date, format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
@@ -452,7 +457,7 @@ defmodule Cldr.Date do
   # format is a direct match, use it. If not - try to find the best match between the
   # requested format and available formats.
 
-  defp find_format(_date, format, locale, calendar, backend) when is_atom(format) do
+  def find_format(_date, format, locale, calendar, backend) when is_atom(format) do
     {:ok, available_formats} = available_formats(locale, calendar, backend)
 
     if Map.has_key?(available_formats, format) do
@@ -467,7 +472,7 @@ defmodule Cldr.Date do
   # If its a binary then its considered a format string so we use
   # it directly.
 
-  defp find_format(_date, format_string, _locale, _calendar, _backend)
+  def find_format(_date, format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
   end
