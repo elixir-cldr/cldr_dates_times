@@ -119,7 +119,7 @@ defmodule Cldr.DateTime.Relative do
       {:ok, "lundi dernier"}
 
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, unit: :ziggeraut)
-      {:error, {Cldr.UnknownTimeUnit,
+      {:error, {Cldr.DateTime.UnknownTimeUnit,
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :fri, :hour, :minute, :mon, :month, :quarter, :sat, :second, :sun, :thu, :tue, :wed, :week, :year]"}}
 
   """
@@ -302,7 +302,7 @@ defmodule Cldr.DateTime.Relative do
   end
 
   defp time_unit_error(unit) do
-    {Cldr.UnknownTimeUnit,
+    {Cldr.DateTime.UnknownTimeUnit,
      "Unknown time unit #{inspect(unit)}.  Valid time units are #{inspect(@unit_keys)}"}
   end
 

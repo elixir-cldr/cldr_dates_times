@@ -1,4 +1,4 @@
-defmodule Cldr.UnknownTimeUnit do
+defmodule Cldr.DateTime.UnknownTimeUnit do
   @moduledoc """
   Exception raised when an attempt is made to use a time unit that is not known.
   in `Cldr.DateTime.Relative`.

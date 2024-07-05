@@ -123,7 +123,7 @@ defmodule Cldr.DateTime.Relative.Backend do
             {:ok, "lundi dernier"}
 
             iex> #{inspect(__MODULE__)}.to_string(~D[2017-04-29], unit: :ziggeraut)
-            {:error, {Cldr.UnknownTimeUnit,
+            {:error, {Cldr.DateTime.UnknownTimeUnit,
              "Unknown time unit :ziggeraut.  Valid time units are [:day, :fri, :hour, :minute, :mon, :month, :quarter, :sat, :second, :sun, :thu, :tue, :wed, :week, :year]"}}
 
         """
