@@ -26,6 +26,16 @@ defmodule Cldr.Time do
   @default_format_type :medium
   @default_prefer :unicode
 
+  @field_map %{
+    hour: "h",
+    minute: "m",
+    second: "s",
+    time_zone: "v",
+    zone_abbr: "V"
+  }
+
+  @field_names Map.keys(@field_map)
+
   # TODO Do we need microseconds here too? Are there any standard formats that use it?
   # have we got the formatting right for fractional seconds?
   # have we got derived formats working for microseconds?
@@ -278,7 +288,7 @@ defmodule Cldr.Time do
 
   # Partial date, no option, derive the format from the date
   defp format_from_options(time, nil, _default_format) do
-    derive_format_id(time)
+    Cldr.DateTime.derive_format_id(time, @field_map, @field_names)
   end
 
   # If a format is requested, use it
@@ -339,22 +349,6 @@ defmodule Cldr.Time do
   defp find_format(_time, format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
-  end
-
-  # Given the fields in the (maybe partial) date, derive
-  # format id (atom map key into available formats)
-
-  defp derive_format_id(time) do
-    time
-    |> Map.take([:hour, :minute, :second])
-    |> Map.keys()
-    |> Enum.map(fn
-      :hour -> "h"
-      :minute -> "m"
-      :second -> "s"
-    end)
-    |> Enum.join()
-    |> String.to_atom()
   end
 
   @doc """

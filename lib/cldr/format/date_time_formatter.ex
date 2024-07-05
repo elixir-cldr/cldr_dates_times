@@ -2035,7 +2035,13 @@ defmodule Cldr.DateTime.Formatter do
     period_am_pm(period_am_pm, n, locale, backend, Map.new(options))
   end
 
-  @spec period_am_pm(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec period_am_pm(
+          Cldr.Calendar.time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def period_am_pm(time, n, locale, backend, options \\ %{})
@@ -3020,7 +3026,13 @@ defmodule Cldr.DateTime.Formatter do
     zone_generic(zone_generic, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_generic(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_generic(
+          Cldr.Calendar.date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def zone_generic(time, n, locale, backend, options \\ %{})
@@ -3096,7 +3108,13 @@ defmodule Cldr.DateTime.Formatter do
     zone_short(zone_short, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_short(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_short(
+          Cldr.Calendar.date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def zone_short(time, n, locale, backend, options \\ %{})
@@ -3180,7 +3198,13 @@ defmodule Cldr.DateTime.Formatter do
     zone_id(zone_id, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_id(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_id(
+          Cldr.Calendar.date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def zone_id(time, n, locale, backend, options \\ %{})
@@ -3272,7 +3296,13 @@ defmodule Cldr.DateTime.Formatter do
     zone_basic(zone_basic, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_basic(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_basic(
+          Cldr.Calendar.date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def zone_basic(time, n, locale, backend, options \\ %{})
@@ -3386,7 +3416,13 @@ defmodule Cldr.DateTime.Formatter do
     zone_iso_z(zone_iso_z, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_iso_z(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_iso_z(
+          Cldr.Calendar.date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def zone_iso_z(time, n, locale, backend, options \\ %{})
@@ -3546,7 +3582,13 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @iso_utc_offset_hours_minutes "+00:00"
-  @spec zone_iso(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_iso(
+          Cldr.Calendar.date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def zone_iso(time, n, locale, backend, options \\ %{})
@@ -3663,7 +3705,13 @@ defmodule Cldr.DateTime.Formatter do
     zone_gmt(zone_gmt, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_gmt(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_gmt(
+          Cldr.Calendar.date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
           String.t() | {:error, String.t()}
 
   def zone_gmt(time, n, locale, backend, options \\ %{})

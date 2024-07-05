@@ -25,6 +25,19 @@ defmodule Cldr.DateTime do
   @default_style :default
   @default_prefer :unicode
 
+  @field_map %{
+    year: "y",
+    month: "M",
+    day: "d",
+    hour: "h",
+    minute: "m",
+    second: "s",
+    time_zone: "v",
+    zone_abbr: "V"
+  }
+
+  @field_names Map.keys(@field_map)
+
   defguard is_date_time(datetime)
            when is_map_key(datetime, :year) and
                   is_map_key(datetime, :month) and
@@ -169,7 +182,8 @@ defmodule Cldr.DateTime do
     with {:ok, locale} <- Cldr.validate_locale(options.locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, options.number_system, backend),
-         {:ok, format} <- find_format(datetime, format, locale, cldr_calendar, backend, options),
+         {:ok, format, options} <-
+           find_format(datetime, format, locale, cldr_calendar, backend, options),
          {:ok, format} <- apply_unicode_or_ascii_preference(format, options.prefer),
          {:ok, format_string} <- resolve_plural_format(format, datetime, backend, options) do
       format_backend.format(datetime, format_string, locale, options)
@@ -308,6 +322,18 @@ defmodule Cldr.DateTime do
     |> Map.put(:number_system, number_system)
   end
 
+  # Returns the CLDR calendar type for a calendar
+  @doc false
+  def type_from_calendar(Cldr.Calendar.Gregorian = calendar) do
+    {:ok, calendar.cldr_calendar_type()}
+  end
+
+  def type_from_calendar(calendar) do
+    with {:ok, calendar} <- Cldr.Calendar.validate_calendar(calendar) do
+      {:ok, calendar.cldr_calendar_type()}
+    end
+  end
+
   # There are three formats required to format a date time:
   # 1. A format for the date part, if any.
   # 2. A format for the time part, if any.
@@ -353,6 +379,16 @@ defmodule Cldr.DateTime do
     {format, format, time_format}
   end
 
+  defp formats_from_options(_datetime, format, nil, time_format, _default)
+       when time_format in @format_types do
+    {format, time_format, time_format}
+  end
+
+  defp formats_from_options(_datetime, format, date_format, nil, _default)
+       when date_format in @format_types do
+    {format, date_format, date_format}
+  end
+
   # If standard date and time formats but no format, we'll derive the
   # format later on.
   defp formats_from_options(_datetime, nil = format, date_format, time_format, _default)
@@ -364,27 +400,18 @@ defmodule Cldr.DateTime do
     {format, date_format, time_format}
   end
 
-  @doc false
-
-  # Returns the CLDR calendar type for a calendar
-
-  def type_from_calendar(Cldr.Calendar.Gregorian = calendar) do
-    {:ok, calendar.cldr_calendar_type()}
-  end
-
-  def type_from_calendar(calendar) do
-    with {:ok, calendar} <- Cldr.Calendar.validate_calendar(calendar) do
-      {:ok, calendar.cldr_calendar_type()}
-    end
-  end
+  # Resolve the actual format string for the date time format.
+  # Unless we need to derive the format, this only touches `format`,
+  # not `date_format` or `time_format`.
 
   # Standard format, at style
   defp find_format(_datetime, format, locale, calendar, backend, %{style: :at} = options)
        when format in @format_types do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
-    with {:ok, formats} <- Format.date_time_at_formats(locale_name, calendar, backend) do
-      preferred_format(formats, format, options.prefer)
+    with {:ok, formats} <- Format.date_time_at_formats(locale_name, calendar, backend),
+         {:ok, format} <- preferred_format(formats, format, options.prefer) do
+      {:ok, format, options}
     end
   end
 
@@ -393,32 +420,65 @@ defmodule Cldr.DateTime do
        when format in @format_types do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
-    with {:ok, formats} <- Format.date_time_formats(locale_name, calendar, backend) do
-      preferred_format(formats, format, options.prefer)
+    with {:ok, formats} <- Format.date_time_formats(locale_name, calendar, backend),
+         {:ok, format} <- preferred_format(formats, format, options.prefer) do
+      {:ok, format, options}
     end
   end
 
   # Look up for the format in :available_formats
   defp find_format(_datetime, format, locale, calendar, backend, options)
-       when is_atom(format) do
+       when is_atom(format) and not is_nil(format) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
-    with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend) do
-      preferred_format(formats, format, options.prefer)
+    with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend),
+         {:ok, format} <- preferred_format(formats, format, options.prefer) do
+      {:ok, format, options}
     end
   end
 
   # Straight up format string
-  defp find_format(_datetime, format, _locale, _calendar, _backend, _options)
+  defp find_format(_datetime, format, _locale, _calendar, _backend, options)
        when is_binary(format) do
-    {:ok, format}
+    {:ok, format, options}
   end
 
   # Format with a number system
   defp find_format(datetime, %{} = format, locale, calendar, backend, options) do
     %{number_system: number_system, format: format} = format
     {:ok, format_string} = find_format(datetime, format, locale, calendar, backend, options)
-    {:ok, %{number_system: number_system, format: format_string}}
+    {:ok, %{number_system: number_system, format: format_string}, options}
+  end
+
+  # We need to derive the format, or maybe even date_format and time_format
+  defp find_format(datetime, nil, locale, calendar, backend, options) do
+    # with {:ok, date_format} <- extract_or_derive(:date, options.date_format),
+    #      {:ok, time_format} <- extract_or_derive(:time, options.time_format),
+    #    {:ok, format} <- derive_format_id(datetime, @field_map, @field_names)
+    #      {:ok, available_formats} = available_formats(locale, calendar, backend) do
+    #
+    #   if Map.has_key?(available_formats, format) do
+    #     Map.fetch(available_formats, format)
+    #   else
+    #     with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend) do
+    #       {:ok, Map.fetch!(available_formats, match)}
+    #     end
+    #   end
+    # end
+    #
+    # {:ok, format, options}
+  end
+
+  # Given the fields in the (maybe partial) date, derive
+  # format id (atom map key into available formats)
+  @doc false
+  def derive_format_id(datetime, field_map, field_names) do
+    datetime
+    |> Map.take(field_names)
+    |> Map.keys()
+    |> Enum.map(&Map.fetch!(field_map, &1))
+    |> Enum.join()
+    |> String.to_atom()
   end
 
   defp preferred_format(formats, format, prefer) do

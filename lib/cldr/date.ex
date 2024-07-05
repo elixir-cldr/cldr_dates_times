@@ -26,6 +26,14 @@ defmodule Cldr.Date do
   @default_format_type :medium
   @default_prefer :unicode
 
+  @field_map %{
+    year: "y",
+    month: "M",
+    day: "d"
+  }
+
+  @field_names Map.keys(@field_map)
+
   defguard is_full_date(date)
            when is_map_key(date, :year) and is_map_key(date, :month) and is_map_key(date, :day)
 
@@ -278,7 +286,7 @@ defmodule Cldr.Date do
 
   # Partial date, no option, derive the format from the date
   defp format_from_options(date, nil, _default_format) do
-    derive_format_id(date)
+    Cldr.DateTime.derive_format_id(date, @field_map, @field_names)
   end
 
   # If a format is requested, use it
@@ -462,22 +470,6 @@ defmodule Cldr.Date do
   defp find_format(_date, format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
-  end
-
-  # Given the fields in the (maybe partial) date, derive
-  # format id (atom map key into available formats)
-
-  defp derive_format_id(date) do
-    date
-    |> Map.take([:year, :month, :day])
-    |> Map.keys()
-    |> Enum.map(fn
-      :year -> "y"
-      :month -> "M"
-      :day -> "d"
-    end)
-    |> Enum.join()
-    |> String.to_atom()
   end
 
   defp error_return(map, requirements) do
