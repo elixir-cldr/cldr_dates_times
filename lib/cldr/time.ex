@@ -1,8 +1,10 @@
 defmodule Cldr.Time do
   @moduledoc """
-  Provides localization and formatting of a `Time`
-  struct or any map with the keys `:hour`, `:minute`,
-  `:second` and optionlly `:microsecond`.
+  Provides localization and formatting of a time.
+
+  A time is any `t:Time.t/0` struct or any map with one or more of
+  the keys `:hour`, `:minute`, `:second` and optionally `:time_zone`,
+  `:zone_abbr`, `:utc_offset`, `:std_offset` and `:microsecond`.
 
   `Cldr.Time` provides support for the built-in calendar
   `Calendar.ISO` or any calendars defined with
@@ -60,8 +62,9 @@ defmodule Cldr.Time do
 
   ## Arguments
 
-  * `time` is a `t:DateTime.t/0`,`t:NaiveDateTime/0` struct or any map that contains
-    one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`.
+  * `time` is a `t:Time.t/0` struct or any map that contains
+    one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`,
+    `:time_zone`, `:zone_abbr`, `:utc_offset` and `:std_offset`.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
@@ -75,7 +78,7 @@ defmodule Cldr.Time do
     times having `:hour`, `:minute` and `:second` fields). The
     default for partial times is to derive a candidate format from the time and
     find the best match from the formats returned by
-    `Cldr.Time.available_formats/2`.
+    `Cldr.Time.available_formats/3`.
 
   * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is
     `Cldr.get_locale/0`.
@@ -90,7 +93,7 @@ defmodule Cldr.Time do
     to see which formats have these variants.
 
   * `period: :variant` will use a variant for the time period and flexible time period if
-    one is available in the locale.  For example, in the `:en` locale `period: :variant` will
+    one is available in the locale.  For example, in the `:en` locale, `period: :variant` will
     return "pm" instead of "PM".
 
   ## Examples
@@ -161,7 +164,7 @@ defmodule Cldr.Time do
       format_backend.format(time, format_string, locale, options)
     end
   rescue
-    e in [Cldr.DateTime.UnresolvedFormat] ->
+    e in [Cldr.DateTime.FormatError] ->
       {:error, {e.__struct__, e.message}}
   end
 
@@ -175,11 +178,12 @@ defmodule Cldr.Time do
 
   ## Arguments
 
-  * `time` is a `t:DateTime.t/0`,`t:NaiveDateTime/0` struct or any map that contains
-    one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`.
+  * `time` is a `t:Time.t/0` struct or any map that contains
+    one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`,
+    `:time_zone`, `:zone_abbr`, `:utc_offset` and `:std_offset`.
 
   * `backend` is any module that includes `use Cldr` and therefore
-    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+    is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
 
   * `options` is a keyword list of options for formatting.
 
@@ -190,12 +194,12 @@ defmodule Cldr.Time do
     times having `:hour`, `:minute` and `:second` fields). The
     default for partial times is to derive a candidate format from the time and
     find the best match from the formats returned by
-    `Cldr.Time.available_formats/1`.
+    `Cldr.Time.available_formats/3`.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
 
-  * `number_system:` a number system into which the formatted date digits should
+  * `:number_system` a number system into which the formatted time digits should
     be transliterated.
 
   * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of

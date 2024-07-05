@@ -16,7 +16,7 @@ defmodule Cldr.DateTime.Format do
 
   @typedoc """
   The standard formats of `:full`,
-  `:long`, :medium` and `:short` are used
+  `:long`, `:medium` and `:short` are used
   to resolve standard formats in a locale independent
   way.
   """

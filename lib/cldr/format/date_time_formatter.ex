@@ -3048,7 +3048,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   def zone_generic(time, _n, _locale, _backend, _options) do
-    error_return(time, "v", [:time_zone, :utc_offset, :std_offset])
+    error_return(time, "v", [:time_zone])
   end
 
   @doc """
@@ -3166,19 +3166,19 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.zone_id %{zone_abbr: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 1
       "unk"
 
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.zone_id %{zone_abbr: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 2
       "Etc/UTC"
 
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.zone_id %{zone_abbr: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 3
       "Unknown City"
 
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.zone_id %{zone_abbr: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 4
       "GMT"
 
@@ -3209,26 +3209,26 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_id(time, n, locale, backend, options \\ %{})
 
-  def zone_id(%{time_zone: _time_zone}, 1, _locale, _backend, options) do
+  def zone_id(%{zone_abbr: _time_zone}, 1, _locale, _backend, options) do
     maybe_wrap("unk", :zone_id, options)
   end
 
-  def zone_id(%{time_zone: time_zone}, 2, _locale, _backend, options) do
+  def zone_id(%{zone_abbr: time_zone}, 2, _locale, _backend, options) do
     maybe_wrap(time_zone, :zone_id, options)
   end
 
-  def zone_id(%{time_zone: _time_zone}, 3, _locale, _backend, options) do
+  def zone_id(%{zone_abbr: _time_zone}, 3, _locale, _backend, options) do
     maybe_wrap("Unknown City", :zone_id, options)
   end
 
-  def zone_id(%{time_zone: _time_zone} = time, 4, locale, backend, options) do
+  def zone_id(time, 4, locale, backend, options) do
     time
     |> zone_gmt(4, locale, backend, options)
     |> maybe_wrap(:zone_id, options)
   end
 
   def zone_id(time, _n, _locale, _backend, _options) do
-    error_return(time, "V", [:time_zone])
+    error_return(time, "V", [:zone_abbr])
   end
 
   @doc """
@@ -3499,7 +3499,7 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a ``t:DateTime.t/0` struct or any map that contains at least the `:utc_offset`
+  * `time` is a `t:DateTime.t/0` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
@@ -3855,7 +3855,7 @@ defmodule Cldr.DateTime.Formatter do
       |> Enum.map(&inspect/1)
       |> join_requirements
 
-    raise Cldr.DateTime.UnresolvedFormat,
+    raise Cldr.DateTime.FormatError,
           "The format symbol '#{symbol}' requires at map with at least #{requirements}. Found: #{inspect(map)}"
   end
 

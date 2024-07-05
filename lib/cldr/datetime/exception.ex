@@ -45,6 +45,19 @@ defmodule Cldr.DateTime.InvalidFormat do
   end
 end
 
+defmodule Cldr.DateTime.FormatError do
+  @moduledoc """
+  Exception raised when attempting to
+  format a date or time which does not have
+  the data available to fulfill the format.
+  """
+  defexception [:message]
+
+  def exception(message) do
+    %__MODULE__{message: message}
+  end
+end
+
 defmodule Cldr.DateTime.IntervalFormatError do
   @moduledoc """
   Exception raised when attempting to

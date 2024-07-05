@@ -78,7 +78,7 @@ defmodule Cldr.Date do
     to see which formats have these variants. Currently no date-specific
     formats have such variants but they may in the future.
 
-  * `:era` which, if set to :variant`, will use a variant for the era if one
+  * `:era` which, if set to `:variant`, will use a variant for the era if one
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
     will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
@@ -121,7 +121,7 @@ defmodule Cldr.Date do
        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"dy\\""}}
 
   """
-  @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
+  @spec to_string(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(date, backend \\ Cldr.Date.default_backend(), options \\ [])
@@ -157,7 +157,7 @@ defmodule Cldr.Date do
       format_backend.format(date, format_string, locale, options)
     end
   rescue
-    e in [Cldr.DateTime.UnresolvedFormat] ->
+    e in [Cldr.DateTime.FormatError] ->
       {:error, {e.__struct__, e.message}}
   end
 
@@ -202,7 +202,7 @@ defmodule Cldr.Date do
     to see which formats have these variants. Currently no date-specific
     formats have such variants but they may in the future.
 
-  * `:era` which, if set to :variant`, will use a variant for the era if one
+  * `:era` which, if set to `:variant`, will use a variant for the era if one
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
     will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
@@ -238,7 +238,8 @@ defmodule Cldr.Date do
       "juin 2024"
 
   """
-  @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
+  @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
+    String.t() | no_return
 
   def to_string!(date, backend \\ Cldr.Date.default_backend(), options \\ [])
 

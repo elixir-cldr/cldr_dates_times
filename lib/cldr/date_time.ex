@@ -1,9 +1,11 @@
 defmodule Cldr.DateTime do
   @moduledoc """
-  Provides localization and formatting of a `t:DateTime.t/0`
-  struct or any map that contains
-  one or more of the keys `:year`, `:month`, `:day`, ``:hour`, `:minute` and `:second` or
-  `:microsecond` with an optional `:calendar`.
+  Provides localization and formatting of a datetime.
+
+  A date time is any `t:DateTime.t/0` or `t:NaiveDateTime.t/0`
+  struct or aor any map that contains one or more of the keys `:year`, `:month`, `:day`,
+  `:hour`, `:minute` and `:second` or `:microsecond` with optional `:time_zone`, `:zone_abbr`,
+  `:utc_offset`, `:std_offset` and `:calendar` fields.
 
   `Cldr.DateTime` provides support for the built-in calendar
   `Calendar.ISO` or any calendars defined with
@@ -25,6 +27,10 @@ defmodule Cldr.DateTime do
   @default_style :default
   @default_prefer :unicode
 
+  @doc """
+  Indicates if a given map fulfills the requirements
+  for a naive date time.
+  """
   defguard is_naive_date_time(datetime)
            when is_map_key(datetime, :year) and
                   is_map_key(datetime, :month) and
@@ -33,11 +39,19 @@ defmodule Cldr.DateTime do
                   is_map_key(datetime, :minute) and
                   is_map_key(datetime, :second)
 
+  @doc """
+  Indicates if a given map fulfills the requirements
+  for a date time.
+  """
   defguard is_date_time(datetime)
            when is_naive_date_time(datetime) and
                   is_map_key(datetime, :time_zone) and
                   is_map_key(datetime, :zone_abbr)
 
+  @doc """
+  Indicates if a given map fulfills the requirements
+  for a naive date time or date time.
+  """
   defguard is_any_date_time(datetime)
            when is_date_time(datetime) or is_naive_date_time(datetime)
 
@@ -48,13 +62,14 @@ defmodule Cldr.DateTime do
 
   @doc """
   Formats a DateTime according to a format string
-  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
   ## Arguments
 
-  * `datetime` is a `t:DateTime.t/0` `or t:NaiveDateTime.t/0`struct or any map that contains
-    one or more of the keys `:year`, `:month`, `:day`, ``:hour`, `:minute` and `:second` or
-    `:microsecond` with optional `:time_zone` and `:calendar` fields.
+  * `datetime` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that contains
+    one or more of the keys `:year`, `:month`, `:day`, `:hour`, `:minute` and `:second` or
+    `:microsecond` with optional `:time_zone`, `:zone_abbr`, `:utc_offset`, `:std_offset`
+    and `:calendar` fields.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
@@ -64,7 +79,7 @@ defmodule Cldr.DateTime do
   ## Options
 
     * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
-      any of the keys in the map returned by `Cldr.DateTime.date_time_available_formats/3`.
+      any of the keys in the map returned by `Cldr.DateTime.Format.date_time_formats/3`.
       The default is `:medium`.
 
     * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
@@ -86,7 +101,7 @@ defmodule Cldr.DateTime do
     * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
       formats have two variants - one using Unicode spaces (typically non-breaking space) and
       another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-      use cases and is not recommended. See `Cldr.DateTime.available_formats/3`
+      use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/3`
       to see which formats have these variants.
 
     * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
@@ -95,7 +110,7 @@ defmodule Cldr.DateTime do
     * `:number_system` a number system into which the formatted datetime digits should
       be transliterated.
 
-    * `:era` which, if set to :variant`, will use a variant for the era if one
+    * `:era` which, if set to `:variant`, will use a variant for the era if one
       is available in the requested locale. In the `:en` locale, for example, `era: :variant`
       will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
@@ -134,7 +149,7 @@ defmodule Cldr.DateTime do
       {:ok, "semaine 1 de 2000"}
 
   """
-  @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
+  @spec to_string(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(datetime, backend \\ Cldr.Date.default_backend(), options \\ [])
@@ -169,7 +184,7 @@ defmodule Cldr.DateTime do
       format_backend.format(datetime, format_string, locale, options)
     end
   rescue
-    e in [Cldr.DateTime.UnresolvedFormat] ->
+    e in [Cldr.DateTime.FormatError] ->
       {:error, {e.__struct__, e.message}}
   end
 
@@ -184,9 +199,10 @@ defmodule Cldr.DateTime do
 
   ## Arguments
 
-  * `datetime` is a `t:DateTime.t/0` `or t:NaiveDateTime.t/0`struct or any map that contains
-    one or more of the keys `:year`, `:month`, `:day`, ``:hour`, `:minute` and `:second` or
-    `:microsecond` with optional `:time_zone` and `:calendar` fields.
+  * `datetime` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that contains
+    one or more of the keys `:year`, `:month`, `:day`, `:hour`, `:minute` and `:second` or
+    `:microsecond` with optional `:time_zone`, `:zone_abbr`, `:utc_offset`, `:std_offset`
+    and `:calendar` fields.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
@@ -195,33 +211,33 @@ defmodule Cldr.DateTime do
 
   ## Options
 
-    * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
-      any of the keys returned by `Cldr.DateTime.Format.date_time_available_formats/3`.
-      The default is `:medium`.
+  * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
+    any of the keys returned by `Cldr.DateTime.Format.date_time_formats/3`.
+    The default is `:medium`.
 
-    * `:style` is either `:at` or `:default`. When set to `:at` the datetime is
-      formatted with a localised string representing `<date> at <time>`. See
-      `Cldr.DateTime.Format.date_time_at_formats/2`.
+  * `:style` is either `:at` or `:default`. When set to `:at` the datetime is
+    formatted with a localised string representing `<date> at <time>`. See
+    `Cldr.DateTime.Format.date_time_at_formats/2`.
 
-    * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of datetime
-      formats have two variants - one using Unicode spaces (typically non-breaking space) and
-      another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-      use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/2`
-      to see which formats have these variants.
+  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of datetime
+    formats have two variants - one using Unicode spaces (typically non-breaking space) and
+    another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+    use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/2`
+    to see which formats have these variants.
 
-    * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-      or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-    * `:number_system` a number system into which the formatted datetime digits should
-      be transliterated.
+  * `:number_system` a number system into which the formatted datetime digits should
+    be transliterated.
 
-    * `:era` which, if set to :variant`, will use a variant for the era if one
-      is available in the requested locale. In the `:en` locale, for example, `era: :variant`
-      will return `CE` instead of `AD` and `BCE` instead of `BC`.
+  * `:era` which, if set to `:variant`, will use a variant for the era if one
+    is available in the requested locale. In the `:en` locale, for example, `era: :variant`
+    will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
-    * `period: :variant` will use a variant for the time period and flexible time period if
-      one is available in the locale.  For example, in the `:en` locale `period: :variant` will
-      return "pm" instead of "PM".
+  * `period: :variant` will use a variant for the time period and flexible time period if
+    one is available in the locale.  For example, in the `:en` locale `period: :variant` will
+    return "pm" instead of "PM".
 
   ## Returns
 
@@ -246,7 +262,8 @@ defmodule Cldr.DateTime do
       "semaine 1 de 2000"
 
   """
-  @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
+  @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
+    String.t() | no_return
 
   def to_string!(datetime, backend \\ Cldr.Date.default_backend(), options \\ [])
 
@@ -426,7 +443,8 @@ defmodule Cldr.DateTime do
   # Format with a number system
   defp find_format(datetime, %{} = format, locale, calendar, backend, options) do
     %{number_system: number_system, format: format} = format
-    {:ok, format_string} = find_format(datetime, format, locale, calendar, backend, options)
+    {:ok, format_string, options} =
+      find_format(datetime, format, locale, calendar, backend, options)
     {:ok, %{number_system: number_system, format: format_string}, options}
   end
 
