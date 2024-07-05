@@ -1639,7 +1639,7 @@ defmodule Cldr.DateTime.Formatter do
       "Tue"
 
   """
-  @spec day_name(Cldr.Calendar.date(), integer, Keyword.t()) ::
+  @spec day_name(Cldr.Calendar.any_date_time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def day_name(day_name, n \\ @default_format, options \\ [])
@@ -1654,7 +1654,7 @@ defmodule Cldr.DateTime.Formatter do
     day_name(day_name, n, locale, backend, Map.new(options))
   end
 
-  @spec day_name(Cldr.Calendar.date(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec day_name(Cldr.Calendar.any_date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def day_name(date, n, locale, backend, options \\ %{})
