@@ -6,7 +6,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
     config = Macro.escape(config)
     module = inspect(__MODULE__)
 
-    quote location: :keep, bind_quoted: [config: config, backend: backend, module: module] do
+    quote bind_quoted: [config: config, backend: backend, module: module] do
       defmodule DateTime.Formatter do
         @moduledoc false
         if Cldr.Config.include_module_docs?(config.generate_docs) do
@@ -54,9 +54,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
 
         """
         @spec format(
-                Cldr.Calendar.date()
-                | Cldr.Calendar.time()
-                | Cldr.Calendar.date_time(),
+                Cldr.Calendar.any_date_time(),
                 String.t(),
                 Cldr.Locale.locale_reference(),
                 Keyword.t()

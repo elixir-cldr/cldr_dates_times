@@ -75,7 +75,8 @@ defmodule Cldr.DateTime.Format.Compiler do
 
   """
   @spec compile(String.t(), module(), module()) ::
-          {:ok, Cldr.Calendar.calendar()} | {:error, String.t()}
+          {:ok, Macro.t()} | {:error, String.t()}
+
   def compile(format_string, backend, context)
 
   def compile("", _, _) do

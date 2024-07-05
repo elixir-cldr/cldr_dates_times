@@ -211,7 +211,7 @@ defmodule Cldr.DateTime.Formatter do
   the overall format being requested.
 
   """
-  @spec time(Calendar.time(), integer, Keyword.t()) ::
+  @spec time(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, {module(), String.t()}}
 
   def time(time, n \\ @default_format, options \\ [])
@@ -227,7 +227,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec time(
-          Calendar.time(),
+          Cldr.Calendar.time(),
           integer,
           Locale.locale_reference(),
           Cldr.backend(),
@@ -258,7 +258,7 @@ defmodule Cldr.DateTime.Formatter do
     the year
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  The only applicable
     option is `:era` with a value of either `nil` (the default) or
@@ -357,7 +357,7 @@ defmodule Cldr.DateTime.Formatter do
     the year
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `year/4`
@@ -471,7 +471,7 @@ defmodule Cldr.DateTime.Formatter do
     the year
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `weeK_aligned_year/4`
@@ -589,7 +589,7 @@ defmodule Cldr.DateTime.Formatter do
     the year
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `weeK_aligned_year/4`
@@ -739,7 +739,7 @@ defmodule Cldr.DateTime.Formatter do
     the quarter
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `related_year/4`
@@ -835,7 +835,7 @@ defmodule Cldr.DateTime.Formatter do
     the quarter
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `quarter/5`
@@ -951,7 +951,7 @@ defmodule Cldr.DateTime.Formatter do
     the quarter
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `standalone_quarter/5`
@@ -1067,7 +1067,7 @@ defmodule Cldr.DateTime.Formatter do
     the month
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `month/4`
@@ -1176,7 +1176,7 @@ defmodule Cldr.DateTime.Formatter do
     the month
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `standalone_month/4`
@@ -1284,7 +1284,7 @@ defmodule Cldr.DateTime.Formatter do
     the week of the year
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `week_of_year/4`
@@ -1379,7 +1379,7 @@ defmodule Cldr.DateTime.Formatter do
     determines the format of the week of the month
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `week_of_month/4`
@@ -1458,7 +1458,7 @@ defmodule Cldr.DateTime.Formatter do
     the day of month
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `day_of_month/4`
@@ -1555,7 +1555,7 @@ defmodule Cldr.DateTime.Formatter do
     the day of year
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `day_of_year/4`
@@ -1637,7 +1637,7 @@ defmodule Cldr.DateTime.Formatter do
     the day of week
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `day_name/4`
@@ -1747,7 +1747,7 @@ defmodule Cldr.DateTime.Formatter do
     the day of week
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `day_of_week/4`
@@ -1854,7 +1854,7 @@ defmodule Cldr.DateTime.Formatter do
     the day of week
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options
     used in `standalone_day_of_week/4`
@@ -1982,7 +1982,7 @@ defmodule Cldr.DateTime.Formatter do
     time period
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  The available option is
     `period: :variant` which will use a veriant of localised "am" or
@@ -2020,7 +2020,7 @@ defmodule Cldr.DateTime.Formatter do
       "p"
 
   """
-  @spec period_am_pm(Calendar.time(), integer, Keyword.t()) ::
+  @spec period_am_pm(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def period_am_pm(period_am_pm, n \\ @default_format, options \\ [])
@@ -2035,7 +2035,7 @@ defmodule Cldr.DateTime.Formatter do
     period_am_pm(period_am_pm, n, locale, backend, Map.new(options))
   end
 
-  @spec period_am_pm(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec period_am_pm(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def period_am_pm(time, n, locale, backend, options \\ %{})
@@ -2081,7 +2081,7 @@ defmodule Cldr.DateTime.Formatter do
     time period
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  The available option is
     `period: :variant` which will use a variant of localised "noon" and
@@ -2123,7 +2123,7 @@ defmodule Cldr.DateTime.Formatter do
       "PM"
 
   """
-  @spec period_noon_midnight(Calendar.time(), integer, Keyword.t()) ::
+  @spec period_noon_midnight(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def period_noon_midnight(period_noon_midnight, n \\ @default_format, options \\ [])
@@ -2139,7 +2139,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec period_noon_midnight(
-          Calendar.time(),
+          Cldr.Calendar.time(),
           integer,
           Locale.locale_reference(),
           Cldr.backend(),
@@ -2185,7 +2185,7 @@ defmodule Cldr.DateTime.Formatter do
     time period
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  The available option is
     `period: :variant` which will use a veriant of localised flexible time
@@ -2219,7 +2219,7 @@ defmodule Cldr.DateTime.Formatter do
       "at night"
 
   """
-  @spec period_flex(Calendar.time(), integer, Keyword.t()) ::
+  @spec period_flex(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def period_flex(period_flex, n \\ @default_format, options \\ [])
@@ -2234,7 +2234,7 @@ defmodule Cldr.DateTime.Formatter do
     period_flex(period_flex, n, locale, backend, Map.new(options))
   end
 
-  @spec period_flex(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec period_flex(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def period_flex(time, n, locale, backend, options \\ %{})
@@ -2266,7 +2266,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the number of digits to which `:hour` is padded
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `hour/4`
@@ -2286,7 +2286,7 @@ defmodule Cldr.DateTime.Formatter do
       "15"
 
   """
-  @spec hour(Calendar.time(), integer, Keyword.t()) ::
+  @spec hour(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def hour(hour, n \\ @default_format, options \\ [])
@@ -2301,7 +2301,7 @@ defmodule Cldr.DateTime.Formatter do
     hour(hour, n, locale, backend, Map.new(options))
   end
 
-  @spec hour(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec hour(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def hour(time, n, locale, backend, options \\ %{})
@@ -2325,7 +2325,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the number of digits to which `:hour` is padded
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `h12/4`
@@ -2357,7 +2357,7 @@ defmodule Cldr.DateTime.Formatter do
       "11"
 
   """
-  @spec h12(Calendar.time(), integer, Keyword.t()) ::
+  @spec h12(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def h12(h12, n \\ @default_format, options \\ [])
@@ -2372,7 +2372,7 @@ defmodule Cldr.DateTime.Formatter do
     h12(h12, n, locale, backend, Map.new(options))
   end
 
-  @spec h12(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec h12(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def h12(time, n, locale, backend, options \\ %{})
@@ -2410,7 +2410,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the number of digits to which `:hour` is padded
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `h11/4`
@@ -2445,7 +2445,7 @@ defmodule Cldr.DateTime.Formatter do
       "9"
 
   """
-  @spec h11(Calendar.time(), integer, Keyword.t()) ::
+  @spec h11(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def h11(h11, n \\ @default_format, options \\ [])
@@ -2460,7 +2460,7 @@ defmodule Cldr.DateTime.Formatter do
     h11(h11, n, locale, backend, Map.new(options))
   end
 
-  @spec h11(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec h11(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def h11(time, n, locale, backend, options \\ %{})
@@ -2498,7 +2498,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the number of digits to which `:hour` is padded
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `h24/4`
@@ -2530,7 +2530,7 @@ defmodule Cldr.DateTime.Formatter do
       "24"
 
   """
-  @spec h24(Calendar.time(), integer, Keyword.t()) ::
+  @spec h24(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def h24(h24, n \\ @default_format, options \\ [])
@@ -2545,7 +2545,7 @@ defmodule Cldr.DateTime.Formatter do
     h24(h24, n, locale, backend, Map.new(options))
   end
 
-  @spec h24(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec h24(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def h24(time, n, locale, backend, options \\ %{})
@@ -2577,7 +2577,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the number of digits to which `:hour` is padded
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `h23/4`
@@ -2609,7 +2609,7 @@ defmodule Cldr.DateTime.Formatter do
       "0"
 
   """
-  @spec h23(Calendar.time(), integer, Keyword.t()) ::
+  @spec h23(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def h23(h23, n \\ @default_format, options \\ [])
@@ -2624,7 +2624,7 @@ defmodule Cldr.DateTime.Formatter do
     h23(h23, n, locale, backend, Map.new(options))
   end
 
-  @spec h23(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec h23(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def h23(time, n, locale, backend, options \\ %{})
@@ -2656,7 +2656,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the number of digits to which `:minute` is padded
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `minute/4`
@@ -2680,7 +2680,7 @@ defmodule Cldr.DateTime.Formatter do
       "03"
 
   """
-  @spec minute(Calendar.time(), integer, Keyword.t()) ::
+  @spec minute(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def minute(minute, n \\ @default_format, options \\ [])
@@ -2695,7 +2695,7 @@ defmodule Cldr.DateTime.Formatter do
     minute(minute, n, locale, backend, Map.new(options))
   end
 
-  @spec minute(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec minute(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def minute(time, n, locale, backend, options \\ %{})
@@ -2725,7 +2725,7 @@ defmodule Cldr.DateTime.Formatter do
   * `n` is the number of digits to which `:hour` is padded
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `second/4`
@@ -2748,7 +2748,7 @@ defmodule Cldr.DateTime.Formatter do
       iex> Cldr.DateTime.Formatter.second %{second: 4}, 2
       "04"
   """
-  @spec second(Calendar.time(), integer, Keyword.t()) ::
+  @spec second(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def second(second, n \\ @default_format, options \\ [])
@@ -2763,7 +2763,7 @@ defmodule Cldr.DateTime.Formatter do
     second(second, n, locale, backend, Map.new(options))
   end
 
-  @spec second(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec second(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def second(time, n, locale, backend, options \\ %{})
@@ -2792,7 +2792,7 @@ defmodule Cldr.DateTime.Formatter do
     is rounded
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `fractional_second/4`
@@ -2820,7 +2820,7 @@ defmodule Cldr.DateTime.Formatter do
       "4"
 
   """
-  @spec fractional_second(Calendar.time(), integer, Keyword.t()) ::
+  @spec fractional_second(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def fractional_second(fractional_second, n \\ @default_format, options \\ [])
@@ -2836,7 +2836,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @spec fractional_second(
-          Calendar.time(),
+          Cldr.Calendar.time(),
           integer,
           Locale.locale_reference(),
           Cldr.backend(),
@@ -2887,7 +2887,7 @@ defmodule Cldr.DateTime.Formatter do
     is rounded
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `millisecond/4`
@@ -2917,7 +2917,7 @@ defmodule Cldr.DateTime.Formatter do
       "27313215"
 
   """
-  @spec millisecond(Calendar.time(), integer, Keyword.t()) ::
+  @spec millisecond(Cldr.Calendar.time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def millisecond(millisecond, n \\ @default_format, options \\ [])
@@ -2933,7 +2933,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @milliseconds 1_000
-  @spec millisecond(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec millisecond(Cldr.Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def millisecond(time, n, locale, backend, options \\ %{})
@@ -2972,14 +2972,14 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the key `:time_zone`
+  * `time` is a `t:DateTime.t/0` struct or any map that contains at least the key `:time_zone`
     key of the format used by `Time`
 
   * `n` is the generic non-location timezone format and is either `1` (the
     default) or `4`
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `zone_generic/4`
@@ -3005,7 +3005,7 @@ defmodule Cldr.DateTime.Formatter do
       "Etc/UTC"
 
   """
-  @spec zone_generic(Calendar.time(), integer, Keyword.t()) ::
+  @spec zone_generic(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def zone_generic(zone_generic, n \\ @default_format, options \\ [])
@@ -3020,7 +3020,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_generic(zone_generic, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_generic(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_generic(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_generic(time, n, locale, backend, options \\ %{})
@@ -3049,13 +3049,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the `:zone_abbr`,
+  * `time` is a `t:DateTime.t/0` struct or any map that contains at least the `:zone_abbr`,
   `:utc_offset` and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
    `zone_short/4`
@@ -3081,7 +3081,7 @@ defmodule Cldr.DateTime.Formatter do
       "GMT"
 
   """
-  @spec zone_short(Calendar.time(), integer, Keyword.t()) ::
+  @spec zone_short(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def zone_short(zone_short, n \\ @default_format, options \\ [])
@@ -3096,7 +3096,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_short(zone_short, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_short(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_short(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_short(time, n, locale, backend, options \\ %{})
@@ -3123,13 +3123,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  * `time` is a `t:DateTime.t/0` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
    `zone_id/4`
@@ -3165,7 +3165,7 @@ defmodule Cldr.DateTime.Formatter do
       "GMT"
 
   """
-  @spec zone_id(Calendar.time(), integer, Keyword.t()) ::
+  @spec zone_id(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def zone_id(zone_id, n \\ @default_format, options \\ [])
@@ -3180,7 +3180,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_id(zone_id, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_id(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_id(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_id(time, n, locale, backend, options \\ %{})
@@ -3216,13 +3216,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  * `time` is a `t:DateTime.t/0` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `zone_basic/4`
@@ -3257,7 +3257,7 @@ defmodule Cldr.DateTime.Formatter do
       "+01:00:10"
 
   """
-  @spec zone_basic(Calendar.time(), integer, Keyword.t()) ::
+  @spec zone_basic(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def zone_basic(zone_basic, n \\ @default_format, options \\ [])
@@ -3272,7 +3272,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_basic(zone_basic, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_basic(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_basic(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_basic(time, n, locale, backend, options \\ %{})
@@ -3308,13 +3308,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  * `time` is a `t:DateTime.t/0` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `zone_iso_z/4`
@@ -3371,7 +3371,7 @@ defmodule Cldr.DateTime.Formatter do
       "Z"
 
   """
-  @spec zone_iso_z(Calendar.time(), integer, Keyword.t()) ::
+  @spec zone_iso_z(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def zone_iso_z(zone_iso_z, n \\ @default_format, options \\ [])
@@ -3386,7 +3386,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_iso_z(zone_iso_z, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_iso_z(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_iso_z(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_iso_z(time, n, locale, backend, options \\ %{})
@@ -3463,13 +3463,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  * `time` is a ``t:DateTime.t/0` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `zone_iso/4`
@@ -3530,7 +3530,7 @@ defmodule Cldr.DateTime.Formatter do
       "+00"
 
   """
-  @spec zone_iso(Calendar.time(), integer, Keyword.t()) ::
+  @spec zone_iso(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def zone_iso(zone_iso, n \\ @default_format, options \\ [])
@@ -3546,7 +3546,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   @iso_utc_offset_hours_minutes "+00:00"
-  @spec zone_iso(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_iso(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_iso(time, n, locale, backend, options \\ %{})
@@ -3616,13 +3616,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Arguments
 
-  * `time` is a `Time` struct or any map that contains at least the `:utc_offset`
+  * `time` is a `t:DateTime.t/0` struct or any map that contains at least the `:utc_offset`
     and `:std_offset` keys of the format used by `Time`
 
   * `n` is the specific non-location timezone format and is in the range `1..4`
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
   * `options` is a `Keyword` list of options.  There are no options used in
     `zone_gmt/4`
@@ -3648,7 +3648,7 @@ defmodule Cldr.DateTime.Formatter do
       "GMT+01:00"
 
   """
-  @spec zone_gmt(Calendar.time(), integer, Keyword.t()) ::
+  @spec zone_gmt(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
   def zone_gmt(zone_gmt, n \\ @default_format, options \\ [])
@@ -3663,7 +3663,7 @@ defmodule Cldr.DateTime.Formatter do
     zone_gmt(zone_gmt, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_gmt(Calendar.time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
+  @spec zone_gmt(Cldr.Calendar.date_time(), integer, Locale.locale_reference(), Cldr.backend(), map()) ::
           String.t() | {:error, String.t()}
 
   def zone_gmt(time, n, locale, backend, options \\ %{})
