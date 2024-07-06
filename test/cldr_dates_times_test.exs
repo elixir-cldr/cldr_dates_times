@@ -75,4 +75,9 @@ defmodule Cldr.DatesTimes.Test do
     assert Cldr.DateTime.to_string(date_time, format: :long, style: :at, locale: :fr) ==
              {:ok, "8 septembre 2023 à 15:50:00 UTC"}
   end
+
+  test "Era variants" do
+    assert {:ok, "2024/7/6 CE"} = Cldr.Date.to_string(~D[2024-07-06], era: :variant, format: "y/M/d G")
+    assert {:ok, "2024/7/6 AD"} = Cldr.Date.to_string(~D[2024-07-06], format: "y/M/d G")
+  end
 end
