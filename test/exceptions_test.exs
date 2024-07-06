@@ -10,7 +10,7 @@ defmodule Cldr.Exceptions.Test do
   end
 
   test "that an invalid date raises" do
-    assert_raise ArgumentError, ~r/Invalid date. Date is a map that contains at least .*/, fn ->
+    assert_raise ArgumentError, ~r/Missing required date fields. .*/, fn ->
       Cldr.Date.to_string!("not a date")
     end
   end
@@ -25,7 +25,7 @@ defmodule Cldr.Exceptions.Test do
     test "that an unfulfilled format directive returns an error" do
       assert Cldr.Date.to_string(~D[2019-01-01], format: "x") ==
                {:error,
-                {Cldr.DateTime.UnresolvedFormat,
+                {Cldr.DateTime.FormatError,
                  "The format symbol 'x' requires at map with at least :utc_offset. Found: ~D[2019-01-01 Cldr.Calendar.Gregorian]"}}
     end
   end

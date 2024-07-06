@@ -6,7 +6,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
     config = Macro.escape(config)
     module = inspect(__MODULE__)
 
-    quote location: :keep, bind_quoted: [config: config, backend: backend, module: module] do
+    quote bind_quoted: [config: config, backend: backend, module: module] do
       defmodule DateTime.Formatter do
         @moduledoc false
         if Cldr.Config.include_module_docs?(config.generate_docs) do
@@ -17,7 +17,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
           """
         end
 
-        alias Cldr.DateTime.Compiler
+        alias Cldr.DateTime.Format.Compiler
         alias Cldr.DateTime.Formatter
         alias Cldr.Number
 
@@ -36,7 +36,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
           or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
 
-        * `options` is a keyword list of options.  The valid options are:
+        * `options` is a keyword list of options.
 
         ## Options
 
@@ -49,14 +49,12 @@ defmodule Cldr.DateTime.Formatter.Backend do
 
         ## Examples
 
-            iex> #{inspect __MODULE__}.format ~U[2017-09-03 10:23:00.0Z], "yy/MM/dd hh:MM", "en"
+            iex> #{inspect(__MODULE__)}.format ~U[2017-09-03 10:23:00.0Z], "yy/MM/dd hh:MM", "en"
             {:ok, "17/09/03 10:09"}
 
         """
         @spec format(
-                Elixir.Calendar.date()
-                | Elixir.Calendar.time()
-                | Elixir.Calendar.datetime(),
+                Cldr.Calendar.any_date_time(),
                 String.t(),
                 Cldr.Locale.locale_reference(),
                 Keyword.t()
@@ -71,20 +69,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
           case Compiler.compile(format, backend, Cldr.DateTime.Formatter.Backend) do
             {:ok, transforms} ->
               def format(date, unquote(Macro.escape(format)) = f, locale, options) do
-                number_system =
-                  number_system(f, options)
-
-                options =
-                  options
-                  |> Map.new()
-                  |> Map.put(:_number_systems, format_number_systems(f))
-
-                formatted =
-                  unquote(transforms)
-                  |> Enum.join()
-                  |> transliterate(locale, number_system)
-
-                {:ok, formatted}
+                format_transforms(date, f, unquote(transforms), locale, options)
               end
 
             {:error, message} ->
@@ -101,26 +86,36 @@ defmodule Cldr.DateTime.Formatter.Backend do
         def format(date, format, locale, options) do
           case Compiler.tokenize(format) do
             {:ok, tokens, _} ->
-              number_system =
-                number_system(format, options)
-
-              options =
-                options
-                |> Map.new()
-                |> Map.put(:_number_systems, format_number_systems(format))
-
-              formatted =
-                tokens
-                |> apply_transforms(date, locale, options)
-                |> Enum.join()
-                |> transliterate(locale, number_system)
-
-              {:ok, formatted}
+              transforms = apply_transforms(tokens, date, locale, options)
+              format_transforms(date, format, transforms, locale, options)
 
             {:error, {_, :date_time_format_lexer, {_, error}}, _} ->
               {:error,
                {Cldr.DateTime.Compiler.ParseError,
                 "Could not tokenize #{inspect(format)}. Error detected at #{inspect(error)}"}}
+          end
+        end
+
+        @doc false
+        def format_transforms(date, format, transforms, locale, options) do
+          number_system =
+            number_system(format, options)
+
+          formatted =
+            Enum.reduce_while(transforms, "", fn
+              {:error, reason}, acc -> {:halt, {:error, reason}}
+              string, acc when is_binary(string) -> {:cont, acc <> string}
+              number, acc when is_number(number) -> {:cont, acc <> to_string(number)}
+              list, acc when is_list(list) -> {:cont, acc <> Enum.join(list)}
+            end)
+
+          case formatted do
+            {:error, reason} ->
+              {:error, reason}
+
+            string ->
+              transliterated = transliterate(string, locale, number_system)
+              {:ok, transliterated}
           end
         end
 

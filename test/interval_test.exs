@@ -11,15 +11,23 @@ defmodule Cldr.DateTime.Interval.Test do
   test "right open date interval" do
     assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil) == {:ok, "Jan 1, 2020 –"}
     assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil, MyApp.Cldr) == {:ok, "Jan 1, 2020 –"}
-    assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil, locale: "fr") == {:ok, "1 janv. 2020 –"}
-    assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil, MyApp.Cldr, locale: "fr") == {:ok, "1 janv. 2020 –"}
+
+    assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil, locale: "fr") ==
+             {:ok, "1 janv. 2020 –"}
+
+    assert Cldr.Date.Interval.to_string(~D[2020-01-01], nil, MyApp.Cldr, locale: "fr") ==
+             {:ok, "1 janv. 2020 –"}
   end
 
   test "left open date interval" do
     assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01]) == {:ok, "– Jan 1, 2020"}
     assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01], MyApp.Cldr) == {:ok, "– Jan 1, 2020"}
-    assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01], locale: "fr") == {:ok, "– 1 janv. 2020"}
-    assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01], MyApp.Cldr, locale: "fr") == {:ok, "– 1 janv. 2020"}
+
+    assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01], locale: "fr") ==
+             {:ok, "– 1 janv. 2020"}
+
+    assert Cldr.Date.Interval.to_string(nil, ~D[2020-01-01], MyApp.Cldr, locale: "fr") ==
+             {:ok, "– 1 janv. 2020"}
   end
 
   test "time formatting" do
@@ -38,14 +46,18 @@ defmodule Cldr.DateTime.Interval.Test do
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil) == {:ok, "12:00:00 AM –"}
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, MyApp.Cldr) == {:ok, "12:00:00 AM –"}
     assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, locale: "fr") == {:ok, "00:00:00 –"}
-    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, MyApp.Cldr, locale: "fr") == {:ok, "00:00:00 –"}
+
+    assert Cldr.Time.Interval.to_string(~T[00:00:00.0], nil, MyApp.Cldr, locale: "fr") ==
+             {:ok, "00:00:00 –"}
   end
 
   test "left option time interval" do
     assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0]) == {:ok, "– 12:00:00 AM"}
     assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], MyApp.Cldr) == {:ok, "– 12:00:00 AM"}
     assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], locale: "fr") == {:ok, "– 00:00:00"}
-    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], MyApp.Cldr, locale: "fr") == {:ok, "– 00:00:00"}
+
+    assert Cldr.Time.Interval.to_string(nil, ~T[00:00:00.0], MyApp.Cldr, locale: "fr") ==
+             {:ok, "– 00:00:00"}
   end
 
   # Just to get tests compiling. Those tests will
@@ -77,18 +89,18 @@ defmodule Cldr.DateTime.Interval.Test do
              locale: "fr"
            )
 
-     assert Cldr.DateTime.Interval.to_string(
-              ~U[2020-01-01 00:00:00.0Z],
-              nil,
-              MyApp.Cldr,
-              locale: "fr"
-            ) == {:ok, "1 janv. 2020, 00:00:00 –"}
+    assert Cldr.DateTime.Interval.to_string(
+             ~U[2020-01-01 00:00:00.0Z],
+             nil,
+             MyApp.Cldr,
+             locale: "fr"
+           ) == {:ok, "1 janv. 2020, 00:00:00 –"}
 
-     assert Cldr.DateTime.Interval.to_string(
-              nil,
-              ~U[2020-01-01 00:00:00.0Z],
-              MyApp.Cldr,
-              locale: "fr"
+    assert Cldr.DateTime.Interval.to_string(
+             nil,
+             ~U[2020-01-01 00:00:00.0Z],
+             MyApp.Cldr,
+             locale: "fr"
            ) == {:ok, "– 1 janv. 2020, 00:00:00"}
   end
 
@@ -162,47 +174,112 @@ defmodule Cldr.DateTime.Interval.Test do
   end
 
   test "time intervals obey locale's hour format" do
-    assert {:ok, "12:00 – 13:00"} = Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00], MyApp.Cldr, locale: :fr)
-    assert {:ok, "12:00 – 1:00 PM"} = Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00], MyApp.Cldr, locale: :en)
+    assert {:ok, "12:00 – 13:00"} =
+             Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00], MyApp.Cldr, locale: :fr)
+
+    assert {:ok, "12:00 – 1:00 PM"} =
+             Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00], MyApp.Cldr, locale: :en)
   end
 
   test "Interval formatting when the format is a string" do
     assert {:ok, "12:00:00 - 13:00:00"} =
-      MyApp.Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00], format: "HH:mm:ss - HH:mm:ss", locale: :fr)
+             MyApp.Cldr.Time.Interval.to_string(~T[12:00:00], ~T[13:00:00],
+               format: "HH:mm:ss - HH:mm:ss",
+               locale: :fr
+             )
   end
 
   test "Interval formatting of dates with :month_and_day where the last date is in a subsequent year" do
     assert {:ok, "12/31 – 1/2"} =
-      MyApp.Cldr.Date.Interval.to_string(~D[2023-12-31], ~D[2024-01-02], format: :short, style: :month_and_day)
+             MyApp.Cldr.Date.Interval.to_string(~D[2023-12-31], ~D[2024-01-02],
+               format: :short,
+               style: :month_and_day
+             )
   end
 
   test "Interval formats with different date and time formats" do
     assert {:ok, "January 1, 2020, 12:00 AM – December 31, 2020, 10:00 AM"} =
-      MyApp.Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-12-31 10:00:00.0Z], format: :medium, date_format: :long, time_format: :short)
+             MyApp.Cldr.DateTime.Interval.to_string(
+               ~U[2020-01-01 00:00:00.0Z],
+               ~U[2020-12-31 10:00:00.0Z],
+               format: :medium,
+               date_format: :long,
+               time_format: :short
+             )
 
     assert {:ok, "January 1, 2020, 12:00 AM – 10:00 AM"} =
-      MyApp.Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z], format: :medium, date_format: :long, time_format: :short)
+             MyApp.Cldr.DateTime.Interval.to_string(
+               ~U[2020-01-01 00:00:00.0Z],
+               ~U[2020-01-01 10:00:00.0Z],
+               format: :medium,
+               date_format: :long,
+               time_format: :short
+             )
 
     assert {:ok, "1/1/20, 12:00 AM – 12/31/20, 10:00 AM"} =
-      MyApp.Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-12-31 10:00:00.0Z], format: :medium, date_format: :short, time_format: :short)
+             MyApp.Cldr.DateTime.Interval.to_string(
+               ~U[2020-01-01 00:00:00.0Z],
+               ~U[2020-12-31 10:00:00.0Z],
+               format: :medium,
+               date_format: :short,
+               time_format: :short
+             )
 
     assert {:ok, "1/1/20, 12:00 AM – 10:00 AM"} =
-      MyApp.Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z], format: :medium, date_format: :short, time_format: :short)
+             MyApp.Cldr.DateTime.Interval.to_string(
+               ~U[2020-01-01 00:00:00.0Z],
+               ~U[2020-01-01 10:00:00.0Z],
+               format: :medium,
+               date_format: :short,
+               time_format: :short
+             )
   end
 
   test "Invalid :date_format and :time_format for intervals" do
-    assert {:error, {Cldr.DateTime.InvalidFormat, ":date_format and :time_format must be one of [:short, :medium, :long] if :format is also one of [:short, :medium, :long]. Found :short and \"invalid\"."}} =
-      MyApp.Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z], format: :medium, date_format: :short, time_format: "invalid")
+    assert {:error,
+            {Cldr.DateTime.InvalidFormat,
+             ":date_format and :time_format must be one of [:short, :medium, :long] if :format is also one of [:short, :medium, :long]. Found :short and \"invalid\"."}} =
+             MyApp.Cldr.DateTime.Interval.to_string(
+               ~U[2020-01-01 00:00:00.0Z],
+               ~U[2020-01-01 10:00:00.0Z],
+               format: :medium,
+               date_format: :short,
+               time_format: "invalid"
+             )
 
-    assert {:error, {Cldr.DateTime.InvalidFormat, ":date_format and :time_format must be one of [:short, :medium, :long] if :format is also one of [:short, :medium, :long]. Found \"invalid\" and :short."}} =
-      MyApp.Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z], format: :medium, date_format: "invalid", time_format: :short)
+    assert {:error,
+            {Cldr.DateTime.InvalidFormat,
+             ":date_format and :time_format must be one of [:short, :medium, :long] if :format is also one of [:short, :medium, :long]. Found \"invalid\" and :short."}} =
+             MyApp.Cldr.DateTime.Interval.to_string(
+               ~U[2020-01-01 00:00:00.0Z],
+               ~U[2020-01-01 10:00:00.0Z],
+               format: :medium,
+               date_format: "invalid",
+               time_format: :short
+             )
   end
 
   test "If :format is a string or atom (other than standard formats) then :date_format and :time_format are not permitted" do
-    assert {:error, {Cldr.DateTime.InvalidFormat, ":date_format and :time_format cannot be specified when the interval format is a binary or atom other than one of [:short, :medium, :long]. Found: \"y-M-d - d\"."}} =
-      MyApp.Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z], format: "y-M-d - d", date_format: :short, time_format: :long)
+    assert {:error,
+            {Cldr.DateTime.InvalidFormat,
+             ":date_format and :time_format cannot be specified when the interval format is a binary or atom other than one of [:short, :medium, :long]. Found: \"y-M-d - d\"."}} =
+             MyApp.Cldr.DateTime.Interval.to_string(
+               ~U[2020-01-01 00:00:00.0Z],
+               ~U[2020-01-01 10:00:00.0Z],
+               format: "y-M-d - d",
+               date_format: :short,
+               time_format: :long
+             )
 
-   assert {:error, {Cldr.DateTime.InvalidFormat, ":date_format and :time_format cannot be specified when the interval format is a binary or atom other than one of [:short, :medium, :long]. Found: :gMY."}} =
-     MyApp.Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z], format: :gMY, date_format: :short, time_format: :short)
+    assert {:error,
+            {Cldr.DateTime.InvalidFormat,
+             ":date_format and :time_format cannot be specified when the interval format is a binary or atom other than one of [:short, :medium, :long]. Found: :gMY."}} =
+             MyApp.Cldr.DateTime.Interval.to_string(
+               ~U[2020-01-01 00:00:00.0Z],
+               ~U[2020-01-01 10:00:00.0Z],
+               format: :gMY,
+               date_format: :short,
+               time_format: :short
+             )
   end
 end

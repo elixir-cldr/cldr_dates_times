@@ -8,7 +8,7 @@
 
 ## Installation
 
-**Note that `ex_cldr_dates_times` requires Elixir 1.11 or later.**
+**Note that `ex_cldr_dates_times` requires Elixir 1.12 or later.**
 
 Add `ex_cldr_dates_time` as a dependency to your `mix` project:
 
@@ -50,23 +50,6 @@ A `backend` module is required that is used to host the functions that manage CL
     config :ex_cldr,
       default_locale: "en",
       default_backend: MyApp.Cldr
-    ```
-
-### Migration from Cldr.DatesTimes Version 1
-
-1. In modules where there are calls to `Cldr.DateTime.to_string/2` (or the `Date` and `Time` equivalents), add `alias MyApp.Cldr` to the top of the module. That will ensure that calls are directed to the backend with minimal code change. This is the preferred approach.
-
-
-2. Alternatively, update any calls to `Cldr.Date.to_string/2` to call `Cldr.Date.to_string/3` with the second parameter being a backend module. The same applies for migrating to `Cldr.DateTime.to_string/3`, `Cldr.Time.to_string/3` and `Cldr.DateTime.Relative.to_string/3`.  For example:
-
-    ```elixir
-    # Change from to_string/2 to to_string/3
-    # Old version
-    iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :short
-
-    # New version. Note the addition of a backend module as
-    # the second parameter.
-    iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, format: :short
     ```
 
 ## Usage Introduction

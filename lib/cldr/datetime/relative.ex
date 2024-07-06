@@ -47,21 +47,23 @@ defmodule Cldr.DateTime.Relative do
   * `:locale` is the locale in which the binary is formatted.
     The default is `Cldr.get_locale/0`
 
-  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`
+  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`.
 
   * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
     `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
-    `:sun`, `:quarter`
+    `:sun`, `:quarter`.
 
-  * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
-    calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
-    for a DateTime it is `DateTime.utc_now`
+  * `:relative_to` is the baseline `t:Date/0` or `t:Datetime.t/0` from which the difference
+    from `relative` is calculated when `relative` is a Date or a DateTime. The default for
+    a `t:Date.t/0` is `Date.utc_today/0`, for a `t:DateTime.t/0` it is `DateTime.utc_now/0`.
 
   ### Notes
 
-  When `options[:unit]` is not specified, `Cldr.DateTime.Relative.to_string/2` attempts to identify
-  the appropriate unit based upon the magnitude of `relative`.  For example, given a parameter
-  of less than `60`, then `to_string/2` will assume `:seconds` as the unit.  See `unit_from_relative_time/1`.
+  When `options[:unit]` is not specified, `Cldr.DateTime.Relative.to_string/2`
+  attempts to identify the appropriate unit based upon the magnitude of `relative`.
+
+  For example, given a parameter of less than `60`, then `to_string/2` will assume
+  `:seconds` as the unit.  See `unit_from_relative_time/1`.
 
   ## Examples
 
@@ -117,7 +119,7 @@ defmodule Cldr.DateTime.Relative do
       {:ok, "lundi dernier"}
 
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, unit: :ziggeraut)
-      {:error, {Cldr.UnknownTimeUnit,
+      {:error, {Cldr.DateTime.UnknownTimeUnit,
        "Unknown time unit :ziggeraut.  Valid time units are [:day, :fri, :hour, :minute, :mon, :month, :quarter, :sat, :second, :sun, :thu, :tue, :wed, :week, :year]"}}
 
   """
@@ -228,18 +230,18 @@ defmodule Cldr.DateTime.Relative do
   ## Options
 
   * `:locale` is the locale in which the binary is formatted.
-    The default is `Cldr.get_locale/0`
+    The default is `Cldr.get_locale/0`.
 
   * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`.
-    The default is `:default`
+    The default is `:default`.
 
   * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
     `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
-    `:sun`, `:quarter`
+    `:sun`, `:quarter`.
 
-  * `:relative_to` is the baseline Date or Datetime from which the difference from `relative` is
-    calculated when `relative` is a Date or a DateTime. The default for a Date is `Date.utc_today`,
-    for a DateTime it is `DateTime.utc_now`
+  * `:relative_to` is the baseline `t:Date/0` or `t:Datetime.t/0` from which the difference
+    from `relative` is calculated when `relative` is a Date or a DateTime. The default for
+    a `t:Date.t/0` is `Date.utc_today/0`, for a `t:DateTime.t/0` it is `DateTime.utc_now/0`.
 
   See `to_string/3`
 
@@ -293,25 +295,14 @@ defmodule Cldr.DateTime.Relative do
     rule = Module.concat(backend, Number.Cardinal).pluralize(trunc(relative), locale, rules)
 
     relative
-    |> abs
+    |> abs()
     |> Cldr.Number.to_string!(backend, locale: locale)
     |> Cldr.Substitution.substitute(rule)
     |> Enum.join()
   end
 
-  # For all other cases
-  # defp to_string(span, unit, locale, backend, options) do
-  #   do_to_string(span, unit, locale, backend, options)
-  # end
-  #
-  # defp do_to_string(seconds, unit, locale, backend, options) do
-  #   seconds
-  #   |> scale_relative(unit)
-  #   |> to_string(unit, locale, backend, options)
-  # end
-
   defp time_unit_error(unit) do
-    {Cldr.UnknownTimeUnit,
+    {Cldr.DateTime.UnknownTimeUnit,
      "Unknown time unit #{inspect(unit)}.  Valid time units are #{inspect(@unit_keys)}"}
   end
 
@@ -388,7 +379,8 @@ defmodule Cldr.DateTime.Relative do
   ## Example
 
       iex> Cldr.DateTime.Relative.known_units()
-      [:day, :fri, :hour, :minute, :mon, :month, :quarter, :sat, :second, :sun, :thu, :tue, :wed, :week, :year]
+      [:day, :fri, :hour, :minute, :mon, :month, :quarter, :sat, :second,
+      :sun, :thu, :tue, :wed, :week, :year]
 
   """
   def known_units do

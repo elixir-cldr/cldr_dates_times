@@ -28,10 +28,50 @@ defmodule Cldr.DateTime.Format.Backend do
 
         @standard_formats [:short, :medium, :long, :full]
 
-        @doc "A struct of the format types and formats"
+        @date_symbols [
+          "Y",
+          "y",
+          "G",
+          "M",
+          "L",
+          "D",
+          "d",
+          "U",
+          "u",
+          "Q",
+          "q",
+          "F",
+          "g",
+          "W",
+          "w",
+          "E",
+          "e",
+          "c"
+        ]
+
+        @time_symbols [
+          "H",
+          "h",
+          "K",
+          "k",
+          "C",
+          "m",
+          "s",
+          "S",
+          "A",
+          "Z",
+          "z",
+          "V",
+          "v",
+          "X",
+          "x",
+          "O"
+        ]
+
+        @doc "A struct from a format id as an atom to a format string"
         @type formats :: map()
 
-        @doc "The CLDR calendar type as an atome"
+        @doc "The CLDR calendar type as an atom"
         @type calendar :: atom()
 
         @doc """
@@ -192,7 +232,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec date_time_formats(Locale.locale_reference(), calendar) ::
-            {:ok, map()} | {:error, {module(), String.t()}}
+                {:ok, map()} | {:error, {module(), String.t()}}
 
         def date_time_formats(
               locale \\ unquote(backend).get_locale(),
@@ -245,7 +285,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec date_time_at_formats(Locale.locale_reference(), calendar) ::
-            {:ok, map()} | {:error, {module(), String.t()}}
+                {:ok, map()} | {:error, {module(), String.t()}}
 
         def date_time_at_formats(
               locale \\ unquote(backend).get_locale(),
@@ -263,7 +303,7 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         @doc """
-        Returns a map of the available non-standard datetime formats for a
+        Returns a map of the available datetime formats for a
         given locale and calendar.
 
         ## Arguments
@@ -353,6 +393,97 @@ defmodule Cldr.DateTime.Format.Backend do
         def date_time_available_formats(locale_name, calendar) when is_binary(locale_name) do
           with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
             date_time_available_formats(locale, calendar)
+          end
+        end
+
+        @doc """
+        Returns a map of the available date formats for a
+        given locale and calendar.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+          The default is `:gregorian`.
+
+        ## Examples:
+
+            iex> #{inspect(__MODULE__)}.date_available_formats "en"
+
+        """
+        @spec date_available_formats(Locale.locale_reference(), calendar) :: {:ok, formats}
+        def date_available_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
+
+        def date_available_formats(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
+          date_available_formats(cldr_locale_name, calendar)
+        end
+
+        def date_available_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_available_formats(locale, calendar)
+          end
+        end
+
+        @doc """
+        Returns a map of the available time formats for a
+        given locale and calendar.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+          The default is `:gregorian`.
+
+        ## Examples:
+
+            iex> #{inspect(__MODULE__)}.time_available_formats "en"
+
+        """
+        @spec time_available_formats(Locale.locale_reference(), calendar) :: {:ok, formats}
+        def time_available_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
+
+        def time_available_formats(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
+          time_available_formats(cldr_locale_name, calendar)
+        end
+
+        def time_available_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_available_formats(locale, calendar)
+          end
+        end
+
+        @doc false
+        def date_time_available_format_tokens(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
+
+        def date_time_available_format_tokens(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
+          date_time_available_format_tokens(cldr_locale_name, calendar)
+        end
+
+        def date_time_available_format_tokens(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_time_available_format_tokens(locale, calendar)
           end
         end
 
@@ -602,7 +733,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec gmt_zero_format(Locale.locale_reference()) ::
-            {:ok, String.t()} | {:error, {module(), String.t()}}
+                {:ok, String.t()} | {:error, {module(), String.t()}}
 
         def gmt_zero_format(locale \\ unquote(backend).get_locale())
 
@@ -687,9 +818,10 @@ defmodule Cldr.DateTime.Format.Backend do
               |> get_in([:date_time_formats, :available_formats])
               |> Enum.map(fn
                 {name, %{other: _other} = plurals} ->
-                  {:ok, tokens, _} = Cldr.DateTime.Compiler.tokenize(to_string(name))
+                  {:ok, tokens, _} = Cldr.DateTime.Format.Compiler.tokenize(to_string(name))
                   [{pluralize, _, _} | _rest] = Enum.reverse(tokens)
                   {name, Map.put(plurals, :pluralize, pluralize)}
+
                 other ->
                   other
               end)
@@ -699,7 +831,49 @@ defmodule Cldr.DateTime.Format.Backend do
               {:ok, unquote(Macro.escape(available_formats))}
             end
 
-            formats = get_in(calendar_data, [:date_time_formats, :interval_formats])
+            date_available_formats =
+              Enum.filter(available_formats, fn {format_id, _} ->
+                remaining =
+                  format_id
+                  |> to_string()
+                  |> String.replace(@date_symbols, "")
+
+                remaining == ""
+              end)
+              |> Map.new()
+
+            def date_available_formats(unquote(locale), unquote(calendar)) do
+              {:ok, unquote(Macro.escape(date_available_formats))}
+            end
+
+            time_available_formats =
+              Enum.filter(available_formats, fn {format_id, _} ->
+                remaining =
+                  format_id
+                  |> to_string()
+                  |> String.replace(@time_symbols, "")
+
+                remaining == ""
+              end)
+              |> Map.new()
+
+            def time_available_formats(unquote(locale), unquote(calendar)) do
+              {:ok, unquote(Macro.escape(time_available_formats))}
+            end
+
+            available_format_tokens =
+              Enum.map(available_formats, fn {format_id, format} ->
+                {:ok, tokens} = Cldr.DateTime.Format.Compiler.tokenize_skeleton(format_id)
+                {format_id, tokens}
+              end)
+              |> Map.new()
+
+            def date_time_available_format_tokens(unquote(locale), unquote(calendar)) do
+              unquote(Macro.escape(available_format_tokens))
+            end
+
+            interval_formats =
+              get_in(calendar_data, [:date_time_formats, :interval_formats])
 
             interval_format_fallback =
               get_in(
@@ -707,8 +881,8 @@ defmodule Cldr.DateTime.Format.Backend do
                 [:date_time_formats, :interval_formats, :interval_format_fallback]
               )
 
-            formats =
-              formats
+            interval_formats =
+              interval_formats
               |> Map.delete(:interval_format_fallback)
               |> Enum.map(fn {k, v} ->
                 split_formats =
@@ -723,7 +897,7 @@ defmodule Cldr.DateTime.Format.Backend do
               |> Map.new()
 
             def date_time_interval_formats(unquote(locale), unquote(calendar)) do
-              {:ok, unquote(Macro.escape(formats))}
+              {:ok, unquote(Macro.escape(interval_formats))}
             end
 
             def date_time_interval_fallback(unquote(locale), unquote(calendar)) do
@@ -802,7 +976,10 @@ defmodule Cldr.DateTime.Format.Backend do
             :evening1
 
         """
-        @spec day_period_for(Elixir.Calendar.time(), LanguageTag.t() | String.t() | Locale.locale_name()) ::
+        @spec day_period_for(
+                Elixir.Calendar.time(),
+                LanguageTag.t() | String.t() | Locale.locale_name()
+              ) ::
                 atom
         def day_period_for(time, language)
 
@@ -831,7 +1008,8 @@ defmodule Cldr.DateTime.Format.Backend do
             false
 
         """
-        @spec language_has_noon_and_midnight?(LanguageTag.t() | String.t() | Locale.locale_name()) :: boolean
+        @spec language_has_noon_and_midnight?(LanguageTag.t() | String.t() | Locale.locale_name()) ::
+                boolean
         def language_has_noon_and_midnight?(locale)
 
         def language_has_noon_and_midnight?(%LanguageTag{language: language}) do

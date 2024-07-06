@@ -17,14 +17,15 @@ defmodule Cldr.Date.Interval.Backend do
 
         """
 
-        date = quote do
-          %{
-            year: _,
-            month: _,
-            day: _,
-            calendar: var!(calendar, unquote(__MODULE__))
-          }
-        end
+        date =
+          quote do
+            %{
+              year: _,
+              month: _,
+              day: _,
+              calendar: var!(calendar, unquote(__MODULE__))
+            }
+          end
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           @doc false

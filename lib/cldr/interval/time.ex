@@ -34,12 +34,12 @@ defmodule Cldr.Time.Interval do
         short: :h,
         medium: :hm,
         long: :hm
-        },
+      },
       h23: %{
         short: :H,
         medium: :Hm,
         long: :Hm
-      },
+      }
     },
 
     # Includes the timezone
@@ -53,7 +53,7 @@ defmodule Cldr.Time.Interval do
         short: :Hv,
         medium: :Hmv,
         long: :Hmv
-      },
+      }
     },
 
     # Includes flex times
@@ -69,8 +69,8 @@ defmodule Cldr.Time.Interval do
         short: :Bh,
         medium: :Bhm,
         long: :Bhm
-      },
-    },
+      }
+    }
   }
 
   @styles Map.keys(@style_map)
@@ -271,6 +271,7 @@ defmodule Cldr.Time.Interval do
 
     with {:ok, formatted} <- Cldr.Time.to_string(to, backend, options) do
       pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale)
+
       result =
         ["", formatted]
         |> Cldr.Substitution.substitute(pattern)
@@ -286,6 +287,7 @@ defmodule Cldr.Time.Interval do
 
     with {:ok, formatted} <- Cldr.Time.to_string(from, backend, options) do
       pattern = Module.concat(backend, DateTime.Format).date_time_interval_fallback(locale)
+
       result =
         [formatted, ""]
         |> Cldr.Substitution.substitute(pattern)

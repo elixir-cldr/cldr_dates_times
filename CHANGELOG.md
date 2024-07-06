@@ -2,6 +2,26 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.19.0
+
+This is the changelog for Cldr_Dates_Times v2.19.0 released on _____, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix `Cldr.Date.to_string/2` with the option `era: :variant` to correctly render the variant "AD"/"CE"/"BC"/"BCE" text.
+
+* Fix `Cldr.Date.to_string/2` with the option `period: :variant` to correctly render the variant "am"/"pm" text.
+
+### Enhancements
+
+* Adds support for partial dates in `Cldr.Date.to_string/2`. Partial dates are maps with one or more of the fields `:year`, `:month`, `:day` and `:calendar`.
+
+* Adds support for deriving the "best match" format for a date based upon the users requested format or deriving from the available date fields.
+
+* Adds support for formatting using format IDs (atoms that are keys to locale-independent formats) in `Cldr.Date.to_string/2` and `Cldr.Time.to_string/2`. They have been previously supported in `Cldr.DateTime.to_string/2` only.
+
+* Improve the error message if `:hour` is outside the valid range.
+
 ## Cldr_Dates_Times v2.18.1
 
 This is the changelog for Cldr_Dates_Times v2.18.1 released on July 1st, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

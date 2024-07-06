@@ -17,18 +17,19 @@ defmodule Cldr.DateTime.Interval.Backend do
 
         """
 
-        naivedatetime = quote do
-          %{
-            year: _,
-            month: _,
-            day: _,
-            hour: _,
-            minute: _,
-            second: _,
-            microsecond: _,
-            calendar: var!(calendar, unquote(__MODULE__))
-          }
-        end
+        naivedatetime =
+          quote do
+            %{
+              year: _,
+              month: _,
+              day: _,
+              hour: _,
+              minute: _,
+              second: _,
+              microsecond: _,
+              calendar: var!(calendar, unquote(__MODULE__))
+            }
+          end
 
         if Cldr.Code.ensure_compiled?(CalendarInterval) do
           @doc false
@@ -167,8 +168,9 @@ defmodule Cldr.DateTime.Interval.Backend do
 
         """
         @spec to_string(
-                  Elixir.Calendar.naive_datetime() | nil,
-                  Elixir.Calendar.naive_datetime() | nil, Keyword.t()
+                Elixir.Calendar.naive_datetime() | nil,
+                Elixir.Calendar.naive_datetime() | nil,
+                Keyword.t()
               ) ::
                 {:ok, String.t()} | {:error, {module, String.t()}}
 

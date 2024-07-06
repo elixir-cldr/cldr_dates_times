@@ -1,4 +1,4 @@
-defmodule Cldr.DateTime.Compiler do
+defmodule Cldr.DateTime.Format.Compiler do
   @moduledoc """
   Tokenizes and parses `Date`, `Time` and `DateTime` format strings.
 
@@ -27,7 +27,7 @@ defmodule Cldr.DateTime.Compiler do
   Tokenize a date, time or datetime format string.
 
   This function is designed to produce output
-  that is fed into `Cldr.DateTime.Compiler.compile/3`.
+  that is fed into `Cldr.DateTime.Format.Compiler.compile/3`.
 
   ## Arguments
 
@@ -41,7 +41,7 @@ defmodule Cldr.DateTime.Compiler do
 
   ## Example
 
-      iex> Cldr.DateTime.Compiler.tokenize("yyyy/MM/dd")
+      iex> Cldr.DateTime.Format.Compiler.tokenize("yyyy/MM/dd")
       {:ok,
        [{:year, 1, 4}, {:literal, 1, "/"}, {:month, 1, 2}, {:literal, 1, "/"},
         {:day_of_month, 1, 2}], 1}
@@ -75,7 +75,8 @@ defmodule Cldr.DateTime.Compiler do
 
   """
   @spec compile(String.t(), module(), module()) ::
-          {:ok, Cldr.Calendar.calendar()} | {:error, String.t()}
+          {:ok, Macro.t()} | {:error, String.t()}
+
   def compile(format_string, backend, context)
 
   def compile("", _, _) do
@@ -114,5 +115,27 @@ defmodule Cldr.DateTime.Compiler do
 
   def compile(arg, _, _) do
     raise ArgumentError, message: "No idea how to compile format: #{inspect(arg)}"
+  end
+
+  @doc false
+  def tokenize_skeleton(token_id) when is_atom(token_id) do
+    token_id
+    |> Atom.to_string()
+    |> tokenize_skeleton()
+  end
+
+  def tokenize_skeleton(token_id) when is_binary(token_id) do
+    tokenized =
+      token_id
+      |> String.to_charlist()
+      |> :skeleton_tokenizer.string()
+
+    case tokenized do
+      {:ok, tokens, _} ->
+        {:ok, tokens}
+
+      {:error, {_, :skeleton_tokenizer, {:illegal, content}}, _} ->
+        {:error, "Illegal format string content found at: #{inspect(content)}"}
+    end
   end
 end
