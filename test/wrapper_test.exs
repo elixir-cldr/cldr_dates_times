@@ -1,5 +1,5 @@
 defmodule Cldr.DateTime.WrapperTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "wrapping a datetime" do
     wrapper = fn value, type ->
