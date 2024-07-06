@@ -443,7 +443,7 @@ defmodule Cldr.Date do
     {:error,
      {
        Cldr.DateTime.UnresolvedFormat,
-       "Standard formats are not available for partial dates"
+       "Standard formats are not accepted for partial dates"
      }}
   end
 

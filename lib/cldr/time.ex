@@ -325,7 +325,7 @@ defmodule Cldr.Time do
     {:error,
      {
        Cldr.DateTime.UnresolvedFormat,
-       "Standard formats are not available for partial times"
+       "Standard formats are not accepted for partial times"
      }}
   end
 
