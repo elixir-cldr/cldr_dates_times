@@ -52,4 +52,22 @@ defmodule Cldr.DateTime.PartialTest do
          "Found: %{second: 45, calendar: Cldr.Calendar.Gregorian, hour: 23}"}}
   end
 
+  test "Partial date times" do
+    assert {:ok, "11/2024, 10 AM"} = Cldr.DateTime.to_string(%{year: 2024, month: 11, hour: 10})
+    assert {:ok, "2024, 10 AM"} = Cldr.DateTime.to_string(%{year: 2024, hour: 10})
+
+    assert Cldr.DateTime.to_string(%{year: 2024, minute: 10}) ==
+      {:error,
+        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \"m\""}}
+
+  end
+
+  test "Additional error returns" do
+    assert Cldr.DateTime.to_string(%{hour: 2024}) ==
+      {:error,
+       {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found 2024"}}
+    assert Cldr.Time.to_string(%{hour: 2024}) ==
+      {:error,
+       {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found 2024"}}
+  end
 end

@@ -2401,6 +2401,11 @@ defmodule Cldr.DateTime.Formatter do
     |> maybe_wrap(:h12, options)
   end
 
+  def h12(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
+    {:error,
+     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect hour}"}}
+  end
+
   def h12(time, _n, _locale, _backend, _options) do
     error_return(time, "h", [:hour])
   end
@@ -2489,6 +2494,11 @@ defmodule Cldr.DateTime.Formatter do
     |> maybe_wrap(:h11, options)
   end
 
+  def h11(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
+    {:error,
+     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect hour}"}}
+  end
+
   def h11(time, _n, _locale, _backend, _options) do
     error_return(time, "K", [:hour])
   end
@@ -2568,6 +2578,11 @@ defmodule Cldr.DateTime.Formatter do
     |> maybe_wrap(:h24, options)
   end
 
+  def h24(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
+    {:error,
+     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect hour}"}}
+  end
+
   def h24(time, _n, _locale, _backend, _options) do
     error_return(time, "k", [:hour])
   end
@@ -2645,6 +2660,11 @@ defmodule Cldr.DateTime.Formatter do
     abs(hour)
     |> pad(n)
     |> maybe_wrap(:h23, options)
+  end
+
+  def h23(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
+    {:error,
+     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect hour}"}}
   end
 
   def h23(time, _n, _locale, _backend, _options) do

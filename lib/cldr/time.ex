@@ -54,13 +54,13 @@ defmodule Cldr.Time do
   Formats a time according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
-  ## Returns
+  ### Returns
 
   * `{:ok, formatted_time}` or
 
   * `{:error, reason}`.
 
-  ## Arguments
+  ### Arguments
 
   * `time` is a `t:Time.t/0` struct or any map that contains
     one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`,
@@ -71,7 +71,7 @@ defmodule Cldr.Time do
 
   * `options` is a keyword list of options for formatting.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
     or a format string. The default is `:medium` for full times (that is,
@@ -96,7 +96,7 @@ defmodule Cldr.Time do
     one is available in the locale.  For example, in the `:en` locale, `period: :variant` will
     return "pm" instead of "PM".
 
-  ## Examples
+  ### Examples
 
       iex> Cldr.Time.to_string(~T[07:35:13.215217], MyApp.Cldr)
       {:ok, "7:35:13 AM"}
@@ -176,7 +176,7 @@ defmodule Cldr.Time do
   Formats a time according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
-  ## Arguments
+  ### Arguments
 
   * `time` is a `t:Time.t/0` struct or any map that contains
     one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`,
@@ -187,7 +187,7 @@ defmodule Cldr.Time do
 
   * `options` is a keyword list of options for formatting.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
     or a format string. The default is `:medium` for full times (that is,
@@ -212,13 +212,13 @@ defmodule Cldr.Time do
     one is available in the locale.  For example, in the `:en` locale `period: :variant` will
     return "pm" instead of "PM"
 
-  ## Returns
+  ### Returns
 
   * `formatted_time_string` or
 
   * raises an exception.
 
-  ## Examples
+  ### Examples
 
       iex> Cldr.Time.to_string!(~T[07:35:13.215217], MyApp.Cldr)
       "7:35:13 AM"
@@ -263,7 +263,7 @@ defmodule Cldr.Time do
   defp normalize_options(time, backend, []) do
     {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
-    format = format_from_options(time, nil, @default_format_type)
+    format = format_from_options(time, nil, @default_format_type, @default_prefer)
 
     %{locale: locale, number_system: number_system, format: format, prefer: @default_prefer}
   end
@@ -274,7 +274,7 @@ defmodule Cldr.Time do
     number_system = Keyword.get(options, :number_system, locale_number_system)
     prefer = Keyword.get(options, :prefer, @default_prefer)
     format_option = options[:time_format] || options[:format] || options[:style]
-    format = format_from_options(time, format_option, @default_format_type)
+    format = format_from_options(time, format_option, @default_format_type, prefer)
 
     options
     |> Keyword.put(:locale, locale)
@@ -286,17 +286,18 @@ defmodule Cldr.Time do
   end
 
   # Full date, no option, use the default format
-  defp format_from_options(time, nil, default_format) when is_full_time(time) do
+  defp format_from_options(time, nil, default_format, _prefer) when is_full_time(time) do
     default_format
   end
 
   # Partial date, no option, derive the format from the date
-  defp format_from_options(time, nil, _default_format) do
+  defp format_from_options(time, nil, _default_format, _prefer) do
     derive_format_id(time)
   end
 
   # If a format is requested, use it
-  defp format_from_options(_time, format, _default_format) do
+  defp format_from_options(_time, format, _default_format, prefer) do
+    {:ok, format} = apply_unicode_or_ascii_preference(format, prefer)
     format
   end
 
@@ -329,8 +330,8 @@ defmodule Cldr.Time do
      }}
   end
 
-  def find_format(time, %{} = format_map, locale, calendar, backend) do
-    %{number_system: number_system, format: format} = format_map
+  def find_format(time, %{format: format} = format_map, locale, calendar, backend) do
+    %{number_system: number_system} = format_map
     {:ok, format_string} = find_format(time, format, locale, calendar, backend)
     {:ok, %{number_system: number_system, format: format_string}}
   end
@@ -364,7 +365,7 @@ defmodule Cldr.Time do
   Returns a map of the standard time formats for a given
   locale and calendar.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -375,7 +376,7 @@ defmodule Cldr.Time do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Examples:
+  ### Examples:
 
       iex> Cldr.Time.formats(:en, :gregorian, MyApp.Cldr)
       {:ok,
@@ -416,7 +417,7 @@ defmodule Cldr.Time do
   Returns a map of the available date formats for a
   given locale and calendar.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -427,7 +428,7 @@ defmodule Cldr.Time do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Examples:
+  ### Examples:
 
       iex> Cldr.Time.available_formats(:en)
       {:ok,
@@ -464,17 +465,17 @@ defmodule Cldr.Time do
   @doc """
   Return the preferred time format for a locale.
 
-  ## Arguments
+  ### Arguments
 
   * `language_tag` is any language tag returned by `Cldr.Locale.new/2`
     or any `locale_name` returned by `Cldr.known_locale_names/1`
 
-  ## Returns
+  ### Returns
 
   * The hour format as an atom to be used for localization purposes. The
     return value is used as a function name in `Cldr.DateTime.Formatter`
 
-  ## Notes
+  ### Notes
 
   * The `hc` key of the `u` extension is honoured and will
     override the default preferences for a locale or territory.
@@ -491,7 +492,7 @@ defmodule Cldr.Time do
   |   H     |   0    | 1...11    |  12   |  13...23   |   0   |
   |   k     |  24    | 1...11    |  12   |  13...23   |  24   |
 
-  ## Examples
+  ### Examples
 
       iex> Cldr.Time.hour_format_from_locale("en-AU")
       :h12

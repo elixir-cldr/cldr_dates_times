@@ -55,6 +55,27 @@ defmodule Cldr.DateTime do
   defguard is_any_date_time(datetime)
            when is_date_time(datetime) or is_naive_date_time(datetime)
 
+  @doc """
+  Guards whether the given datetime has components of
+  a date.
+  """
+  defguard has_date(datetime)
+    when is_map_key(datetime, :year) or is_map_key(datetime, :month) or is_map_key(datetime, :day)
+
+  @doc """
+  Guards whether the given datetime has components of
+  a time.
+  """
+  defguard has_time(datetime)
+    when is_map_key(datetime, :hour) or is_map_key(datetime, :minute) or is_map_key(datetime, :second)
+
+  @doc """
+  Guard whether the given datetime has components of
+  both a date and a time.
+  """
+  defguard has_date_and_time(datetime)
+    when has_date(datetime) and has_time(datetime)
+
   defmodule Formats do
     @moduledoc false
     defstruct Module.get_attribute(Cldr.DateTime, :format_types)
@@ -64,7 +85,7 @@ defmodule Cldr.DateTime do
   Formats a DateTime according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
-  ## Arguments
+  ### Arguments
 
   * `datetime` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that contains
     one or more of the keys `:year`, `:month`, `:day`, `:hour`, `:minute` and `:second` or
@@ -78,53 +99,61 @@ defmodule Cldr.DateTime do
 
   ## Options
 
-    * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
-      any of the keys in the map returned by `Cldr.DateTime.Format.date_time_formats/3`.
-      The default is `:medium`.
+  * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
+    any of the keys in the map returned by `Cldr.DateTime.Format.date_time_formats/3`.
+    The default is `:medium`.
 
-    * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
-      this option is used to format the date part of the date time. This option is
-      only acceptable if the `:format` option is not specified, or is specified as either
-      `:short`, `:medium`, `:long`, `:full`. If `:date_format` is not specified
-      then the date format is defined by the `:format` option.
+  * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+    this option is used to format the date part of the date time. This option is
+    only acceptable if the `:format` option is not specified, or is specified as either
+    `:short`, `:medium`, `:long`, `:full`. If `:date_format` is not specified
+    then the date format is defined by the `:format` option.
 
-    * `:time_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
-      this option is used to format the time part of the date time. This option is
-      only acceptable if the `:format` option is not specified, or is specified as either
-      `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
-      then the time format is defined by the `:format` option.
+  * `:time_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
+    this option is used to format the time part of the date time. This option is
+    only acceptable if the `:format` option is not specified, or is specified as either
+    `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
+    then the time format is defined by the `:format` option.
 
-    * `:style` is either `:at` or `:default`. When set to `:at` the datetime is
-      formatted with a localised string representing `<date> at <time>`. See
-      `Cldr.DateTime.Format.date_time_at_formats/2`.
+  * `:style` is either `:at` or `:default`. When set to `:at` the datetime is
+    formatted with a localised string representing `<date> at <time>`. See
+    `Cldr.DateTime.Format.date_time_at_formats/2`.
 
-    * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
-      formats have two variants - one using Unicode spaces (typically non-breaking space) and
-      another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-      use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/3`
-      to see which formats have these variants.
+  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
+    formats have two variants - one using Unicode spaces (typically non-breaking space) and
+    another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
+    use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/3`
+    to see which formats have these variants.
 
-    * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-      or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-    * `:number_system` a number system into which the formatted datetime digits should
-      be transliterated.
+  * `:number_system` a number system into which the formatted datetime digits should
+    be transliterated.
 
-    * `:era` which, if set to `:variant`, will use a variant for the era if one
-      is available in the requested locale. In the `:en` locale, for example, `era: :variant`
-      will return `CE` instead of `AD` and `BCE` instead of `BC`.
+  * `:era` which, if set to `:variant`, will use a variant for the era if one
+    is available in the requested locale. In the `:en` locale, for example, `era: :variant`
+    will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
-    * `period: :variant` will use a variant for the time period and flexible time period if
-      one is available in the locale.  For example, in the `:en` locale `period: :variant` will
-      return "pm" instead of "PM".
+  * `period: :variant` will use a variant for the time period and flexible time period if
+    one is available in the locale.  For example, in the `:en` locale `period: :variant` will
+    return "pm" instead of "PM".
 
-  ## Returns
+  ### Notes
+
+  * If the provided `datetime` contains only date fields, the call is delegated to
+    `Cldr.Date.to_string/2`.
+
+  * If the provided `datetime` contains only time fields, the call is delegated to
+    `Cldr.Time.to_string/2`.
+
+  ### Returns
 
   * `{:ok, formatted_datetime}` or
 
   * `{:error, reason}`
 
-  ## Examples
+  ### Examples
 
       iex> {:ok, date_time} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
       iex> Cldr.DateTime.to_string(date_time)
@@ -166,7 +195,7 @@ defmodule Cldr.DateTime do
   end
 
   def to_string(%{} = datetime, backend, options)
-      when is_atom(backend) and is_list(options) do
+      when is_atom(backend) and is_list(options) and has_date_and_time(datetime) do
     options = normalize_options(datetime, backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
     format = options.format
@@ -188,6 +217,16 @@ defmodule Cldr.DateTime do
       {:error, {e.__struct__, e.message}}
   end
 
+  def to_string(%{} = datetime, backend, options)
+      when is_atom(backend) and is_list(options) and has_date(datetime) do
+    Cldr.Date.to_string(datetime, backend, options)
+  end
+
+  def to_string(%{} = datetime, backend, options)
+      when is_atom(backend) and is_list(options) and has_time(datetime) do
+    Cldr.Time.to_string(datetime, backend, options)
+  end
+
   def to_string(datetime, _backend, _options) do
     error_return(datetime, [:year, :month, :day, :hour, :minute, :second, :calendar])
   end
@@ -197,7 +236,7 @@ defmodule Cldr.DateTime do
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
   returning a formatted string or raising on error.
 
-  ## Arguments
+  ### Arguments
 
   * `datetime` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that contains
     one or more of the keys `:year`, `:month`, `:day`, `:hour`, `:minute` and `:second` or
@@ -239,13 +278,21 @@ defmodule Cldr.DateTime do
     one is available in the locale.  For example, in the `:en` locale `period: :variant` will
     return "pm" instead of "PM".
 
-  ## Returns
+  ### Notes
+
+  * If the provided `datetime` contains only date fields, the call is delegated to
+    `Cldr.Date.to_string/2`.
+
+  * If the provided `datetime` contains only time fields, the call is delegated to
+    `Cldr.Time.to_string/2`.
+
+  ### Returns
 
   * `formatted_datetime` or
 
   * raises an exception
 
-  ## Examples
+  ### Examples
 
       iex> {:ok, date_time} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, locale: :en)

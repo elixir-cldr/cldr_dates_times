@@ -46,7 +46,7 @@ defmodule Cldr.Date do
   Formats a date according to a format string
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
-  ## Arguments
+  ### Arguments
 
   * `date` is a `t:Date.t/0` struct or any map that contains one or more
     of the keys `:year`, `:month`, `:day` and optionally `:calendar`.
@@ -56,7 +56,7 @@ defmodule Cldr.Date do
 
   * `options` is a keyword list of options for formatting.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
     or a format string. The default is `:medium` for full dates (that is,
@@ -82,13 +82,13 @@ defmodule Cldr.Date do
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
     will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
-  ## Returns
+  ### Returns
 
   * `{:ok, formatted_string}` or
 
   * `{:error, reason}`
 
-  ## Examples
+  ### Examples
 
       # Full dates have the default format `:medium`
       iex> Cldr.Date.to_string(~D[2017-07-10], MyApp.Cldr, locale: :en)
@@ -170,7 +170,7 @@ defmodule Cldr.Date do
   as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
   or raises an exception.
 
-  ## Arguments
+  ### Arguments
 
   * `date` is a `t:Date.t/0` struct or any map that contains one or more
     of the keys `:year`, `:month`, `:day` and optionally `:calendar`.
@@ -180,7 +180,7 @@ defmodule Cldr.Date do
 
   * `options` is a keyword list of options for formatting.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
     or a format string. The default is `:medium` for full dates (that is,
@@ -206,13 +206,13 @@ defmodule Cldr.Date do
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
     will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
-  ## Returns
+  ### Returns
 
   * `formatted_date` or
 
   * raises an exception.
 
-  ## Examples
+  ### Examples
 
       iex> Cldr.Date.to_string!(~D[2017-07-10], MyApp.Cldr, locale: :en)
       "Jul 10, 2017"
@@ -304,7 +304,7 @@ defmodule Cldr.Date do
   Returns a map of the standard date formats for a given
   locale and calendar.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -315,7 +315,7 @@ defmodule Cldr.Date do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Examples:
+  ### Examples:
 
       iex> Cldr.Date.formats(:en, :gregorian, MyApp.Cldr)
       {:ok, %Cldr.Date.Formats{
@@ -354,7 +354,7 @@ defmodule Cldr.Date do
   Returns a map of the available date formats for a
   given locale and calendar.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -365,7 +365,7 @@ defmodule Cldr.Date do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Examples:
+  ### Examples:
 
       iex> Cldr.Date.available_formats(:en)
       {:ok,

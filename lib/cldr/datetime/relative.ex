@@ -295,7 +295,7 @@ defmodule Cldr.DateTime.Relative do
     rule = Module.concat(backend, Number.Cardinal).pluralize(trunc(relative), locale, rules)
 
     relative
-    |> abs
+    |> abs()
     |> Cldr.Number.to_string!(backend, locale: locale)
     |> Cldr.Substitution.substitute(rule)
     |> Enum.join()
