@@ -80,4 +80,17 @@ defmodule Cldr.DatesTimes.Test do
     assert {:ok, "2024/7/6 CE"} = Cldr.Date.to_string(~D[2024-07-06], era: :variant, format: "y/M/d G")
     assert {:ok, "2024/7/6 AD"} = Cldr.Date.to_string(~D[2024-07-06], format: "y/M/d G")
   end
+
+  test "Resolving with skeleton code c, J and j" do
+    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :hmj)
+    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :hmJ)
+
+    assert Cldr.Date.to_string(~T[10:48:00], format: :hmc) ==
+      {:error,
+        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :hmc"}}
+
+    assert Cldr.Time.to_string(~T[10:48:00], format: :hme) ==
+      {:error,
+        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :hme"}}
+  end
 end
