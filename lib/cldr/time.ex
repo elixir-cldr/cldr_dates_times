@@ -311,7 +311,7 @@ defmodule Cldr.Time do
   # applied.
   @doc false
   def find_format(time, format, locale, calendar, backend)
-       when format in @format_types and is_full_time(time) do
+      when format in @format_types and is_full_time(time) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
     with {:ok, time_formats} <- formats(locale_name, calendar, backend) do
@@ -322,7 +322,7 @@ defmodule Cldr.Time do
   # If its a partial date and a standard format is requested, its an error
 
   def find_format(time, format, _locale, _calendar, _backend)
-       when format in @format_types and not is_full_time(time) do
+      when format in @format_types and not is_full_time(time) do
     {:error,
      {
        Cldr.DateTime.UnresolvedFormat,
@@ -355,7 +355,7 @@ defmodule Cldr.Time do
   # it directly.
 
   def find_format(_time, format_string, _locale, _calendar, _backend)
-       when is_binary(format_string) do
+      when is_binary(format_string) do
     {:ok, format_string}
   end
 

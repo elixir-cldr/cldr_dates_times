@@ -77,7 +77,9 @@ defmodule Cldr.DatesTimes.Test do
   end
 
   test "Era variants" do
-    assert {:ok, "2024/7/6 CE"} = Cldr.Date.to_string(~D[2024-07-06], era: :variant, format: "y/M/d G")
+    assert {:ok, "2024/7/6 CE"} =
+             Cldr.Date.to_string(~D[2024-07-06], era: :variant, format: "y/M/d G")
+
     assert {:ok, "2024/7/6 AD"} = Cldr.Date.to_string(~D[2024-07-06], format: "y/M/d G")
   end
 
@@ -86,40 +88,50 @@ defmodule Cldr.DatesTimes.Test do
     assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :hmJ)
 
     assert Cldr.Date.to_string(~T[10:48:00], format: :hmc) ==
-      {:error,
-        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :hmc"}}
+             {:error, {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :hmc"}}
 
     assert Cldr.Time.to_string(~T[10:48:00], format: :hme) ==
-      {:error,
-        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :hme"}}
+             {:error, {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :hme"}}
   end
 
   test "Datetime formatting with standard formats" do
     datetime = ~U[2024-07-07 21:36:00.440105Z]
 
     assert {:ok, "Jul 7, 2024, 9:36:00 PM"} =
-      Cldr.DateTime.to_string(datetime)
+             Cldr.DateTime.to_string(datetime)
 
     assert {:ok, "7/7/24, 9:36:00 PM GMT"} =
-      Cldr.DateTime.to_string(datetime, date_format: :short, time_format: :full)
+             Cldr.DateTime.to_string(datetime, date_format: :short, time_format: :full)
 
     assert {:ok, "7/7/24, 9:36:00 PM GMT"} =
-      Cldr.DateTime.to_string(datetime, format: :medium, date_format: :short, time_format: :full)
+             Cldr.DateTime.to_string(datetime,
+               format: :medium,
+               date_format: :short,
+               time_format: :full
+             )
   end
 
   test "Datetime format option consistency" do
     datetime = ~U[2024-07-07 21:36:00.440105Z]
 
-    assert Cldr.DateTime.to_string(datetime, format: "yyy", date_format: :short, time_format: :medium)
-      {:error,
-       {Cldr.DateTime.InvalidFormat,
-        ":date_format and :time_format cannot be specified if :format is also specified as a " <>
-        "format id or a format string. Found [time_format: :medium, date_format: :short]"}}
+    assert Cldr.DateTime.to_string(datetime,
+             format: "yyy",
+             date_format: :short,
+             time_format: :medium
+           ) ==
+             {:error,
+              {Cldr.DateTime.InvalidFormat,
+               ":date_format and :time_format cannot be specified if :format is also specified as a " <>
+                 "format id or a format string. Found [time_format: :medium, date_format: :short]"}}
 
-    assert Cldr.DateTime.to_string(datetime, format: :yMd, date_format: :short, time_format: :medium)
-      {:error,
-       {Cldr.DateTime.InvalidFormat,
-        ":date_format and :time_format cannot be specified if :format is also specified as a " <>
-        "format id or a format string. Found [time_format: :medium, date_format: :short]"}}
-    end
+    assert Cldr.DateTime.to_string(datetime,
+             format: :yMd,
+             date_format: :short,
+             time_format: :medium
+           ) ==
+             {:error,
+              {Cldr.DateTime.InvalidFormat,
+               ":date_format and :time_format cannot be specified if :format is also specified as a " <>
+                 "format id or a format string. Found [time_format: :medium, date_format: :short]"}}
+  end
 end

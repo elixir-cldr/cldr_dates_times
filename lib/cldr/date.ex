@@ -239,7 +239,7 @@ defmodule Cldr.Date do
 
   """
   @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
-    String.t() | no_return
+          String.t() | no_return
 
   def to_string!(date, backend \\ Cldr.Date.default_backend(), options \\ [])
 
@@ -428,7 +428,7 @@ defmodule Cldr.Date do
   # applied.
   @doc false
   def find_format(date, format, locale, calendar, backend)
-       when format in @format_types and is_full_date(date) do
+      when format in @format_types and is_full_date(date) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
     with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
@@ -439,7 +439,7 @@ defmodule Cldr.Date do
   # If its a partial date and a standard format is requested, its an error
 
   def find_format(date, format, _locale, _calendar, _backend)
-       when format in @format_types and not is_full_date(date) do
+      when format in @format_types and not is_full_date(date) do
     {:error,
      {
        Cldr.DateTime.UnresolvedFormat,
@@ -472,7 +472,7 @@ defmodule Cldr.Date do
   # it directly.
 
   def find_format(_date, format_string, _locale, _calendar, _backend)
-       when is_binary(format_string) do
+      when is_binary(format_string) do
     {:ok, format_string}
   end
 

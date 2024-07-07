@@ -328,7 +328,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         """
         @spec to_string!(Cldr.Calendar.any_date_time(), Keyword.t()) ::
-          String.t() | no_return
+                String.t() | no_return
 
         def to_string!(date, options \\ []) do
           Cldr.Date.to_string!(date, unquote(backend), options)
@@ -489,7 +489,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         """
         @spec to_string!(Cldr.Calendar.any_date_time(), Keyword.t()) ::
-          String.t() | no_return
+                String.t() | no_return
 
         def to_string!(time, options \\ []) do
           Cldr.Time.to_string!(time, unquote(backend), options)

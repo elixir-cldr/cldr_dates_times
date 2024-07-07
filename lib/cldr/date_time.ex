@@ -60,21 +60,23 @@ defmodule Cldr.DateTime do
   a date.
   """
   defguard has_date(datetime)
-    when is_map_key(datetime, :year) or is_map_key(datetime, :month) or is_map_key(datetime, :day)
+           when is_map_key(datetime, :year) or is_map_key(datetime, :month) or
+                  is_map_key(datetime, :day)
 
   @doc """
   Guards whether the given datetime has components of
   a time.
   """
   defguard has_time(datetime)
-    when is_map_key(datetime, :hour) or is_map_key(datetime, :minute) or is_map_key(datetime, :second)
+           when is_map_key(datetime, :hour) or is_map_key(datetime, :minute) or
+                  is_map_key(datetime, :second)
 
   @doc """
   Guard whether the given datetime has components of
   both a date and a time.
   """
   defguard has_date_and_time(datetime)
-    when has_date(datetime) and has_time(datetime)
+           when has_date(datetime) and has_time(datetime)
 
   defmodule Formats do
     @moduledoc false
@@ -306,7 +308,7 @@ defmodule Cldr.DateTime do
 
   """
   @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
-    String.t() | no_return
+          String.t() | no_return
 
   def to_string!(datetime, backend \\ Cldr.Date.default_backend(), options \\ [])
 
@@ -377,27 +379,28 @@ defmodule Cldr.DateTime do
   end
 
   defp validate_formats_consistent(format, nil = _date_format, nil = _time_format)
-      when is_atom(format) or is_binary(format) do
+       when is_atom(format) or is_binary(format) do
     :ok
   end
 
   defp validate_formats_consistent(nil, date_format, time_format)
-      when not is_nil(date_format) and not is_nil(time_format) do
+       when not is_nil(date_format) and not is_nil(time_format) do
     :ok
   end
 
   defp validate_formats_consistent(format, date_format, time_format)
-      when format in @format_types and date_format in @format_types and time_format in @format_types do
+       when format in @format_types and date_format in @format_types and
+              time_format in @format_types do
     :ok
   end
 
   defp validate_formats_consistent(format, date_format, time_format)
-      when is_atom(format) or is_binary(format) do
-    {:error, {Cldr.DateTime.InvalidFormat,
+       when is_atom(format) or is_binary(format) do
+    {:error,
+     {Cldr.DateTime.InvalidFormat,
       ":date_format and :time_format cannot be specified if :format is also specified as " <>
-      "a format id or a format string. Found [time_format: #{inspect time_format}, " <>
-      "date_format: #{inspect date_format}]"
-      }}
+        "a format id or a format string. Found [time_format: #{inspect(time_format)}, " <>
+        "date_format: #{inspect(date_format)}]"}}
   end
 
   # Returns the CLDR calendar type for a calendar
@@ -524,8 +527,10 @@ defmodule Cldr.DateTime do
   # Format with a number system
   defp find_format(datetime, %{} = format, locale, calendar, backend, options) do
     %{number_system: number_system, format: format} = format
+
     {:ok, format_string, options} =
       find_format(datetime, format, locale, calendar, backend, options)
+
     {:ok, %{number_system: number_system, format: format_string}, options}
   end
 

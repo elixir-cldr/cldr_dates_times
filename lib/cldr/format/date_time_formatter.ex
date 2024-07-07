@@ -2406,7 +2406,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def h12(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
     {:error,
-     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect hour}"}}
+     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect(hour)}"}}
   end
 
   def h12(time, _n, _locale, _backend, _options) do
@@ -2499,7 +2499,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def h11(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
     {:error,
-     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect hour}"}}
+     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect(hour)}"}}
   end
 
   def h11(time, _n, _locale, _backend, _options) do
@@ -2583,7 +2583,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def h24(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
     {:error,
-     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect hour}"}}
+     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect(hour)}"}}
   end
 
   def h24(time, _n, _locale, _backend, _options) do
@@ -2667,7 +2667,7 @@ defmodule Cldr.DateTime.Formatter do
 
   def h23(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
     {:error,
-     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect hour}"}}
+     {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect(hour)}"}}
   end
 
   def h23(time, _n, _locale, _backend, _options) do
