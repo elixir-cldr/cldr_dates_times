@@ -619,6 +619,27 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         @doc """
+        Returns a list of the date_time format IDs that are
+        available in all known locales.
+
+        The format IDs returned by `common_date_time_format_names/0`
+        are guaranteed to be available in all known locales,
+
+        ## Example:
+
+            iex> #{inspect(__MODULE__)}.common_date_time_format_names()
+            [:Bh, :Bhm, :Bhms, :E, :EBhm, :EBhms, :EHm, :EHms, :Ed, :Ehm, :Ehms, :Gy,
+             :GyMMM, :GyMMMEd, :GyMMMd, :GyMd, :H, :Hm, :Hms, :Hmsv, :Hmv, :M, :MEd, :MMM,
+             :MMMEd, :MMMMW, :MMMMd, :MMMd, :Md, :d, :h, :hm, :hms, :hmsv, :hmv, :ms, :y,
+             :yM, :yMEd, :yMMM, :yMMMEd, :yMMMM, :yMMMd, :yMd, :yQQQ, :yQQQQ, :yw]
+
+        """
+        @spec common_date_time_format_names() :: [Format.format_id()]
+        def common_date_time_format_names do
+          Cldr.DateTime.Format.common_date_time_format_names(unquote(backend))
+        end
+
+        @doc """
         Returns the fallback format for a given
         locale and calendar type
 

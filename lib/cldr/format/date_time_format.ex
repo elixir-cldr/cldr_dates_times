@@ -498,7 +498,7 @@ defmodule Cldr.DateTime.Format do
        :yM, :yMEd, :yMMM, :yMMMEd, :yMMMM, :yMMMd, :yMd, :yQQQ, :yQQQQ, :yw]
 
   """
-  @spec common_date_time_format_names(backend :: Cldr.backend()) :: [atom]
+  @spec common_date_time_format_names(backend :: Cldr.backend()) :: [format_id()]
   def common_date_time_format_names(backend \\ Cldr.Date.default_backend()) do
     datetime_module = Module.concat(backend, DateTime.Format)
 

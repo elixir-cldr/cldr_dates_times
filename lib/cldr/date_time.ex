@@ -103,7 +103,8 @@ defmodule Cldr.DateTime do
 
   * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
     any of the keys in the map returned by `Cldr.DateTime.Format.date_time_formats/3`.
-    The default is `:medium`.
+    The default is `:medium`. See [here](README.md#date-time-and-datetime-localization-formats)
+    for more information about specifiying formats.
 
   * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
     this option is used to format the date part of the date time. This option is
@@ -250,7 +251,8 @@ defmodule Cldr.DateTime do
 
   * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
     any of the keys returned by `Cldr.DateTime.Format.date_time_formats/3`.
-    The default is `:medium`.
+    The default is `:medium`. See [here](README.md#date-time-and-datetime-localization-formats)
+    for more information about specifiying formats.
 
   * `:style` is either `:at` or `:default`. When set to `:at` the datetime may
     be formatted with a localised string representing `<date> at <time>` if such

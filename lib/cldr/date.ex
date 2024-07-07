@@ -58,12 +58,13 @@ defmodule Cldr.Date do
 
   ### Options
 
-  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format ID
     or a format string. The default is `:medium` for full dates (that is,
     dates having `:year`, `:month`, `:day` and `:calendar` fields). The
-    default for partial dates is to derive a candidate format id from the date and
+    default for partial dates is to derive a candidate format ID from the date and
     find the best match from the formats returned by
-    `Cldr.Date.available_formats/3`.
+    `Cldr.Date.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
+    for more information about specifiying formats.
 
   * `:locale:` any locale returned by `Cldr.known_locale_names/1`.
     The default is `Cldr.get_locale/0`.
@@ -182,12 +183,13 @@ defmodule Cldr.Date do
 
   ### Options
 
-  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
+  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format ID
     or a format string. The default is `:medium` for full dates (that is,
     dates having `:year`, `:month`, `:day` and `:calendar` fields). The
     default for partial dates is to derive a candidate format from the date and
     find the best match from the formats returned by
-    `Cldr.Date.available_formats/3`.
+    `Cldr.Date.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
+    for more information about specifiying formats.
 
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.

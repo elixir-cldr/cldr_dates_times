@@ -52,7 +52,7 @@ A `backend` module is required that is used to host the functions that manage CL
       default_backend: MyApp.Cldr
     ```
 
-## Usage Introduction
+## Introduction
 
 `ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
 
@@ -83,11 +83,11 @@ iex> h MyApp.Cldr.DateTime.to_string
 iex> h MyApp.Cldr.DateTime.Relative.to_string
 ```
 
-## Date, Time and DateTime Localization Formatting
+## Date, Time and DateTime Localization Formats
 
-Dates, Times and DateTimes can be formatted using:
+Dates, Times and DateTimes can be formatted using standard formats, format strings or format IDs.
 
-* The format types defined for each locale.  These format types provide cross-locale standardisation and therefore should be preferred where possible.  The format types, implemented for `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`,`MyApp.Cldr.DateTime.to_string/2` are `:short`, `:medium`, `:long`  and `:full`.   The default is `:medium`. For example, assuming a configured backend called `MyApp.Cldr`:
+* Standard formats provide cross-locale standardisation and therefore should be preferred where possible.  The format types, implemented for `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`,`MyApp.Cldr.DateTime.to_string/2` are `:short`, `:medium`, `:long`  and `:full`.   The default is `:medium`. For example, assuming a configured backend called `MyApp.Cldr`:
 
     ```elixir
     iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: :short
@@ -103,17 +103,17 @@ Dates, Times and DateTimes can be formatted using:
     {:ok, "30 mai 2020 à 03:52:56 UTC"}
     ```
 
-* A user specified format string.  A format string uses one or more formatting symbols to define what date and time elements should be places in the format.  A simple example to format the time into hours and minutes:
+* Format strings use one or more formatting symbols to define what date and time elements should be places in the format.  A simple example to format the time into hours and minutes:
 
     ```elixir
     iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: "hh:mm"
     {:ok, "03:52"}
     ```
 
-* For `DateTime`s there is also a set of predefined format name.  These format names are returned by `MyApp.Cldr.DateTime.Format.date_time_available_formats/0` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `Cldr.DateTime.Format.common_date_time_format_names`.  These format names can be used with the `:format` parameter to `Cldr.DateTime.to_string/2` module only.
+* Format IDs are an atom that is a key into a map of formats defined by CLDR. These format IDs are returned by `MyApp.Cldr.DateTime.Format.date_time_available_formats/2` (assuming your backend is `MyApp.Cldr`).  The set of common format names across all locales configured in `ex_cldr` can be returned by `MyApp.Cldr.DateTime.Format.common_date_time_format_names/0`.
 
     ```elixir
-    iex> MyApp.Cldr.DateTime.Format.date_time_available_formats
+    iex> MyApp.Cldr.DateTime.Format.date_time_available_formats()
     %{mmmm_w_count_one: "'week' W 'of' MMMM", gy_mmm: "MMM y G", md: "M/d",
     mmm_md: "MMMM d", e_hms: "E HH:mm:ss", ed: "d E", y_mmm: "MMM y",
     e_hm: "E HH:mm", mmm_ed: "E, MMM d", y_mmm_ed: "E, MMM d, y",
@@ -128,7 +128,7 @@ Dates, Times and DateTimes can be formatted using:
 
     # These format types can be invoked for any locale - meaning
     # these format names are defined for all configured locales.
-    iex> Cldr.DateTime.Format.common_date_time_format_names(MyApp.Cldr)
+    iex> MyApp.Cldr.DateTime.Format.common_date_time_format_names()
     [:gy_mmm, :md, :mmm_md, :e_hms, :ed, :y_mmm, :e_hm, :mmm_ed, :y_mmm_ed,
     :gy_mm_md, :mmm, :y_md, :gy, :hms, :hm, :y_mmmm, :m, :gy_mmm_ed, :y_qqq, :e,
     :y_qqqq, :hmsv, :mmmm_w_count_other, :ehm, :y_m_ed, :h, :hmv, :yw_count_other,
@@ -136,6 +136,12 @@ Dates, Times and DateTimes can be formatted using:
 
     iex> Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, format: :gy_mmm_ed
     {:ok, "Sat, May 30, 2020 AD"}
+
+    iex(2)> Cldr.Time.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, format: :hm
+    {:ok, "3:52 AM"}
+
+    iex(3)> Cldr.Date.to_string ~U[2020-05-30 03:52:56Z], MyApp.Cldr, format: :yMd
+    {:ok, "5/30/2020"}
     ```
 
 ## Format strings

@@ -4,7 +4,7 @@
 
 ## Cldr_Dates_Times v2.19.0
 
-This is the changelog for Cldr_Dates_Times v2.19.0 released on _____, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.19.0 released on Jult 8th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Bug Fixes
 
@@ -16,9 +16,15 @@ This is the changelog for Cldr_Dates_Times v2.19.0 released on _____, 2024.  For
 
 * Adds support for partial dates in `Cldr.Date.to_string/2`. Partial dates are maps with one or more of the fields `:year`, `:month`, `:day` and `:calendar`.
 
-* Adds support for deriving the "best match" format for a date based upon the users requested format or deriving from the available date fields.
+* Adds support for partial time in `Cldr.Time.to_string/2`. Partial times are maps with one or more of the fields `:hour`, `:minute`, and `:second`.
+
+* Adds support for partial datetimes in `Cldr.DateTime.to_string/2`. Partial datetimes are maps with one or more of the fields `:year`, `:month`, `:day`, `:hour`, `:minute`, `:second` and `:calendar`.
+
+* Adds support for deriving the "best match" format for a date, time or datetime based upon the users requested format or deriving from the available date, time or datetime fields.
 
 * Adds support for formatting using format IDs (atoms that are keys to locale-independent formats) in `Cldr.Date.to_string/2` and `Cldr.Time.to_string/2`. They have been previously supported in `Cldr.DateTime.to_string/2` only.
+
+* Add `MyApp.Cldr.DateTime.Format.common_date_time_format_names/0`.
 
 * Improve the error message if `:hour` is outside the valid range.
 

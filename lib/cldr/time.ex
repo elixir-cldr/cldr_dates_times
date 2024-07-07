@@ -78,7 +78,8 @@ defmodule Cldr.Time do
     times having `:hour`, `:minute` and `:second` fields). The
     default for partial times is to derive a candidate format from the time and
     find the best match from the formats returned by
-    `Cldr.Time.available_formats/3`.
+    `Cldr.Time.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
+    for more information about specifiying formats.
 
   * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is
     `Cldr.get_locale/0`.
@@ -194,7 +195,8 @@ defmodule Cldr.Time do
     times having `:hour`, `:minute` and `:second` fields). The
     default for partial times is to derive a candidate format from the time and
     find the best match from the formats returned by
-    `Cldr.Time.available_formats/3`.
+    `Cldr.Time.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
+    for more information about specifiying formats.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
