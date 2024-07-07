@@ -196,18 +196,14 @@ defmodule Cldr.DateTime do
 
   def to_string(%{} = datetime, backend, options)
       when is_atom(backend) and is_list(options) and has_date_and_time(datetime) do
-    options = normalize_options(datetime, backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
-    format = options.format
 
-    calendar = Map.get(datetime, :calendar, Cldr.Calendar.Gregorian)
-    datetime = Map.put_new(datetime, :calendar, calendar)
-
-    with {:ok, locale} <- Cldr.validate_locale(options.locale, backend),
-         {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
+    with {:ok, datetime, options} <- normalize_options(datetime, backend, options),
+         {:ok, locale} <- Cldr.validate_locale(options.locale, backend),
+         {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(datetime.calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, options.number_system, backend),
          {:ok, format, options} <-
-           find_format(datetime, format, locale, cldr_calendar, backend, options),
+           find_format(datetime, options.format, locale, cldr_calendar, backend, options),
          {:ok, format} <- apply_unicode_or_ascii_preference(format, options.prefer),
          {:ok, format_string} <- resolve_plural_format(format, datetime, backend, options) do
       format_backend.format(datetime, format_string, locale, options)
@@ -325,22 +321,31 @@ defmodule Cldr.DateTime do
     {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
 
+    calendar = Map.get(datetime, :calendar, Cldr.Calendar.Gregorian)
+    datetime = Map.put_new(datetime, :calendar, calendar)
+
     {format, date_format, time_format} =
       formats_from_options(datetime, nil, nil, nil, @default_format_type)
 
-    %{
-      locale: locale,
-      number_system: number_system,
-      format: format,
-      date_format: date_format,
-      time_format: time_format,
-      style: @default_style,
-      prefer: @default_prefer
-    }
+    options =
+      %{
+        locale: locale,
+        number_system: number_system,
+        format: format,
+        date_format: date_format,
+        time_format: time_format,
+        style: @default_style,
+        prefer: @default_prefer
+      }
+
+    {:ok, datetime, options}
   end
 
   defp normalize_options(datetime, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+
+    calendar = Map.get(datetime, :calendar, Cldr.Calendar.Gregorian)
+    datetime = Map.put_new(datetime, :calendar, calendar)
 
     style = options[:style] || @default_style
     prefer = options[:prefer] || @default_prefer
@@ -355,15 +360,44 @@ defmodule Cldr.DateTime do
     {format, date_format, time_format} =
       formats_from_options(datetime, format, date_format, time_format, @default_format_type)
 
-    options
-    |> Map.new()
-    |> Map.put(:locale, locale)
-    |> Map.put(:format, format)
-    |> Map.put(:date_format, date_format)
-    |> Map.put(:time_format, time_format)
-    |> Map.put(:style, style)
-    |> Map.put(:prefer, prefer)
-    |> Map.put(:number_system, number_system)
+    with :ok <- validate_formats_consistent(format, date_format, time_format) do
+      options =
+        options
+        |> Map.new()
+        |> Map.put(:locale, locale)
+        |> Map.put(:format, format)
+        |> Map.put(:date_format, date_format)
+        |> Map.put(:time_format, time_format)
+        |> Map.put(:style, style)
+        |> Map.put(:prefer, prefer)
+        |> Map.put(:number_system, number_system)
+
+      {:ok, datetime, options}
+    end
+  end
+
+  defp validate_formats_consistent(format, nil = _date_format, nil = _time_format)
+      when is_atom(format) or is_binary(format) do
+    :ok
+  end
+
+  defp validate_formats_consistent(nil, date_format, time_format)
+      when not is_nil(date_format) and not is_nil(time_format) do
+    :ok
+  end
+
+  defp validate_formats_consistent(format, date_format, time_format)
+      when format in @format_types and date_format in @format_types and time_format in @format_types do
+    :ok
+  end
+
+  defp validate_formats_consistent(format, date_format, time_format)
+      when is_atom(format) or is_binary(format) do
+    {:error, {Cldr.DateTime.InvalidFormat,
+      ":date_format and :time_format cannot be specified if :format is also specified as " <>
+      "a format id or a format string. Found [time_format: #{inspect time_format}, " <>
+      "date_format: #{inspect date_format}]"
+      }}
   end
 
   # Returns the CLDR calendar type for a calendar
