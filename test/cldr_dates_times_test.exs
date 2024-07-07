@@ -134,4 +134,31 @@ defmodule Cldr.DatesTimes.Test do
                ":date_format and :time_format cannot be specified if :format is also specified as a " <>
                  "format id or a format string. Found [time_format: :medium, date_format: :short]"}}
   end
+
+  test "Pluralized formats" do
+    datetime = ~U[2024-07-07 21:36:00.440105Z]
+
+    assert {:ok, "week 28 of 2024"} = Cldr.DateTime.to_string(~D[2024-07-08], format: :yw)
+    assert {:ok, "week 2 of July"} = Cldr.DateTime.to_string(~D[2024-07-08], format: :MMMMW)
+    assert {:ok, "8:11 AM"} = Cldr.DateTime.to_string(~T[08:11:02], format: :hm)
+    assert {:ok, "Sun 9:36 PM"} = Cldr.DateTime.to_string(datetime, format: :Ehm)
+  end
+
+  test "Unicode or ASCII preference" do
+    datetime = ~U[2024-07-07 21:36:00.440105Z]
+
+    unicode = Cldr.DateTime.to_string(datetime, format: :Ehm, prefer: :unicode)
+    ascii = Cldr.DateTime.to_string(datetime, format: :Ehm, prefer: :ascii)
+    assert unicode != ascii
+  end
+
+  test "'at' formats" do
+    datetime = ~U[2024-07-07 21:36:00.440105Z]
+
+    assert {:ok, "July 7, 2024 at 9:36:00 PM UTC"} =
+      Cldr.DateTime.to_string(datetime, format: :long, style: :at)
+
+    assert {:ok, "July 7, 2024, 9:36:00 PM UTC"} =
+      Cldr.DateTime.to_string(datetime, format: :long, style: :default)
+  end
 end

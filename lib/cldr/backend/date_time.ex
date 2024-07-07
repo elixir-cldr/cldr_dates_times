@@ -38,9 +38,9 @@ defmodule Cldr.DateAndTime.Backend do
           `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
           then the time format is defined by the `:format` option.
 
-        * `:style` is either `:at` or `:default`. When set to `:at` the datetime is
-          formatted with a localised string representing `<date> at <time>`. See
-          `Cldr.DateTime.Format.date_time_at_formats/2`.
+        * `:style` is either `:at` or `:default`. When set to `:at` the datetime may
+          be formatted with a localised string representing `<date> at <time>` if such
+          a format exists. See `Cldr.DateTime.Format.date_time_at_formats/2`.
 
         * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
           formats have two variants - one using Unicode spaces (typically non-breaking space) and
@@ -124,9 +124,9 @@ defmodule Cldr.DateAndTime.Backend do
           `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
           then the time format is defined by the `:format` option.
 
-        * `:style` is either `:at` or `:default`. When set to `:at` the datetime is
-          formatted with a localised string representing `<date> at <time>`. See
-          `Cldr.DateTime.Format.date_time_at_formats/2`.
+        * `:style` is either `:at` or `:default`. When set to `:at` the datetime may
+          be formatted with a localised string representing `<date> at <time>` if such
+          a format exists. See `Cldr.DateTime.Format.date_time_at_formats/2`.
 
         * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
           formats have two variants - one using Unicode spaces (typically non-breaking space) and
@@ -152,7 +152,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         * `formatted_datetime` or
 
-        * raises an exception
+        * raises an exception.
 
         ## Examples
 
