@@ -247,7 +247,7 @@ defmodule Cldr.DateAndTime.Backend do
             # CLDR defined format.
             iex> #{inspect(__MODULE__)}.to_string(%{year: 2024, day: 3}, locale: "fr")
             {:error,
-             {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"dy\\""}}
+             {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :dy"}}
 
         """
         @spec to_string(Cldr.Calendar.any_date_time(), Keyword.t()) ::
@@ -408,7 +408,7 @@ defmodule Cldr.DateAndTime.Backend do
             # CLDR defined format.
             iex> #{inspect(__MODULE__)}.to_string(%{minute: 11})
             {:error,
-             {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"m\\""}}
+             {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :m"}}
 
         """
         @spec to_string(Cldr.Calendar.any_date_time(), Keyword.t()) ::

@@ -118,7 +118,7 @@ defmodule Cldr.Date do
       # CLDR-defined format.
       iex> Cldr.Date.to_string(%{year: 2024, day: 3}, MyApp.Cldr, locale: "fr")
       {:error,
-       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"dy\\""}}
+       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :dy"}}
 
   """
   @spec to_string(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
@@ -464,9 +464,7 @@ defmodule Cldr.Date do
     if Map.has_key?(available_formats, format) do
       Map.fetch(available_formats, format)
     else
-      with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend) do
-        {:ok, Map.fetch!(available_formats, match)}
-      end
+      resolve_format(format, available_formats, locale, calendar, backend)
     end
   end
 
@@ -476,6 +474,20 @@ defmodule Cldr.Date do
   def find_format(_date, format_string, _locale, _calendar, _backend)
        when is_binary(format_string) do
     {:ok, format_string}
+  end
+
+  @doc false
+  def resolve_format(format, available_formats, locale, calendar, backend) do
+    with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend),
+         {:ok, format} <- Map.fetch(available_formats, match) do
+      {:ok, format}
+    else
+      :error ->
+        {:error, Cldr.DateTime.Format.no_format_resolved_error(format)}
+
+      other ->
+        other
+    end
   end
 
   defp error_return(map, requirements) do

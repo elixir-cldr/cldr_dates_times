@@ -632,13 +632,13 @@ defmodule Cldr.DateTime.Format do
         ) :: {:ok, format_id()} | {:error, {module(), String.t()}}
 
   def best_match(
-        skeleton,
+        original_skeleton,
         locale \\ Cldr.get_locale(),
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
         backend \\ Cldr.Date.default_backend()
       ) do
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
-         skeleton = to_string(skeleton),
+         skeleton = to_string(original_skeleton),
          {:ok, skeleton} <- put_preferred_time_symbols(skeleton, locale),
          {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton) do
       # match_with_day_periods? =
@@ -663,16 +663,20 @@ defmodule Cldr.DateTime.Format do
 
       case candidates do
         [] ->
-          {:error,
-           {
-             Cldr.DateTime.UnresolvedFormat,
-             "No available format resolved for #{inspect(skeleton)}"
-           }}
+          {:error, no_format_resolved_error(original_skeleton)}
 
         [{format_id, _} | _rest] ->
           {:ok, format_id}
       end
     end
+  end
+
+  @doc false
+  def no_format_resolved_error(skeleton) do
+    {
+      Cldr.DateTime.UnresolvedFormat,
+      "No available format resolved for #{inspect(skeleton)}"
+    }
   end
 
   # https://www.unicode.org/reports/tr35/tr35-dates.html#Matching_Skeletons
@@ -785,6 +789,9 @@ defmodule Cldr.DateTime.Format do
         when different_but_compatible({symbol_a, count_a}, {symbol_b, count_b}) and
                different_types({symbol_a, count_a}, {symbol_b, count_b}) ->
           acc + abs(count_a - count_b) + 10
+
+        _other_a, _other_b, acc ->
+          acc + 10
       end)
 
     {token_id, distance}

@@ -15,7 +15,7 @@ defmodule Cldr.DateTime.PartialTest do
 
     assert Cldr.Date.to_string(%{year: 3, day: 5}) ==
       {:error,
-       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \"dy\""}}
+       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :dy"}}
   end
 
   test "Partial Times" do
@@ -43,7 +43,7 @@ defmodule Cldr.DateTime.PartialTest do
 
     assert Cldr.Time.to_string(%{hour: 23, second: 45}) ==
       {:error,
-        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \"sh\""}}
+        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :sh"}}
 
     assert Cldr.Time.to_string(%{hour: 23, second: 45}, format: "h:m:s") ==
       {:error,
@@ -58,7 +58,7 @@ defmodule Cldr.DateTime.PartialTest do
 
     assert Cldr.DateTime.to_string(%{year: 2024, minute: 10}) ==
       {:error,
-        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \"m\""}}
+        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :m"}}
 
   end
 

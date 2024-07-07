@@ -125,7 +125,7 @@ defmodule Cldr.Time do
       # CLDR-defined format.
       iex> Cldr.Time.to_string(%{minute: 11})
       {:error,
-       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"m\\""}}
+       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :m"}}
 
   """
   @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
@@ -347,9 +347,7 @@ defmodule Cldr.Time do
     if Map.has_key?(available_formats, format) do
       Map.fetch(available_formats, format)
     else
-      with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend) do
-        {:ok, Map.fetch!(available_formats, match)}
-      end
+      resolve_format(format, available_formats, locale, calendar, backend)
     end
   end
 
@@ -360,6 +358,9 @@ defmodule Cldr.Time do
        when is_binary(format_string) do
     {:ok, format_string}
   end
+
+  @doc false
+  defdelegate resolve_format(format, available_formats, locale, calendar, backend), to: Cldr.Date
 
   @doc """
   Returns a map of the standard time formats for a given
