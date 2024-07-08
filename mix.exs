@@ -89,6 +89,7 @@ defmodule Cldr.DatesTimes.Mixfile do
       files: [
         "lib",
         "src/date_time_format_lexer.xrl",
+        "src/skeleton_tokenizer.xrl",
         "config",
         "mix.exs",
         "README*",
