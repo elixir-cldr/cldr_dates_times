@@ -9,7 +9,7 @@ defmodule Cldr.Date do
   [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars).
 
   CLDR provides standard format strings for `t:Date.t/0` which
-  are reresented by the formats `:short`, `:medium`, `:long`
+  are represented by the formats `:short`, `:medium`, `:long`
   and `:full`.  This abstraction allows for locale-independent
   formatting since each locale and calendar may define the underlying
   format string as appropriate.

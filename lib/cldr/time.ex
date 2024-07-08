@@ -11,7 +11,7 @@ defmodule Cldr.Time do
   [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars)
 
   CLDR provides standard format strings for `Time` which
-  are reresented by the names `:short`, `:medium`, `:long`
+  are represented by the names `:short`, `:medium`, `:long`
   and `:full`.  This allows for locale-independent
   formatting since each locale may define the underlying
   format string as appropriate.
