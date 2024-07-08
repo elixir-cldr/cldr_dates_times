@@ -2,9 +2,17 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.19.1
+
+This is the changelog for Cldr_Dates_Times v2.19.1 released on July 8th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Include `:skeleton_tokenizer.xrl` to the hex package definition. 
+
 ## Cldr_Dates_Times v2.19.0
 
-This is the changelog for Cldr_Dates_Times v2.19.0 released on Jult 8th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.19.0 released on July 8th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Bug Fixes
 
