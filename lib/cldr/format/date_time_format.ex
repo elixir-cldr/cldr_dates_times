@@ -181,6 +181,56 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
+  Returns a map of the standard date formats for a given
+  locale and calendar.
+
+  ### Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+    The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  ### Examples:
+
+      iex> Cldr.DateTime.Format.date_formats(:en, :gregorian, MyApp.Cldr)
+      {:ok, %Cldr.Date.Formats{
+        full: "EEEE, MMMM d, y",
+        long: "MMMM d, y",
+        medium: "MMM d, y",
+        short: "M/d/yy"
+      }}
+
+      iex> Cldr.DateTime.Format.date_formats(:en, :buddhist, MyApp.Cldr)
+      {:ok, %Cldr.Date.Formats{
+        full: "EEEE, MMMM d, y G",
+        long: "MMMM d, y G",
+        medium: "MMM d, y G",
+        short: "M/d/y GGGGG"
+      }}
+
+  """
+  @spec date_formats(
+          Locale.locale_reference(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) ::
+          {:ok, Cldr.DateTime.Format.standard_formats()} | {:error, {atom, String.t()}}
+
+  def date_formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_formats(locale, calendar)
+  end
+
+  @doc """
   Returns a map of the standard time formats for a given locale and calendar.
 
   ## Arguments

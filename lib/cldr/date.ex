@@ -348,8 +348,7 @@ defmodule Cldr.Date do
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
         backend \\ Cldr.Date.default_backend()
       ) do
-    backend = Module.concat(backend, DateTime.Format)
-    backend.date_formats(locale, calendar)
+    Cldr.DateTime.Format.date_formats(locale, calendar, backend)
   end
 
   @doc """

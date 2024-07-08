@@ -15,6 +15,16 @@ defmodule Cldr.DatesTimes.Dialyzer do
     {:ok, %{medium: _format_dt}} = MyApp.Cldr.DateTime.Format.time_formats(:en)
   end
 
+  def formats do
+    {:ok, _} = Cldr.Date.formats()
+    {:ok, _} = Cldr.Time.formats()
+    {:ok, _} = Cldr.DateTime.formats()
+
+    {:ok, _} = Cldr.Date.available_formats()
+    {:ok, _} = Cldr.Time.available_formats()
+    {:ok, _} = Cldr.DateTime.available_formats()
+  end
+
   def format do
     _ = Cldr.DateTime.Format.calendars_for(:en, MyApp.Cldr)
     _ = Cldr.DateTime.Format.calendars_for("en", MyApp.Cldr)

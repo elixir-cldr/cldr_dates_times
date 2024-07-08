@@ -2,6 +2,14 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.19.2
+
+This is the changelog for Cldr_Dates_Times v2.19.2 released on July 9th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Reinstate `Cldr.DateTime.Format.date_formats/3` which was incorrectly removed in version 2.19. Version 2.19 made efforts to improve the symmetry of `Cldr.Date`, `Cldr.Time` and `Cldr.DateTime`. Part of that work is to have each of those modules contain the functions `formats/3` and `available_formats/3`. It was not intended at this time that the equivalent functions be removed from `Cldr.DateTime.Format`. Thanks to @tjchambers for the report. Closes #51.
+
 ## Cldr_Dates_Times v2.19.1
 
 This is the changelog for Cldr_Dates_Times v2.19.1 released on July 8th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

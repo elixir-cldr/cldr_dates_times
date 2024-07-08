@@ -161,4 +161,14 @@ defmodule Cldr.DatesTimes.Test do
     assert {:ok, "July 7, 2024, 9:36:00 PM UTC"} =
       Cldr.DateTime.to_string(datetime, format: :long, style: :default)
   end
+
+  test "Symmetry of the format/3 and available_format/3 functions for Date, Time and DateTime" do
+    assert {:ok, _} = Cldr.Date.formats()
+    assert {:ok, _} = Cldr.Time.formats()
+    assert {:ok, _} = Cldr.DateTime.formats()
+
+    assert {:ok, _} = Cldr.Date.available_formats()
+    assert {:ok, _} = Cldr.Time.available_formats()
+    assert {:ok, _} = Cldr.DateTime.available_formats()
+  end
 end
