@@ -3,7 +3,7 @@ defmodule Cldr.DateTime do
   Provides localization and formatting of a datetime.
 
   A date time is any `t:DateTime.t/0` or `t:NaiveDateTime.t/0`
-  struct or aor any map that contains one or more of the keys `:year`, `:month`, `:day`,
+  struct or any map that contains one or more of the keys `:year`, `:month`, `:day`,
   `:hour`, `:minute` and `:second` or `:microsecond` with optional `:time_zone`, `:zone_abbr`,
   `:utc_offset`, `:std_offset` and `:calendar` fields.
 
