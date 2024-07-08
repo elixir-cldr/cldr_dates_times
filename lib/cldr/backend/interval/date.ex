@@ -57,7 +57,7 @@ defmodule Cldr.Date.Interval.Backend do
           specific format type or a string representing of an interval
           format. The default is `:medium`.
 
-        * `:style` supports dfferent formatting styles. The
+        * `:style` supports different formatting styles. The
           alternatives are `:date`, `:month_and_day`, `:month`
           and `:year_and_month`. The default is `:date`.
 
@@ -171,7 +171,7 @@ defmodule Cldr.Date.Interval.Backend do
           specific format type or a string representing of an interval
           format. The default is `:medium`.
 
-        * `:style` supports dfferent formatting styles. The
+        * `:style` supports different formatting styles. The
           alternatives are `:date`, `:month_and_day`, `:month`
           and `:year_and_month`. The default is `:date`.
 
@@ -276,7 +276,7 @@ defmodule Cldr.Date.Interval.Backend do
           specific format type or a string representing of an interval
           format. The default is `:medium`.
 
-        * `:style` supports dfferent formatting styles. The
+        * `:style` supports different formatting styles. The
           alternatives are `:date`, `:month_and_day`, `:month`
           and `:year_and_month`. The default is `:date`.
 
@@ -387,7 +387,7 @@ defmodule Cldr.Date.Interval.Backend do
           specific format type or a string representing of an interval
           format. The default is `:medium`.
 
-        * `:style` supports dfferent formatting styles. The
+        * `:style` supports different formatting styles. The
           alternatives are `:date`, `:month_and_day`, `:month`
           and `:year_and_month`. The default is `:date`.
 

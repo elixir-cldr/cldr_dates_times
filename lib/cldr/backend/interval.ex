@@ -55,7 +55,7 @@ defmodule Cldr.Interval.Backend do
           specific format type or a string representing of an interval
           format. The default is `:medium`.
 
-        * `:style` supports dfferent formatting styles. The valid
+        * `:style` supports different formatting styles. The valid
           styles depends on whether formatting is for a date, time or datetime.
           Since the functions in this module will make a determination as
           to which formatter to be used based upon the data passed to them
@@ -166,7 +166,7 @@ defmodule Cldr.Interval.Backend do
           specific format type or a string representing of an interval
           format. The default is `:medium`.
 
-        * `:style` supports dfferent formatting styles. The valid
+        * `:style` supports different formatting styles. The valid
           styles depends on whether formatting is for a date, time or datetime.
           Since the functions in this module will make a determination as
           to which formatter to be used based upon the data passed to them
@@ -297,7 +297,7 @@ defmodule Cldr.Interval.Backend do
           specific format type or a string representing of an interval
           format. The default is `:medium`.
 
-        * `:style` supports dfferent formatting styles. The valid
+        * `:style` supports different formatting styles. The valid
           styles depends on whether formatting is for a date, time or datetime.
           Since the functions in this module will make a determination as
           to which formatter to be used based upon the data passed to them
@@ -409,7 +409,7 @@ defmodule Cldr.Interval.Backend do
           specific format type or a string representing of an interval
           format. The default is `:medium`.
 
-        * `:style` supports dfferent formatting styles. The valid
+        * `:style` supports different formatting styles. The valid
           styles depends on whether formatting is for a date, time or datetime.
           Since the functions in this module will make a determination as
           to which formatter to be used based upon the data passed to them
