@@ -191,7 +191,7 @@ defmodule Cldr.Interval do
 
   If there is a requirement for repeated use of format strings
   then they can be configured in the backend module so that they are
-  precompiled and therefore not suffer a runtime performance penaly.
+  precompiled and therefore not suffer a runtime performance penalty.
 
   In a backend module, configure the required formats as a list under the
   `:precompile_interval_formats` key:
