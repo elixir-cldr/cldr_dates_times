@@ -56,7 +56,7 @@ A `backend` module is required that is used to host the functions that manage CL
 
 `ex_cldr_dates_times` is an addon library application for [ex_cldr](https://hex.pm/packages/ex_cldr) that provides localisation and formatting for dates, times and date_times.
 
-The primary api is `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`, `MyApp.Cldr.DateTime.to_string/2` and `MyApp.Cldr.DateTime.Relative.to_string/2`.  In the following examples `MyApp` refers to a CLDR backend module that must be defined by the developer:
+The primary API is `MyApp.Cldr.Date.to_string/2`, `MyApp.Cldr.Time.to_string/2`, `MyApp.Cldr.DateTime.to_string/2` and `MyApp.Cldr.DateTime.Relative.to_string/2`.  In the following examples `MyApp` refers to a CLDR backend module that must be defined by the developer:
 
 ```elixir
 iex> MyApp.Cldr.Date.to_string ~D[2020-05-30]
@@ -103,7 +103,7 @@ Dates, Times and DateTimes can be formatted using standard formats, format strin
     {:ok, "30 mai 2020 à 03:52:56 UTC"}
     ```
 
-* Format strings use one or more formatting symbols to define what date and time elements should be places in the format.  A simple example to format the time into hours and minutes:
+* Format strings use one or more formatting symbols to define what date and time elements should be placed in the format.  A simple example to format the time into hours and minutes:
 
     ```elixir
     iex> MyApp.Cldr.DateTime.to_string ~U[2020-05-30 03:52:56Z], format: "hh:mm"
@@ -148,7 +148,7 @@ Dates, Times and DateTimes can be formatted using standard formats, format strin
 
 The [CLDR standard](http://unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
 defines a wide range of format symbols.  Most - but not all - of these symbols are supported in
-`Cldr`.  The supported  symbols are described below.  Note the [known restrictions and limitations](#known-restrictions-and-limitations).
+`Cldr`.  The supported symbols are described below.  Note the [known restrictions and limitations](#known-restrictions-and-limitations).
 
 | Element                | Symbol     | Example         | Cldr Format                        |
 | :--------------------  | :--------  | :-------------- | :--------------------------------- |
