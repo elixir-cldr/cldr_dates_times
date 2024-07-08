@@ -191,7 +191,7 @@ defmodule Cldr.Interval do
 
   If there is a requirement for repeated use of format strings
   then they can be configured in the backend module so that they are
-  precompiled and therefore not suffer a runtime performance penaly.
+  precompiled and therefore not suffer a runtime performance penalty.
 
   In a backend module, configure the required formats as a list under the
   `:precompile_interval_formats` key:
@@ -330,7 +330,7 @@ defmodule Cldr.Interval do
     specific format type or a string representing of an interval
     format. The default is `:medium`.
 
-  * `:style` supports dfferent formatting styles. The valid
+  * `:style` supports different formatting styles. The valid
     styles depends on whether formatting is for a date, time or datetime.
     Since the functions in this module will make a determination as
     to which formatter to be used based upon the data passed to them
@@ -462,7 +462,7 @@ defmodule Cldr.Interval do
     specific format type or a string representing of an interval
     format. The default is `:medium`.
 
-  * `:style` supports dfferent formatting styles. The valid
+  * `:style` supports different formatting styles. The valid
     styles depends on whether formatting is for a date, time or datetime.
     Since the functions in this module will make a determination as
     to which formatter to be used based upon the data passed to them
@@ -615,7 +615,7 @@ defmodule Cldr.Interval do
     specific format type or a string representing of an interval
     format. The default is `:medium`.
 
-  * `:style` supports dfferent formatting styles. The valid
+  * `:style` supports different formatting styles. The valid
     styles depends on whether formatting is for a date, time or datetime.
     Since the functions in this module will make a determination as
     to which formatter to be used based upon the data passed to them
@@ -735,7 +735,7 @@ defmodule Cldr.Interval do
     specific format type or a string representing of an interval
     format. The default is `:medium`.
 
-  * `:style` supports dfferent formatting styles. The valid
+  * `:style` supports different formatting styles. The valid
     styles depends on whether formatting is for a date, time or datetime.
     Since the functions in this module will make a determination as
     to which formatter to be used based upon the data passed to them

@@ -160,7 +160,7 @@ defmodule Cldr.Time.Interval do
     specific format type or a string representing of an interval
     format. The default is `:medium`.
 
-  * `:style` supports dfferent formatting styles. The
+  * `:style` supports different formatting styles. The
     alternatives are `:time`, `:zone`,
     and `:flex`. The default is `:time`.
 
@@ -328,7 +328,7 @@ defmodule Cldr.Time.Interval do
     specific format type or a string representing of an interval
     format. The default is `:medium`.
 
-  * `:style` supports dfferent formatting styles. The
+  * `:style` supports different formatting styles. The
     alternatives are `:time`, `:zone`,
     and `:flex`. The default is `:time`.
 

@@ -9,7 +9,7 @@ defmodule Cldr.Date do
   [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars).
 
   CLDR provides standard format strings for `t:Date.t/0` which
-  are reresented by the formats `:short`, `:medium`, `:long`
+  are represented by the formats `:short`, `:medium`, `:long`
   and `:full`.  This abstraction allows for locale-independent
   formatting since each locale and calendar may define the underlying
   format string as appropriate.
@@ -64,7 +64,7 @@ defmodule Cldr.Date do
     default for partial dates is to derive a candidate format ID from the date and
     find the best match from the formats returned by
     `Cldr.Date.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
-    for more information about specifiying formats.
+    for more information about specifying formats.
 
   * `:locale:` any locale returned by `Cldr.known_locale_names/1`.
     The default is `Cldr.get_locale/0`.
@@ -189,7 +189,7 @@ defmodule Cldr.Date do
     default for partial dates is to derive a candidate format from the date and
     find the best match from the formats returned by
     `Cldr.Date.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
-    for more information about specifiying formats.
+    for more information about specifying formats.
 
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.

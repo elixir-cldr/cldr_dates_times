@@ -11,7 +11,7 @@ defmodule Cldr.Time do
   [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars)
 
   CLDR provides standard format strings for `Time` which
-  are reresented by the names `:short`, `:medium`, `:long`
+  are represented by the names `:short`, `:medium`, `:long`
   and `:full`.  This allows for locale-independent
   formatting since each locale may define the underlying
   format string as appropriate.
@@ -79,7 +79,7 @@ defmodule Cldr.Time do
     default for partial times is to derive a candidate format from the time and
     find the best match from the formats returned by
     `Cldr.Time.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
-    for more information about specifiying formats.
+    for more information about specifying formats.
 
   * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is
     `Cldr.get_locale/0`.
@@ -196,7 +196,7 @@ defmodule Cldr.Time do
     default for partial times is to derive a candidate format from the time and
     find the best match from the formats returned by
     `Cldr.Time.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
-    for more information about specifiying formats.
+    for more information about specifying formats.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
