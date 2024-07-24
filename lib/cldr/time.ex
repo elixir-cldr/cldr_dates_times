@@ -22,7 +22,7 @@ defmodule Cldr.Time do
   alias Cldr.Locale
 
   import Cldr.DateTime,
-    only: [resolve_plural_format: 4, apply_unicode_or_ascii_preference: 2]
+    only: [resolve_plural_format: 4, apply_preference: 2]
 
   @format_types [:short, :medium, :long, :full]
   @default_format_type :medium
@@ -155,12 +155,13 @@ defmodule Cldr.Time do
 
     locale = options.locale
     format = options.format
+    prefer = List.wrap(options.prefer)
 
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, format} <- find_format(time, format, locale, cldr_calendar, backend),
-         {:ok, format} <- apply_unicode_or_ascii_preference(format, options.prefer),
+         {:ok, format} <- apply_preference(format, prefer),
          {:ok, format_string} <- resolve_plural_format(format, time, backend, options) do
       format_backend.format(time, format_string, locale, options)
     end
@@ -265,16 +266,17 @@ defmodule Cldr.Time do
   defp normalize_options(time, backend, []) do
     {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
-    format = format_from_options(time, nil, @default_format_type, @default_prefer)
+    default_prefer = List.wrap(@default_prefer)
+    format = format_from_options(time, nil, @default_format_type, default_prefer)
 
-    %{locale: locale, number_system: number_system, format: format, prefer: @default_prefer}
+    %{locale: locale, number_system: number_system, format: format, prefer: default_prefer}
   end
 
   defp normalize_options(time, backend, options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
-    prefer = Keyword.get(options, :prefer, @default_prefer)
+    prefer = Keyword.get(options, :prefer, @default_prefer) |> List.wrap()
     format_option = options[:time_format] || options[:format] || options[:style]
     format = format_from_options(time, format_option, @default_format_type, prefer)
 
@@ -299,7 +301,7 @@ defmodule Cldr.Time do
 
   # If a format is requested, use it
   defp format_from_options(_time, format, _default_format, prefer) do
-    {:ok, format} = apply_unicode_or_ascii_preference(format, prefer)
+    {:ok, format} = apply_preference(format, prefer)
     format
   end
 

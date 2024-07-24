@@ -10,6 +10,7 @@ defmodule Cldr.Date.Interval do
   """
   alias Cldr.DateTime.Format
   import Cldr.Calendar, only: [date: 0]
+  import Cldr.DateTime, only: [apply_preference: 2]
 
   # Date styles not defined
   # by a grouping but can still
@@ -64,6 +65,7 @@ defmodule Cldr.Date.Interval do
 
   @default_format :medium
   @default_style :date
+  @default_prefer :default
 
   def styles do
     @style_map
@@ -384,6 +386,7 @@ defmodule Cldr.Date.Interval do
     format = Keyword.get(options, :format, @default_format)
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
+    prefer = Keyword.get(options, :prefer, @default_prefer) |> List.wrap()
 
     options =
       options
@@ -396,7 +399,8 @@ defmodule Cldr.Date.Interval do
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, formats} <- Format.interval_formats(locale, calendar.cldr_calendar_type(), backend),
-         {:ok, [left, right]} <- resolve_format(from, to, formats, options),
+         {:ok, format} <- resolve_format(from, to, formats, options),
+         {:ok, [left, right]} <- apply_preference(format, prefer),
          {:ok, left_format} <- formatter.format(from, left, locale, options),
          {:ok, right_format} <- formatter.format(to, right, locale, options) do
       {:ok, left_format <> right_format}

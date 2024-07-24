@@ -46,7 +46,6 @@ defmodule Cldr.DateTime.Format do
   def format_list(config) do
     locale_names = Cldr.Locale.Loader.known_locale_names(config)
     backend = config.backend
-
     ((known_formats(&all_date_formats(&1, backend), locale_names) ++
         known_formats(&all_time_formats(&1, backend), locale_names) ++
         known_formats(&all_date_time_formats(&1, backend), locale_names) ++
@@ -69,6 +68,7 @@ defmodule Cldr.DateTime.Format do
   defp precompile_interval_formats(config) do
     config.precompile_interval_formats
     |> Enum.flat_map(&split_interval!/1)
+    |> List.flatten()
   end
 
   @doc """
@@ -622,6 +622,10 @@ defmodule Cldr.DateTime.Format do
         |> Map.values()
         |> Enum.filter(&is_map/1)
         |> Enum.flat_map(&Map.values/1)
+        |> Enum.map(fn
+          %{default: default, variant: variant} -> [default, variant]
+          other -> other
+        end)
       end)
       |> List.flatten()
       |> Enum.uniq()
@@ -935,6 +939,12 @@ defmodule Cldr.DateTime.Format do
   defp do_split_interval("", _acc, left) do
     {:error,
      {Cldr.DateTime.IntervalFormatError, "Invalid datetime interval format #{inspect(left)}"}}
+  end
+
+  # Handle default/variant maps
+
+  defp do_split_interval(%{default: default, variant: variant}, _acc, _left) do
+    %{default: do_split_interval(default, [], ""), variant: do_split_interval(variant, [], "")}
   end
 
   # Quoted strings pass through. This assumes the quotes

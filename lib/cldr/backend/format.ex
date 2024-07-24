@@ -446,7 +446,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{inspect(__MODULE__)}.time_available_formats "en"
+            iex> #{inspect(__MODULE__)}.time_available_formats :en
 
         """
         @spec time_available_formats(Locale.locale_reference(), calendar) :: {:ok, formats}
@@ -464,7 +464,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         def time_available_formats(locale_name, calendar) when is_binary(locale_name) do
           with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
-            date_available_formats(locale, calendar)
+            time_available_formats(locale, calendar)
           end
         end
 

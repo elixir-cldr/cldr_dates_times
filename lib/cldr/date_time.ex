@@ -211,7 +211,7 @@ defmodule Cldr.DateTime do
          {:ok, _} <- Cldr.Number.validate_number_system(locale, options.number_system, backend),
          {:ok, format, options} <-
            find_format(datetime, options.format, locale, cldr_calendar, backend, options),
-         {:ok, format} <- apply_unicode_or_ascii_preference(format, options.prefer),
+         {:ok, format} <- apply_preference(format, options.prefer),
          {:ok, format_string} <- resolve_plural_format(format, datetime, backend, options) do
       format_backend.format(datetime, format_string, locale, options)
     end
@@ -486,7 +486,7 @@ defmodule Cldr.DateTime do
         date_format: date_format,
         time_format: time_format,
         style: @default_style,
-        prefer: @default_prefer
+        prefer: [@default_prefer]
       }
 
     {:ok, datetime, options}
@@ -499,7 +499,7 @@ defmodule Cldr.DateTime do
     datetime = Map.put_new(datetime, :calendar, calendar)
 
     style = options[:style] || @default_style
-    prefer = options[:prefer] || @default_prefer
+    prefer = Keyword.get(options, :prefer, @default_prefer) |> List.wrap()
 
     format = options[:format]
     date_format = options[:date_format]
@@ -790,7 +790,7 @@ defmodule Cldr.DateTime do
   defp preferred_format(formats, format, prefer) do
     case Map.fetch(formats, format) do
       {:ok, format} ->
-        apply_unicode_or_ascii_preference(format, prefer)
+        apply_preference(format, prefer)
 
       :error ->
         {:error,
@@ -801,15 +801,23 @@ defmodule Cldr.DateTime do
   end
 
   @doc false
-  def apply_unicode_or_ascii_preference(%{unicode: _unicode, ascii: ascii}, :ascii) do
-    {:ok, ascii}
+  def apply_preference(%{unicode: unicode, ascii: ascii}, preference) do
+    if :ascii in preference do
+      {:ok, ascii}
+    else
+      {:ok, unicode}
+    end
   end
 
-  def apply_unicode_or_ascii_preference(%{unicode: unicode, ascii: _ascii}, _) do
-    {:ok, unicode}
+  def apply_preference(%{default: default, variant: variant}, preference) do
+    if :variant in preference do
+      {:ok, variant}
+    else
+      {:ok, default}
+    end
   end
 
-  def apply_unicode_or_ascii_preference(format, _) do
+  def apply_preference(format, _) do
     {:ok, format}
   end
 
