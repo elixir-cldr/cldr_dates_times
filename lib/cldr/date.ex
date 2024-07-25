@@ -68,7 +68,7 @@ defmodule Cldr.Date do
     `Cldr.Date.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
     for more information about specifying formats.
 
-  * `:locale:` any locale returned by `Cldr.known_locale_names/1`.
+  * `:locale` any locale returned by `Cldr.known_locale_names/1`.
     The default is `Cldr.get_locale/0`.
 
   * `:number_system` a number system into which the formatted date digits
@@ -108,6 +108,9 @@ defmodule Cldr.Date do
 
       iex> Cldr.Date.to_string(~D[2017-07-10], MyApp.Cldr, format: :short, locale: "fr")
       {:ok, "10/07/2017"}
+
+      iex> Cldr.Date.to_string(~D[2024-03-01], format: :yMd, prefer: :variant, locale: "en-CA")
+      {:ok, "1/3/2024"}
 
       # A partial date with a derived "best match" format
       iex> Cldr.Date.to_string(%{year: 2024, month: 6}, MyApp.Cldr, locale: "fr")
@@ -236,6 +239,9 @@ defmodule Cldr.Date do
 
       iex> Cldr.Date.to_string!(~D[2017-07-10], MyApp.Cldr, format: :short, locale: "fr")
       "10/07/2017"
+
+      iex> Cldr.Date.to_string!(~D[2024-03-01], format: :yMd, prefer: :variant, locale: "en-CA")
+      "1/3/2024"
 
       # A partial date with a derived "best match" format
       iex> Cldr.Date.to_string!(%{year: 2024, month: 6}, MyApp.Cldr, locale: "fr")
