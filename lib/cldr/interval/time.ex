@@ -239,15 +239,11 @@ defmodule Cldr.Time.Interval do
   def to_string(unquote(time()) = from, unquote(time()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     formatter = Module.concat(backend, DateTime.Formatter)
-    format = options[:time_format] || options[:format] || @default_format
-    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
-    number_system = Keyword.get(options, :number_system, locale_number_system)
-    prefer = Keyword.get(options, :prefer, @default_prefer)
+    options = normalize_options(locale, backend, options)
 
-    options =
-      options
-      |> Keyword.put(:locale, locale)
-      |> Keyword.put(:number_system, number_system)
+    number_system = options.number_system
+    prefer = options.prefer
+    format = options.format
 
     with {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
@@ -399,6 +395,26 @@ defmodule Cldr.Time.Interval do
     end
   end
 
+  defp normalize_options(_locale, _backend, %{} = options) do
+    options
+  end
+
+  defp normalize_options(locale, backend, options) do
+    format = options[:time_format] || options[:format] || @default_format
+    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+    number_system = Keyword.get(options, :number_system, locale_number_system)
+    prefer = Keyword.get(options, :prefer, @default_prefer)
+    style = Keyword.get(options, :style, @default_style)
+
+    options
+    |> Map.new()
+    |> Map.put(:format, format)
+    |> Map.put(:style, style)
+    |> Map.put(:locale, locale)
+    |> Map.put(:number_system, number_system)
+    |> Map.put(:prefer, prefer)
+  end
+
   @doc """
   Returns the format code representing the date or
   time unit that is the greatest difference between
@@ -434,19 +450,9 @@ defmodule Cldr.Time.Interval do
     Cldr.Date.Interval.greatest_difference(from, to)
   end
 
-  # defp from_less_than_or_equal_to(from, to) do
-  #   case Time.compare(from, to) do
-  #     comp when comp in [:eq, :lt] -> {:ok, comp}
-  #     _other -> {:error, Cldr.Date.Interval.datetime_order_error(from, to)}
-  #   end
-  # end
-
   defp resolve_format(from, to, formats, locale, options) do
-    format = Keyword.get(options, :format, @default_format)
-    style = Keyword.get(options, :style, @default_style)
-
-    with {:ok, style} <- validate_style(style),
-         {:ok, format} <- validate_format(formats, style, locale, format),
+    with {:ok, style} <- validate_style(options.style),
+         {:ok, format} <- validate_format(formats, style, locale, options.format),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
       greatest_difference_format(from, to, format, greatest_difference)
     end

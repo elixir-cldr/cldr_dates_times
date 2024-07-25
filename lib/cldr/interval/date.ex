@@ -383,15 +383,11 @@ defmodule Cldr.Date.Interval do
   def to_string(unquote(date()) = from, unquote(date()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     formatter = Module.concat(backend, DateTime.Formatter)
-    format = options[:date_format] || options[:format] || @default_format
-    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
-    number_system = Keyword.get(options, :number_system, locale_number_system)
-    prefer = Keyword.get(options, :prefer, @default_prefer) |> List.wrap()
+    options = normalize_options(locale, backend,  options)
 
-    options =
-      options
-      |> Keyword.put(:locale, locale)
-      |> Keyword.put(:number_system, number_system)
+    number_system = options.number_system
+    prefer = options.prefer
+    format = options.format
 
     with {:ok, _} <- from_less_than_or_equal_to(from, to),
          {:ok, backend} <- Cldr.validate_backend(backend),
@@ -659,6 +655,26 @@ defmodule Cldr.Date.Interval do
     end
   end
 
+  defp normalize_options(_locale, _backend, %{} = options) do
+    options
+  end
+
+  defp normalize_options(locale, backend, options) do
+    format = options[:date_format] || options[:format] || @default_format
+    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+    number_system = Keyword.get(options, :number_system, locale_number_system)
+    prefer = Keyword.get(options, :prefer, @default_prefer) |> List.wrap()
+    style = Keyword.get(options, :style, @default_style)
+
+    options
+    |> Map.new()
+    |> Map.put(:format, format)
+    |> Map.put(:style, style)
+    |> Map.put(:locale, locale)
+    |> Map.put(:number_system, number_system)
+    |> Map.put(:prefer, prefer)
+  end
+
   defp from_less_than_or_equal_to(from, to) do
     case Date.compare(from, to) do
       comp when comp in [:eq, :lt] -> {:ok, comp}
@@ -667,13 +683,10 @@ defmodule Cldr.Date.Interval do
   end
 
   defp resolve_format(from, to, formats, options) do
-    requested_format = Keyword.get(options, :format, @default_format)
-    requested_style = Keyword.get(options, :style, @default_style)
-
-    with {:ok, style} <- validate_style(requested_style),
-         {:ok, format} <- validate_format(formats, style, requested_format),
+    with {:ok, style} <- validate_style(options.style),
+         {:ok, format} <- validate_format(formats, style, options.format),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
-      greatest_difference_format(format, requested_format, requested_style, greatest_difference)
+      greatest_difference_format(format, format, style, greatest_difference)
     end
   end
 

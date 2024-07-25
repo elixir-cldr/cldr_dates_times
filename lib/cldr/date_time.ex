@@ -23,6 +23,8 @@ defmodule Cldr.DateTime do
   alias Cldr.LanguageTag
   alias Cldr.Locale
 
+  @typep options :: Keyword.t() | map()
+
   @format_types [:short, :medium, :long, :full]
   @default_format_type :medium
   @default_style :default
@@ -185,7 +187,10 @@ defmodule Cldr.DateTime do
       {:ok, "semaine 1 de 2000"}
 
   """
-  @spec to_string(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
+  @spec to_string(Cldr.Calendar.any_date_time(), Cldr.backend(), options()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
+
+  @spec to_string(Cldr.Calendar.any_date_time(), options(), []) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(datetime, backend \\ Cldr.Date.default_backend(), options \\ [])
@@ -316,8 +321,11 @@ defmodule Cldr.DateTime do
       "semaine 1 de 2000"
 
   """
-  @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
-          String.t() | no_return
+  @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend(), options()) ::
+          String.t() | no_return()
+
+  @spec to_string!(Cldr.Calendar.any_date_time(), options(), []) ::
+          String.t() | no_return()
 
   def to_string!(datetime, backend \\ Cldr.Date.default_backend(), options \\ [])
 

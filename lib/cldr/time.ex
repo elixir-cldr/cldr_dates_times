@@ -24,6 +24,8 @@ defmodule Cldr.Time do
   import Cldr.DateTime,
     only: [resolve_plural_format: 4, apply_preference: 2]
 
+  @typep options :: Keyword.t() | map()
+
   @format_types [:short, :medium, :long, :full]
   @default_format_type :medium
   @default_prefer :unicode
@@ -129,7 +131,10 @@ defmodule Cldr.Time do
        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :m"}}
 
   """
-  @spec to_string(map, Cldr.backend() | Keyword.t(), Keyword.t()) ::
+  @spec to_string(Cldr.Calendar.any_date_time(), Cldr.backend(), options()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
+
+  @spec to_string(Cldr.Calendar.any_date_time(), options(), []) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(time, backend \\ Cldr.Date.default_backend(), options \\ [])
@@ -247,7 +252,11 @@ defmodule Cldr.Time do
       "11:11 PM"
 
   """
-  @spec to_string!(map, Cldr.backend() | Keyword.t(), Keyword.t()) :: String.t() | no_return
+  @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend(), options()) ::
+          String.t() | no_return()
+
+  @spec to_string!(Cldr.Calendar.any_date_time(), options(), []) ::
+          String.t() | no_return()
 
   def to_string!(time, backend \\ Cldr.Date.default_backend(), options \\ [])
 
@@ -281,12 +290,12 @@ defmodule Cldr.Time do
     format = format_from_options(time, format_option, @default_format_type, prefer)
 
     options
-    |> Keyword.put(:locale, locale)
-    |> Keyword.put(:format, format)
-    |> Keyword.put(:prefer, prefer)
-    |> Keyword.delete(:style)
-    |> Keyword.put_new(:number_system, number_system)
     |> Map.new()
+    |> Map.put(:locale, locale)
+    |> Map.put(:format, format)
+    |> Map.put(:prefer, prefer)
+    |> Map.delete(:style)
+    |> Map.put_new(:number_system, number_system)
   end
 
   # Full date, no option, use the default format

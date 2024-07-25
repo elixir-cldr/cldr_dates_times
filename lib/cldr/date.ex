@@ -22,6 +22,8 @@ defmodule Cldr.Date do
   import Cldr.DateTime,
     only: [resolve_plural_format: 4, apply_preference: 2]
 
+  @typep options :: Keyword.t() | map()
+
   @format_types [:short, :medium, :long, :full]
   @default_format_type :medium
   @default_prefer :unicode
@@ -122,7 +124,10 @@ defmodule Cldr.Date do
        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :dy"}}
 
   """
-  @spec to_string(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
+  @spec to_string(Cldr.Calendar.any_date_time(), Cldr.backend(), options()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
+
+  @spec to_string(Cldr.Calendar.any_date_time(), options(), []) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(date, backend \\ Cldr.Date.default_backend(), options \\ [])
@@ -241,8 +246,11 @@ defmodule Cldr.Date do
       "juin 2024"
 
   """
-  @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
-          String.t() | no_return
+  @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend(), options()) ::
+          String.t() | no_return()
+
+  @spec to_string!(Cldr.Calendar.any_date_time(), options(), []) ::
+          String.t() | no_return()
 
   def to_string!(date, backend \\ Cldr.Date.default_backend(), options \\ [])
 
@@ -267,7 +275,7 @@ defmodule Cldr.Date do
     %{locale: locale, number_system: number_system, format: format, prefer: prefer}
   end
 
-  defp normalize_options(date, backend, options) do
+  defp normalize_options(date, backend, options) when is_list(options) do
     {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
@@ -276,12 +284,12 @@ defmodule Cldr.Date do
     format = format_from_options(date, format_option, @default_format_type, prefer)
 
     options
-    |> Keyword.put(:locale, locale)
-    |> Keyword.put(:format, format)
-    |> Keyword.put(:prefer, prefer)
-    |> Keyword.delete(:style)
-    |> Keyword.put_new(:number_system, number_system)
     |> Map.new()
+    |> Map.put(:locale, locale)
+    |> Map.put(:format, format)
+    |> Map.put(:prefer, prefer)
+    |> Map.delete(:style)
+    |> Map.put_new(:number_system, number_system)
   end
 
   # Full date, no option, use the default format
