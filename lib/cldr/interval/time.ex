@@ -239,7 +239,7 @@ defmodule Cldr.Time.Interval do
   def to_string(unquote(time()) = from, unquote(time()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     formatter = Module.concat(backend, DateTime.Formatter)
-    format = Keyword.get(options, :format, @default_format)
+    format = options[:time_format] || options[:format] || @default_format
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
     prefer = Keyword.get(options, :prefer, @default_prefer)

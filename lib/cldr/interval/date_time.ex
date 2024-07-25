@@ -16,6 +16,7 @@ defmodule Cldr.DateTime.Interval do
 
   @default_format :medium
   @formats [:short, :medium, :long]
+  @default_prefer :default
 
   if Cldr.Code.ensure_compiled?(CalendarInterval) do
     @doc false
@@ -174,7 +175,8 @@ defmodule Cldr.DateTime.Interval do
   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, options)
       when is_list(options) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
-    to_string(from, to, backend, locale: locale)
+    options = Keyword.put_new(options, :locale, locale)
+    to_string(from, to, backend, options)
   end
 
   def to_string(nil = from, unquote(naivedatetime()) = to, options)
@@ -182,7 +184,8 @@ defmodule Cldr.DateTime.Interval do
     _ = calendar
 
     {locale, backend} = Cldr.locale_and_backend_from(options)
-    to_string(from, to, backend, locale: locale)
+    options = Keyword.put_new(options, :locale, locale)
+    to_string(from, to, backend, options)
   end
 
   def to_string(unquote(naivedatetime()) = from, nil = to, options)
@@ -190,7 +193,8 @@ defmodule Cldr.DateTime.Interval do
     _ = calendar
 
     {locale, backend} = Cldr.locale_and_backend_from(options)
-    to_string(from, to, backend, locale: locale)
+    options = Keyword.put_new(options, :locale, locale)
+    to_string(from, to, backend, options)
   end
 
   @doc """
@@ -318,25 +322,21 @@ defmodule Cldr.DateTime.Interval do
   end
 
   def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend, options) do
-    {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    format = Keyword.get(options, :format, @default_format)
-    date_format = Keyword.get(options, :date_format)
-    time_format = Keyword.get(options, :time_format)
-    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
-    number_system = Keyword.get(options, :number_system, locale_number_system)
+    options = normalize_options(from, backend, options)
+    format = options.format
+    locale = options.locale
+    backend = options.backend
+    number_system = options.number_system
 
-    options =
-      options
-      |> Keyword.put(:locale, locale)
-      |> Keyword.put(:number_system, number_system)
+    date_format = Map.get(options, :date_format)
+    time_format = Map.get(options, :time_format)
 
     with {:ok, _} <- from_less_than_or_equal_to(from, to),
          {:ok, backend} <- Cldr.validate_backend(backend),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
-         {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format, date_format, time_format} <-
-           validate_format(format, date_format, time_format),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
+         {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
+         {:ok, format, date_format, time_format} <- validate_format(format, date_format, time_format, options),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
       options = adjust_options(options, locale, format, date_format, time_format)
       format_date_time(from, to, locale, backend, calendar, greatest_difference, options)
@@ -617,27 +617,45 @@ defmodule Cldr.DateTime.Interval do
     end
   end
 
+  defp normalize_options(from, backend, options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
+    locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
+    number_system = Keyword.get(options, :number_system, locale_number_system)
+    prefer = Keyword.get(options, :prefer, @default_prefer) |> List.wrap()
+    format = Keyword.get(options, :format, @default_format)
+
+    options
+    |> Map.new()
+    |> Map.put(:format, format)
+    |> Map.put(:locale, locale)
+    |> Map.put(:number_system, number_system)
+    |> Map.put(:backend, backend)
+    |> Map.put(:calendar, from.calendar)
+    |> Map.put(:prefer, prefer)
+  end
+
   @doc false
   def adjust_options(options, locale, format, date_format \\ nil, time_format \\ nil) do
     options
-    |> Keyword.put(:locale, locale)
-    |> Keyword.put(:format, format)
-    |> Keyword.put(:date_format, date_format)
-    |> Keyword.put(:time_format, time_format)
-    |> Keyword.delete(:style)
+    |> Map.put(:locale, locale)
+    |> Map.put(:format, format)
+    |> Map.put(:date_format, date_format)
+    |> Map.put(:time_format, time_format)
+    |> Map.delete(:style)
   end
 
   defp format_date_time(from, to, locale, backend, calendar, difference, options) do
     backend_format = Module.concat(backend, DateTime.Format)
     {:ok, calendar} = Cldr.DateTime.type_from_calendar(calendar)
     fallback = backend_format.date_time_interval_fallback(locale, calendar)
-    format = Keyword.fetch!(options, :format)
+    format = Map.fetch!(options, :format)
 
-    [from_format, to_format] = extract_format(format)
-    from_options = Keyword.put(options, :format, from_format)
-    to_options = Keyword.put(options, :format, to_format)
+    [from_format, to_format] = extract_format(format, difference, options)
+    from_options = Map.put(options, :format, from_format)
+    to_options = Map.put(options, :format, to_format)
+    final_format = if is_atom(format), do: format, else: [from_format, to_format]
 
-    do_format_date_time(from, to, backend, format, difference, from_options, to_options, fallback)
+    do_format_date_time(from, to, backend, final_format, difference, from_options, to_options, fallback)
   end
 
   # The difference is only in the time part
@@ -670,23 +688,47 @@ defmodule Cldr.DateTime.Interval do
     |> Enum.join()
   end
 
-  defp extract_format(format) when is_atom(format) do
-    [format, format]
+  defp extract_format(format, _distance, options) when is_atom(format) do
+    case options do
+      %{time_format: nil, date_format: nil} ->
+        [format, format]
+
+      %{time_format: time_format, date_format: nil} ->
+        [format, time_format]
+
+      %{time_format: nil, date_format: date_format} ->
+        [date_format, format]
+
+      %{time_format: time_format, date_format: date_format} ->
+        [date_format, time_format]
+    end
   end
 
-  defp extract_format([from_format, to_format]) do
+  defp extract_format(format, distance, options) when is_map(format) do
+    format = Map.fetch!(format, distance)
+
+    case format do
+      %{default: default, variant: variant} ->
+        if :variant in options.prefer, do: variant, else: default
+
+      other ->
+        other
+    end
+  end
+
+  defp extract_format([from_format, to_format], _greatest_distance, _prefer) do
     [from_format, to_format]
   end
 
   # Using standard format terms like :short, :medium, :long
   # When there is no specific date or time format requested
-  defp validate_format(format, nil, nil) when format in @formats do
+  defp validate_format(format, nil, nil, _options) when format in @formats do
     {:ok, format, nil, nil}
   end
 
   # Using standard format terms like :short, :medium, :long
   # with date and time formats also of the same style
-  defp validate_format(format, date_format, time_format)
+  defp validate_format(format, date_format, time_format, _options)
        when format in @formats and date_format in @formats and time_format in @formats do
     {:ok, format, date_format, time_format}
   end
@@ -694,7 +736,7 @@ defmodule Cldr.DateTime.Interval do
   # Using standard format terms like :short, :medium, :long
   # with date format specified but time format
   # uses the interval format
-  defp validate_format(format, date_format, nil)
+  defp validate_format(format, date_format, nil, _options)
        when format in @formats and date_format in @formats do
     {:ok, format, date_format, format}
   end
@@ -702,26 +744,42 @@ defmodule Cldr.DateTime.Interval do
   # Using standard format terms like :short, :medium, :long
   # with time format specified but date format
   # uses the interval format
-  defp validate_format(format, nil, time_format)
+  defp validate_format(format, nil, time_format, _options)
        when format in @formats and time_format in @formats do
     {:ok, format, format, time_format}
   end
 
   # Direct specification of a format as a string
-  @doc false
-  defp validate_format(format, nil, nil) when is_binary(format) do
+  defp validate_format(format, nil, nil, _options) when is_binary(format) do
     with {:ok, format} <- Cldr.DateTime.Format.split_interval(format) do
       {:ok, format, nil, nil}
     end
   end
 
+  # Direct specification of a format as a string
+  defp validate_format(format, nil, nil, options) when is_atom(format) do
+    alias Cldr.DateTime.Format
+
+    locale = options.locale
+    backend = options.backend
+    {:ok, cldr_calendar} = Cldr.DateTime.type_from_calendar(options.calendar)
+
+    with {:ok, interval_formats} <- Format.interval_formats(locale, cldr_calendar, backend) do
+      if format = Map.get(interval_formats, format) do
+        {:ok, format, nil, nil}
+      else
+        {:error, format_error(format, nil, nil)}
+      end
+    end
+  end
+
   # If the format is binary then neither date or time format can be
   # specified.
-  defp validate_format(format, date_format, time_format) when is_binary(format) do
+  defp validate_format(format, date_format, time_format, _options) when is_binary(format) do
     {:error, format_error(format, date_format, time_format)}
   end
 
-  defp validate_format(format, date_format, time_format) do
+  defp validate_format(format, date_format, time_format, _options) do
     {:error, format_error(format, date_format, time_format)}
   end
 

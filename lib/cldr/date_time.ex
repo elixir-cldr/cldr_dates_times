@@ -202,7 +202,7 @@ defmodule Cldr.DateTime do
   end
 
   def to_string(%{} = datetime, backend, options)
-      when is_atom(backend) and is_list(options) and has_date_and_time(datetime) do
+      when is_atom(backend) and has_date_and_time(datetime) do
     format_backend = Module.concat(backend, DateTime.Formatter)
 
     with {:ok, datetime, options} <- normalize_options(datetime, backend, options),
@@ -221,12 +221,12 @@ defmodule Cldr.DateTime do
   end
 
   def to_string(%{} = datetime, backend, options)
-      when is_atom(backend) and is_list(options) and has_date(datetime) do
+      when is_atom(backend) and has_date(datetime) do
     Cldr.Date.to_string(datetime, backend, options)
   end
 
   def to_string(%{} = datetime, backend, options)
-      when is_atom(backend) and is_list(options) and has_time(datetime) do
+      when is_atom(backend) and has_time(datetime) do
     Cldr.Time.to_string(datetime, backend, options)
   end
 
@@ -492,7 +492,11 @@ defmodule Cldr.DateTime do
     {:ok, datetime, options}
   end
 
-  defp normalize_options(datetime, backend, options) do
+  defp normalize_options(datetime, _backend, options) when is_map(options) do
+    {:ok, datetime, options}
+  end
+
+  defp normalize_options(datetime, backend, options) when is_list(options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
 
     calendar = Map.get(datetime, :calendar, Cldr.Calendar.Gregorian)
