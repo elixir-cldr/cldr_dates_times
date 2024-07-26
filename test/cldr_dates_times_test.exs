@@ -148,10 +148,10 @@ defmodule Cldr.DatesTimes.Test do
     datetime = ~U[2024-07-07 21:36:00.440105Z]
 
     assert {:ok, "July 7, 2024 at 9:36:00 PM UTC"} =
-      Cldr.DateTime.to_string(datetime, format: :long, style: :at)
+             Cldr.DateTime.to_string(datetime, format: :long, style: :at)
 
     assert {:ok, "July 7, 2024, 9:36:00 PM UTC"} =
-      Cldr.DateTime.to_string(datetime, format: :long, style: :default)
+             Cldr.DateTime.to_string(datetime, format: :long, style: :default)
   end
 
   test "Symmetry of the format/3 and available_format/3 functions for Date, Time and DateTime" do

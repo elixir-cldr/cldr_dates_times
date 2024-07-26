@@ -433,7 +433,7 @@ defmodule Cldr.Date.Interval do
   def to_string(unquote(date()) = from, unquote(date()) = to, backend, options) do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
     formatter = Module.concat(backend, DateTime.Formatter)
-    options = normalize_options(locale, backend,  options)
+    options = normalize_options(locale, backend, options)
 
     number_system = options.number_system
     prefer = options.prefer

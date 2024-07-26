@@ -386,7 +386,8 @@ defmodule Cldr.DateTime.Interval do
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, calendar} <- Cldr.Calendar.validate_calendar(from.calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format, date_format, time_format} <- validate_format(format, date_format, time_format, options),
+         {:ok, format, date_format, time_format} <-
+           validate_format(format, date_format, time_format, options),
          {:ok, greatest_difference} <- greatest_difference(from, to) do
       options = adjust_options(options, locale, format, date_format, time_format)
       format_date_time(from, to, locale, backend, calendar, greatest_difference, options)
@@ -755,7 +756,16 @@ defmodule Cldr.DateTime.Interval do
     to_options = Map.put(options, :format, to_format)
     final_format = if is_atom(format), do: format, else: [from_format, to_format]
 
-    do_format_date_time(from, to, backend, final_format, difference, from_options, to_options, fallback)
+    do_format_date_time(
+      from,
+      to,
+      backend,
+      final_format,
+      difference,
+      from_options,
+      to_options,
+      fallback
+    )
   end
 
   # The difference is only in the time part

@@ -46,6 +46,7 @@ defmodule Cldr.DateTime.Format do
   def format_list(config) do
     locale_names = Cldr.Locale.Loader.known_locale_names(config)
     backend = config.backend
+
     ((known_formats(&all_date_formats(&1, backend), locale_names) ++
         known_formats(&all_time_formats(&1, backend), locale_names) ++
         known_formats(&all_date_time_formats(&1, backend), locale_names) ++
