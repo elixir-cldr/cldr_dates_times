@@ -56,7 +56,7 @@ defmodule Cldr.DateTime.Interval.Backend do
             format. The default is `:medium`.
 
           * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-            or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`
+            or a `t:Cldr.LanguageTag.t/0` struct.  The default is `#{backend}.get_locale/0`
 
           * `:number_system` a number system into which the formatted datetime
              digits should be transliterated
@@ -129,7 +129,7 @@ defmodule Cldr.DateTime.Interval.Backend do
           format. The default is `:medium`.
 
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`
+          or a `t:Cldr.LanguageTag.t/0` struct.  The default is `#{backend}.get_locale/0`
 
         * `number_system:` a number system into which the formatted date digits should
           be transliterated
@@ -219,7 +219,7 @@ defmodule Cldr.DateTime.Interval.Backend do
             format. The default is `:medium`.
 
           * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-            or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`
+            or a `t:Cldr.LanguageTag.t/0` struct.  The default is `#{backend}.get_locale/0`
 
           * `:number_system` a number system into which the formatted datetime
              digits should be transliterated
@@ -293,7 +293,7 @@ defmodule Cldr.DateTime.Interval.Backend do
           format. The default is `:medium`.
 
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag` struct.  The default is `#{backend}.get_locale/0`.
+          or a `t:Cldr.LanguageTag.t/0` struct.  The default is `#{backend}.get_locale/0`.
 
         * `number_system:` a number system into which the formatted date digits should
           be transliterated.

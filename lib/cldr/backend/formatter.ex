@@ -34,7 +34,7 @@ defmodule Cldr.DateTime.Formatter.Backend do
         * `format` is a valid format string, for example `yy/MM/dd hh:MM`
 
         * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-          or a `Cldr.LanguageTag` struct. The default is `Cldr.get_locale/0`
+          or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
 
         * `options` is a keyword list of options.
 

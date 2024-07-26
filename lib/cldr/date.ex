@@ -74,16 +74,34 @@ defmodule Cldr.Date do
   * `:number_system` a number system into which the formatted date digits
     should be transliterated.
 
-  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
-    formats have two variants - one using Unicode spaces (typically non-breaking space) and
-    another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-    use cases and is not recommended. See `Cldr.Date.available_formats/3`
-    to see which formats have these variants. Currently no date-specific
-    formats have such variants but they may in the future.
+  * `:prefer` expresses the preference for one of the possible alternative
+    sub-formats. See the variant preference notes below.
 
   * `:era` which, if set to `:variant`, will use a variant for the era if one
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
     will return `CE` instead of `AD` and `BCE` instead of `BC`.
+
+  ### Variant Preference
+
+  * A small number of formats have one of two different alternatives, each with their own
+    preference specifier. The preferences are specified with the `:prefer` option to
+    `Cldr.Date.to_string/3`. The preference is expressed as an atom, or a list of one or two
+    atoms with one atom being either `:unicode` or `:ascii` and one atom being either
+    `:default` or `:variant`.
+
+    * Some formats (at the time of publishng only time formats but that
+      may change in the future) have `:unicode` and `:ascii` versions of the format. The
+      difference is the use of ascii space (0x20) as a separateor in the `:ascii` verison
+      whereas the `:unicode` version may use non-breaking or other space characters. The
+      default is `:unicode` and this is the strongly preferred option. The `:ascii` format
+      is primarily to support legacy use cases and is not recommended. See
+      `Cldr.Date.available_formats/3` to see which formats have these variants.
+
+    * Some formats (at the time of publishing, only date and datetime formats) have
+      `:default` and `:variant` versions of the format. These variant formats are only
+      included in a small number of locales. For example, the `:"en-CA"` locale, which has
+      a `:default` format respecting typical Canadian formatting and a `:variant` that is
+      more closely aligned to US formatting. The default is `:default`.
 
   ### Returns
 
@@ -201,21 +219,39 @@ defmodule Cldr.Date do
     for more information about specifying formats.
 
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
   * `:number_system` a number system into which the formatted date digits should
     be transliterated.
 
-  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
-    formats have two variants - one using Unicode spaces (typically non-breaking space) and
-    another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-    use cases and is not recommended. See `Cldr.Date.available_formats/3`
-    to see which formats have these variants. Currently no date-specific
-    formats have such variants but they may in the future.
+  * `:prefer` expresses the preference for one of the possible alternative
+    sub-formats. See the variant preference notes below.
 
   * `:era` which, if set to `:variant`, will use a variant for the era if one
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
     will return `CE` instead of `AD` and `BCE` instead of `BC`.
+
+  ### Variant Preference
+
+  * A small number of formats have one of two different alternatives, each with their own
+    preference specifier. The preferences are specified with the `:prefer` option to
+    `Cldr.Date.to_string/3`. The preference is expressed as an atom, or a list of one or two
+    atoms with one atom being either `:unicode` or `:ascii` and one atom being either
+    `:default` or `:variant`.
+
+    * Some formats (at the time of publishng only time formats but that
+      may change in the future) have `:unicode` and `:ascii` versions of the format. The
+      difference is the use of ascii space (0x20) as a separateor in the `:ascii` verison
+      whereas the `:unicode` version may use non-breaking or other space characters. The
+      default is `:unicode` and this is the strongly preferred option. The `:ascii` format
+      is primarily to support legacy use cases and is not recommended. See
+      `Cldr.Date.available_formats/3` to see which formats have these variants.
+
+    * Some formats (at the time of publishing, only date and datetime formats) have
+      `:default` and `:variant` versions of the format. These variant formats are only
+      included in a small number of locales. For example, the `:"en-CA"` locale, which has
+      a `:default` format respecting typical Canadian formatting and a `:variant` that is
+      more closely aligned to US formatting. The default is `:default`.
 
   ### Returns
 

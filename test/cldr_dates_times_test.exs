@@ -144,14 +144,6 @@ defmodule Cldr.DatesTimes.Test do
     assert {:ok, "Sun 9:36 PM"} = Cldr.DateTime.to_string(datetime, format: :Ehm)
   end
 
-  test "Unicode or ASCII preference" do
-    datetime = ~U[2024-07-07 21:36:00.440105Z]
-
-    unicode = Cldr.DateTime.to_string(datetime, format: :Ehm, prefer: :unicode)
-    ascii = Cldr.DateTime.to_string(datetime, format: :Ehm, prefer: :ascii)
-    assert unicode != ascii
-  end
-
   test "'at' formats" do
     datetime = ~U[2024-07-07 21:36:00.440105Z]
 

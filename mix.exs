@@ -1,7 +1,7 @@
 defmodule Cldr.DatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.19.2"
+  @version "2.20.0"
 
   def project do
     [
@@ -70,8 +70,7 @@ defmodule Cldr.DatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr, path: "../cldr", override: true},
-
+      {:ex_cldr, "~> 2.40"},
       {:ex_cldr_calendars, "~> 1.25"},
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},

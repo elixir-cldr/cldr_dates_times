@@ -39,7 +39,7 @@ defmodule Cldr.DateTime.Interval.Test do
     assert Cldr.Time.Interval.to_string(~T[10:00:00], ~T[22:03:00], MyApp.Cldr,
              format: :short,
              locale: "en-GB"
-           ) == {:ok, "10 – 22"}
+           ) == {:ok, "10–22"}
   end
 
   test "right option time interval" do

@@ -137,7 +137,7 @@ defmodule Cldr.Time.Interval do
   Returns a string representing the formatted
   interval formed by two times.
 
-  ## Arguments
+  ### Arguments
 
   * `from` is any map that conforms to the
     `Calendar.time` type.
@@ -156,7 +156,7 @@ defmodule Cldr.Time.Interval do
   interval is formatted as an open interval with the non-nil
   side formatted as a standalone time.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representing of an interval
@@ -166,13 +166,38 @@ defmodule Cldr.Time.Interval do
     alternatives are `:time`, `:zone`,
     and `:flex`. The default is `:time`.
 
-  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`.
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-  * `number_system:` a number system into which the formatted date digits should
+  * `:number_system` a number system into which the formatted date digits should
     be transliterated.
 
-  ## Returns
+  * `:prefer` expresses the preference for one of the possible alternative
+    sub-formats. See the variant preference notes below.
+
+  ### Variant Preference
+
+  * A small number of formats have one of two different alternatives, each with their own
+    preference specifier. The preferences are specified with the `:prefer` option to
+    `Cldr.Date.to_string/3`. The preference is expressed as an atom, or a list of one or two
+    atoms with one atom being either `:unicode` or `:ascii` and one atom being either
+    `:default` or `:variant`.
+
+    * Some formats (at the time of publishng only time formats but that
+      may change in the future) have `:unicode` and `:ascii` versions of the format. The
+      difference is the use of ascii space (0x20) as a separateor in the `:ascii` verison
+      whereas the `:unicode` version may use non-breaking or other space characters. The
+      default is `:unicode` and this is the strongly preferred option. The `:ascii` format
+      is primarily to support legacy use cases and is not recommended. See
+      `Cldr.Date.available_formats/3` to see which formats have these variants.
+
+    * Some formats (at the time of publishing, only date and datetime formats) have
+      `:default` and `:variant` versions of the format. These variant formats are only
+      included in a small number of locales. For example, the `:"en-CA"` locale, which has
+      a `:default` format respecting typical Canadian formatting and a `:variant` that is
+      more closely aligned to US formatting. The default is `:default`.
+
+  ### Returns
 
   * `{:ok, string}` or
 
@@ -191,7 +216,7 @@ defmodule Cldr.Time.Interval do
   * In the case where `from` and `to` are equal, a single
     time is formatted instead of an interval.
 
-  ## Examples
+  ### Examples
 
       iex> Cldr.Time.Interval.to_string ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
       {:ok, "10 – 10 AM"}
@@ -308,7 +333,7 @@ defmodule Cldr.Time.Interval do
   Returns a string representing the formatted
   interval formed by two times.
 
-  ## Arguments
+  ### Arguments
 
   * `from` is any map that conforms to the
     `Calendar.time` type.
@@ -322,7 +347,7 @@ defmodule Cldr.Time.Interval do
   * `options` is a keyword list of options. The default is
     `[format: :medium, style: :time]`.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
     specific format type or a string representing of an interval
@@ -332,19 +357,44 @@ defmodule Cldr.Time.Interval do
     alternatives are `:time`, `:zone`,
     and `:flex`. The default is `:time`.
 
-  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `Cldr.LanguageTag` struct.  The default is `Cldr.get_locale/0`
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`
 
-  * `number_system:` a number system into which the formatted date digits should
+  * `:number_system` a number system into which the formatted date digits should
     be transliterated.
 
-  ## Returns
+  * `:prefer` expresses the preference for one of the possible alternative
+    sub-formats. See the variant preference notes below.
+
+  ### Variant Preference
+
+  * A small number of formats have one of two different alternatives, each with their own
+    preference specifier. The preferences are specified with the `:prefer` option to
+    `Cldr.Date.to_string/3`. The preference is expressed as an atom, or a list of one or two
+    atoms with one atom being either `:unicode` or `:ascii` and one atom being either
+    `:default` or `:variant`.
+
+    * Some formats (at the time of publishng only time formats but that
+      may change in the future) have `:unicode` and `:ascii` versions of the format. The
+      difference is the use of ascii space (0x20) as a separateor in the `:ascii` verison
+      whereas the `:unicode` version may use non-breaking or other space characters. The
+      default is `:unicode` and this is the strongly preferred option. The `:ascii` format
+      is primarily to support legacy use cases and is not recommended. See
+      `Cldr.Date.available_formats/3` to see which formats have these variants.
+
+    * Some formats (at the time of publishing, only date and datetime formats) have
+      `:default` and `:variant` versions of the format. These variant formats are only
+      included in a small number of locales. For example, the `:"en-CA"` locale, which has
+      a `:default` format respecting typical Canadian formatting and a `:variant` that is
+      more closely aligned to US formatting. The default is `:default`.
+
+  ### Returns
 
   * `string` or
 
   * raises an exception
 
-  ## Notes
+  ### Notes
 
   * For more information on interval format string
     see `Cldr.Interval`.
@@ -357,7 +407,7 @@ defmodule Cldr.Time.Interval do
   * In the case where `from` and `to` are equal, a single
     time is formatted instead of an interval.
 
-  ## Examples
+  ### Examples
 
       iex> Cldr.Time.Interval.to_string! ~T[10:00:00], ~T[10:03:00], MyApp.Cldr, format: :short
       "10 – 10 AM"
@@ -422,13 +472,13 @@ defmodule Cldr.Time.Interval do
 
   Only differences in hours or minutes are considered.
 
-  ## Arguments
+  ### Arguments
 
   * `from` is any `t:Time.t/0`.
 
   * `to` is any `t:Time.t/0`.
 
-  ## Returns
+  ### Returns
 
   * `{:ok, format_code}` where `format_code` is one of:
 
@@ -437,7 +487,7 @@ defmodule Cldr.Time.Interval do
 
   * `{:error, :no_practical_difference}`
 
-  ## Example
+  ### Example
 
       iex> Cldr.Time.Interval.greatest_difference ~T[10:11:00], ~T[10:12:00]
       {:ok, :m}

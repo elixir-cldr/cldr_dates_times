@@ -2,9 +2,9 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
-## Cldr_Dates_Times v2.19.3
+## Cldr_Dates_Times v2.20.0
 
-This is the changelog for Cldr_Dates_Times v2.19.3 released on _____, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.20.0 released on July 26th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Bug Fixes
 
@@ -12,7 +12,7 @@ This is the changelog for Cldr_Dates_Times v2.19.3 released on _____, 2024.  For
 
 ### Enhancements
 
-* Modify the `:prefer` option of `to_string/2` to take a list of preferences. Time formats may sometimes have a `:unicode` or `:ascii` preference. Date formats may have a `:default` or `:variant` preference. The `:prefer` option can no be specified with one or both of these options.
+* Modify the `:prefer` option of `to_string/2` to take a list of preferences. Time formats may sometimes have a `:unicode` or `:ascii` preference. Date and datetime formats may have a `:default` or `:variant` preference. The `:prefer` option can now be specified with one or both of these options.
 
 ## Cldr_Dates_Times v2.19.2
 
