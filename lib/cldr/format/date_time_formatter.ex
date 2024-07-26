@@ -147,6 +147,7 @@ defmodule Cldr.DateTime.Formatter do
   alias Cldr.Calendar.Gregorian
   alias Cldr.Locale
 
+  @duration_modules [Cldr.Calendar.Duration, Duration]
   @default_format 1
 
   @doc false
@@ -2404,6 +2405,12 @@ defmodule Cldr.DateTime.Formatter do
     |> maybe_wrap(:h12, options)
   end
 
+  def h12(%module{hour: hour}, n, _locale, _backend, options) when module in @duration_modules do
+    hour
+    |> pad(n)
+    |> maybe_wrap(:h12, options)
+  end
+
   def h12(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
     {:error,
      {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect(hour)}"}}
@@ -2497,6 +2504,12 @@ defmodule Cldr.DateTime.Formatter do
     |> maybe_wrap(:h11, options)
   end
 
+  def h11(%module{hour: hour}, n, _locale, _backend, options) when module in @duration_modules do
+    hour
+    |> pad(n)
+    |> maybe_wrap(:h11, options)
+  end
+
   def h11(%{hour: hour}, _n, _locale, _backend, _options) when is_integer(hour) do
     {:error,
      {Cldr.DateTime.FormatError, "Hour must be in the range of 0..24. Found #{inspect(hour)}"}}
@@ -2576,6 +2589,12 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   def h24(%{hour: hour}, n, _locale, _backend, options) when hour in 1..23 do
+    hour
+    |> pad(n)
+    |> maybe_wrap(:h24, options)
+  end
+
+  def h24(%module{hour: hour}, n, _locale, _backend, options) when module in @duration_modules do
     hour
     |> pad(n)
     |> maybe_wrap(:h24, options)
@@ -2661,6 +2680,12 @@ defmodule Cldr.DateTime.Formatter do
 
   def h23(%{hour: hour}, n, _locale, _backend, options) when abs(hour) in 1..23 do
     abs(hour)
+    |> pad(n)
+    |> maybe_wrap(:h23, options)
+  end
+
+  def h23(%module{hour: hour}, n, _locale, _backend, options) when module in @duration_modules do
+    hour
     |> pad(n)
     |> maybe_wrap(:h23, options)
   end

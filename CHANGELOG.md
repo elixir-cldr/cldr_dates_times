@@ -2,6 +2,14 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.20.1
+
+This is the changelog for Cldr_Dates_Times v2.20.1 released on July 27th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Supports formatting `t:Cldr.Calendar.Duration.t/0` and, on Elixir 1.17 or later, `t:Duration.t/0` structs. For these structs, and only these structs, the `:hour` can be any number. In other cases the number is required to be in the range `0..24`.
+
 ## Cldr_Dates_Times v2.20.0
 
 This is the changelog for Cldr_Dates_Times v2.20.0 released on July 26th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
