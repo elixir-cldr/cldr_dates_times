@@ -87,8 +87,12 @@ defmodule Cldr.DatesTimes.Test do
     assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :hmj)
     assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :hmJ)
 
-    assert Cldr.Date.to_string(~T[10:48:00], format: :hmc) ==
-             {:error, {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :hmc"}}
+    assert Cldr.Date.to_string(~T"10:48:00", format: :hmc) ==
+    {:error,
+      {
+        ArgumentError,
+        "Missing required date fields. The function requires a map with at least :year, :month, :day and :calendar. " <>
+        "Found: ~T[10:48:00 Cldr.Calendar.Gregorian]"}}
 
     assert Cldr.Time.to_string(~T[10:48:00], format: :hme) ==
              {:error, {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :hme"}}
@@ -162,5 +166,19 @@ defmodule Cldr.DatesTimes.Test do
     assert {:ok, _} = Cldr.Date.available_formats()
     assert {:ok, _} = Cldr.Time.available_formats()
     assert {:ok, _} = Cldr.DateTime.available_formats()
+  end
+
+  test "When to_string options is not a list" do
+    assert {:error,
+     {ArgumentError,
+      "Unexpected option value \"en-GB\". Options must be a keyword list"}} = Cldr.DateTime.to_string DateTime.utc_now(), "en-GB"
+
+    assert {:error,
+     {ArgumentError,
+      "Unexpected option value \"en-GB\". Options must be a keyword list"}} = Cldr.Date.to_string Date.utc_today(), "en-GB"
+
+    assert {:error,
+     {ArgumentError,
+      "Unexpected option value \"en-GB\". Options must be a keyword list"}} = Cldr.Time.to_string Time.utc_now(), "en-GB"
   end
 end

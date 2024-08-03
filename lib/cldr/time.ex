@@ -22,7 +22,7 @@ defmodule Cldr.Time do
   alias Cldr.Locale
 
   import Cldr.DateTime,
-    only: [resolve_plural_format: 4, apply_preference: 2]
+    only: [resolve_plural_format: 4, apply_preference: 2, has_time: 1]
 
   @typep options :: Keyword.t() | map()
 
@@ -169,7 +169,8 @@ defmodule Cldr.Time do
     to_string(time, backend, options)
   end
 
-  def to_string(%{} = time, backend, options) do
+  def to_string(%{} = time, backend, options)
+      when is_atom(backend) and has_time(time) do
     options = normalize_options(time, backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
 
@@ -192,6 +193,10 @@ defmodule Cldr.Time do
   rescue
     e in [Cldr.DateTime.FormatError] ->
       {:error, {e.__struct__, e.message}}
+  end
+
+  def to_string(time, value, []) when is_map(time) do
+    {:error, {ArgumentError, "Unexpected option value #{inspect value}. Options must be a keyword list"}}
   end
 
   def to_string(time, _backend, _options) do

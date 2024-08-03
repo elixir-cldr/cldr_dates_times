@@ -257,6 +257,10 @@ defmodule Cldr.DateTime do
     Cldr.Time.to_string(datetime, backend, options)
   end
 
+  def to_string(datetime, value, []) when is_map(datetime) do
+    {:error, {ArgumentError, "Unexpected option value #{inspect value}. Options must be a keyword list"}}
+  end
+
   def to_string(datetime, _backend, _options) do
     error_return(datetime, [:year, :month, :day, :hour, :minute, :second, :calendar])
   end

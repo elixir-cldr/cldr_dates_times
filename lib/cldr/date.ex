@@ -20,7 +20,7 @@ defmodule Cldr.Date do
   alias Cldr.Locale
 
   import Cldr.DateTime,
-    only: [resolve_plural_format: 4, apply_preference: 2]
+    only: [resolve_plural_format: 4, apply_preference: 2, has_date: 1]
 
   @typep options :: Keyword.t() | map()
 
@@ -164,7 +164,8 @@ defmodule Cldr.Date do
     to_string(date, backend, options)
   end
 
-  def to_string(%{} = date, backend, options) do
+  def to_string(%{} = date, backend, options)
+      when is_atom(backend) and has_date(date) do
     options = normalize_options(date, backend, options)
     format_backend = Module.concat(backend, DateTime.Formatter)
 
@@ -187,6 +188,10 @@ defmodule Cldr.Date do
   rescue
     e in [Cldr.DateTime.FormatError] ->
       {:error, {e.__struct__, e.message}}
+  end
+
+  def to_string(date, value, []) when is_map(date) do
+    {:error, {ArgumentError, "Unexpected option value #{inspect value}. Options must be a keyword list"}}
   end
 
   def to_string(date, _backend, _options) do
