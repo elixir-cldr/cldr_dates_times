@@ -68,4 +68,16 @@ defmodule Cldr.DatesTimes.Dialyzer do
 
     _ = Cldr.DateTime.Format.common_date_time_format_names()
   end
+
+  def other_tests do
+    datetime = DateTime.utc_now()
+    Process.sleep(3000)
+
+    _ =
+      datetime
+      |> DateTime.diff(DateTime.utc_now(), :second)
+      |> MyApp.Cldr.DateTime.Relative.to_string!()
+
+    _ = MyApp.Cldr.DateTime.to_string!(datetime, [])
+  end
 end

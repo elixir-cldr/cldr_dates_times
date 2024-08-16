@@ -170,7 +170,7 @@ defmodule Cldr.DateTime.Formatter do
 
   """
   @spec date(Calendar.date(), integer, Keyword.t()) ::
-          String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()} | {:error, {module, String.t()}}
 
   def date(date, n \\ @default_format, options \\ [])
 
@@ -234,7 +234,7 @@ defmodule Cldr.DateTime.Formatter do
           Cldr.backend(),
           Keyword.t() | map()
         ) ::
-          String.t() | {:error, String.t()}
+          String.t() | {:error, String.t()} | {:error, {module, String.t()}}
 
   def time(time, _n, _locale, backend, options) when is_list(options) do
     with {:ok, time_string} <- Cldr.Time.to_string(time, backend, options) do
@@ -3897,6 +3897,7 @@ defmodule Cldr.DateTime.Formatter do
   defp number_of_digits(n), do: Enum.count(Integer.digits(n))
 
   @doc false
+  @dialyzer {:nowarn_function, error_return: 3}
   def error_return(map, symbol, requirements) do
     requirements =
       requirements
@@ -3905,6 +3906,8 @@ defmodule Cldr.DateTime.Formatter do
 
     raise Cldr.DateTime.FormatError,
           "The format symbol '#{symbol}' requires at map with at least #{requirements}. Found: #{inspect(map)}"
+
+    :error
   end
 
   @doc false

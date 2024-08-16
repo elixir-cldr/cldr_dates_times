@@ -1,7 +1,7 @@
 defmodule Cldr.DatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.20.2"
+  @version "2.20.3"
 
   def project do
     [
@@ -20,7 +20,13 @@ defmodule Cldr.DatesTimes.Mixfile do
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore_warnings",
         plt_add_apps: ~w(calendar_interval)a,
-        flags: [:underspecs]
+        flags: [
+          :error_handling,
+          :unknown,
+          :underspecs,
+          :extra_return,
+          :missing_return
+        ]
       ],
       xref: [exclude: [:eprof]]
     ]
@@ -72,6 +78,7 @@ defmodule Cldr.DatesTimes.Mixfile do
     [
       {:ex_cldr, "~> 2.40"},
       {:ex_cldr_calendars, "~> 1.25"},
+
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_cldr_units, "~> 3.17", optional: true},
       {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},
