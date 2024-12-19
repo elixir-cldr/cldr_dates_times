@@ -23,7 +23,7 @@ defmodule Cldr.DateAndTime.Backend do
         ## Options
 
         * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
-          any of the keys in the map returned by `Cldr.DateTime.date_time_formats/3`.
+          any of the keys in the map returned by `Cldr.DateTime.Format.date_time_formats/3`.
           The default is `:medium`. See [here](README.md#date-time-and-datetime-localization-formats)
           for more information about specifying formats.
 
@@ -110,7 +110,7 @@ defmodule Cldr.DateAndTime.Backend do
         ## Options
 
         * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
-          any of the keys in the map returned by `Cldr.DateTime.date_time_formats/3`.
+          any of the keys in the map returned by `Cldr.DateTime.Format.date_time_formats/3`.
           The default is `:medium`. See [here](README.md#date-time-and-datetime-localization-formats)
           for more information about specifying formats.
 
@@ -354,7 +354,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         * `time` is a `t:Time.t/0` struct or any map that contains
           one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`,
-          `:time_zone`, `:zone_abbr`, `:utc_offset` and `:std_offset.
+          `:time_zone`, `:zone_abbr`, `:utc_offset` and `:std_offset`.
 
         * `options` is a keyword list of options for formatting.
 
@@ -432,7 +432,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         * `time` is a `t:Time.t/0` struct or any map that contains
           one or more of the keys `:hour`, `:minute`, `:second` and optionally `:microsecond`,
-          `:time_zone`, `:zone_abbr`, `:utc_offset` and `:std_offset.
+          `:time_zone`, `:zone_abbr`, `:utc_offset` and `:std_offset`.
 
         * `options` is a keyword list of options for formatting.
 
