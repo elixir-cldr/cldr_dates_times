@@ -88,7 +88,7 @@ defmodule Cldr.DateTime.Format do
       iex> Cldr.DateTime.Format.calendars_for(:en, MyApp.Cldr)
       {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
        :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
-       :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
+       :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :iso8601, :japanese, :persian, :roc]}
 
   """
   @spec calendars_for(Locale.locale_reference(), Cldr.backend()) ::

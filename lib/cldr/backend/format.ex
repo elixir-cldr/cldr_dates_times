@@ -87,7 +87,7 @@ defmodule Cldr.DateTime.Format.Backend do
             iex> #{inspect(__MODULE__)}.calendars_for(:en)
             {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
              :generic, :gregorian, :hebrew, :indian, :islamic, :islamic_civil,
-             :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :japanese, :persian, :roc]}
+             :islamic_rgsa, :islamic_tbla, :islamic_umalqura, :iso8601, :japanese, :persian, :roc]}
 
         """
         @spec calendars_for(Locale.locale_reference()) ::
