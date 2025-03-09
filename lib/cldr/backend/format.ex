@@ -167,20 +167,26 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Examples:
 
             iex> #{inspect(__MODULE__)}.time_formats(:en)
-            {:ok, %Cldr.Time.Formats{
-              full: "h:mm:ss a zzzz",
-              long: "h:mm:ss a z",
-              medium: "h:mm:ss a",
-              short: "h:mm a"
-            }}
+            {
+              :ok,
+              %Cldr.Time.Formats{
+                full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+                long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+                medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+                short: %{unicode: "h:mm a", ascii: "h:mm a"}
+              }
+            }
 
             iex> #{inspect(__MODULE__)}.time_formats(:en, :buddhist)
-            {:ok, %Cldr.Time.Formats{
-              full: "h:mm:ss a zzzz",
-              long: "h:mm:ss a z",
-              medium: "h:mm:ss a",
-              short: "h:mm a"
-            }}
+            {
+              :ok,
+              %Cldr.Time.Formats{
+                full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+                long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+                medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+                short: %{unicode: "h:mm a", ascii: "h:mm a"}
+              }
+            }
 
         """
         @spec time_formats(Locale.locale_reference(), calendar) ::

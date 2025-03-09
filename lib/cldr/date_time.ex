@@ -877,6 +877,14 @@ defmodule Cldr.DateTime do
     end
   end
 
+  def apply_preference(%{default: default}, _preference) do
+    {:ok, default}
+  end
+
+  def apply_preference(%{unicode: unicode}, _preference) do
+    {:ok, unicode}
+  end
+
   def apply_preference(format, _) do
     {:ok, format}
   end

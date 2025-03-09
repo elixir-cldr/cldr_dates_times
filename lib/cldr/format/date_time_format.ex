@@ -248,20 +248,26 @@ defmodule Cldr.DateTime.Format do
   ## Examples:
 
       iex> Cldr.DateTime.Format.time_formats(:en)
-      {:ok, %Cldr.Time.Formats{
-        full: "h:mm:ss a zzzz",
-        long: "h:mm:ss a z",
-        medium: "h:mm:ss a",
-        short: "h:mm a"
-      }}
+      {
+        :ok,
+        %Cldr.Time.Formats{
+          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+          short: %{unicode: "h:mm a", ascii: "h:mm a"}
+        }
+      }
 
       iex> Cldr.DateTime.Format.time_formats(:en, :buddhist)
-      {:ok, %Cldr.Time.Formats{
-        full: "h:mm:ss a zzzz",
-        long: "h:mm:ss a z",
-        medium: "h:mm:ss a",
-        short: "h:mm a"
-      }}
+      {
+        :ok,
+        %Cldr.Time.Formats{
+          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+          short: %{unicode: "h:mm a", ascii: "h:mm a"}
+        }
+      }
 
   """
   @spec time_formats(
@@ -558,7 +564,7 @@ defmodule Cldr.DateTime.Format do
     |> Enum.map(&elem(&1, 1))
     |> Enum.map(&Map.keys/1)
     |> Enum.map(&MapSet.new/1)
-    |> intersect_mapsets
+    |> intersect_mapsets()
     |> MapSet.to_list()
     |> Enum.sort()
   end
@@ -607,7 +613,19 @@ defmodule Cldr.DateTime.Format do
             do: Map.from_struct(calendar_formats),
             else: calendar_formats
 
-        acc ++ Map.values(map)
+        formats =
+          map
+          |> Map.values()
+          |> Enum.map(fn
+            format when is_binary(format) -> format
+            %{format: format, number_system: _} -> format
+            %{unicode: unicode, ascii: ascii} -> [unicode, ascii]
+            %{default: default} -> default
+            other -> other
+          end)
+          |> List.flatten()
+
+        acc ++ formats
       end)
       |> Enum.uniq()
     end

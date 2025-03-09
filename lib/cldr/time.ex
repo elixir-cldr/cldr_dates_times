@@ -436,22 +436,26 @@ defmodule Cldr.Time do
   ### Examples:
 
       iex> Cldr.Time.formats(:en, :gregorian, MyApp.Cldr)
-      {:ok,
-       %Cldr.Time.Formats{
-         short: "h:mm a",
-         medium: "h:mm:ss a",
-         long: "h:mm:ss a z",
-         full: "h:mm:ss a zzzz"
-       }}
+      {
+        :ok,
+        %Cldr.Time.Formats{
+          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+          short: %{unicode: "h:mm a", ascii: "h:mm a"}
+        }
+      }
 
       iex> Cldr.Time.formats(:en, :buddhist, MyApp.Cldr)
-      {:ok,
-       %Cldr.Time.Formats{
-         short: "h:mm a",
-         medium: "h:mm:ss a",
-         long: "h:mm:ss a z",
-         full: "h:mm:ss a zzzz"
-       }}
+      {
+        :ok,
+        %Cldr.Time.Formats{
+          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+          short: %{unicode: "h:mm a", ascii: "h:mm a"}
+        }
+      }
 
   """
   @spec formats(
