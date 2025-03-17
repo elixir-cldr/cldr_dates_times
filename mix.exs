@@ -1,7 +1,7 @@
 defmodule Cldr.DatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.21.0"
+  @version "2.22.0"
 
   def project do
     [
@@ -77,13 +77,13 @@ defmodule Cldr.DatesTimes.Mixfile do
   defp deps do
     [
       {:ex_cldr_numbers, path: "../cldr_numbers", override: true},
-      # {:ex_cldr, "~> 2.40"},
+      # {:ex_cldr_numbers, "~> 2.34"},
 
       {:ex_cldr, path: "../cldr", override: true},
       # {:ex_cldr, github: "elixir-cldr/cldr47", override: true},
 
       {:ex_cldr_calendars, path: "../cldr_calendars", override: true},
-      # {:ex_cldr_calendars, "~> 1.25 or ~> 2.0"},
+      # {:ex_cldr_calendars, "~> 2.1"},
 
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_cldr_units, "~> 3.17", optional: true},
