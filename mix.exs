@@ -76,17 +76,11 @@ defmodule Cldr.DatesTimes.Mixfile do
 
   defp deps do
     [
-      {:ex_cldr_numbers, path: "../cldr_numbers", override: true},
-      # {:ex_cldr_numbers, "~> 2.34"},
-
-      {:ex_cldr, path: "../cldr", override: true},
-      # {:ex_cldr, github: "elixir-cldr/cldr47", override: true},
-
-      {:ex_cldr_calendars, path: "../cldr_calendars", override: true},
-      # {:ex_cldr_calendars, "~> 2.1"},
+      {:ex_cldr_numbers, "~> 2.34"},
+      {:ex_cldr_calendars, "~> 2.1"},
+      {:ex_cldr_units, "~> 3.18", optional: true},
 
       {:calendar_interval, "~> 0.2", optional: true},
-      {:ex_cldr_units, "~> 3.17", optional: true},
       {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
       {:tz, "~> 0.26", optional: true},
