@@ -6,6 +6,19 @@
 
 This is the changelog for Cldr_Dates_Times v2.22.0 released on March 18th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
+### Breaking Data format changes
+
+There are some changes to the underlying locale data format that will be a breaking change for results returned from:
+
+* `Cldr.DateTime.Format.time_formats/{1,2,3}`
+* `MyApp.Cldr.Calendar.day_periods/{0, 1, 2}`
+
+The data changes are summarised as:
+
+* Time formats now group the `:default` and `:ascii` alternatives.
+* Day periods used for date/time formatting now group the alternatives for `am` and `pm` where the data is available.
+* Day period display names now group the alternatives for `am` and `pm` where the data is available.
+
 ### Enhancements
 
 * Update to [CLDR 47](https://cldr.unicode.org/downloads/cldr-47) data.
