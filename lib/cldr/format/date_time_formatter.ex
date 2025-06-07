@@ -20,7 +20,7 @@ defmodule Cldr.DateTime.Formatter do
   all - of these symbols are supported in `Cldr`.  The supported
   symbols are described below.
 
-  ## Format Symbol Table
+  ### Format Symbol Table
 
   | Element                | Symbol     | Example         | Cldr Format                        |
   | :--------------------  | :--------  | :-------------- | :--------------------------------- |
@@ -127,7 +127,7 @@ defmodule Cldr.DateTime.Formatter do
   | GMT Format              | O         | "+0100"         | Short localised GMT format        |
   |                         | OOOO      | "+010059"       | Long localised GMT format         |
 
-  ## Formatting symbols for hour of day
+  ### Formatting symbols for hour of day
 
   The hour of day can be formatted differently depending whether
   a 12- or 24-hour day is being represented and depending on the
@@ -141,6 +141,46 @@ defmodule Cldr.DateTime.Formatter do
   |   H	    |   0	  | 1...11	|  12	 |  13...23   |   0   |
   |   k	    |  24	  | 1...11	|  12	 |  13...23   |  24   |
 
+  ### Fractional Seconds
+
+  The fractional seconds formatting code (`S`) formats *only*
+  the fraction of a second as represented by the `Time.t/0`
+  type which is a tuple of the form `{microseconds, precision}`.
+
+  If used standalone, `S` will be formatted as only the
+  fractional digits. For example:
+
+      iex> t = ~T[10:00:07.002]
+      ~T[10:00:07.002]
+      iex> Cldr.Time.to_string(t, format: "SSS")
+      {:ok, "002"}
+
+  If, however, fractional seconds (format code `S`) are formatted
+  immediately after seconds (format code `s`) then a decimal
+  separator is inserted between the `s` and `S`. The separator
+  will be that appropriate for the designated locale, number system
+  and selected separators.  For example:
+
+      iex> t = ~T[10:00:07.002]
+      ~T[10:00:07.002]
+      iex> Cldr.Time.to_string t, format: "ssSSS"
+      {:ok, "07.002"}
+
+  Lastly, the number of fractional seconds is truncated
+  to the count of the number of `S` format characters. And, if
+  required, will be zero filled to that width.
+
+      iex> t = ~T[10:00:07.002]
+      ~T[10:00:07.002]
+      iex> Cldr.Time.to_string t, format: "ssS"
+      {:ok, "07.0"}
+      iex> Cldr.Time.to_string t, format: "ssSS"
+      {:ok, "07.00"}
+      iex> Cldr.Time.to_string t, format: "ssSSS"
+      {:ok, "07.002"}
+      iex> Cldr.Time.to_string t, format: "ssSSSS"
+      {:ok, "07.0020"}
+
   """
 
   alias Cldr.DateTime.Timezone
@@ -149,6 +189,7 @@ defmodule Cldr.DateTime.Formatter do
 
   @duration_modules [Cldr.Calendar.Duration, Duration]
   @default_format 1
+  @default_separators :standard
 
   @doc false
   defguard is_date(date)
@@ -2865,13 +2906,13 @@ defmodule Cldr.DateTime.Formatter do
   ## Examples
 
       iex> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 1
-      "4.0"
+      "0"
 
       iex> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 3
-      "4.002"
+      "002"
 
       iex> Cldr.DateTime.Formatter.fractional_second %{second: 4}, 1
-      "4"
+      "0"
 
   """
   @spec fractional_second(Cldr.Calendar.time(), integer, Keyword.t()) ::
@@ -2898,35 +2939,45 @@ defmodule Cldr.DateTime.Formatter do
         ) ::
           String.t() | {:error, String.t()}
 
-  # Note that TR35 says we should truncate the number of decimal digits
-  # but we are rounding
   def fractional_second(time, n, locale, backend, options \\ %{})
 
-  @microseconds 1_000_000
-  def fractional_second(
-        %{second: second, microsecond: {fraction, resolution}},
-        n,
-        _locale,
-        _backend,
-        options
-      ) do
-    rounding = min(resolution, n)
-
-    (second * 1.0 + fraction / @microseconds)
-    |> Float.round(rounding)
-    |> to_string
+  def fractional_second(%{microsecond: {microseconds, precision}}, n, _locale, _backend, options) do
+    microseconds
+    |> microseconds_to_string(precision)
+    |> truncate(n)
+    |> right_fill(n)
     |> maybe_wrap(:fractional_second, options)
   end
 
-  def fractional_second(%{second: second}, n, _locale, _backend, options) do
-    second
-    |> pad(n)
+  def fractional_second(%{second: _second}, n, _locale, _backend, options) do
+    "0"
+    |> right_fill(n)
     |> maybe_wrap(:fractional_second, options)
   end
 
   def fractional_second(time, _n, _locale, _backend, _options) do
-    error_return(time, "S", [:second])
+    error_return(time, "S", [:fractional_second])
   end
+
+  defp truncate(string, n) do
+    String.slice(string, 0, n)
+  end
+
+  @doc false
+  def microseconds_to_string(_microsecond, 0), do: []
+  def microseconds_to_string(microsecond, 6), do: pad(microsecond, 6)
+
+  def microseconds_to_string(microsecond, precision) do
+    num = div(microsecond, scale_factor(precision))
+    pad(num, precision)
+  end
+
+  defp scale_factor(1), do: 100_000
+  defp scale_factor(2), do: 10_000
+  defp scale_factor(3), do: 1_000
+  defp scale_factor(4), do: 100
+  defp scale_factor(5), do: 10
+  defp scale_factor(6), do: 1
 
   @doc """
   Returns the `time` (format symbol `A`) as milliseconds since
@@ -3810,6 +3861,33 @@ defmodule Cldr.DateTime.Formatter do
     |> maybe_wrap(:literal, options)
   end
 
+  @doc """
+  Inserts the decimal separator appropriate for the
+  given locale, number system and separators.
+
+  """
+  @spec decimal_separator(
+          Cldr.Calendar.any_date_time(),
+          atom,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
+          String.t() | {:error, String.t()}
+
+  def decimal_separator(_date, nil, locale, backend, options) do
+    {:ok, symbols} = Cldr.Number.Symbol.number_symbols_for(locale, backend)
+    number_system = options.number_system
+    separators = options.separators
+
+    decimal_separators =
+      symbols
+      |> Map.fetch!(number_system)
+      |> Map.fetch!(:decimal)
+
+    Map.get(decimal_separators, separators) || Map.fetch!(decimal_separators, @default_separators)
+  end
+
   # Helpers
 
   # ISO 8601 time zone formats:
@@ -3878,6 +3956,16 @@ defmodule Cldr.DateTime.Formatter do
       integer
     else
       String.duplicate("0", n - len) <> integer
+    end
+  end
+
+  defp right_fill(string, n) do
+    len = String.length(string)
+    if len >= n do
+      string
+    else
+      fill = String.duplicate("0", n - len)
+      string <> fill
     end
   end
 

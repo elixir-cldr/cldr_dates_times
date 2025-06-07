@@ -51,10 +51,31 @@ defmodule Cldr.DateTime.Format.Compiler do
     format_string
     |> String.to_charlist()
     |> :date_time_format_lexer.string()
+    |> maybe_add_decimal_separator()
   end
 
   def tokenize(%{number_system: _numbers, format: format_string}) do
     tokenize(format_string)
+  end
+
+  defp maybe_add_decimal_separator({:ok, token_list, other}) do
+    {:ok, seconds_followed_by_fraction(token_list), other}
+  end
+
+  defp maybe_add_decimal_separator(other) do
+    other
+  end
+
+  defp seconds_followed_by_fraction([]) do
+    []
+  end
+
+  defp seconds_followed_by_fraction([{:second, _, _} = second, {:fractional_second, _, _} = fractional_second | rest]) do
+    [second, {:decimal_separator, nil, nil}, fractional_second | seconds_followed_by_fraction(rest)]
+  end
+
+  defp seconds_followed_by_fraction([first | rest]) do
+    [first | seconds_followed_by_fraction(rest)]
   end
 
   @doc """

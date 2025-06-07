@@ -29,6 +29,7 @@ defmodule Cldr.DateTime do
   @default_format_type :medium
   @default_style :default
   @default_prefer :unicode
+  @default_separators :standard
 
   @doc """
   Indicates if a given map fulfills the requirements
@@ -139,6 +140,12 @@ defmodule Cldr.DateTime do
 
   * `:number_system` a number system into which the formatted datetime digits should
     be transliterated.
+
+  * `:separators` selects which of the available symbol
+    sets should be used when formatting fractional seconds (format
+    character `S`).  The default is `:standard`. Some limited locales have an alternative `:us`
+    variant that can be used. See `Cldr.Number.Symbol.number_symbols_for/3`
+    for the symbols supported for a given locale and number system.
 
   * `:era` which, if set to `:variant`, will use a variant for the era if one
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
@@ -542,7 +549,8 @@ defmodule Cldr.DateTime do
         date_format: date_format,
         time_format: time_format,
         style: @default_style,
-        prefer: [@default_prefer]
+        prefer: [@default_prefer],
+        separators: @default_separators
       }
 
     {:ok, datetime, options}
@@ -567,6 +575,7 @@ defmodule Cldr.DateTime do
 
     locale_number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     number_system = Keyword.get(options, :number_system, locale_number_system)
+    separators = Keyword.get(options, :separators, @default_separators)
 
     {format, date_format, time_format} =
       formats_from_options(datetime, format, date_format, time_format, @default_format_type)
@@ -582,6 +591,7 @@ defmodule Cldr.DateTime do
         |> Map.put(:style, style)
         |> Map.put(:prefer, prefer)
         |> Map.put(:number_system, number_system)
+        |> Map.put(:separators, separators)
 
       {:ok, datetime, options}
     end

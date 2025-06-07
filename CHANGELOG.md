@@ -2,6 +2,17 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.23.0
+
+This is the changelog for Cldr_Dates_Times v2.23.0 released on _____, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fixes formatting of the `S` format code which formats fractional seconds. In previous versions, `S` was formatted to include *both* the number of seconds *and* the fraction of a second. This is incorrect according to [TR 35](https://unicode.org/reports/tr35/tr35-dates.html). Now the `S` formats *only* the fraction of a second. In addition, the fraction of a second is truncated (previously rounded) and right-filled with `0` characters if required. See also the [formatter documentation](https://hexdocs.pm/ex_cldr_dates_times/Cldr.DateTime.Formatter.html#module-fractional-seconds) for further information. Thanks to @jswanner for the report. Closes #55.
+
+### Enhancements
+
+
 ## Cldr_Dates_Times v2.22.0
 
 This is the changelog for Cldr_Dates_Times v2.22.0 released on March 18th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

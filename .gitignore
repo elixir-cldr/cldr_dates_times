@@ -19,3 +19,4 @@ erl_crash.dump
 src/*.erl
 
 .tools-versions
+mise.toml
