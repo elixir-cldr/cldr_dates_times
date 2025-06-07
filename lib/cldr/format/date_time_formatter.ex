@@ -2859,8 +2859,8 @@ defmodule Cldr.DateTime.Formatter do
   | Symbol | Results    | Description                                           |
   | :----  | :--------- | :---------------------------------------------------- |
   | S      | "4.0"      | Minimum digits of fractional seconds                  |
-  | SS     | "4.00"     | Number of seconds zero-padded to 2 fractional digits  |
-  | SSS    | "4.002"    | Number of seconds zero-padded to 3 fractional digits  |
+  | SS     | "04.00"    | Number of seconds zero-padded to 2 fractional digits  |
+  | SSS    | "04.002"   | Number of seconds zero-padded to 3 fractional digits  |
 
   ## Examples
 
@@ -2868,7 +2868,7 @@ defmodule Cldr.DateTime.Formatter do
       "4.0"
 
       iex> Cldr.DateTime.Formatter.fractional_second %{second: 4, microsecond: {2000, 3}}, 3
-      "4.002"
+      "04.002"
 
       iex> Cldr.DateTime.Formatter.fractional_second %{second: 4}, 1
       "4"
@@ -2911,11 +2911,15 @@ defmodule Cldr.DateTime.Formatter do
         options
       ) do
     rounding = min(resolution, n)
+    n_second = min(2, n)
 
-    (second * 1.0 + fraction / @microseconds)
-    |> Float.round(rounding)
-    |> to_string
-    |> maybe_wrap(:fractional_second, options)
+    [second, fractional_second] =
+      (second * 1.0 + fraction / @microseconds)
+      |> Float.round(rounding)
+      |> to_string
+      |> String.split(".")
+
+    "#{pad(second, n_second)}.#{maybe_wrap(fractional_second, :fractional_second, options)}"
   end
 
   def fractional_second(%{second: second}, n, _locale, _backend, options) do
