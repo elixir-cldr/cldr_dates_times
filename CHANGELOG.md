@@ -4,7 +4,11 @@
 
 ## Cldr_Dates_Times v2.23.0
 
-This is the changelog for Cldr_Dates_Times v2.23.0 released on _____, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.23.0 released on June 24th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Breaking change to `S` format code implementation
+
+This release fixes a long-standing bug in the formatting of the `S` (fractional second) format code. Any applications relying on the previous incorrect implementation will need updating.
 
 ### Bug Fixes
 
@@ -12,6 +16,7 @@ This is the changelog for Cldr_Dates_Times v2.23.0 released on _____, 2025.  For
 
 ### Enhancements
 
+* Implements user-specified relative time steps. This allows developers to specify when a relative time interval steps from seconds to minutes to days and so on.  Thanks to @tjchambers for the collaboration and patience. Closes #54.
 
 ## Cldr_Dates_Times v2.22.0
 
