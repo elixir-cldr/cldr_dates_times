@@ -266,7 +266,6 @@ defmodule Cldr.DateTime.Relative do
     being the number of seconds below which the key defines the time unit difference. The
     default is:
 
-
       #{inspect @unit_steps}
 
   ### Notes
@@ -405,7 +404,6 @@ defmodule Cldr.DateTime.Relative do
   defp unit?(time_difference, unit_time) do
     time_difference < unit_time
   end
-
 
   @doc """
   Calculates the time span in the given `unit` from the time given in seconds.
