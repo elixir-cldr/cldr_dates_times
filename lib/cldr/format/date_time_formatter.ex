@@ -198,6 +198,9 @@ defmodule Cldr.DateTime.Formatter do
   defguard is_time(time)
            when is_map_key(time, :hour) and is_map_key(time, :minute) and is_map_key(time, :second)
 
+  defguard is_date_time(datetime)
+           when is_date(datetime) and is_time(datetime)
+
   defguard has_year_and_month(date)
            when is_map_key(date, :year) and is_map_key(date, :month)
 

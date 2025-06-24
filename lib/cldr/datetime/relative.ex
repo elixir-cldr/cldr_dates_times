@@ -7,6 +7,7 @@ defmodule Cldr.DateTime.Relative do
   "in 10 seconds"
 
   """
+  import Cldr.DateTime.Formatter, only: :macros
 
   @second 1
   @minute 60
@@ -56,6 +57,14 @@ defmodule Cldr.DateTime.Relative do
   * `:relative_to` is the baseline `t:Date/0` or `t:Datetime.t/0` from which the difference
     from `relative` is calculated when `relative` is a Date or a DateTime. The default for
     a `t:Date.t/0` is `Date.utc_today/0`, for a `t:DateTime.t/0` it is `DateTime.utc_now/0`.
+
+  * `:unit_splits` is a map that is used to derive the time unit that best desribes the difference
+    between `relative` and `relative_to`. The map is required to have the keys `:second`,
+    `:minute`, `:hour`, `:day`, `:week`, `:month`, and `:year` with the values being the number
+    of seconds below which the key defines the time unit difference. The default is:
+
+
+      #{inspect @unit}
 
   ### Notes
 
@@ -137,11 +146,13 @@ defmodule Cldr.DateTime.Relative do
     options = normalize_options(backend, options)
     locale = Keyword.get(options, :locale)
     {unit, options} = Keyword.pop(options, :unit)
+    {unit_splits, options} = Keyword.pop(options, :unit_splits, @unit)
 
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, unit} <- validate_unit(unit),
          {:ok, _style} <- validate_style(options[:style] || options[:format]) do
-      {relative, unit} = define_unit_and_relative_time(relative, unit, options[:relative_to])
+      relative_to = options[:relative_to]
+      {relative, unit} = define_unit_and_relative_time(relative, unit, relative_to, unit_splits)
       string = to_string(relative, unit, locale, backend, options)
       {:ok, string}
     end
@@ -158,34 +169,27 @@ defmodule Cldr.DateTime.Relative do
   end
 
   # No unit or relative_to is specified so we derive them
-  defp define_unit_and_relative_time(relative, nil, nil) when is_number(relative) do
-    unit = unit_from_relative_time(relative)
-    relative = scale_relative(relative, unit)
+  defp define_unit_and_relative_time(relative, nil, nil, unit_splits) do
+    unit = unit_from_relative_time(relative, unit_splits)
+    relative = scale_relative(relative, unit, unit_splits)
     {relative, unit}
   end
 
   # Take two datetimes and calculate the seconds between them
-  defp define_unit_and_relative_time(
-         %{year: _, month: _, day: _, hour: _, minute: _, second: _, calendar: Calendar.ISO} =
-           relative,
-         unit,
-         relative_to
-       ) do
+  defp define_unit_and_relative_time(relative, unit, relative_to, unit_splits)
+      when is_date_time(relative) do
     now = (relative_to || DateTime.utc_now()) |> DateTime.to_unix()
     then = DateTime.to_unix(relative)
     relative_time = then - now
-    unit = unit || unit_from_relative_time(relative_time)
 
-    relative = scale_relative(relative_time, unit)
+    unit = unit || unit_from_relative_time(relative_time, unit_splits)
+    relative = scale_relative(relative_time, unit, unit_splits)
     {relative, unit}
   end
 
   # Take two dates and calculate the days between them
-  defp define_unit_and_relative_time(
-         %{year: _, month: _, day: _, calendar: Calendar.ISO} = relative,
-         unit,
-         relative_to
-       ) do
+  defp define_unit_and_relative_time(relative, unit, relative_to, unit_splits)
+      when is_date(relative) do
     today =
       (relative_to || Date.utc_today())
       |> Date.to_erl()
@@ -201,15 +205,13 @@ defmodule Cldr.DateTime.Relative do
     relative_time =
       then - today
 
-    unit =
-      unit || unit_from_relative_time(relative_time)
-
-    relative = scale_relative(relative_time, unit)
+    unit = unit || unit_from_relative_time(relative_time, unit_splits)
+    relative = scale_relative(relative_time, unit, unit_splits)
     {relative, unit}
   end
 
   # Anything else just return the values
-  defp define_unit_and_relative_time(relative_time, unit, _relative_to) do
+  defp define_unit_and_relative_time(relative_time, unit, _relative_to, _unit_splits) do
     {relative_time, unit}
   end
 
@@ -243,7 +245,15 @@ defmodule Cldr.DateTime.Relative do
     from `relative` is calculated when `relative` is a Date or a DateTime. The default for
     a `t:Date.t/0` is `Date.utc_today/0`, for a `t:DateTime.t/0` it is `DateTime.utc_now/0`.
 
-  See `to_string/3`
+  * `:unit_splits` is a map that is used to derive the time unit that best desribes the difference
+    between `relative` and `relative_to`. The map is required to have the keys `:second`,
+    `:minute`, `:hour`, `:day`, `:week`, `:month`, and `:year` with the values being the number
+    of seconds below which the key defines the time unit difference. The default is:
+
+
+      #{inspect @unit}
+
+  See `to_string/3` for example usage.
 
   """
   @spec to_string!(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
@@ -336,21 +346,25 @@ defmodule Cldr.DateTime.Relative do
       :year
 
   """
-  def unit_from_relative_time(time) when is_number(time) do
-    case abs(time) do
-      i when i < @minute -> :second
-      i when i < @hour -> :minute
-      i when i < @day -> :hour
-      i when i < @week -> :day
-      i when i < @month -> :week
-      i when i < @year -> :month
-      _ -> :year
+  def unit_from_relative_time(time, unit_splits \\ @unit)
+
+  def unit_from_relative_time(time, unit_splits) when is_number(time) and is_map(unit_splits) do
+    time= abs(time)
+
+    cond do
+      time < unit_splits[:minute] -> :second
+      time < unit_splits[:hour] -> :minute
+      time < unit_splits[:day] -> :hour
+      time < unit_splits[:week] -> :day
+      time < unit_splits[:month] -> :week
+      time < unit_splits[:year] -> :month
+      true -> :year
     end
   end
 
-  def unit_from_relative_time(time) do
-    time
-  end
+  # def unit_from_relative_time(time, _unit, _unit_splits) do
+  #   time
+  # end
 
   @doc """
   Calculates the time span in the given `unit` from the time given in seconds.
@@ -367,8 +381,9 @@ defmodule Cldr.DateTime.Relative do
       0
 
   """
-  def scale_relative(time, unit) when is_number(time) and is_atom(unit) do
-    (time / @unit[unit])
+  def scale_relative(time, unit, unit_splits \\ @unit)
+      when is_number(time) and is_atom(unit) and is_map(unit_splits) do
+    (time / unit_splits[unit])
     |> Float.round()
     |> trunc
   end
