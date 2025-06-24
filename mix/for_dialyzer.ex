@@ -5,6 +5,8 @@ defmodule Cldr.DatesTimes.Dialyzer do
   This module is not included in the hex package.
 
   """
+  require Cldr.DateTime.Backend
+
   def backend_formats do
     {:ok, %{medium: _format_dt}} = MyApp.Cldr.DateTime.Format.date_time_formats("en")
     {:ok, %{medium: _format_dt}} = MyApp.Cldr.DateTime.Format.date_formats("en")
