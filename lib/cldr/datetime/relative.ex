@@ -268,7 +268,7 @@ defmodule Cldr.DateTime.Relative do
 
       #{inspect @unit_steps}
 
-  ### Notes
+  ### The :derive_unit_from map
 
   * Any `:derive_unit_from` map is first merged into the default map. This means that developers
     can use the default values and override only specific entries by providing a sparse map.
@@ -278,6 +278,14 @@ defmodule Cldr.DateTime.Relative do
 
   * Any entry in the `:derive_unit_from` map that has the value `:infinity` will always be the
     largest time unit used to represent the relative time.
+
+  ### Notes
+
+  When `options[:unit]` is not specified, `Cldr.DateTime.Relative.to_string/2`
+  attempts to identify the appropriate unit based upon the magnitude of `relative`.
+
+  For example, given a parameter of less than `60`, then `to_string/2` will assume
+  `:seconds` as the unit.  See `unit_from_relative_time/1`.
 
   See `to_string/3` for example usage.
 
