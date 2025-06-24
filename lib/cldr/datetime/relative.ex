@@ -17,7 +17,7 @@ defmodule Cldr.DateTime.Relative do
   @month 2_629_743.83
   @year 31_556_926
 
-  @unit %{
+  @unit_steps %{
     second: @second,
     minute: @minute,
     hour: @hour,
@@ -28,7 +28,7 @@ defmodule Cldr.DateTime.Relative do
   }
 
   @other_units [:mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]
-  @unit_keys Enum.sort(Map.keys(@unit) ++ @other_units)
+  @unit_keys Enum.sort(Map.keys(@unit_steps) ++ @other_units)
   @known_styles [:default, :narrow, :short]
 
   @doc """
@@ -58,13 +58,24 @@ defmodule Cldr.DateTime.Relative do
     from `relative` is calculated when `relative` is a Date or a DateTime. The default for
     a `t:Date.t/0` is `Date.utc_today/0`, for a `t:DateTime.t/0` it is `DateTime.utc_now/0`.
 
-  * `:unit_splits` is a map that is used to derive the time unit that best desribes the difference
-    between `relative` and `relative_to`. The map is required to have the keys `:second`,
-    `:minute`, `:hour`, `:day`, `:week`, `:month`, and `:year` with the values being the number
-    of seconds below which the key defines the time unit difference. The default is:
+  * `:derive_unit_from` is a map that is used to derive the time unit that best desribes the
+    difference between `relative` and `relative_to`. The map is required to have the keys
+    `:second`, `:minute`, `:hour`, `:day`, `:week`, `:month`, and `:year` with the values
+    being the number of seconds below which the key defines the time unit difference. The
+    default is:
 
+      #{inspect @unit_steps}
 
-      #{inspect @unit}
+  ### The :derive_unit_from map
+
+  * Any `:derive_unit_from` map is first merged into the default map. This means that developers
+    can use the default values and override only specific entries by providing a sparse map.
+
+  * Any entry in the `:derive_unit_from` map that has a value of `nil` is ignored. This has the
+    result that any key set to `nil` will never be represented in the output.
+
+  * Any entry in the `:derive_unit_from` map that has the value `:infinity` will always be the
+    largest time unit used to represent the relative time.
 
   ### Notes
 
@@ -144,15 +155,19 @@ defmodule Cldr.DateTime.Relative do
 
   def to_string(relative, backend, options) do
     options = normalize_options(backend, options)
+
     locale = Keyword.get(options, :locale)
     {unit, options} = Keyword.pop(options, :unit)
-    {unit_splits, options} = Keyword.pop(options, :unit_splits, @unit)
+    {derive_unit_from, options} = Keyword.pop(options, :derive_unit_from, @unit_steps)
+    relative_to = Keyword.get_lazy(options, :relative_to, &DateTime.utc_now/0)
+    style = options[:style] || options[:format]
 
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, unit} <- validate_unit(unit),
-         {:ok, _style} <- validate_style(options[:style] || options[:format]) do
-      relative_to = options[:relative_to]
-      {relative, unit} = define_unit_and_relative_time(relative, unit, relative_to, unit_splits)
+         {:ok, _style} <- validate_style(style),
+         {:ok, time_difference} <- time_difference(relative, relative_to) do
+      derive_unit_from = Map.merge(@unit_steps, derive_unit_from)
+      {relative, unit} = define_unit(relative, time_difference, unit, derive_unit_from)
       string = to_string(relative, unit, locale, backend, options)
       {:ok, string}
     end
@@ -168,30 +183,19 @@ defmodule Cldr.DateTime.Relative do
     |> Keyword.delete(:format)
   end
 
-  # No unit or relative_to is specified so we derive them
-  defp define_unit_and_relative_time(relative, nil, nil, unit_splits) do
-    unit = unit_from_relative_time(relative, unit_splits)
-    relative = scale_relative(relative, unit, unit_splits)
-    {relative, unit}
+  defp time_difference(relative, _relative_to) when is_integer(relative) do
+    {:ok, relative}
   end
 
-  # Take two datetimes and calculate the seconds between them
-  defp define_unit_and_relative_time(relative, unit, relative_to, unit_splits)
-      when is_date_time(relative) do
-    now = (relative_to || DateTime.utc_now()) |> DateTime.to_unix()
+  defp time_difference(relative, relative_to) when is_date_time(relative) do
+    now = DateTime.to_unix(relative_to)
     then = DateTime.to_unix(relative)
-    relative_time = then - now
-
-    unit = unit || unit_from_relative_time(relative_time, unit_splits)
-    relative = scale_relative(relative_time, unit, unit_splits)
-    {relative, unit}
+    {:ok, then - now}
   end
 
-  # Take two dates and calculate the days between them
-  defp define_unit_and_relative_time(relative, unit, relative_to, unit_splits)
-      when is_date(relative) do
+  defp time_difference(relative, relative_to) when is_date(relative) do
     today =
-      (relative_to || Date.utc_today())
+      relative_to
       |> Date.to_erl()
       |> :calendar.date_to_gregorian_days()
       |> Kernel.*(@day)
@@ -202,17 +206,28 @@ defmodule Cldr.DateTime.Relative do
       |> :calendar.date_to_gregorian_days()
       |> Kernel.*(@day)
 
-    relative_time =
-      then - today
+    {:ok, then - today}
+  end
 
-    unit = unit || unit_from_relative_time(relative_time, unit_splits)
-    relative = scale_relative(relative_time, unit, unit_splits)
+  # No unit specified so we derive it
+  defp define_unit(_relative, time_difference, nil = unit, derive_unit_from)
+      when is_map(derive_unit_from) do
+    unit = unit_from_relative_time(time_difference, unit, derive_unit_from)
+    relative = scale_relative(time_difference, unit, derive_unit_from)
     {relative, unit}
   end
 
-  # Anything else just return the values
-  defp define_unit_and_relative_time(relative_time, unit, _relative_to, _unit_splits) do
-    {relative_time, unit}
+  # Use the unit and difference as supplied
+  defp define_unit(relative, _time_difference, unit, _derive_unit_from)
+      when is_integer(relative) do
+    {relative, unit}
+  end
+
+  # It's a calculated difference, it needs scaling
+  defp define_unit(_relative, time_difference, unit, derive_unit_from)
+      when is_map(derive_unit_from) do
+    relative = scale_relative(time_difference, unit, derive_unit_from)
+    {relative, unit}
   end
 
   @doc """
@@ -245,13 +260,25 @@ defmodule Cldr.DateTime.Relative do
     from `relative` is calculated when `relative` is a Date or a DateTime. The default for
     a `t:Date.t/0` is `Date.utc_today/0`, for a `t:DateTime.t/0` it is `DateTime.utc_now/0`.
 
-  * `:unit_splits` is a map that is used to derive the time unit that best desribes the difference
-    between `relative` and `relative_to`. The map is required to have the keys `:second`,
-    `:minute`, `:hour`, `:day`, `:week`, `:month`, and `:year` with the values being the number
-    of seconds below which the key defines the time unit difference. The default is:
+  * `:derive_unit_from` is a map that is used to derive the time unit that best desribes the
+    difference between `relative` and `relative_to`. The map is required to have the keys
+    `:second`, `:minute`, `:hour`, `:day`, `:week`, `:month`, and `:year` with the values
+    being the number of seconds below which the key defines the time unit difference. The
+    default is:
 
 
-      #{inspect @unit}
+      #{inspect @unit_steps}
+
+  ### Notes
+
+  * Any `:derive_unit_from` map is first merged into the default map. This means that developers
+    can use the default values and override only specific entries by providing a sparse map.
+
+  * Any entry in the `:derive_unit_from` map that has a value of `nil` is ignored. This has the
+    result that any key set to `nil` will never be represented in the output.
+
+  * Any entry in the `:derive_unit_from` map that has the value `:infinity` will always be the
+    largest time unit used to represent the relative time.
 
   See `to_string/3` for example usage.
 
@@ -346,25 +373,39 @@ defmodule Cldr.DateTime.Relative do
       :year
 
   """
-  def unit_from_relative_time(time, unit_splits \\ @unit)
+  def unit_from_relative_time(time_difference, unit \\ nil, derive_unit_from \\ @unit_steps)
 
-  def unit_from_relative_time(time, unit_splits) when is_number(time) and is_map(unit_splits) do
-    time= abs(time)
+  def unit_from_relative_time(time_difference, nil, derive_unit_from)
+      when is_number(time_difference) and is_map(derive_unit_from) do
+    time_difference = abs(time_difference)
 
     cond do
-      time < unit_splits[:minute] -> :second
-      time < unit_splits[:hour] -> :minute
-      time < unit_splits[:day] -> :hour
-      time < unit_splits[:week] -> :day
-      time < unit_splits[:month] -> :week
-      time < unit_splits[:year] -> :month
+      unit?(time_difference, derive_unit_from[:minute]) -> :second
+      unit?(time_difference, derive_unit_from[:hour]) -> :minute
+      unit?(time_difference, derive_unit_from[:day]) -> :hour
+      unit?(time_difference, derive_unit_from[:week]) -> :day
+      unit?(time_difference, derive_unit_from[:month]) -> :week
+      unit?(time_difference, derive_unit_from[:year]) -> :month
       true -> :year
     end
   end
 
-  # def unit_from_relative_time(time, _unit, _unit_splits) do
-  #   time
-  # end
+  def unit_from_relative_time(_time_difference, unit, _derive_unit_from) do
+    unit
+  end
+
+  defp unit?(_time_difference, nil) do
+    false
+  end
+
+  defp unit?(_time_difference, :infinity) do
+    true
+  end
+
+  defp unit?(time_difference, unit_time) do
+    time_difference < unit_time
+  end
+
 
   @doc """
   Calculates the time span in the given `unit` from the time given in seconds.
@@ -381,9 +422,9 @@ defmodule Cldr.DateTime.Relative do
       0
 
   """
-  def scale_relative(time, unit, unit_splits \\ @unit)
-      when is_number(time) and is_atom(unit) and is_map(unit_splits) do
-    (time / unit_splits[unit])
+  def scale_relative(time_difference, unit, derive_unit_from \\ @unit_steps)
+      when is_number(time_difference) and is_atom(unit) and is_map(derive_unit_from) do
+    (time_difference / derive_unit_from[unit])
     |> Float.round()
     |> trunc
   end
