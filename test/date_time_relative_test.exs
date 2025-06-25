@@ -7,7 +7,22 @@ defmodule Cldr.DateTime.Relative.Test do
   @datetime ~U[2021-10-01 10:15:00+00:00]
   @relative_datetime_to ~U[2021-09-19 12:15:00+00:00]
 
+  @time ~T[18:11:01]
+  @relative_time_to ~T[11:52:03]
+
   alias MyApp.Cldr.DateTime.Relative
+
+  test "Relative times with specified unit" do
+    assert Relative.to_string(@time, relative_to: @relative_time_to, unit: :hour) ==
+             {:ok, "in 6 hours"}
+
+    assert Relative.to_string(@time, relative_to: @relative_time_to, unit: :minute) ==
+             {:ok, "in 379 minutes"}
+
+    assert Relative.to_string(@time, relative_to: @relative_time_to, unit: :second) ==
+             {:ok, "in 22,738 seconds"}
+
+  end
 
   test "Relative dates with specified unit" do
     assert Relative.to_string(@date, relative_to: @relative_to) ==
@@ -59,5 +74,18 @@ defmodule Cldr.DateTime.Relative.Test do
 
     assert Relative.to_string(@datetime, relative_to: @relative_datetime_to, unit: :year) ==
              {:ok, "this year"}
+  end
+
+  test "Relative date with derive unit function" do
+    assert {:ok, "in 3 months"} =
+      Relative.to_string(~D[2017-04-29], relative_to: ~D[2017-01-26], derive_unit_from: &Cldr.DateTime.Relative.derive_unit_from/4)
+  end
+
+  test "Relative time" do
+    assert {:ok, "in 6 hours"} =
+      Relative.to_string(@time, relative_to: @relative_time_to, derive_unit_from: &Cldr.DateTime.Relative.derive_unit_from/4)
+
+    assert {:ok, "in 6 hours"} =
+      Relative.to_string(@time, relative_to: @relative_time_to)
   end
 end

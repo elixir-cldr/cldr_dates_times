@@ -35,13 +35,13 @@ defmodule Cldr.DateTime.Relative do
   Returns a `{:ok, string}` representing a relative time (ago, in) for a given
   number, Date or Datetime.  Returns `{:error, reason}` when errors are detected.
 
-  * `relative` is a number or Date/Datetime representing the time distance from `now` or from
-    `options[:relative_to]`
+  * `relative` is an integer or `t:DateTime.t/0`, `t:Date.t/0` or `t:Time.t/0` representing the
+    time distance from `now` or from `options[:relative_to]`.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  * `options` is a `Keyword` list of options which are:
+  * `options` is a `t:Keyword.t/0` list of options.
 
   ## Options
 
@@ -212,6 +212,11 @@ defmodule Cldr.DateTime.Relative do
     {:ok, seconds}
   end
 
+  defp time_difference(relative, relative_to) when is_time(relative) do
+    seconds = Time.diff(relative, relative_to)
+    {:ok, seconds}
+  end
+
   # No unit specified so we derive it
   defp define_unit(_relative, _relative_to, time_difference, nil = unit, derive_unit_from)
       when is_map(derive_unit_from) do
@@ -249,13 +254,13 @@ defmodule Cldr.DateTime.Relative do
 
   ## Arguments
 
-  * `relative` is a number or Date/Datetime representing the time distance from `now` or from
-    options[:relative_to].
+  * `relative` is an integer or `t:DateTime.t/0`, `t:Date.t/0` or `t:Time.t/0` representing the
+    time distance from `now` or from `options[:relative_to]`.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  * `options` is a `Keyword` list of options.
+  * `options` is a `t:Keyword.t/0` list of options.
 
   ## Options
 
