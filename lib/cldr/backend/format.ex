@@ -785,9 +785,140 @@ defmodule Cldr.DateTime.Format.Backend do
           end
         end
 
+        @doc """
+        Returns the time zone region format map for
+        a given locale.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        ## Example
+
+            iex> #{inspect(__MODULE__)}.zone_region_format(:en)
+            {:ok,
+              %{
+                standard: [0, " Standard Time"],
+                generic: [0, " Time"],
+                daylight_savings: [0, " Daylight Time"]
+              }
+            }
+
+        """
+        @spec zone_region_format(Locale.locale_reference()) ::
+                {:ok, String.t()} | {:error, {module(), String.t()}}
+
+        def zone_region_format(locale \\ unquote(backend).get_locale())
+
+        def zone_region_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+          zone_region_format(cldr_locale_name)
+        end
+
+        def zone_region_format(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            zone_region_format(locale)
+          end
+        end
+
+        @doc """
+        Returns the time zone fallback format map for
+        a given locale.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        ## Example
+
+            iex> #{inspect(__MODULE__)}.zone_fallback_format(:en)
+            {:ok, [1, " (", 0, ")"]}
+
+        """
+        @spec zone_fallback_format(Locale.locale_reference()) ::
+                {:ok, String.t()} | {:error, {module(), String.t()}}
+
+        def zone_fallback_format(locale \\ unquote(backend).get_locale())
+
+        def zone_fallback_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+          zone_fallback_format(cldr_locale_name)
+        end
+
+        def zone_fallback_format(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            zone_fallback_format(locale)
+          end
+        end
+
+        @doc """
+        Returns the timezone data for a locale.
+
+        ### Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        ### Returns
+
+        * a map of localized timezone display data.
+
+        """
+        @doc since: "2.33.0"
+        @spec timezones(Locale.locale_reference()) ::
+                {:ok, map()} | {:error, {module(), String.t()}}
+
+        def timezones(locale \\ unquote(backend).get_locale())
+
+        def timezones(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+          timezones(cldr_locale_name)
+        end
+
+        def timezones(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            timezones(locale)
+          end
+        end
+
+        @doc """
+        Returns the metazone data for a locale.
+
+        ### Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        ### Returns
+
+        * a map of localized metazone display data.
+
+        """
+        @doc since: "2.33.0"
+        @spec metazones(Locale.locale_reference()) ::
+                {:ok, map()} | {:error, {module(), String.t()}}
+
+        def metazones(locale \\ unquote(backend).get_locale())
+
+        def metazones(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+          metazones(cldr_locale_name)
+        end
+
+        def metazones(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            metazones(locale)
+          end
+        end
+
         for locale <- Cldr.Locale.Loader.known_locale_names(config) do
           locale_data = Cldr.Locale.Loader.get_locale(locale, config)
           calendars = Cldr.Config.calendars_for_locale(locale, config)
+
+          timezones =
+            Macro.escape(get_in(locale_data, [:dates, :time_zone_names, :zone]))
+          metazones =
+            Macro.escape(get_in(locale_data, [:dates, :time_zone_names, :metazone]))
+          metazone_ids =
+            Macro.escape(get_in(locale_data, [:dates, :time_zone_names, :region_format]))
 
           def calendars_for(unquote(locale)), do: {:ok, unquote(calendars)}
 
@@ -796,6 +927,18 @@ defmodule Cldr.DateTime.Format.Backend do
 
           def gmt_zero_format(unquote(locale)),
             do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))}
+
+          def timezones(unquote(locale)),
+            do: {:ok, unquote(timezones)}
+
+          def metazones(unquote(locale)),
+            do: {:ok, unquote(metazones)}
+
+          def zone_region_format(unquote(locale)),
+            do: {:ok, unquote(metazone_ids)}
+
+          def zone_fallback_format(unquote(locale)),
+            do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :fallback_format]))}
 
           hour_formats =
             locale_data
@@ -968,6 +1111,10 @@ defmodule Cldr.DateTime.Format.Backend do
         def calendars_for(locale), do: {:error, Locale.locale_error(locale)}
         def gmt_format(locale), do: {:error, Locale.locale_error(locale)}
         def gmt_zero_format(locale), do: {:error, Locale.locale_error(locale)}
+        def timezones(locale), do: {:error, Locale.locale_error(locale)}
+        def metzones(locale), do: {:error, Locale.locale_error(locale)}
+        def zone_region_format(locale), do: {:error, Locale.locale_error(locale)}
+        def zone_fallback_format(locale), do: {:error, Locale.locale_error(locale)}
         def hour_format(locale), do: {:error, Locale.locale_error(locale)}
         def date_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
         def time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}

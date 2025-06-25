@@ -76,6 +76,8 @@ defmodule Cldr.DatesTimes.Mixfile do
 
   defp deps do
     [
+      {:ex_cldr, github: "elixir-cldr/cldr-2.43.0-dev", override: true},
+
       {:ex_cldr_numbers, "~> 2.34"},
       {:ex_cldr_calendars, "~> 2.1"},
       {:ex_cldr_units, "~> 3.18", optional: true},

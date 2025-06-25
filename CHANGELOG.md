@@ -18,6 +18,8 @@ This release fixes a long-standing bug in the formatting of the `S` (fractional 
 
 * Implements user-specified relative time steps as the `:derive_unit_from` option to `Cldr.DateTime.Relative.to_string/3` function. This allows developers to specify when a relative time interval steps from seconds to minutes to days and so on.  Thanks to @tjchambers for the collaboration and patience. Closes #54.
 
+* Adds support for `t:Time.t/0` arguments to `Cldr.DateTime.Relative.to_string/3`.
+
 ## Cldr_Dates_Times v2.22.0
 
 This is the changelog for Cldr_Dates_Times v2.22.0 released on March 18th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

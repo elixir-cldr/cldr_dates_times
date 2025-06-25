@@ -75,7 +75,7 @@ defmodule Cldr.DateTime.Format do
   @doc """
   Returns a list of calendars defined for a given locale.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`.
@@ -83,7 +83,7 @@ defmodule Cldr.DateTime.Format do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Example
+  ### Example
 
       iex> Cldr.DateTime.Format.calendars_for(:en, MyApp.Cldr)
       {:ok, [:buddhist, :chinese, :coptic, :dangi, :ethiopic, :ethiopic_amete_alem,
@@ -103,7 +103,7 @@ defmodule Cldr.DateTime.Format do
   Returns the GMT offset format list for a
   for a timezone offset for a given locale.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -111,7 +111,7 @@ defmodule Cldr.DateTime.Format do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Example
+  ### Example
 
       iex> Cldr.DateTime.Format.gmt_format(:en, MyApp.Cldr)
       {:ok, ["GMT", 0]}
@@ -133,7 +133,7 @@ defmodule Cldr.DateTime.Format do
   for a timezone with an offset of zero for
   a given locale.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -141,7 +141,7 @@ defmodule Cldr.DateTime.Format do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Example
+  ### Example
 
       iex> Cldr.DateTime.Format.gmt_zero_format(:en, MyApp.Cldr)
       {:ok, "GMT"}
@@ -156,8 +156,87 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns the positive and negative hour format
-  for a timezone offset for a given locale.
+  Returns the timezone display data for
+  a locale.
+
+  ### Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  """
+  @doc since: "2.33.0"
+
+  @spec timezones(Locale.locale_reference(), Cldr.backend()) ::
+          {:ok, map()} | {:error, {atom, String.t()}}
+
+  def timezones(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.timezones(locale)
+  end
+
+  @doc """
+  Returns the metazone data for
+  a locale.
+
+  ### Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  """
+  @doc since: "2.33.0"
+
+  @spec metazones(Locale.locale_reference(), Cldr.backend()) ::
+          {:ok, map()} | {:error, {atom, String.t()}}
+
+  def metazones(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.metazones(locale)
+  end
+
+  @doc """
+  Returns the regional format for
+  formatting time zones.
+
+  ### Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  ### Example
+
+      iex> Cldr.DateTime.Format.zone_region_format(:en, MyApp.Cldr)
+      {:ok,
+       %{
+         standard: [0, " Standard Time"],
+         generic: [0, " Time"],
+         daylight_savings: [0, " Daylight Time"]
+       }}
+
+  """
+  @doc since: "2.33.0"
+
+  @spec zone_region_format(Locale.locale_reference(), Cldr.backend()) ::
+          {:ok, map()} | {:error, {atom, String.t()}}
+
+  def zone_region_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.zone_region_format(locale)
+  end
+
+  @doc """
+  Returns the time zone fallback format for
+  formatting time zones.
 
   ## Arguments
 
@@ -167,7 +246,35 @@ defmodule Cldr.DateTime.Format do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Example
+  ### Example
+
+      iex> Cldr.DateTime.Format.zone_fallback_format(:en, MyApp.Cldr)
+      {:ok, [1, " (", 0, ")"]}
+
+  """
+  @doc since: "2.33.0"
+
+  @spec zone_fallback_format(Locale.locale_reference(), Cldr.backend()) ::
+          {:ok, list()} | {:error, {atom, String.t()}}
+
+  def zone_fallback_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.zone_fallback_format(locale)
+  end
+
+  @doc """
+  Returns the positive and negative hour format
+  for a timezone offset for a given locale.
+
+  ### Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  ### Example
 
       iex> Cldr.DateTime.Format.hour_format(:en, MyApp.Cldr)
       {:ok, {"+HH:mm", "-HH:mm"}}
@@ -234,7 +341,7 @@ defmodule Cldr.DateTime.Format do
   @doc """
   Returns a map of the standard time formats for a given locale and calendar.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -245,7 +352,7 @@ defmodule Cldr.DateTime.Format do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Examples:
+  ### Examples:
 
       iex> Cldr.DateTime.Format.time_formats(:en)
       {
@@ -289,7 +396,7 @@ defmodule Cldr.DateTime.Format do
   @doc """
   Returns a map of the standard datetime formats for a given locale and calendar.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -300,7 +407,7 @@ defmodule Cldr.DateTime.Format do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Examples:
+  ### Examples:
 
       iex> Cldr.DateTime.Format.date_time_formats(:en)
       {:ok, %Cldr.DateTime.Formats{
@@ -343,7 +450,7 @@ defmodule Cldr.DateTime.Format do
   date part separated from the time part by a localized version
   of "at".
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -354,7 +461,7 @@ defmodule Cldr.DateTime.Format do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Examples:
+  ### Examples:
 
       iex> Cldr.DateTime.Format.date_time_at_formats(:en)
       {:ok, %Cldr.DateTime.Formats{
@@ -393,7 +500,7 @@ defmodule Cldr.DateTime.Format do
   Returns a map of the available datetime formats for a
   given locale and calendar.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -404,7 +511,7 @@ defmodule Cldr.DateTime.Format do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Examples:
+  ### Examples:
 
       iex> Cldr.DateTime.Format.date_time_available_formats(:en)
       {:ok,
@@ -501,7 +608,7 @@ defmodule Cldr.DateTime.Format do
   Returns a map of the interval formats for a
   given locale and calendar.
 
-  ## Arguments
+  ### Arguments
 
   * `locale` is any locale returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
@@ -512,7 +619,7 @@ defmodule Cldr.DateTime.Format do
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  ## Examples:
+  ### Examples:
 
       Cldr.DateTime.Format.interval_formats(:en, :gregorian, MyApp.Cldr)
       => {:ok,
@@ -546,7 +653,7 @@ defmodule Cldr.DateTime.Format do
   The format types returned by `common_date_time_format_names`
   are guaranteed to be available in all known locales,
 
-  ## Example:
+  ### Example:
 
       iex> Cldr.DateTime.Format.common_date_time_format_names()
       [:Bh, :Bhm, :Bhms, :E, :EBhm, :EBhms, :EHm, :EHms, :Ed, :Ehm, :Ehms, :Gy,
