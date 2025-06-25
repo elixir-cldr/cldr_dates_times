@@ -837,7 +837,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec zone_fallback_format(Locale.locale_reference()) ::
-                {:ok, String.t()} | {:error, {module(), String.t()}}
+                {:ok, list()} | {:error, {module(), String.t()}}
 
         def zone_fallback_format(locale \\ unquote(backend).get_locale())
 
