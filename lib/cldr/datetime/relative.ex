@@ -413,9 +413,10 @@ defmodule Cldr.DateTime.Relative do
 
   ### Notes
 
-  * In [this implementation](https://github.com/elixir-cldr/cldr_dates_times/blob/main/lib/cldr/datetime/relative.ex#L385-L461)
-    we use the time difference to derive seconds, minutes, hours, days and weeks.
-    We use the calendar data to derive months and years.
+  * In [this implementation](https://github.com/elixir-cldr/cldr_dates_times/blob/main/lib/cldr/datetime/relative.ex#L390-L467)
+    the time difference is used to derive seconds, minutes, hours, days and weeks.
+    The `:month` and `:year` fields of the the `relative` struct are used to derive months
+    and years.
 
   """
   def derive_unit_from(relative, relative_to, time_difference, nil) do
