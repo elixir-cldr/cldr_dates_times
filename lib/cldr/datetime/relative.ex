@@ -188,25 +188,13 @@ defmodule Cldr.DateTime.Relative do
   end
 
   defp time_difference(relative, relative_to) when is_date_time(relative) do
-    now = DateTime.to_unix(relative_to)
-    then = DateTime.to_unix(relative)
-    {:ok, then - now}
+    seconds = DateTime.diff(relative, relative_to)
+    {:ok, seconds}
   end
 
   defp time_difference(relative, relative_to) when is_date(relative) do
-    today =
-      relative_to
-      |> Date.to_erl()
-      |> :calendar.date_to_gregorian_days()
-      |> Kernel.*(@day)
-
-    then =
-      relative
-      |> Date.to_erl()
-      |> :calendar.date_to_gregorian_days()
-      |> Kernel.*(@day)
-
-    {:ok, then - today}
+    seconds = Date.diff(relative, relative_to) * @day
+    {:ok, seconds}
   end
 
   # No unit specified so we derive it
