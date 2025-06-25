@@ -807,7 +807,8 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec zone_region_format(Locale.locale_reference()) ::
-                {:ok, String.t()} | {:error, {module(), String.t()}}
+            {:ok, %{:daylight_savings => list(), :generic => list(), :standard => list()}} |
+            {:error, {module(), String.t()}}
 
         def zone_region_format(locale \\ unquote(backend).get_locale())
 

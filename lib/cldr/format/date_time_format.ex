@@ -227,7 +227,8 @@ defmodule Cldr.DateTime.Format do
   @doc since: "2.33.0"
 
   @spec zone_region_format(Locale.locale_reference(), Cldr.backend()) ::
-          {:ok, map()} | {:error, {atom, String.t()}}
+          {:ok, %{:daylight_savings => list(), :generic => list(), :standard => list()}} |
+          {:error, {atom, String.t()}}
 
   def zone_region_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
