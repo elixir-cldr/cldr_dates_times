@@ -144,7 +144,7 @@ defmodule Cldr.DateTime.Formatter do
   ### Fractional Seconds
 
   The fractional seconds formatting code (`S`) formats *only*
-  the fraction of a second as represented by the `Time.t/0`
+  the fraction of a second as represented by the `t:Time.t/0`
   type which is a tuple of the form `{microseconds, precision}`.
 
   If used standalone, `S` will be formatted as only the
