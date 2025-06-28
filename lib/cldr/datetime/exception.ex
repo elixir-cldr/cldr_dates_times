@@ -1,7 +1,18 @@
 defmodule Cldr.DateTime.UnknownTimeUnit do
   @moduledoc """
-  Exception raised when an attempt is made to use a time unit that is not known.
+  Exception raised when an attempt is made to use a time unit that is not known
   in `Cldr.DateTime.Relative`.
+  """
+  defexception [:message]
+
+  def exception(message) do
+    %__MODULE__{message: message}
+  end
+end
+
+defmodule Cldr.UnknownTimezone do
+  @moduledoc """
+  Exception raised when an attempt is made to use a time zone that is not known.
   """
   defexception [:message]
 

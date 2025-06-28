@@ -866,18 +866,18 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @doc since: "2.33.0"
-        @spec timezones(Locale.locale_reference()) ::
+        @spec time_zones(Locale.locale_reference()) ::
                 {:ok, map()} | {:error, {module(), String.t()}}
 
-        def timezones(locale \\ unquote(backend).get_locale())
+        def time_zones(locale \\ unquote(backend).get_locale())
 
-        def timezones(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
-          timezones(cldr_locale_name)
+        def time_zones(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+          time_zones(cldr_locale_name)
         end
 
-        def timezones(locale_name) when is_binary(locale_name) do
+        def time_zones(locale_name) when is_binary(locale_name) do
           with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
-            timezones(locale)
+            time_zones(locale)
           end
         end
 
@@ -915,9 +915,13 @@ defmodule Cldr.DateTime.Format.Backend do
           calendars = Cldr.Config.calendars_for_locale(locale, config)
 
           timezones =
-            Macro.escape(get_in(locale_data, [:dates, :time_zone_names, :zone]))
+            get_in(locale_data, [:dates, :time_zone_names, :zone])
+            |> Macro.escape()
+
           metazones =
-            Macro.escape(get_in(locale_data, [:dates, :time_zone_names, :metazone]))
+            get_in(locale_data, [:dates, :time_zone_names, :metazone])
+            |> Macro.escape()
+
           metazone_ids =
             Macro.escape(get_in(locale_data, [:dates, :time_zone_names, :region_format]))
 
@@ -929,7 +933,7 @@ defmodule Cldr.DateTime.Format.Backend do
           def gmt_zero_format(unquote(locale)),
             do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))}
 
-          def timezones(unquote(locale)),
+          def time_zones(unquote(locale)),
             do: {:ok, unquote(timezones)}
 
           def metazones(unquote(locale)),
@@ -1113,7 +1117,7 @@ defmodule Cldr.DateTime.Format.Backend do
         def gmt_format(locale), do: {:error, Locale.locale_error(locale)}
         def gmt_zero_format(locale), do: {:error, Locale.locale_error(locale)}
         def timezones(locale), do: {:error, Locale.locale_error(locale)}
-        def metzones(locale), do: {:error, Locale.locale_error(locale)}
+        def metazones(locale), do: {:error, Locale.locale_error(locale)}
         def zone_region_format(locale), do: {:error, Locale.locale_error(locale)}
         def zone_fallback_format(locale), do: {:error, Locale.locale_error(locale)}
         def hour_format(locale), do: {:error, Locale.locale_error(locale)}
