@@ -895,18 +895,18 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @doc since: "2.33.0"
-        @spec metazones(Locale.locale_reference()) ::
+        @spec meta_zones(Locale.locale_reference()) ::
                 {:ok, map()} | {:error, {module(), String.t()}}
 
-        def metazones(locale \\ unquote(backend).get_locale())
+        def meta_zones(locale \\ unquote(backend).get_locale())
 
-        def metazones(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
-          metazones(cldr_locale_name)
+        def meta_zones(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+          meta_zones(cldr_locale_name)
         end
 
-        def metazones(locale_name) when is_binary(locale_name) do
+        def meta_zones(locale_name) when is_binary(locale_name) do
           with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
-            metazones(locale)
+            meta_zones(locale)
           end
         end
 
@@ -914,16 +914,21 @@ defmodule Cldr.DateTime.Format.Backend do
           locale_data = Cldr.Locale.Loader.get_locale(locale, config)
           calendars = Cldr.Config.calendars_for_locale(locale, config)
 
-          timezones =
+          time_zones =
             get_in(locale_data, [:dates, :time_zone_names, :zone])
             |> Macro.escape()
 
-          metazones =
+          meta_zones =
             get_in(locale_data, [:dates, :time_zone_names, :metazone])
             |> Macro.escape()
 
-          metazone_ids =
-            Macro.escape(get_in(locale_data, [:dates, :time_zone_names, :region_format]))
+          zone_fallback_format =
+            get_in(locale_data, [:dates, :time_zone_names, :fallback_format])
+            |> Macro.escape()
+
+          zone_region_format =
+            get_in(locale_data, [:dates, :time_zone_names, :region_format])
+            |> Macro.escape()
 
           def calendars_for(unquote(locale)), do: {:ok, unquote(calendars)}
 
@@ -934,16 +939,16 @@ defmodule Cldr.DateTime.Format.Backend do
             do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))}
 
           def time_zones(unquote(locale)),
-            do: {:ok, unquote(timezones)}
+            do: {:ok, unquote(time_zones)}
 
-          def metazones(unquote(locale)),
-            do: {:ok, unquote(metazones)}
-
-          def zone_region_format(unquote(locale)),
-            do: {:ok, unquote(metazone_ids)}
+          def meta_zones(unquote(locale)),
+            do: {:ok, unquote(meta_zones)}
 
           def zone_fallback_format(unquote(locale)),
-            do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :fallback_format]))}
+            do: {:ok, unquote(zone_fallback_format)}
+
+          def zone_region_format(unquote(locale)),
+            do: {:ok, unquote(zone_region_format)}
 
           hour_formats =
             locale_data
@@ -1116,8 +1121,8 @@ defmodule Cldr.DateTime.Format.Backend do
         def calendars_for(locale), do: {:error, Locale.locale_error(locale)}
         def gmt_format(locale), do: {:error, Locale.locale_error(locale)}
         def gmt_zero_format(locale), do: {:error, Locale.locale_error(locale)}
-        def timezones(locale), do: {:error, Locale.locale_error(locale)}
-        def metazones(locale), do: {:error, Locale.locale_error(locale)}
+        def time_zones(locale), do: {:error, Locale.locale_error(locale)}
+        def meta_zones(locale), do: {:error, Locale.locale_error(locale)}
         def zone_region_format(locale), do: {:error, Locale.locale_error(locale)}
         def zone_fallback_format(locale), do: {:error, Locale.locale_error(locale)}
         def hour_format(locale), do: {:error, Locale.locale_error(locale)}
@@ -1153,16 +1158,16 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples
 
-            iex> #{inspect(__MODULE__)}.day_period_for ~T[06:05:54.515228], :en
+            iex> #{inspect(__MODULE__)}.day_period_for(~T[06:05:54.515228], :en)
             :morning1
 
-            iex> #{inspect(__MODULE__)}.day_period_for ~T[13:05:54.515228], :en
+            iex> #{inspect(__MODULE__)}.day_period_for(~T[13:05:54.515228], :en)
             :afternoon1
 
-            iex> #{inspect(__MODULE__)}.day_period_for ~T[21:05:54.515228], :en
+            iex> #{inspect(__MODULE__)}.day_period_for(~T[21:05:54.515228], :en)
             :night1
 
-            iex> #{inspect(__MODULE__)}.day_period_for ~T[21:05:54.515228], :fr
+            iex> #{inspect(__MODULE__)}.day_period_for(~T[21:05:54.515228], :fr)
             :evening1
 
         """
