@@ -852,6 +852,44 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         @doc """
+        Returns the localized territory names.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        ## Example
+
+            iex> {:ok, territories} = #{inspect(__MODULE__)}.territories(:en)
+            iex> Map.get(territories, :AU)
+            %{standard: "Australia"}
+
+            iex> {:ok, territories} = #{inspect(__MODULE__)}.territories(:en)
+            iex> Map.get(territories, :NZ)
+            %{standard: "New Zealand", variant: "Aotearoa New Zealand"}
+
+            iex> {:ok, territories} = #{inspect(__MODULE__)}.territories(:en)
+            iex> Map.get(territories, :US)
+            %{short: "US", standard: "United States"}
+
+        """
+        @spec territories(Locale.locale_reference()) ::
+                {:ok, map()} | {:error, {module(), String.t()}}
+
+        def territories(locale \\ unquote(backend).get_locale())
+
+        def territories(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+          territories(cldr_locale_name)
+        end
+
+        def territories(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            territories(locale)
+          end
+        end
+
+        @doc """
         Returns the timezone data for a locale.
 
         ### Arguments
@@ -929,6 +967,10 @@ defmodule Cldr.DateTime.Format.Backend do
             get_in(locale_data, [:dates, :time_zone_names, :region_format])
             |> Macro.escape()
 
+          territories =
+            get_in(locale_data, [:territories])
+            |> Macro.escape()
+
           def calendars_for(unquote(locale)), do: {:ok, unquote(calendars)}
 
           def gmt_format(unquote(locale)),
@@ -948,6 +990,9 @@ defmodule Cldr.DateTime.Format.Backend do
 
           def zone_region_format(unquote(locale)),
             do: {:ok, unquote(zone_region_format)}
+
+          def territories(unquote(locale)),
+            do: {:ok, unquote(territories)}
 
           hour_formats =
             locale_data
@@ -1124,6 +1169,7 @@ defmodule Cldr.DateTime.Format.Backend do
         def meta_zones(locale), do: {:error, Locale.locale_error(locale)}
         def zone_region_format(locale), do: {:error, Locale.locale_error(locale)}
         def zone_fallback_format(locale), do: {:error, Locale.locale_error(locale)}
+        def territories(locale), do: {:error, Locale.locale_error(locale)}
         def hour_format(locale), do: {:error, Locale.locale_error(locale)}
         def date_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
         def time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}

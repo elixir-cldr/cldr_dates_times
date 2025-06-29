@@ -50,6 +50,9 @@ defmodule Cldr.DateTime.Timezone do
       iex> Cldr.DateTime.Timezone.non_location_format("Australia/Sydney")
       {:ok, "Australian Eastern Time"}
 
+      iex> Cldr.DateTime.Timezone.non_location_format("Asia/Shanghai")
+      {:ok, "China Time"}
+
       iex> Cldr.DateTime.Timezone.non_location_format("America/Phoenix")
       {:ok, "Mountain Time"}
 
@@ -93,7 +96,7 @@ defmodule Cldr.DateTime.Timezone do
       meta_zone =
         meta_zone(time_zone, options.date_time)
 
-      meta_zone_name =
+      meta_zone_format =
         meta_zone_name(meta_zone, meta_zones, options)
 
       preferred_zone =
@@ -103,8 +106,8 @@ defmodule Cldr.DateTime.Timezone do
         zone_format ->
           {:ok, zone_format}
 
-        meta_zone_name ->
-          {:ok, meta_zone_name}
+        meta_zone_format ->
+          {:ok, meta_zone_format}
 
         preferred_zone == time_zone ->
           {:ok, zone_format}
@@ -143,8 +146,6 @@ defmodule Cldr.DateTime.Timezone do
   * `:backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
 
-  * `:format` is either `:long` (the default) or `:short`.
-
   * `:type` is either `:generic` (the default), `:standard` or `:daylight`.
 
   ### Returns
@@ -158,6 +159,9 @@ defmodule Cldr.DateTime.Timezone do
       iex> Cldr.DateTime.Timezone.location_format("Australia/Sydney")
       {:ok, "Sydney Time"}
 
+      iex> Cldr.DateTime.Timezone.location_format("Asia/Shanghai")
+      {:ok, "China Time"}
+
       iex> Cldr.DateTime.Timezone.location_format("America/Phoenix")
       {:ok, "Phoenix Time"}
 
@@ -168,7 +172,7 @@ defmodule Cldr.DateTime.Timezone do
       {:ok, "Phoenix Time"}
 
       iex> Cldr.DateTime.Timezone.location_format("Europe/Rome", locale: :ja)
-      {:ok, "IT時間"}
+      {:ok, "イタリア時間"}
 
       iex> Cldr.DateTime.Timezone.location_format("America/New_York", locale: :fr, type: :daylight)
       {:ok, "New York (heure d’été)"}
@@ -197,6 +201,7 @@ defmodule Cldr.DateTime.Timezone do
     with {:ok, options} <- validate_options(options),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
+         {:ok, territories} <- format.territories(locale),
          {:ok, region_format} <- format.zone_region_format(locale) do
       zone_territory = territory_for_zone(canonical_zone)
       format = zone_format(region_format, options)
@@ -204,7 +209,8 @@ defmodule Cldr.DateTime.Timezone do
       location =
         if territory_has_one_zone?(zone_territory) || primary_zone?(canonical_zone) do
           territory = territory_for_zone(time_zone)
-          to_string(territory)
+          territory_names = Map.fetch!(territories, territory)
+          territory_names[:short] || territory_names[:standard]
         else
           {:ok, exemplar_city} = exemplar_city(canonical_zone)
           exemplar_city
