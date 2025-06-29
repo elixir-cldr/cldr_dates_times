@@ -21,6 +21,18 @@ defmodule Cldr.UnknownTimezone do
   end
 end
 
+defmodule Cldr.DateTime.NoTerritoryForTimezone do
+  @moduledoc """
+  Exception raised when an attempt is made to get the territory for
+  a time zone and it has none - like "UTC"
+  """
+  defexception [:message]
+
+  def exception(message) do
+    %__MODULE__{message: message}
+  end
+end
+
 defmodule Cldr.DateTime.Compiler.ParseError do
   @moduledoc """
   Exception raised when tokenizing a datetime format.

@@ -117,15 +117,25 @@ defmodule Cldr.DateTime.Timezone do
 
             preferred_zone_for_territory?(preferred_zone) &&
                 !preferred_zone_for_locale?(preferred_zone, locale) ->
-              zone_territory = territory_for_zone(canonical_zone)
-              territory_name = territory_name(territories, zone_territory)
-              iolist = Substitution.substitute([meta_zone_format, territory_name], fallback_format)
-              {:ok, List.to_string(iolist)}
+              case territory_for_zone(canonical_zone) do
+                {:ok, zone_territory} ->
+                  territory_name = territory_name(territories, zone_territory)
+                  iolist = Substitution.substitute([meta_zone_format, territory_name], fallback_format)
+                  {:ok, List.to_string(iolist)}
+
+                other ->
+                  other
+              end
 
             true ->
-              {:ok, exemplar_city} = exemplar_city(canonical_zone)
-              iolist = Substitution.substitute([meta_zone_format, exemplar_city], fallback_format)
-              {:ok, List.to_string(iolist)}
+              case exemplar_city(canonical_zone) do
+                {:ok, exemplar_city} ->
+                  iolist = Substitution.substitute([meta_zone_format, exemplar_city], fallback_format)
+                  {:ok, List.to_string(iolist)}
+
+                error ->
+                  error
+              end
           end
 
         options.type == :generic ->
@@ -217,22 +227,27 @@ defmodule Cldr.DateTime.Timezone do
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
          {:ok, territories} <- format.territories(locale),
-         {:ok, region_format} <- format.zone_region_format(locale) do
-      zone_territory = territory_for_zone(canonical_zone)
+         {:ok, region_format} <- format.zone_region_format(locale),
+         {:ok, zone_territory} <- territory_for_zone(canonical_zone) do
       format = zone_format(region_format, options)
 
-      location =
-        if territory_has_one_zone?(zone_territory) || primary_zone?(canonical_zone) do
-          territory = territory_for_zone(time_zone)
-          territory_names = Map.fetch!(territories, territory)
-          territory_names[:short] || territory_names[:standard]
-        else
-          {:ok, exemplar_city} = exemplar_city(canonical_zone)
-          exemplar_city
-        end
+      case location_from_territory_and_zone(zone_territory, territories, canonical_zone) do
+        {:ok, location} ->
+          io_list = Substitution.substitute(location, format)
+          {:ok, List.to_string(io_list)}
 
-      io_list = Substitution.substitute(location, format)
-      {:ok, List.to_string(io_list)}
+        error ->
+          error
+      end
+    end
+  end
+
+  defp location_from_territory_and_zone(territory, territories, zone) do
+    if territory_has_one_zone?(territory) || primary_zone?(zone) do
+      territory_names = Map.fetch!(territories, territory)
+      {:ok, territory_names[:short] || territory_names[:standard]}
+    else
+      exemplar_city(zone)
     end
   end
 
@@ -457,25 +472,24 @@ defmodule Cldr.DateTime.Timezone do
   end
 
   defp preferred_zone_for_territory?(time_zone) do
-    territory = territory_for_zone(time_zone)
-    preferred_zone_for_territory(territory)
+    case territory_for_zone(time_zone) do
+      {:ok, territory} ->
+        preferred_zone_for_territory(territory)
+      error ->
+        error
+    end
   end
 
   defp preferred_zone_for_locale?(time_zone, locale) do
     territory = Cldr.Locale.territory_from_locale(locale)
-    time_zone == preferred_zone_for_territory(territory)
-  end
 
-  defp territory_for_zone(time_zone) do
-    Map.fetch!(Cldr.Timezone.territories_by_timezone(), time_zone)
-  end
+    case preferred_zone_for_territory(territory) do
+      {:error, _reason} ->
+        false
 
-  defp territory_has_one_zone?(territory) do
-    length(Map.get(Cldr.Timezone.timezones_by_territory(), territory)) == 1
-  end
-
-  defp primary_zone?(time_zone) do
-    Map.has_key?(primary_zones(), time_zone)
+      preferred_zone ->
+        time_zone == preferred_zone
+    end
   end
 
   defp preferred_zone_for_meta_zone(meta_zone, locale) do
@@ -485,6 +499,24 @@ defmodule Cldr.DateTime.Timezone do
       nil -> nil
       mapping -> Map.get(mapping, territory) || Map.get(mapping, :"001")
     end
+  end
+
+  defp territory_for_zone(time_zone) do
+    case Map.fetch(Cldr.Timezone.territories_by_timezone(), time_zone) do
+      {:ok, territory} ->
+        {:ok, territory}
+      :error ->
+        {:error, {
+          Cldr.DateTime.NoTerritoryForTimezone, "No territory was found for time zone #{inspect time_zone}"}}
+    end
+  end
+
+  defp territory_has_one_zone?(territory) do
+    length(Map.get(Cldr.Timezone.timezones_by_territory(), territory)) == 1
+  end
+
+  defp primary_zone?(time_zone) do
+    Map.has_key?(primary_zones(), time_zone)
   end
 
   # If there is no daylight field then we can substitute fall back

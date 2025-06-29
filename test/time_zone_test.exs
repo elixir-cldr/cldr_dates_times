@@ -7,6 +7,10 @@ defmodule Cldr.DateTime.TimezoneTest do
     assert {:ok, "Honolulu"} = Cldr.DateTime.Timezone.exemplar_city("Pacific/Honolulu")
   end
 
+  test "Asia/Shanghai resolves to China (country level) since thats a primary zone" do
+
+  end
+
   for {zone, _} <- Cldr.Timezone.territories_by_timezone(),
       locale <- @test_locales,
       !String.starts_with?(zone, "Etc") && !String.starts_with?(zone, "GMT") && zone != "Greenwich" do
