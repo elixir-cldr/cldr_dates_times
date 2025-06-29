@@ -926,8 +926,10 @@ defmodule Cldr.DateTime.Format.Backend do
             get_in(locale_data, [:dates, :time_zone_names, :fallback_format])
             |> Macro.escape()
 
+          # TODO remove the rename_keys call when CLDR 48 versions are published
           zone_region_format =
             get_in(locale_data, [:dates, :time_zone_names, :region_format])
+            |> Cldr.Map.rename_keys(:daylight_savings, :daylight)
             |> Macro.escape()
 
           def calendars_for(unquote(locale)), do: {:ok, unquote(calendars)}

@@ -49,21 +49,18 @@ defmodule Cldr.DateTime.Timezone do
          {:ok, meta_zones} <- format.meta_zones(locale) do
       split_zone = split_and_downcase_zone(canonical_zone)
 
-      zone_name =
-        zone_name(get_in(time_zones, split_zone), options)
+      zone_format =
+        zone_format(get_in(time_zones, split_zone), options)
 
       meta_zone =
         meta_zone(time_zone, options.date_time)
 
       meta_zone_name =
-        if meta_zone, do:
-          meta_zones
-          |> Map.get(String.downcase(meta_zone))
-          |> zone_name(options)
+        meta_zone_name(meta_zone, meta_zones, options)
 
       cond do
-        zone_name ->
-          zone_name
+        zone_format ->
+          zone_format
 
         meta_zone_name ->
           meta_zone_name
@@ -72,7 +69,7 @@ defmodule Cldr.DateTime.Timezone do
           preferred_zone = preferred_zone_for_meta_zone(meta_zone, locale)
 
           if preferred_zone == time_zone do
-            zone_name
+            zone_format
           else
             {:ok, fallback_format} = format.zone_fallback_format(locale)
           end
@@ -101,13 +98,17 @@ defmodule Cldr.DateTime.Timezone do
   def location_format(time_zone, options) when is_binary(time_zone) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
     format = Module.concat(backend, DateTime.Format)
+    options = Keyword.delete(options, :format)
 
     with {:ok, options} <- validate_options(options),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
          {:ok, region_format} <- format.zone_region_format(locale) do
       territory = Cldr.Locale.territory_from_locale(locale)
-      format = Map.fetch!(region_format, options.type)
+
+      # This so we can reuse zone_format
+      region_format = %{long: region_format}
+      format = zone_format(region_format, options)
 
       location =
         if territory_has_one_zone?(territory) || primary_zone?(canonical_zone) do
@@ -144,39 +145,56 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
-  defp zone_name(nil, _options) do
+  defp zone_format(nil, _options) do
     nil
   end
 
   # If there is no daylight field then we can substitute fall back
   # first to :generic and secondly to :standard
-  defp zone_name(zone, options) when not is_map_key(zone, :daylight) do
-    get_in(zone, [options.format, options.type]) ||
-      get_in(zone, [options.format, :generic]) ||
-      get_in(zone, [options.format, :standard])
-  end
 
   # Otherwise if the generic type is needed, but not available,
   # and the offset and daylight offset do not change within 184
   # day +/- interval around the exact formatted time, use the standard type.
   # Note: 184 is the smallest number that is at least 6 months AND the
   # smallest number that is more than 1/2 year (Gregorian)
-  defp zone_name(zone, %{type: :generic} = options) do
-    if no_offset_change_within_184_days?(options.date_time) do
-      get_in(zone, [options.format, :standard])
+  defp zone_format(zone, options) do
+    formats = Map.fetch!(zone, options.format)
+
+    cond do
+      !is_map_key(formats, :daylight) ->
+         Map.get(formats, options.type) ||
+            Map.get(formats, :generic) ||
+            Map.get(formats, :standard)
+
+      options.type == :generic && is_map_key(formats, :generic) ->
+        Map.get(formats, :generic)
+
+      options.type == :generic ->
+        if no_offset_change_within_184_days?(options.date_time) do
+          Map.get(formats, :standard)
+        end
+
+      true ->
+        Map.get(formats, options.type)
     end
   end
 
-  defp zone_name(zone, options) do
-    get_in(zone, [options.format, options.type])
-  end
-
-  def meta_zone(time_zone, date_time \\ DateTime.utc_now()) do
+  defp meta_zone(time_zone, date_time) do
     case get_in(meta_zones(), split_zone(time_zone)) do
       nil -> nil
       [[meta_zone, nil, nil]] -> meta_zone
       list_of_meta_zones -> find_meta_zone(list_of_meta_zones, date_time)
     end
+  end
+
+  defp meta_zone_name(nil, _meta_zones, _options) do
+    nil
+  end
+
+  defp meta_zone_name(meta_zone, meta_zones, options) do
+    meta_zones
+    |> Map.get(String.downcase(meta_zone))
+    |> zone_format(options)
   end
 
   # Note that meta zones are in descending date time order
