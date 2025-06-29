@@ -205,7 +205,7 @@ defmodule Cldr.DateTime.Timezone do
   def non_location_format(date_time_or_zone, options \\ [])
 
   def non_location_format(%{time_zone: time_zone} = datetime, options) do
-    options = put_new(options, :datetime, datetime)
+    options = put_new(options, :date_time, datetime)
     non_location_format(time_zone, options)
   end
 
@@ -350,7 +350,7 @@ defmodule Cldr.DateTime.Timezone do
   def location_format(date_time_or_zone, options \\ [])
 
   def location_format(%{time_zone: time_zone} = datetime, options) do
-    options = put_new(options, :datetime, datetime)
+    options = put_new(options, :date_time, datetime)
     location_format(time_zone, options)
   end
 
@@ -395,7 +395,7 @@ defmodule Cldr.DateTime.Timezone do
   def gmt_format(date_time_or_zone, options \\ [])
 
   def gmt_format(%{time_zone: time_zone} = datetime, options) do
-    options = Keyword.put_new(options, :datetime, datetime)
+    options = Keyword.put_new(options, :date_time, datetime)
     gmt_format(time_zone, options)
   end
 
@@ -838,7 +838,7 @@ defmodule Cldr.DateTime.Timezone do
            {:error,
             {
               ArgumentError,
-              "Invalid option #{inspect(option)}. Valid options are :type and :format"
+              "Invalid option #{inspect(option)}. Valid options are :date_time, :type and :format"
             }}}
       end)
 
