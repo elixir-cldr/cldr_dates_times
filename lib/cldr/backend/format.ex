@@ -801,7 +801,7 @@ defmodule Cldr.DateTime.Format.Backend do
               %{
                 standard: [0, " Standard Time"],
                 generic: [0, " Time"],
-                daylight_savings: [0, " Daylight Time"]
+                daylight: [0, " Daylight Time"]
               }
             }
 

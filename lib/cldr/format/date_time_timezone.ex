@@ -46,7 +46,8 @@ defmodule Cldr.DateTime.Timezone do
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
          {:ok, time_zones} <- format.time_zones(locale),
-         {:ok, meta_zones} <- format.meta_zones(locale) do
+         {:ok, meta_zones} <- format.meta_zones(locale),
+         {:ok, fallback_format} <- format.zone_fallback_format(locale) do
       split_zone = split_and_downcase_zone(canonical_zone)
 
       zone_format =
@@ -58,29 +59,68 @@ defmodule Cldr.DateTime.Timezone do
       meta_zone_name =
         meta_zone_name(meta_zone, meta_zones, options)
 
+      preferred_zone =
+        preferred_zone_for_meta_zone(meta_zone, locale)
+
       cond do
         zone_format ->
-          zone_format
+          {:ok, zone_format}
 
         meta_zone_name ->
-          meta_zone_name
+          {:ok, meta_zone_name}
 
-        meta_zone ->
-          preferred_zone = preferred_zone_for_meta_zone(meta_zone, locale)
+        preferred_zone == time_zone ->
+          {:ok, zone_format}
 
-          if preferred_zone == time_zone do
-            zone_format
-          else
-            {:ok, fallback_format} = format.zone_fallback_format(locale)
-          end
+        preferred_zone_for_territory?(preferred_zone) && !preferred_zone_for_locale?(preferred_zone, locale) ->
+          territory = Cldr.Locale.territory_from_locale(locale)
+          iolist = Cldr.Substitution.substitute(to_string(territory), fallback_format)
+          {:ok, List.to_string(iolist)}
 
         options.type == :generic ->
           location_format(time_zone, options)
 
         options.type in [:standard, :daylight] ->
-          # gmt_format(time_zone, options)
+          gmt_format(time_zone, options)
       end
     end
+  end
+
+  @doc since: "2.33.0"
+
+  @spec gmt_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t()) ::
+    {:ok, String.t()} | {:error, {module, String.t()}}
+
+  def gmt_format(date_time_or_zone, options \\ [])
+
+  def gmt_format(%{time_zone: time_zone} = datetime, options) do
+    options = Keyword.put_new(options, :datetime, datetime)
+    gmt_format(time_zone, options)
+  end
+
+  def gmt_format(time_zone, _options) when is_binary(time_zone) do
+
+  end
+
+  defp preferred_zone_for_territory(territory) do
+    zones =
+      Cldr.Timezone.timezones_by_territory()
+      |> Map.fetch!(territory)
+
+    case zones do
+      [%{aliases: [time_zone | _rest]}] -> time_zone
+      _other -> nil
+    end
+  end
+
+  defp preferred_zone_for_territory?(time_zone) do
+    territory = territory_for_zone(time_zone)
+    preferred_zone_for_territory(territory)
+  end
+
+  defp preferred_zone_for_locale?(time_zone, locale) do
+    {:ok, territory} = Cldr.Locale.territory_from_locale(locale)
+    time_zone == preferred_zone_for_territory(territory)
   end
 
   @doc since: "2.33.0"
@@ -104,14 +144,14 @@ defmodule Cldr.DateTime.Timezone do
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
          {:ok, region_format} <- format.zone_region_format(locale) do
-      territory = Cldr.Locale.territory_from_locale(locale)
+      zone_territory = territory_for_zone(canonical_zone)
 
-      # This so we can reuse zone_format
+      # This so we can reuse zone_format/0 for resolution
       region_format = %{long: region_format}
       format = zone_format(region_format, options)
 
       location =
-        if territory_has_one_zone?(territory) || primary_zone?(canonical_zone) do
+        if territory_has_one_zone?(zone_territory) || primary_zone?(canonical_zone) do
           territory = territory_for_zone(time_zone)
           to_string(territory)
         else
@@ -129,7 +169,7 @@ defmodule Cldr.DateTime.Timezone do
   end
 
   defp territory_has_one_zone?(territory) do
-    Map.get(Cldr.Timezone.timezones_by_territory(), territory) == 1
+    length(Map.get(Cldr.Timezone.timezones_by_territory(), territory)) == 1
   end
 
   defp primary_zone?(time_zone) do
@@ -150,13 +190,14 @@ defmodule Cldr.DateTime.Timezone do
   end
 
   # If there is no daylight field then we can substitute fall back
-  # first to :generic and secondly to :standard
+  # first to :generic and secondly to :standard.
 
   # Otherwise if the generic type is needed, but not available,
   # and the offset and daylight offset do not change within 184
   # day +/- interval around the exact formatted time, use the standard type.
   # Note: 184 is the smallest number that is at least 6 months AND the
   # smallest number that is more than 1/2 year (Gregorian)
+
   defp zone_format(zone, options) do
     formats = Map.fetch!(zone, options.format)
 
