@@ -98,7 +98,7 @@ defmodule Cldr.DateTime.Timezone do
         zone_format(get_in(time_zones, split_zone ++ [options.format]), options)
 
       meta_zone =
-        meta_zone(time_zone, options.date_time)
+        meta_zone(canonical_zone, options.date_time)
 
       meta_zone_format =
         meta_zone_format(meta_zone, meta_zones, options)
@@ -112,7 +112,7 @@ defmodule Cldr.DateTime.Timezone do
             preferred_zone_for_meta_zone(meta_zone, locale)
 
           cond do
-            preferred_zone == time_zone ->
+            preferred_zone == canonical_zone ->
               {:ok, meta_zone_format}
 
             preferred_zone_for_territory?(preferred_zone) &&
@@ -120,7 +120,10 @@ defmodule Cldr.DateTime.Timezone do
               case territory_for_zone(canonical_zone) do
                 {:ok, zone_territory} ->
                   territory_name = territory_name(territories, zone_territory)
-                  iolist = Substitution.substitute([meta_zone_format, territory_name], fallback_format)
+
+                  iolist =
+                    Substitution.substitute([meta_zone_format, territory_name], fallback_format)
+
                   {:ok, List.to_string(iolist)}
 
                 other ->
@@ -130,7 +133,9 @@ defmodule Cldr.DateTime.Timezone do
             true ->
               case exemplar_city(canonical_zone) do
                 {:ok, exemplar_city} ->
-                  iolist = Substitution.substitute([meta_zone_format, exemplar_city], fallback_format)
+                  iolist =
+                    Substitution.substitute([meta_zone_format, exemplar_city], fallback_format)
+
                   {:ok, List.to_string(iolist)}
 
                 error ->
@@ -208,7 +213,10 @@ defmodule Cldr.DateTime.Timezone do
   """
   @doc since: "2.33.0"
 
-  @spec location_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t() | map()) ::
+  @spec location_format(
+          date_time_or_zone :: String.t() | DateTime.t(),
+          options :: Keyword.t() | map()
+        ) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
   def location_format(date_time_or_zone, options \\ [])
@@ -475,6 +483,7 @@ defmodule Cldr.DateTime.Timezone do
     case territory_for_zone(time_zone) do
       {:ok, territory} ->
         preferred_zone_for_territory(territory)
+
       error ->
         error
     end
@@ -505,9 +514,13 @@ defmodule Cldr.DateTime.Timezone do
     case Map.fetch(Cldr.Timezone.territories_by_timezone(), time_zone) do
       {:ok, territory} ->
         {:ok, territory}
+
       :error ->
-        {:error, {
-          Cldr.DateTime.NoTerritoryForTimezone, "No territory was found for time zone #{inspect time_zone}"}}
+        {:error,
+         {
+           Cldr.DateTime.NoTerritoryForTimezone,
+           "No territory was found for time zone #{inspect(time_zone)}"
+         }}
     end
   end
 
@@ -580,6 +593,7 @@ defmodule Cldr.DateTime.Timezone do
     |> String.replace("__", "_")
     |> String.downcase()
   end
+
   # Note that meta zones are in descending date time order
   # with the most recent meta zone first in the list.
   defp find_meta_zone(list_of_meta_zones, date_time) do

@@ -20,3 +20,5 @@ src/*.erl
 
 .tools-versions
 mise.toml
+
+.iex.exs
