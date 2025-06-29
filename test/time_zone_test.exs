@@ -16,10 +16,10 @@ defmodule Cldr.DateTime.TimezoneTest do
 
   test "When a country has only one zone" do
     assert {:ok, "Italy Daylight Time"} =
-      Timezone.location_format("Europe/Rome", type: :daylight)
+             Timezone.location_format("Europe/Rome", type: :daylight)
 
     assert {:ok, "Central European Summer Time (Italy)"} =
-      Timezone.non_location_format("Europe/Rome", type: :daylight)
+             Timezone.non_location_format("Europe/Rome", type: :daylight)
   end
 
   test "When a country has multiple zones" do
@@ -32,17 +32,18 @@ defmodule Cldr.DateTime.TimezoneTest do
   end
 
   test "When with a datetime argument" do
-    assert  {:ok, "Coordinated Universal Time"} =
-      Timezone.non_location_format(DateTime.utc_now())
+    assert {:ok, "Coordinated Universal Time"} =
+             Timezone.non_location_format(DateTime.utc_now())
 
     assert Timezone.location_format(DateTime.utc_now()) ==
-      {:error,
-       {Cldr.DateTime.NoTerritoryForTimezone,
-        "No territory was found for time zone \"Etc/UTC\""}}
+             {:error,
+              {Cldr.DateTime.NoTerritoryForTimezone,
+               "No territory was found for time zone \"Etc/UTC\""}}
   end
 
   for {zone, _} <- Cldr.Timezone.territories_by_timezone(),
-      locale <- @test_locales, non_location_zones(zone) do
+      locale <- @test_locales,
+      non_location_zones(zone) do
     test "Non-location format for #{inspect(zone)} in locale #{inspect(locale)}" do
       assert {:ok, _} =
                Timezone.non_location_format(unquote(zone),
