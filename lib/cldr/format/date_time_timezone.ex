@@ -3,6 +3,134 @@ defmodule Cldr.DateTime.Timezone do
   Functions to format time zone IDs, including the time zone field
   of a `t:DateTime.t/0`.
 
+  ### Time Zone Names
+
+  There are three main types of formats for zone identifiers: GMT, generic (wall time), and
+  standard/daylight.
+
+  Standard and daylight are equivalent to a particular offset from GMT, and can be represented
+  by a GMT offset as a fallback. In general, this is not true for the generic format, which
+  is used for picking timezones or for conveying a timezone for specifying a recurring time
+  (such as a meeting in a calendar). For either purpose, a GMT offset would lose information.
+
+  ### Time Zone Format Terminology
+
+  The following terminology defines more precisely the formats that are used.
+
+  #### Generic non-location format
+
+  Reflects "wall time" (what is on a clock on the wall): used
+  or recurring events, meetings, or anywhere people do not want to be overly specific.
+  For example, "10 am Pacific Time" will be GMT-8 in the winter, and GMT-7 in the summer.
+
+    * "Pacific Time" (long)
+    * "PT" (short)
+
+  This format is returned from `Cldr.DateTime.Time.non_location_format/2` with `type: :generic`
+  which is the default.
+
+  #### Generic partial location format
+
+  Reflects "wall time": used as a fallback format when
+  the generic non-location format is not specific enough. For example:
+
+  * "Pacific Time (Canada)" (long)
+  * "PT (Whitehorse)" (short)
+
+  #### Generic location format
+
+  Reflects "wall time": a primary function of this format type is to represent
+  a time zone in a list or menu for user selection of time zone. It is also a
+  fallback format when there is no translation for the generic non-location format.
+  Times could also be organized hierarchically by country for easier lookup.
+
+  * France Time
+  * Italy Time
+  * Japan Time
+  * United States
+  * Chicago Time
+  * Denver Time
+  * Los Angeles Time
+  * New York Time
+  * United Kingdom Time
+
+  Note: A generic location format is constructed by a part of time zone ID representing
+  an exemplar city name or its country as the final fallback. However, there are Unicode
+  time zones which are not associated with any locations, such as "Etc/GMT+5" and "PST8PDT".
+
+  Although the date format pattern "VVVV" specifies the generic location format, but it
+  displays localized GMT format for these. Some of these time zones observe daylight saving
+  time, so the result (localized GMT format) may change depending on input date. For generating
+  a list for user selection of time zone with format "VVVV", these non-location zones should
+  be excluded.
+
+  This format is returned from `Cldr.DateTime.Time.location_format/2` with `type: :generic` which
+  is the default.
+
+  #### Specific non-location format
+
+  Reflects a specific standard or daylight time, which may or may not be the wall time.
+  For example, "10 am Pacific Standard Time" will be GMT-8 in the winter and in the summer.
+
+  * "Pacific Standard Time" (long)
+  * "PST" (short)
+  * "Pacific Daylight Time" (long)
+  * "PDT" (short)
+
+  This format is returned from `Cldr.DateTime.Time.non_location_format/2` with `type: :standard` or
+  `type :daylight`.
+
+  #### Specific location format
+
+  This format does not have a symbol, but is used in the fallback chain for the specific
+  non-location format. Like the generic location format it uses time zone locations, but
+  formats these in a zone-variant aware way, e.g. "France Summer Time".
+
+  This format is returned from `Cldr.DateTime.Time.location_format/2` with `type: :standard` or
+  `type :daylight`.
+
+  #### Localized GMT format
+
+  A constant, specific offset from GMT (or UTC), which may be in a translated form.
+  There are two styles for this.
+
+  The long format always uses 2-digit hours field and minutes field, with optional 2-digit
+  seconds field. The short format is intended for the shortest representation and uses hour
+  fields without leading zero, with optional 2-digit minutes and seconds fields.
+
+  The digits used for hours, minutes and seconds fields in this format are the locale's
+  default decimal digits:
+
+  * "GMT+03:30" (long)
+  * "GMT+3:30" (short)
+  * "UTC-03.00" (long)
+  * "UTC-3" (short)
+  * "Гринуич+03:30" (long)
+
+  Otherwise (when the offset from GMT is zero, referring to GMT itself) the style specified
+  by the following format is used:
+
+  * "GMT"
+  * "UTC"
+  * "Гринуич"
+
+  #### ISO 8601 time zone formats
+
+  The formats based on the [ISO 8601] local time difference from UTC ("+" sign is used when
+  local time offset is 0), or the UTC indicator ("Z" - only when the local time offset is 0
+  and the specifier X* is used). The ISO 8601 basic format does not use a separator character
+  between hours and minutes field, while the extended format uses colon (':') as the separator.
+
+  The ISO 8601 basic format with hours and minutes fields is equivalent to RFC 822 zone format.
+
+  * "-0800" (basic)
+  * "-08" (basic - short)
+  * "-08:00" (extended)
+  * "Z" (UTC)
+
+  Note: This specification extends the original ISO 8601 formats and some format specifiers
+  append seconds field when necessary.
+
   """
 
   alias Cldr.Locale
