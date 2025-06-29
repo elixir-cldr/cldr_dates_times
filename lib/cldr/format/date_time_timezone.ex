@@ -54,16 +54,19 @@ defmodule Cldr.DateTime.Timezone do
       {:ok, "China Time"}
 
       iex> Cldr.DateTime.Timezone.non_location_format("America/Phoenix")
-      {:ok, "Mountain Time"}
+      {:ok, "Mountain Time (Phoenix)"}
 
       iex> Cldr.DateTime.Timezone.non_location_format("Australia/Sydney", locale: :fr)
       {:ok, "heure de l’Est de l’Australie"}
 
       iex> Cldr.DateTime.Timezone.non_location_format("America/Phoenix", format: :short)
-      {:ok, "MT"}
+      {:ok, "MT (Phoenix)"}
+
+      iex> Cldr.DateTime.Timezone.non_location_format "Europe/Dublin"
+      {:ok, "Greenwich Mean Time (Ireland)"}
 
       iex> Cldr.DateTime.Timezone.non_location_format("Europe/Rome", locale: :ja)
-      {:ok, "中央ヨーロッパ時間"}
+      {:ok, "中央ヨーロッパ時間（イタリア）"}
 
   """
   @doc since: "2.33.0"
@@ -87,6 +90,7 @@ defmodule Cldr.DateTime.Timezone do
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
          {:ok, time_zones} <- format.time_zones(locale),
          {:ok, meta_zones} <- format.meta_zones(locale),
+         {:ok, territories} <- format.territories(locale),
          {:ok, fallback_format} <- format.zone_fallback_format(locale) do
       split_zone = split_and_downcase_zone(canonical_zone)
 
@@ -97,7 +101,7 @@ defmodule Cldr.DateTime.Timezone do
         meta_zone(time_zone, options.date_time)
 
       meta_zone_format =
-        meta_zone_name(meta_zone, meta_zones, options)
+        meta_zone_format(meta_zone, meta_zones, options)
 
       preferred_zone =
         preferred_zone_for_meta_zone(meta_zone, locale)
@@ -107,16 +111,22 @@ defmodule Cldr.DateTime.Timezone do
           {:ok, zone_format}
 
         meta_zone_format ->
-          {:ok, meta_zone_format}
+          cond do
+            preferred_zone == time_zone ->
+              {:ok, meta_zone_format}
 
-        preferred_zone == time_zone ->
-          {:ok, zone_format}
+            preferred_zone_for_territory?(preferred_zone) &&
+                !preferred_zone_for_locale?(preferred_zone, locale) ->
+              zone_territory = territory_for_zone(canonical_zone)
+              territory_name = territory_name(territories, zone_territory)
+              iolist = Substitution.substitute([meta_zone_format, territory_name], fallback_format)
+              {:ok, List.to_string(iolist)}
 
-        zone_format && preferred_zone_for_territory?(preferred_zone) &&
-            !preferred_zone_for_locale?(preferred_zone, locale) ->
-          territory = Cldr.Locale.territory_from_locale(locale)
-          iolist = Substitution.substitute([zone_format, to_string(territory)], fallback_format)
-          {:ok, List.to_string(iolist)}
+            true ->
+              {:ok, exemplar_city} = exemplar_city(canonical_zone)
+              iolist = Substitution.substitute([meta_zone_format, exemplar_city], fallback_format)
+              {:ok, List.to_string(iolist)}
+          end
 
         options.type == :generic ->
           location_format(time_zone, options)
@@ -125,6 +135,11 @@ defmodule Cldr.DateTime.Timezone do
           gmt_format(time_zone, options)
       end
     end
+  end
+
+  defp territory_name(territories, territory) do
+    territory_names = Map.fetch!(territories, territory)
+    territory_names[:short] || territory_names[:standard]
   end
 
   @doc """
@@ -513,17 +528,26 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
-  defp meta_zone_name(nil, _meta_zones, _options) do
+  defp meta_zone_format(nil, _meta_zones, _options) do
     nil
   end
 
-  defp meta_zone_name(meta_zone, meta_zones, options) do
-    meta_zones
-    |> Map.get(String.downcase(meta_zone))
-    |> Map.get(options.format)
-    |> zone_format(options)
+  defp meta_zone_format(meta_zone, meta_zones, options) do
+    if meta_zone = Map.get(meta_zones, normalize_meta_zone(meta_zone)) do
+      Map.get(meta_zone, options.format)
+      |> zone_format(options)
+    end
   end
 
+  # One metazone is "Australia_CentralWestern" but the
+  # metazone is actually "australia_central_eestern".
+  # Perhaps a data error. We work around it for now.
+  defp normalize_meta_zone(meta_zone) do
+    meta_zone
+    |> Macro.underscore()
+    |> String.replace("__", "_")
+    |> String.downcase()
+  end
   # Note that meta zones are in descending date time order
   # with the most recent meta zone first in the list.
   defp find_meta_zone(list_of_meta_zones, date_time) do
