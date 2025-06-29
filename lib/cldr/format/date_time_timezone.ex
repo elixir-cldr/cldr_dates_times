@@ -103,14 +103,14 @@ defmodule Cldr.DateTime.Timezone do
       meta_zone_format =
         meta_zone_format(meta_zone, meta_zones, options)
 
-      preferred_zone =
-        preferred_zone_for_meta_zone(meta_zone, locale)
-
       cond do
         zone_format ->
           {:ok, zone_format}
 
         meta_zone_format ->
+          preferred_zone =
+            preferred_zone_for_meta_zone(meta_zone, locale)
+
           cond do
             preferred_zone == time_zone ->
               {:ok, meta_zone_format}
