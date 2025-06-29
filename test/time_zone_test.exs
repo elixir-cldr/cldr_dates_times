@@ -4,5 +4,4 @@ defmodule Cldr.DateTime.TimezoneTest do
   test "Exemplar City when timezone data exists but has no exemplar field" do
     assert {:ok, "Honolulu"} = Cldr.DateTime.Timezone.exemplar_city("Pacific/Honolulu")
   end
-
 end

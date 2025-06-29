@@ -18,7 +18,6 @@ defmodule Cldr.DatesTimes.Mixfile do
       compilers: [:leex, :yecc] ++ Mix.compilers(),
       elixirc_paths: elixirc_paths(Mix.env()),
       dialyzer: [
-        ignore_warnings: ".dialyzer_ignore_warnings",
         plt_add_apps: ~w(calendar_interval)a,
         flags: [
           :error_handling,
@@ -77,11 +76,11 @@ defmodule Cldr.DatesTimes.Mixfile do
   defp deps do
     [
       {:ex_cldr, github: "elixir-cldr/cldr-2.43.0-dev", override: true},
+      # {:ex_cldr, "~> 2.43"},
 
       {:ex_cldr_numbers, "~> 2.35"},
       {:ex_cldr_calendars, "~> 2.1"},
       {:ex_cldr_units, "~> 3.18", optional: true},
-
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},

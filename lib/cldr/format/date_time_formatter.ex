@@ -3964,6 +3964,7 @@ defmodule Cldr.DateTime.Formatter do
 
   defp right_fill(string, n) do
     len = String.length(string)
+
     if len >= n do
       string
     else

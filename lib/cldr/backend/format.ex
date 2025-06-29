@@ -384,7 +384,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec date_time_available_formats(Locale.locale_reference(), calendar) ::
-            {:ok, formats} | {:error, {module, String.t()}}
+                {:ok, formats} | {:error, {module, String.t()}}
 
         def date_time_available_formats(
               locale \\ unquote(backend).get_locale(),
@@ -422,7 +422,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec date_available_formats(Locale.locale_reference(), calendar) ::
-            {:ok, formats} | {:error, {module, String.t()}}
+                {:ok, formats} | {:error, {module, String.t()}}
 
         def date_available_formats(
               locale \\ unquote(backend).get_locale(),
@@ -460,7 +460,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec time_available_formats(Locale.locale_reference(), calendar) ::
-            {:ok, formats} | {:error, {module, String.t()}}
+                {:ok, formats} | {:error, {module, String.t()}}
 
         def time_available_formats(
               locale \\ unquote(backend).get_locale(),
@@ -707,7 +707,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec hour_format(Locale.locale_reference()) ::
-            {:ok, {String.t(), String.t()}} | {:error, {module, String.t()}}
+                {:ok, {String.t(), String.t()}} | {:error, {module, String.t()}}
 
         def hour_format(locale \\ unquote(backend).get_locale())
 
@@ -737,7 +737,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec gmt_format(Locale.locale_reference()) ::
-            {:ok, [non_neg_integer | String.t(), ...]} | {:error, {module, String.t()}}
+                {:ok, [non_neg_integer | String.t(), ...]} | {:error, {module, String.t()}}
 
         def gmt_format(locale \\ unquote(backend).get_locale())
 
@@ -807,8 +807,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         """
         @spec zone_region_format(Locale.locale_reference()) ::
-            {:ok, %{:daylight_savings => list(), :generic => list(), :standard => list()}} |
-            {:error, {module(), String.t()}}
+                {:ok, map()} | {:error, {module(), String.t()}}
 
         def zone_region_format(locale \\ unquote(backend).get_locale())
 
@@ -926,10 +925,8 @@ defmodule Cldr.DateTime.Format.Backend do
             get_in(locale_data, [:dates, :time_zone_names, :fallback_format])
             |> Macro.escape()
 
-          # TODO remove the rename_keys call when CLDR 48 versions are published
           zone_region_format =
             get_in(locale_data, [:dates, :time_zone_names, :region_format])
-            |> Cldr.Map.rename_keys(:daylight_savings, :daylight)
             |> Macro.escape()
 
           def calendars_for(unquote(locale)), do: {:ok, unquote(calendars)}

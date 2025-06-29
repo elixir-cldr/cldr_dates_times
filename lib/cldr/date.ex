@@ -191,7 +191,8 @@ defmodule Cldr.Date do
   end
 
   def to_string(date, value, []) when is_map(date) do
-    {:error, {ArgumentError, "Unexpected option value #{inspect value}. Options must be a keyword list"}}
+    {:error,
+     {ArgumentError, "Unexpected option value #{inspect(value)}. Options must be a keyword list"}}
   end
 
   def to_string(date, _backend, _options) do

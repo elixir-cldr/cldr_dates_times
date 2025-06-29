@@ -66,7 +66,7 @@ defmodule Cldr.DateTime.Relative do
       `:day`, `:week`, `:month`, and `:year` with the values being the number of seconds below
       which the key defines the time unit difference. This is the default and its value is:
 
-      #{inspect @unit_steps}
+      #{inspect(@unit_steps)}
 
     * The second option is to specify a function reference. The function must take four
       arguments as described below.
@@ -219,7 +219,7 @@ defmodule Cldr.DateTime.Relative do
 
   # No unit specified so we derive it
   defp define_unit(_relative, _relative_to, time_difference, nil = unit, derive_unit_from)
-      when is_map(derive_unit_from) do
+       when is_map(derive_unit_from) do
     derive_unit_from = Map.merge(@unit_steps, derive_unit_from)
     unit = unit_from_relative_time(time_difference, unit, derive_unit_from)
     relative = scale_relative(time_difference, unit, derive_unit_from)
@@ -228,13 +228,13 @@ defmodule Cldr.DateTime.Relative do
 
   # Use the unit and difference as supplied
   defp define_unit(relative, _relative_to, _time_difference, unit, _derive_unit_from)
-      when is_integer(relative) do
+       when is_integer(relative) do
     {relative, unit}
   end
 
   # It's a calculated difference, it needs scaling
   defp define_unit(_relative, _relative_to, time_difference, unit, derive_unit_from)
-      when is_map(derive_unit_from) do
+       when is_map(derive_unit_from) do
     derive_unit_from = Map.merge(@unit_steps, derive_unit_from)
     relative = scale_relative(time_difference, unit, derive_unit_from)
     {relative, unit}
@@ -244,7 +244,7 @@ defmodule Cldr.DateTime.Relative do
   # `{relative, unit}` tuple where `relative` is an integer number to
   # be presented as a `unit`
   defp define_unit(relative, relative_to, time_difference, unit, derive_unit_from)
-      when is_function(derive_unit_from, 4) do
+       when is_function(derive_unit_from, 4) do
     derive_unit_from.(relative, relative_to, time_difference, unit)
   end
 
@@ -286,7 +286,7 @@ defmodule Cldr.DateTime.Relative do
       `:day`, `:week`, `:month`, and `:year` with the values being the number of seconds below
       which the key defines the time unit difference. This is the default and its value is:
 
-      #{inspect @unit_steps}
+      #{inspect(@unit_steps)}
 
     * The second option is to specify a function reference. The function must take four
       arguments as described below.
@@ -423,16 +423,22 @@ defmodule Cldr.DateTime.Relative do
     cond do
       time_difference < 90 ->
         derive_unit_from(relative, relative_to, time_difference, :second)
+
       time_difference < 90 * 60 ->
         derive_unit_from(relative, relative_to, time_difference, :minute)
+
       time_difference < 60 * 60 * 36 ->
         derive_unit_from(relative, relative_to, time_difference, :hour)
+
       time_difference < 60 * 60 * 24 * 13 ->
         derive_unit_from(relative, relative_to, time_difference, :day)
+
       time_difference < 60 * 60 * 24 * 10 * 7 ->
         derive_unit_from(relative, relative_to, time_difference, :week)
+
       relative.year == relative_to.year ->
         derive_unit_from(relative, relative_to, time_difference, :month)
+
       true ->
         derive_unit_from(relative, relative_to, time_difference, :year)
     end
@@ -465,7 +471,6 @@ defmodule Cldr.DateTime.Relative do
   def derive_unit_from(relative, relative_to, _time_difference, :year) do
     {relative.year - relative_to.year, :year}
   end
-
 
   @doc """
   Returns an estimate of the appropriate time unit for an integer of a given

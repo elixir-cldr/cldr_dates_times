@@ -1,23 +1,13 @@
 defmodule Cldr.DateTime.Timezone do
-  @moduledoc false
+  @moduledoc """
+  Functions to format time zone IDs, including the time zone field
+  of a `t:DateTime.t/0`.
 
-#   Type Fallback
-#
-#   When a specified type (generic, standard, daylight) does not exist:
-#
-#   If the daylight type does not exist, then the metazone doesn’t require daylight support. For
-#   all three types:
-#     If the generic type exists, use it.
-#     Otherwise if the standard type exists, use it.
-#
-#   Otherwise if the generic type is needed, but not available, and the offset and daylight offset
-#   do not change within 184 day +/- interval around the exact formatted time, use the standard
-#   type.
-#     Example: "Mountain Standard Time" for Phoenix
-#     Note: 184 is the smallest number that is at least 6 months AND the smallest number that is
-#     more than 1/2 year (Gregorian).
+  """
 
   alias Cldr.Locale
+  alias Cldr.Substitution
+
   import Cldr.DateTime.Formatter, only: :macros
 
   @valid_types [:generic, :standard, :daylight]
@@ -26,15 +16,62 @@ defmodule Cldr.DateTime.Timezone do
   @valid_formats [:long, :short]
   @default_format :long
 
+  @doc """
+  Return the localized non-location time zone format
+  for a time zone ID or a `t:DateTime.t/0`.
+
+  ### Arguments
+
+  * `date_time_or_zone` is any time zone ID or any
+    `t:DateTime.t/0`.
+
+  * `options` is a keyword list of options.
+
+  ### Options
+
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
+
+  * `:backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
+
+  * `:format` is either `:long` (the default) or `:short`.
+
+  * `:type` is either `:generic` (the default), `:standard` or `:daylight`.
+
+  ### Returns
+
+  * `{:ok, non_location_format}` or
+
+  * `{:error, {exception, reason}}`.
+
+  ### Examples
+
+      iex> Cldr.DateTime.Timezone.non_location_format("Australia/Sydney")
+      {:ok, "Australian Eastern Time"}
+
+      iex> Cldr.DateTime.Timezone.non_location_format("America/Phoenix")
+      {:ok, "Mountain Time"}
+
+      iex> Cldr.DateTime.Timezone.non_location_format("Australia/Sydney", locale: :fr)
+      {:ok, "heure de l’Est de l’Australie"}
+
+      iex> Cldr.DateTime.Timezone.non_location_format("America/Phoenix", format: :short)
+      {:ok, "MT"}
+
+      iex> Cldr.DateTime.Timezone.non_location_format("Europe/Rome", locale: :ja)
+      {:ok, "中央ヨーロッパ時間"}
+
+  """
   @doc since: "2.33.0"
 
   @spec non_location_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module, String.t()}}
+          {:ok, String.t()} | {:error, {module, String.t()}}
 
   def non_location_format(date_time_or_zone, options \\ [])
 
   def non_location_format(%{time_zone: time_zone} = datetime, options) do
-    options = Keyword.put_new(options, :datetime, datetime)
+    options = put_new(options, :datetime, datetime)
     non_location_format(time_zone, options)
   end
 
@@ -51,7 +88,7 @@ defmodule Cldr.DateTime.Timezone do
       split_zone = split_and_downcase_zone(canonical_zone)
 
       zone_format =
-        zone_format(get_in(time_zones, split_zone), options)
+        zone_format(get_in(time_zones, split_zone ++ [options.format]), options)
 
       meta_zone =
         meta_zone(time_zone, options.date_time)
@@ -72,9 +109,10 @@ defmodule Cldr.DateTime.Timezone do
         preferred_zone == time_zone ->
           {:ok, zone_format}
 
-        preferred_zone_for_territory?(preferred_zone) && !preferred_zone_for_locale?(preferred_zone, locale) ->
+        zone_format && preferred_zone_for_territory?(preferred_zone) &&
+            !preferred_zone_for_locale?(preferred_zone, locale) ->
           territory = Cldr.Locale.territory_from_locale(locale)
-          iolist = Cldr.Substitution.substitute(to_string(territory), fallback_format)
+          iolist = Substitution.substitute([zone_format, to_string(territory)], fallback_format)
           {:ok, List.to_string(iolist)}
 
         options.type == :generic ->
@@ -86,68 +124,81 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
+  @doc """
+  Return the localized location time zone format
+  for a time zone ID or a `t:DateTime.t/0`.
+
+  ### Arguments
+
+  * `date_time_or_zone` is any time zone ID or any
+    `t:DateTime.t/0`.
+
+  * `options` is a keyword list of options.
+
+  ### Options
+
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
+
+  * `:backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
+
+  * `:format` is either `:long` (the default) or `:short`.
+
+  * `:type` is either `:generic` (the default), `:standard` or `:daylight`.
+
+  ### Returns
+
+  * `{:ok, non_location_format}` or
+
+  * `{:error, {exception, reason}}`.
+
+  ### Examples
+
+      iex> Cldr.DateTime.Timezone.location_format("Australia/Sydney")
+      {:ok, "Sydney Time"}
+
+      iex> Cldr.DateTime.Timezone.location_format("America/Phoenix")
+      {:ok, "Phoenix Time"}
+
+      iex> Cldr.DateTime.Timezone.location_format("Australia/Sydney", locale: :fr)
+      {:ok, "heure : Sydney"}
+
+      iex> Cldr.DateTime.Timezone.location_format("America/Phoenix", format: :short)
+      {:ok, "Phoenix Time"}
+
+      iex> Cldr.DateTime.Timezone.location_format("Europe/Rome", locale: :ja)
+      {:ok, "IT時間"}
+
+      iex> Cldr.DateTime.Timezone.location_format("America/New_York", locale: :fr, type: :daylight)
+      {:ok, "New York (heure d’été)"}
+
+      iex> Cldr.DateTime.Timezone.location_format("America/New_York", locale: :fr, type: :standard)
+      {:ok, "New York (heure standard)"}
+
+  """
   @doc since: "2.33.0"
 
-  @spec gmt_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module, String.t()}}
-
-  def gmt_format(date_time_or_zone, options \\ [])
-
-  def gmt_format(%{time_zone: time_zone} = datetime, options) do
-    options = Keyword.put_new(options, :datetime, datetime)
-    gmt_format(time_zone, options)
-  end
-
-  def gmt_format(time_zone, _options) when is_binary(time_zone) do
-
-  end
-
-  defp preferred_zone_for_territory(territory) do
-    zones =
-      Cldr.Timezone.timezones_by_territory()
-      |> Map.fetch!(territory)
-
-    case zones do
-      [%{aliases: [time_zone | _rest]}] -> time_zone
-      _other -> nil
-    end
-  end
-
-  defp preferred_zone_for_territory?(time_zone) do
-    territory = territory_for_zone(time_zone)
-    preferred_zone_for_territory(territory)
-  end
-
-  defp preferred_zone_for_locale?(time_zone, locale) do
-    {:ok, territory} = Cldr.Locale.territory_from_locale(locale)
-    time_zone == preferred_zone_for_territory(territory)
-  end
-
-  @doc since: "2.33.0"
-
-  @spec location_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module, String.t()}}
+  @spec location_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t() | map()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
 
   def location_format(date_time_or_zone, options \\ [])
 
   def location_format(%{time_zone: time_zone} = datetime, options) do
-    options = Keyword.put_new(options, :datetime, datetime)
+    options = put_new(options, :datetime, datetime)
     location_format(time_zone, options)
   end
 
   def location_format(time_zone, options) when is_binary(time_zone) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
     format = Module.concat(backend, DateTime.Format)
-    options = Keyword.delete(options, :format)
+    options = delete(options, :format)
 
     with {:ok, options} <- validate_options(options),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
          {:ok, region_format} <- format.zone_region_format(locale) do
       zone_territory = territory_for_zone(canonical_zone)
-
-      # This so we can reuse zone_format/0 for resolution
-      region_format = %{long: region_format}
       format = zone_format(region_format, options)
 
       location =
@@ -159,122 +210,25 @@ defmodule Cldr.DateTime.Timezone do
           exemplar_city
         end
 
-      io_list = Cldr.Substitution.substitute(location, format)
+      io_list = Substitution.substitute(location, format)
       {:ok, List.to_string(io_list)}
     end
   end
 
-  defp territory_for_zone(time_zone) do
-    Map.fetch!(Cldr.Timezone.territories_by_timezone(), time_zone)
+  @doc since: "2.33.0"
+
+  @spec gmt_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t() | map()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
+
+  def gmt_format(date_time_or_zone, options \\ [])
+
+  def gmt_format(%{time_zone: time_zone} = datetime, options) do
+    options = Keyword.put_new(options, :datetime, datetime)
+    gmt_format(time_zone, options)
   end
 
-  defp territory_has_one_zone?(territory) do
-    length(Map.get(Cldr.Timezone.timezones_by_territory(), territory)) == 1
-  end
-
-  defp primary_zone?(time_zone) do
-    Map.has_key?(primary_zones(), time_zone)
-  end
-
-  defp preferred_zone_for_meta_zone(meta_zone, locale) do
-    territory = Locale.territory_from_locale(locale)
-
-    case Map.get(meta_zone_mapping(), meta_zone) do
-      nil -> nil
-      mapping -> Map.get(mapping, territory) || Map.get(mapping, :"001")
-    end
-  end
-
-  defp zone_format(nil, _options) do
-    nil
-  end
-
-  # If there is no daylight field then we can substitute fall back
-  # first to :generic and secondly to :standard.
-
-  # Otherwise if the generic type is needed, but not available,
-  # and the offset and daylight offset do not change within 184
-  # day +/- interval around the exact formatted time, use the standard type.
-  # Note: 184 is the smallest number that is at least 6 months AND the
-  # smallest number that is more than 1/2 year (Gregorian)
-
-  defp zone_format(zone, options) do
-    formats = Map.fetch!(zone, options.format)
-
-    cond do
-      !is_map_key(formats, :daylight) ->
-         Map.get(formats, options.type) ||
-            Map.get(formats, :generic) ||
-            Map.get(formats, :standard)
-
-      options.type == :generic && is_map_key(formats, :generic) ->
-        Map.get(formats, :generic)
-
-      options.type == :generic ->
-        if no_offset_change_within_184_days?(options.date_time) do
-          Map.get(formats, :standard)
-        end
-
-      true ->
-        Map.get(formats, options.type)
-    end
-  end
-
-  defp meta_zone(time_zone, date_time) do
-    case get_in(meta_zones(), split_zone(time_zone)) do
-      nil -> nil
-      [[meta_zone, nil, nil]] -> meta_zone
-      list_of_meta_zones -> find_meta_zone(list_of_meta_zones, date_time)
-    end
-  end
-
-  defp meta_zone_name(nil, _meta_zones, _options) do
-    nil
-  end
-
-  defp meta_zone_name(meta_zone, meta_zones, options) do
-    meta_zones
-    |> Map.get(String.downcase(meta_zone))
-    |> zone_format(options)
-  end
-
-  # Note that meta zones are in descending date time order
-  # with the most recent meta zone first in the list.
-  defp find_meta_zone(list_of_meta_zones, date_time) do
-    Enum.reduce_while list_of_meta_zones, nil, fn
-      [meta_zone, nil, nil], _acc ->
-        {:halt, meta_zone}
-
-      [meta_zone, from, nil], acc ->
-        if DateTime.compare(date_time, from) in [:gt, :eq] do
-          {:halt, meta_zone}
-        else
-          {:cont, acc}
-        end
-
-      [meta_zone, nil, to], acc ->
-        if DateTime.compare(date_time, to) in [:lt, :eq] do
-          {:halt, meta_zone}
-        else
-          {:cont, acc}
-        end
-
-      [meta_zone, from, to], acc ->
-        if DateTime.compare(date_time, from) in [:gt, :eq] &&
-            DateTime.compare(date_time, to) in [:lt, :eq] do
-          {:halt, meta_zone}
-        else
-          {:cont, acc}
-        end
-    end
-  end
-
-  defp no_offset_change_within_184_days?(date_time) do
-    plus_184 = DateTime.shift(date_time, day: 184)
-    minus_184 = DateTime.shift(date_time, day: -184)
-
-    date_time.utc_offset == plus_184.utc_offset == minus_184.utc_offset &&
-      date_time.std_offset == plus_184.std_offset == minus_184.std_offset
+  def gmt_format(time_zone, _options) when is_binary(time_zone) do
+    {:ok, "Not done yet"}
   end
 
   @doc """
@@ -338,7 +292,7 @@ defmodule Cldr.DateTime.Timezone do
   @doc since: "2.33.0"
 
   @spec exemplar_city(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module, String.t()}}
+          {:ok, String.t()} | {:error, {module, String.t()}}
 
   def exemplar_city(date_time_or_zone, options \\ [])
 
@@ -357,55 +311,6 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
-  @doc false
-  def unknown_city(options \\ []) do
-    exemplar_city("Etc/Unknown", options)
-  end
-
-  defp resolve_exemplar_city("Etc/UTC" = time_zone, _time_zones) do
-    {:error, no_exemplar_city_error(time_zone)}
-  end
-
-  defp resolve_exemplar_city("Etc/GMT" <> _rest = time_zone, _time_zones) do
-    {:error, no_exemplar_city_error(time_zone)}
-  end
-
-  defp resolve_exemplar_city(time_zone, time_zones) do
-    zone_segments = split_and_downcase_zone(time_zone)
-
-    exemplar_city =
-      case get_in(time_zones, zone_segments) do
-        nil -> examplar_city_from_segments(zone_segments)
-        time_zone -> time_zone[:exemplar_city] || examplar_city_from_segments(zone_segments)
-      end
-
-    {:ok, exemplar_city}
-  end
-
-  def no_exemplar_city_error(time_zone) do
-    {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for #{inspect time_zone}"}
-  end
-
-  defp split_zone(time_zone) do
-    time_zone
-    |> String.split("/")
-  end
-
-  defp split_and_downcase_zone(time_zone) do
-    time_zone
-    |> String.downcase()
-    |> split_zone()
-  end
-
-  defp examplar_city_from_segments(zone_segments) do
-    zone_segments
-    |> Enum.reverse()
-    |> hd()
-    |> String.split("_")
-    |> Enum.map(&String.capitalize/1)
-    |> Enum.join(" ")
-  end
-
   @doc """
   Returns the canonical time zone name for a given time
   zone identifier.
@@ -415,7 +320,7 @@ defmodule Cldr.DateTime.Timezone do
   def canonical_time_zone(time_zone) do
     case Map.fetch(canonical_time_zones(), time_zone) do
       {:ok, time_zone} -> {:ok, time_zone}
-      :error -> {:error, {Cldr.UnknownTimezoneError, "Unknown time zone #{inspect time_zone}"}}
+      :error -> {:error, {Cldr.UnknownTimezoneError, "Unknown time zone #{inspect(time_zone)}"}}
     end
   end
 
@@ -490,37 +395,248 @@ defmodule Cldr.DateTime.Timezone do
     @canonical_timezones
   end
 
-  defp validate_options(options) do
+  @doc false
+  def unknown_city(options \\ []) do
+    exemplar_city("Etc/Unknown", options)
+  end
+
+  defp resolve_exemplar_city("Etc/UTC" = time_zone, _time_zones) do
+    {:error, no_exemplar_city_error(time_zone)}
+  end
+
+  defp resolve_exemplar_city("Etc/GMT" <> _rest = time_zone, _time_zones) do
+    {:error, no_exemplar_city_error(time_zone)}
+  end
+
+  defp resolve_exemplar_city(time_zone, time_zones) do
+    zone_segments = split_and_downcase_zone(time_zone)
+
+    exemplar_city =
+      case get_in(time_zones, zone_segments) do
+        nil -> examplar_city_from_segments(zone_segments)
+        time_zone -> time_zone[:exemplar_city] || examplar_city_from_segments(zone_segments)
+      end
+
+    {:ok, exemplar_city}
+  end
+
+  def no_exemplar_city_error(time_zone) do
+    {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for #{inspect(time_zone)}"}
+  end
+
+  defp preferred_zone_for_territory(territory) do
+    zones =
+      Cldr.Timezone.timezones_by_territory()
+      |> Map.fetch!(territory)
+
+    case zones do
+      [%{aliases: [time_zone | _rest]}] -> time_zone
+      _other -> nil
+    end
+  end
+
+  defp preferred_zone_for_territory?(time_zone) do
+    territory = territory_for_zone(time_zone)
+    preferred_zone_for_territory(territory)
+  end
+
+  defp preferred_zone_for_locale?(time_zone, locale) do
+    territory = Cldr.Locale.territory_from_locale(locale)
+    time_zone == preferred_zone_for_territory(territory)
+  end
+
+  defp territory_for_zone(time_zone) do
+    Map.fetch!(Cldr.Timezone.territories_by_timezone(), time_zone)
+  end
+
+  defp territory_has_one_zone?(territory) do
+    length(Map.get(Cldr.Timezone.timezones_by_territory(), territory)) == 1
+  end
+
+  defp primary_zone?(time_zone) do
+    Map.has_key?(primary_zones(), time_zone)
+  end
+
+  defp preferred_zone_for_meta_zone(meta_zone, locale) do
+    territory = Locale.territory_from_locale(locale)
+
+    case Map.get(meta_zone_mapping(), meta_zone) do
+      nil -> nil
+      mapping -> Map.get(mapping, territory) || Map.get(mapping, :"001")
+    end
+  end
+
+  # If there is no daylight field then we can substitute fall back
+  # first to :generic and secondly to :standard.
+
+  # Otherwise if the generic type is needed, but not available,
+  # and the offset and daylight offset do not change within 184
+  # day +/- interval around the exact formatted time, use the standard type.
+  # Note: 184 is the smallest number that is at least 6 months AND the
+  # smallest number that is more than 1/2 year (Gregorian)
+
+  defp zone_format(nil, _options) do
+    nil
+  end
+
+  defp zone_format(formats, options) do
+    cond do
+      !is_map_key(formats, :daylight) ->
+        Map.get(formats, options.type) ||
+          Map.get(formats, :generic) ||
+          Map.get(formats, :standard)
+
+      options.type == :generic && is_map_key(formats, :generic) ->
+        Map.get(formats, :generic)
+
+      options.type == :generic ->
+        if no_offset_change_within_184_days?(options.date_time) do
+          Map.get(formats, :standard)
+        end
+
+      true ->
+        Map.get(formats, options.type)
+    end
+  end
+
+  defp meta_zone(time_zone, date_time) do
+    case get_in(meta_zones(), split_zone(time_zone)) do
+      nil -> nil
+      [[meta_zone, nil, nil]] -> meta_zone
+      list_of_meta_zones -> find_meta_zone(list_of_meta_zones, date_time)
+    end
+  end
+
+  defp meta_zone_name(nil, _meta_zones, _options) do
+    nil
+  end
+
+  defp meta_zone_name(meta_zone, meta_zones, options) do
+    meta_zones
+    |> Map.get(String.downcase(meta_zone))
+    |> Map.get(options.format)
+    |> zone_format(options)
+  end
+
+  # Note that meta zones are in descending date time order
+  # with the most recent meta zone first in the list.
+  defp find_meta_zone(list_of_meta_zones, date_time) do
+    Enum.reduce_while(list_of_meta_zones, nil, fn
+      [meta_zone, nil, nil], _acc ->
+        {:halt, meta_zone}
+
+      [meta_zone, from, nil], acc ->
+        if DateTime.compare(date_time, from) in [:gt, :eq] do
+          {:halt, meta_zone}
+        else
+          {:cont, acc}
+        end
+
+      [meta_zone, nil, to], acc ->
+        if DateTime.compare(date_time, to) in [:lt, :eq] do
+          {:halt, meta_zone}
+        else
+          {:cont, acc}
+        end
+
+      [meta_zone, from, to], acc ->
+        if DateTime.compare(date_time, from) in [:gt, :eq] &&
+             DateTime.compare(date_time, to) in [:lt, :eq] do
+          {:halt, meta_zone}
+        else
+          {:cont, acc}
+        end
+    end)
+  end
+
+  defp no_offset_change_within_184_days?(date_time) do
+    plus_184 = DateTime.shift(date_time, day: 184)
+    minus_184 = DateTime.shift(date_time, day: -184)
+
+    date_time.utc_offset == plus_184.utc_offset &&
+      date_time.utc_offset == minus_184.utc_offset &&
+      date_time.std_offset == plus_184.std_offset &&
+      date_time.std_offset == minus_184.std_offset
+  end
+
+  defp split_zone(time_zone) do
+    time_zone
+    |> String.split("/")
+  end
+
+  defp split_and_downcase_zone(time_zone) do
+    time_zone
+    |> String.downcase()
+    |> split_zone()
+  end
+
+  defp examplar_city_from_segments(zone_segments) do
+    zone_segments
+    |> Enum.reverse()
+    |> hd()
+    |> String.split("_")
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.join(" ")
+  end
+
+  defp validate_options(options) when is_map(options) do
+    {:ok, options}
+  end
+
+  defp validate_options(options) when is_list(options) do
     options =
       default_options()
       |> Keyword.merge(options)
 
-    Enum.reduce_while(options, options, fn
-      {:type, type}, acc when type in @valid_types ->
-        {:cont, acc}
+    options =
+      Enum.reduce_while(options, options, fn
+        {:locale, _locale}, acc ->
+          {:cont, acc}
 
-      {:type, type}, _acc ->
-        {:halt, {:error, {
-          ArgumentError, "Invalid type #{inspect type}. Valid types are #{inspect @valid_types}"}}}
+        {:backend, _backend}, acc ->
+          {:cont, acc}
 
-      {:format, format}, acc when format in @valid_formats ->
-        {:cont, acc}
+        {:type, type}, acc when type in @valid_types ->
+          {:cont, acc}
 
-      {:format, format}, _acc ->
-        {:halt, {:error, {
-          ArgumentError, "Invalid format #{inspect format}. Valid format are #{inspect @valid_formats}"}}}
+        {:type, type}, _acc ->
+          {:halt,
+           {:error,
+            {
+              ArgumentError,
+              "Invalid type #{inspect(type)}. Valid types are #{inspect(@valid_types)}"
+            }}}
 
-      {:date_time, date_time}, acc when is_date_time(date_time) ->
-        {:cont, acc}
+        {:format, format}, acc when format in @valid_formats ->
+          {:cont, acc}
 
-      {:date_time, datetime}, _acc ->
-        {:halt, {:error, {
-          ArgumentError, "Invalid date_time #{inspect datetime}"}}}
+        {:format, format}, _acc ->
+          {:halt,
+           {:error,
+            {
+              ArgumentError,
+              "Invalid format #{inspect(format)}. Valid format are #{inspect(@valid_formats)}"
+            }}}
 
-      {option, _}, _acc ->
-        {:halt, {:error, {
-          ArgumentError, "Invalid option #{inspect option}. Valid options are :type and :format"}}}
-    end)
+        {:date_time, date_time}, acc when is_date_time(date_time) ->
+          {:cont, acc}
+
+        {:date_time, datetime}, _acc ->
+          {:halt,
+           {:error,
+            {
+              ArgumentError,
+              "Invalid date_time #{inspect(datetime)}"
+            }}}
+
+        {option, _}, _acc ->
+          {:halt,
+           {:error,
+            {
+              ArgumentError,
+              "Invalid option #{inspect(option)}. Valid options are :type and :format"
+            }}}
+      end)
 
     case options do
       {:error, reason} -> {:error, reason}
@@ -528,10 +644,17 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
+  defp put_new(options, key, value) when is_list(options), do: Keyword.put_new(options, key, value)
+  defp put_new(options, key, value) when is_map(options), do: Map.put_new(options, key, value)
+
+  defp delete(options, key) when is_list(options), do: Keyword.delete(options, key)
+  defp delete(options, key) when is_map(options), do: Map.delete(options, key)
+
   defp default_options do
     [
       type: @default_type,
       format: @default_format,
+      locale: Cldr.get_locale(),
       date_time: DateTime.utc_now()
     ]
   end

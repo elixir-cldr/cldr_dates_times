@@ -2,7 +2,7 @@ defmodule Cldr.DateTime.DurationFormatTest do
   use ExUnit.Case, async: true
 
   test "Formatting a Cldr.Calendar.Duration" do
-    duration = Cldr.Calendar.Duration.new_from_seconds 136092
+    duration = Cldr.Calendar.Duration.new_from_seconds(136_092)
     assert {:ok, "37:48:12"} = Cldr.Time.to_string(duration, format: "hh:mm:ss")
   end
 

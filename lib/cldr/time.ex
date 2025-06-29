@@ -203,7 +203,8 @@ defmodule Cldr.Time do
   end
 
   def to_string(time, value, []) when is_map(time) do
-    {:error, {ArgumentError, "Unexpected option value #{inspect value}. Options must be a keyword list"}}
+    {:error,
+     {ArgumentError, "Unexpected option value #{inspect(value)}. Options must be a keyword list"}}
   end
 
   def to_string(time, _backend, _options) do

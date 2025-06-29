@@ -70,7 +70,10 @@ defmodule Cldr.DateTime.Format.Compiler do
     []
   end
 
-  defp seconds_followed_by_fraction([{:second, _, _} = second, {:fractional_second, _, _} = fractional_second | rest]) do
+  defp seconds_followed_by_fraction([
+         {:second, _, _} = second,
+         {:fractional_second, _, _} = fractional_second | rest
+       ]) do
     [second, {:decimal_separator, nil, nil}, fractional_second | seconds_followed_by_fraction(rest)]
   end
 
