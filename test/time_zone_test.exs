@@ -96,4 +96,12 @@ defmodule Cldr.DateTime.TimezoneTest do
                )
     end
   end
+
+  for {zone, _} <- Cldr.Timezone.territories_by_timezone(),
+      locale <- @test_locales,
+      zone not in ["Factory", "Etc/Unknown"] do
+    test "GMT format for #{inspect(zone)} in locale #{inspect(locale)}" do
+      assert {:ok, _} = Timezone.gmt_format(unquote(zone))
+    end
+  end
 end

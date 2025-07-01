@@ -387,6 +387,67 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
+  @doc """
+
+  Return the localized GMT time zone format
+  for a time zone ID or a `t:DateTime.t/0`.
+
+  > #### Time Zones Other than UTC {: .warning}
+  >
+  > WHen `date_time_or_zone` is a string and it is not UTC or GMT, a
+  > [Time Zone daatabase](https://hexdocs.pm/elixir/DateTime.html#module-time-zone-database)
+  > must be configured or provided as an option `:time_zone_database`.
+
+  ### Arguments
+
+  * `date_time_or_zone` is any time zone ID or any
+    `t:DateTime.t/0`.
+
+  * `options` is a keyword list of options.
+
+  ### Options
+
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
+
+  * `:backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
+
+  * `:time_zone_datababase` determines with time zone database to use when
+    shifting time zones. Shifting time zones only occurs if the `date_time_or_zone`
+    is set to a binary time zone ID.
+
+  ### Returns
+
+  * `{:ok, gmt_format}` or
+
+  * `{:error, {exception, reason}}`.
+
+  ### Examples
+
+      iex> Cldr.DateTime.Timezone.gmt_format(DateTime.utc_now())
+      {:ok, "GMT+00:00"}
+
+      iex> {:ok, standard_time} = DateTime.new(~D[2025-06-01], ~T[00:00:00], "Australia/Sydney")
+      iex> Cldr.DateTime.Timezone.gmt_format(standard_time)
+      {:ok, "GMT+10:00"}
+
+      iex> {:ok, summer_time} = DateTime.new(~D[2025-01-01], ~T[00:00:00], "Australia/Sydney")
+      iex> Cldr.DateTime.Timezone.gmt_format(summer_time)
+      {:ok, "GMT+11:00"}
+      iex> Cldr.DateTime.Timezone.gmt_format(summer_time, locale: :fr)
+      {:ok, "UTC+11:00"}
+
+      iex> {:ok, summer_time} = DateTime.new(~D[2025-06-01], ~T[00:00:00], "America/Los_Angeles")
+      iex> Cldr.DateTime.Timezone.gmt_format(summer_time)
+      {:ok, "GMT-07:00"}
+
+      iex> {:ok, gmt} = DateTime.new(~D[2025-06-01], ~T[00:00:00], "GMT")
+      iex> Cldr.DateTime.Timezone.gmt_format(gmt)
+      {:ok, "GMT+00:00"}
+
+  """
+
   @doc since: "2.33.0"
 
   @spec gmt_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t() | map()) ::
@@ -394,13 +455,52 @@ defmodule Cldr.DateTime.Timezone do
 
   def gmt_format(date_time_or_zone, options \\ [])
 
-  def gmt_format(%{time_zone: time_zone} = datetime, options) do
-    options = Keyword.put_new(options, :date_time, datetime)
+  def gmt_format(%{time_zone: time_zone} = date_time, options) do
+    options = Keyword.put_new(options, :date_time, date_time)
     gmt_format(time_zone, options)
   end
 
-  def gmt_format(time_zone, _options) when is_binary(time_zone) do
-    {:ok, "Not done yet"}
+  def gmt_format(time_zone, options) when is_binary(time_zone) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    format = Module.concat(backend, DateTime.Format)
+    options = delete(options, [:format, :type])
+
+    {time_zone_database, options} =
+      pop(options, :time_zone_database, Calendar.get_time_zone_database())
+
+    with {:ok, options} <- validate_options(options),
+         {:ok, locale} <- Cldr.validate_locale(locale, backend),
+         {:ok, canonical_zone} <- canonical_time_zone(time_zone),
+         {:ok, shifted_date_time} <-
+           shift_zone(options.date_time, canonical_zone, time_zone_database),
+         {:ok, gmt_format} <- format.gmt_format(locale),
+         {:ok, hour_format} <- format.hour_format(locale),
+         {:ok, formatted_hour} <- formatted_hour(shifted_date_time, hour_format) do
+      iolist = Cldr.Substitution.substitute(formatted_hour, gmt_format)
+      {:ok, List.to_string(iolist)}
+    end
+  end
+
+  defp shift_zone(%{time_zone: time_zone} = date_time, time_zone, _time_zone_database) do
+    {:ok, date_time}
+  end
+
+  defp shift_zone(date_time, time_zone, time_zone_database) do
+    DateTime.shift_zone(date_time, time_zone, time_zone_database)
+  end
+
+  defp formatted_hour(date_time, {positive_format, negative_format}) do
+    offset = date_time.utc_offset + date_time.std_offset
+    format = if offset >= 0, do: positive_format, else: negative_format
+
+    case time_from_zone_offset(date_time) do
+      {hour, minute, second} ->
+        {:ok, time} = Time.new(abs(hour), abs(minute), second)
+        Cldr.Time.to_string(time, format: format)
+
+      error ->
+        error
+    end
   end
 
   @doc """
@@ -851,8 +951,20 @@ defmodule Cldr.DateTime.Timezone do
   defp put_new(options, key, value) when is_list(options), do: Keyword.put_new(options, key, value)
   defp put_new(options, key, value) when is_map(options), do: Map.put_new(options, key, value)
 
+  defp delete(options, keys) when is_list(options) and is_list(keys) do
+    Enum.reduce(keys, options, fn key, acc -> Keyword.delete(acc, key) end)
+  end
+
   defp delete(options, key) when is_list(options), do: Keyword.delete(options, key)
   defp delete(options, key) when is_map(options), do: Map.delete(options, key)
+
+  defp pop(options, key, default) when is_list(options) do
+    Keyword.pop(options, key, default)
+  end
+
+  defp pop(options, key, default) when is_map(options) do
+    Map.pop(options, key, default)
+  end
 
   defp default_options do
     [

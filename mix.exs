@@ -87,7 +87,8 @@ defmodule Cldr.DatesTimes.Mixfile do
       {:tz, "~> 0.26", optional: true},
       {:benchee, "~> 1.0", optional: true, only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", optional: true, only: [:dev, :test], runtime: false},
-      {:exprof, "~> 0.2", optional: true, only: :dev, runtime: false}
+      {:exprof, "~> 0.2", optional: true, only: :dev, runtime: false},
+      {:mint, "~> 1.7", optional: true, only: :dev}
     ]
   end
 
