@@ -244,16 +244,16 @@ defmodule Cldr.DateTime.Timezone do
       iex> Cldr.DateTime.Timezone.non_location_format("Asia/Shanghai")
       {:ok, "China Time"}
 
-      iex> Cldr.DateTime.Timezone.non_location_format("America/Phoenix")
-      {:ok, "Mountain Time (Phoenix)"}
-
       iex> Cldr.DateTime.Timezone.non_location_format("Australia/Sydney", locale: :fr)
       {:ok, "heure de l’Est de l’Australie"}
+
+      iex> Cldr.DateTime.Timezone.non_location_format("America/Phoenix")
+      {:ok, "Mountain Time (Phoenix)"}
 
       iex> Cldr.DateTime.Timezone.non_location_format("America/Phoenix", format: :short)
       {:ok, "MT (Phoenix)"}
 
-      iex> Cldr.DateTime.Timezone.non_location_format "Europe/Dublin"
+      iex> Cldr.DateTime.Timezone.non_location_format("Europe/Dublin")
       {:ok, "Greenwich Mean Time (Ireland)"}
 
       iex> Cldr.DateTime.Timezone.non_location_format("Europe/Rome", locale: :ja)
@@ -299,47 +299,63 @@ defmodule Cldr.DateTime.Timezone do
           {:ok, zone_format}
 
         meta_zone_format ->
-          preferred_zone =
-            preferred_zone_for_meta_zone(meta_zone, locale)
-
-          cond do
-            preferred_zone == canonical_zone ->
-              {:ok, meta_zone_format}
-
-            preferred_zone_for_territory?(preferred_zone) &&
-                !preferred_zone_for_locale?(preferred_zone, locale) ->
-              case territory_for_zone(canonical_zone) do
-                {:ok, zone_territory} ->
-                  territory_name = territory_name(territories, zone_territory)
-
-                  iolist =
-                    Substitution.substitute([meta_zone_format, territory_name], fallback_format)
-
-                  {:ok, List.to_string(iolist)}
-
-                _other ->
-                  {:ok, meta_zone_format}
-              end
-
-            true ->
-              case exemplar_city(canonical_zone) do
-                {:ok, exemplar_city} ->
-                  iolist =
-                    Substitution.substitute([meta_zone_format, exemplar_city], fallback_format)
-
-                  {:ok, List.to_string(iolist)}
-
-                error ->
-                  error
-              end
-          end
+          meta_zone_or_fallback_format(canonical_zone, meta_zone, meta_zone_format, fallback_format, locale, territories)
 
         options.type == :generic ->
           location_format(time_zone, options)
 
-        options.type in [:standard, :daylight] ->
+        true ->
           gmt_format(time_zone, options)
       end
+    end
+  end
+
+  defp meta_zone_or_fallback_format(canonical_zone, meta_zone, meta_zone_format, fallback_format, locale, territories) do
+    preferred_zone =
+      preferred_zone_for_meta_zone(meta_zone, locale)
+
+    cond do
+      preferred_zone == canonical_zone ->
+        {:ok, meta_zone_format}
+
+      preferred_zone_for_zone?(canonical_zone, meta_zone) &&
+          !preferred_zone_for_locale?(canonical_zone, meta_zone, locale) ->
+        fallback_with_territory(canonical_zone, meta_zone_format, fallback_format, territories)
+
+      true ->
+        fallback_with_exemplar(canonical_zone, meta_zone_format, fallback_format)
+    end
+  end
+
+  defp fallback_with_territory(canonical_zone, meta_zone_format, fallback_format, territories) do
+    case territory_for_zone(canonical_zone) do
+      {:ok, zone_territory} ->
+        territory_name = territory_name(territories, zone_territory)
+
+        iolist =
+          Substitution.substitute([meta_zone_format, territory_name], fallback_format)
+
+        {:ok, List.to_string(iolist)}
+
+      _other ->
+        {:ok, meta_zone_format}
+    end
+  end
+
+  defp fallback_with_exemplar("Etc/GMT", meta_zone_format, _fallback_format) do
+    {:ok, meta_zone_format}
+  end
+
+  defp fallback_with_exemplar(canonical_zone, meta_zone_format, fallback_format) do
+    case exemplar_city(canonical_zone) do
+      {:ok, exemplar_city} ->
+        iolist =
+          Substitution.substitute([meta_zone_format, exemplar_city], fallback_format)
+
+        {:ok, List.to_string(iolist)}
+
+      error ->
+        error
     end
   end
 
@@ -779,36 +795,23 @@ defmodule Cldr.DateTime.Timezone do
     {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for #{inspect(time_zone)}"}
   end
 
-  defp preferred_zone_for_territory(territory) do
-    zones =
-      Cldr.Timezone.timezones_by_territory()
-      |> Map.fetch!(territory)
-
-    case zones do
-      [%{aliases: [time_zone | _rest]}] -> time_zone
-      _other -> nil
-    end
-  end
-
-  defp preferred_zone_for_territory?(time_zone) do
+  defp preferred_zone_for_zone?(time_zone, meta_zone) do
     case territory_for_zone(time_zone) do
       {:ok, territory} ->
-        preferred_zone_for_territory(territory)
-
-      error ->
-        error
+        time_zone == preferred_zone_for_territory(territory, meta_zone)
+      _other -> false
     end
   end
 
-  defp preferred_zone_for_locale?(time_zone, locale) do
+  defp preferred_zone_for_locale?(time_zone, meta_zone, locale) do
     territory = Cldr.Locale.territory_from_locale(locale)
+    time_zone == preferred_zone_for_territory(territory, meta_zone)
+  end
 
-    case preferred_zone_for_territory(territory) do
-      {:error, _reason} ->
-        false
-
-      preferred_zone ->
-        time_zone == preferred_zone
+  defp preferred_zone_for_territory(territory, meta_zone) do
+    case Map.get(meta_zone_mapping(), meta_zone) do
+      nil -> nil
+      mapping -> (Map.get(mapping, territory) || Map.get(mapping, :"001"))
     end
   end
 
