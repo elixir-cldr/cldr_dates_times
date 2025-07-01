@@ -299,7 +299,14 @@ defmodule Cldr.DateTime.Timezone do
           {:ok, zone_format}
 
         meta_zone_format ->
-          meta_zone_or_fallback_format(canonical_zone, meta_zone, meta_zone_format, fallback_format, locale, territories)
+          meta_zone_or_fallback_format(
+            canonical_zone,
+            meta_zone,
+            meta_zone_format,
+            fallback_format,
+            locale,
+            territories
+          )
 
         options.type == :generic ->
           location_format(time_zone, options)
@@ -310,7 +317,14 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
-  defp meta_zone_or_fallback_format(canonical_zone, meta_zone, meta_zone_format, fallback_format, locale, territories) do
+  defp meta_zone_or_fallback_format(
+         canonical_zone,
+         meta_zone,
+         meta_zone_format,
+         fallback_format,
+         locale,
+         territories
+       ) do
     preferred_zone =
       preferred_zone_for_meta_zone(meta_zone, locale)
 
@@ -327,6 +341,8 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
+  # If we can't identify the territory for a zone (like with UTC) just
+  # use the meta_zone_format
   defp fallback_with_territory(canonical_zone, meta_zone_format, fallback_format, territories) do
     case territory_for_zone(canonical_zone) do
       {:ok, zone_territory} ->
@@ -342,10 +358,8 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
-  defp fallback_with_exemplar("Etc/GMT", meta_zone_format, _fallback_format) do
-    {:ok, meta_zone_format}
-  end
-
+  # If we can't identify the exemplar city for a zone (like with GMT) just
+  # use the meta_zone_format
   defp fallback_with_exemplar(canonical_zone, meta_zone_format, fallback_format) do
     case exemplar_city(canonical_zone) do
       {:ok, exemplar_city} ->
@@ -355,7 +369,7 @@ defmodule Cldr.DateTime.Timezone do
         {:ok, List.to_string(iolist)}
 
       error ->
-        error
+        {:ok, meta_zone_format}
     end
   end
 
@@ -576,6 +590,7 @@ defmodule Cldr.DateTime.Timezone do
 
       transliterated =
         Cldr.Number.Transliterate.transliterate(gmt_format, options.locale, number_system, backend)
+
       {:ok, transliterated}
     end
   end
@@ -799,7 +814,9 @@ defmodule Cldr.DateTime.Timezone do
     case territory_for_zone(time_zone) do
       {:ok, territory} ->
         time_zone == preferred_zone_for_territory(territory, meta_zone)
-      _other -> false
+
+      _other ->
+        false
     end
   end
 
@@ -811,7 +828,7 @@ defmodule Cldr.DateTime.Timezone do
   defp preferred_zone_for_territory(territory, meta_zone) do
     case Map.get(meta_zone_mapping(), meta_zone) do
       nil -> nil
-      mapping -> (Map.get(mapping, territory) || Map.get(mapping, :"001"))
+      mapping -> Map.get(mapping, territory) || Map.get(mapping, :"001")
     end
   end
 
@@ -820,7 +837,7 @@ defmodule Cldr.DateTime.Timezone do
 
     case Map.get(meta_zone_mapping(), meta_zone) do
       nil -> nil
-      mapping -> (Map.get(mapping, territory) || Map.get(mapping, :"001"))
+      mapping -> Map.get(mapping, territory) || Map.get(mapping, :"001")
     end
   end
 
@@ -1024,7 +1041,7 @@ defmodule Cldr.DateTime.Timezone do
               "Invalid date_time #{inspect(datetime)}"
             }}}
 
-        {:time_zone_database, _number_system}, acc  ->
+        {:time_zone_database, _number_system}, acc ->
           {:cont, acc}
 
         {option, _}, _acc ->
