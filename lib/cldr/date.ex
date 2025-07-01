@@ -71,8 +71,9 @@ defmodule Cldr.Date do
   * `:locale` any locale returned by `Cldr.known_locale_names/1`.
     The default is `Cldr.get_locale/0`.
 
-  * `:number_system` a number system into which the formatted date digits
-    should be transliterated.
+  * `:number_system` a number system into which the formatted datetime digits should
+    be transliterated. See `Cldr.known_number_systems/0`. The default is
+    the number system associated with the `:locale`.
 
   * `:prefer` expresses the preference for one of the possible alternative
     sub-formats. See the variant preference notes below.

@@ -139,7 +139,8 @@ defmodule Cldr.DateTime do
     or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
   * `:number_system` a number system into which the formatted datetime digits should
-    be transliterated.
+    be transliterated. See `Cldr.known_number_systems/0`. The default is
+    the number system associated with the `:locale`.
 
   * `:separators` selects which of the available symbol
     sets should be used when formatting fractional seconds (format
