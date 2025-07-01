@@ -368,7 +368,7 @@ defmodule Cldr.DateTime.Timezone do
 
         {:ok, List.to_string(iolist)}
 
-      error ->
+      _error ->
         {:ok, meta_zone_format}
     end
   end
@@ -480,12 +480,12 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
-  defp location_from_territory_and_zone(territory, territories, zone) do
-    if territory_has_one_zone?(territory) || primary_zone?(zone) do
+  defp location_from_territory_and_zone(territory, territories, time_zone) do
+    if territory_has_one_zone?(territory) || primary_zone?(time_zone) do
       territory_names = Map.fetch!(territories, territory)
       {:ok, territory_names[:short] || territory_names[:standard]}
     else
-      exemplar_city(zone)
+      exemplar_city(time_zone)
     end
   end
 
