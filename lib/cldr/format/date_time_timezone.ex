@@ -151,6 +151,40 @@ defmodule Cldr.DateTime.Timezone do
     iex> Cldr.DateTime.Timezone.gmt_format(date_time)
     {:ok, "GMT+10:00"}
 
+  ### GMT and UTC time zone formats
+
+  Some valid time zones are not associated with a city of territory (country).
+  Therefore they return an error for the location formats. The can producxe a
+  valid result for the non-location format and the GMT format.
+
+  #### Non-location format
+
+    iex> Cldr.DateTime.Timezone.non_location_format("GMT")
+    {:ok, "Greenwich Mean Time"}
+
+    iex> Cldr.DateTime.Timezone.non_location_format("UTC")
+    {:ok, "Coordinated Universal Time"}
+
+  ### Location format
+
+      iex> Cldr.DateTime.Timezone.location_format("GMT")
+      {:error,
+       {Cldr.DateTime.NoTerritoryForTimezone,
+        "No territory was found for time zone \\"Etc/GMT\\""}}
+
+      iex> Cldr.DateTime.Timezone.location_format("UTC")
+      {:error,
+       {Cldr.DateTime.NoTerritoryForTimezone,
+        "No territory was found for time zone \\"Etc/UTC\\""}}
+
+  #### GMT format
+
+      iex> Cldr.DateTime.Timezone.gmt_format("UTC")
+      {:ok, "GMT+00:00"}
+
+      iex> Cldr.DateTime.Timezone.gmt_format("GMT")
+      {:ok, "GMT+00:00"}
+
   """
 
   alias Cldr.Locale
@@ -283,8 +317,8 @@ defmodule Cldr.DateTime.Timezone do
 
                   {:ok, List.to_string(iolist)}
 
-                other ->
-                  other
+                _other ->
+                  {:ok, meta_zone_format}
               end
 
             true ->
@@ -783,7 +817,7 @@ defmodule Cldr.DateTime.Timezone do
 
     case Map.get(meta_zone_mapping(), meta_zone) do
       nil -> nil
-      mapping -> Map.get(mapping, territory) || Map.get(mapping, :"001")
+      mapping -> (Map.get(mapping, territory) || Map.get(mapping, :"001"))
     end
   end
 
