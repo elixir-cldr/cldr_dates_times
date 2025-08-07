@@ -1,7 +1,7 @@
 defmodule Cldr.DateTime.Timezone do
   @moduledoc """
-  Functions to format time zone IDs, including the time zone field
-  of a `t:DateTime.t/0`.
+  Functions to format [IANA time zone IDs](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones),
+  including the time zone field of a `t:DateTime.t/0`.
 
   ### Time Zone Names
 
@@ -12,6 +12,11 @@ defmodule Cldr.DateTime.Timezone do
   by a GMT offset as a fallback. In general, this is not true for the generic format, which
   is used for picking timezones or for conveying a timezone for specifying a recurring time
   (such as a meeting in a calendar). For either purpose, a GMT offset would lose information.
+
+  > #### Supported Time Zone IDs  {: .info}
+  >
+  > [NATO time zone names](https://en.wikipedia.org/wiki/Military_time_zone) are not supported, only
+  > [IANA time zone IDs](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
   ### Time Zone Format Terminology
 
@@ -70,7 +75,7 @@ defmodule Cldr.DateTime.Timezone do
   #### Specific non-location format
 
   Reflects a specific standard or daylight time, which may or may not be the wall time.
-  For example, "10 am Pacific Standard Time" will be GMT-8 in the winter and in the summer.
+  For example, "10 am Pacific Standard Time" will be GMT-8 in the winter and GMT-7 in the summer.
 
   * "Pacific Standard Time" (long)
   * "PST" (short)
@@ -133,7 +138,7 @@ defmodule Cldr.DateTime.Timezone do
 
   ### Examples for fomat differences
 
-  THe following shows representative examples of the different formats:
+  The following shows representative examples of the different formats:
 
     iex> {:ok, date_time} = DateTime.new(~D[2025-07-01], ~T[00:00:00], "Australia/Sydney")
     iex> Cldr.DateTime.Timezone.non_location_format(date_time, type: :daylight)
@@ -150,6 +155,8 @@ defmodule Cldr.DateTime.Timezone do
     {:ok, "Sydney Time"}
     iex> Cldr.DateTime.Timezone.gmt_format(date_time)
     {:ok, "GMT+10:00"}
+    iex> Cldr.DateTime.Timezone.iso_format(date_time)
+    {:ok, "+1000"}
 
   ### GMT and UTC time zone formats
 
@@ -179,24 +186,33 @@ defmodule Cldr.DateTime.Timezone do
 
   #### GMT format
 
+      iex> Cldr.DateTime.Timezone.gmt_format("Australia/Adelaide")
+      {:ok, "GMT+09:30"}
+
       iex> Cldr.DateTime.Timezone.gmt_format("UTC")
-      {:ok, "GMT+00:00"}
+      {:ok, "GMT"}
 
       iex> Cldr.DateTime.Timezone.gmt_format("GMT")
-      {:ok, "GMT+00:00"}
+      {:ok, "GMT"}
 
   """
 
   alias Cldr.Locale
   alias Cldr.Substitution
 
-  import Cldr.DateTime.Formatter, only: :macros
+  import Cldr.DateTime.Formatter, only: [is_date_time: 1, minute: 2, second: 2, h23: 2]
 
   @valid_types [:generic, :specific, :standard, :daylight]
   @default_type :generic
 
   @valid_formats [:long, :short]
   @default_format :long
+
+  @valid_iso_formats [:short, :long, :full]
+  @default_iso_format :long
+
+  @valid_iso_types [:basic, :extended]
+  @default_iso_type :basic
 
   @doc """
   Return the localized non-location time zone format
@@ -496,7 +512,7 @@ defmodule Cldr.DateTime.Timezone do
   > #### Time zones other than UTC {: .warning}
   >
   > When `date_time_or_zone` is a string and it is not `UTC` or `GMT`, a
-  > [Time Zone daatabase](https://hexdocs.pm/elixir/DateTime.html#module-time-zone-database)
+  > [Time Zone database](https://hexdocs.pm/elixir/DateTime.html#module-time-zone-database)
   > must be configured or provided as the option `:time_zone_database`.
 
   ### Arguments
@@ -514,7 +530,7 @@ defmodule Cldr.DateTime.Timezone do
   * `:backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
 
-  * `:time_zone_datababase` determines the time zone database to use when
+  * `:time_zone_database` determines the time zone database to use when
     shifting time zones. Shifting time zones only occurs if the `date_time_or_zone`
     is set to a string time zone ID. The default is `Calendar.get_time_zone_database/0`.
 
@@ -532,7 +548,7 @@ defmodule Cldr.DateTime.Timezone do
   ### Examples
 
       iex> Cldr.DateTime.Timezone.gmt_format(DateTime.utc_now())
-      {:ok, "GMT+00:00"}
+      {:ok, "GMT"}
 
       iex> {:ok, standard_time} = DateTime.new(~D[2025-06-01], ~T[00:00:00], "Australia/Sydney")
       iex> Cldr.DateTime.Timezone.gmt_format(standard_time)
@@ -553,7 +569,7 @@ defmodule Cldr.DateTime.Timezone do
 
       iex> {:ok, gmt} = DateTime.new(~D[2025-06-01], ~T[00:00:00], "GMT")
       iex> Cldr.DateTime.Timezone.gmt_format(gmt)
-      {:ok, "GMT+00:00"}
+      {:ok, "GMT"}
 
   """
 
@@ -580,20 +596,175 @@ defmodule Cldr.DateTime.Timezone do
          {:ok, shifted_date_time} <-
            shift_zone(options.date_time, canonical_zone, options.time_zone_database),
          {:ok, gmt_format} <- format.gmt_format(locale),
+         {:ok, gmt_zero_format} <- format.gmt_zero_format(locale),
          {:ok, hour_format} <- format.hour_format(locale),
          {:ok, formatted_hour} <- formatted_hour(shifted_date_time, hour_format) do
-      gmt_format =
-        Cldr.Substitution.substitute(formatted_hour, gmt_format) |> List.to_string()
-
-      number_system =
-        Cldr.Number.System.number_system_from_locale(options.locale)
-
-      transliterated =
-        Cldr.Number.Transliterate.transliterate(gmt_format, options.locale, number_system, backend)
-
-      {:ok, transliterated}
+      time = time_map_from_zone_offset(shifted_date_time)
+      {:ok, format_gmt(time, formatted_hour, gmt_format, gmt_zero_format, backend, options)}
     end
   end
+
+  @doc false
+  def gmt_tz_format(time_map, options) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    format = Module.concat(backend, DateTime.Format)
+
+    with {:ok, options} <- validate_options(options),
+         {:ok, gmt_format} <- format.gmt_format(locale),
+         {:ok, gmt_zero_format} <- format.gmt_zero_format(locale),
+         {:ok, {positive_format, negative_format}} <- format.hour_format(locale) do
+      format = if time_map.hour >= 0, do: positive_format, else: negative_format
+      {:ok, time} = Time.new(abs(time_map.hour), abs(time_map.minute), time_map.second)
+      {:ok, formatted_hour} = Cldr.Time.to_string(time, format: format)
+      format_gmt(time, formatted_hour, gmt_format, gmt_zero_format, backend, options)
+    end
+  end
+
+  defp format_gmt(%{hour: 0, minute: 0, second: 0}, _formatted_hour, _gmt_format, gmt_zero_format, _backend, _options) do
+    gmt_zero_format
+  end
+
+  defp format_gmt(_time, formatted_hour, gmt_format, _gmt_zero_format, backend, options) do
+    gmt_format =
+      Cldr.Substitution.substitute(formatted_hour, gmt_format) |> List.to_string()
+
+    number_system =
+      Cldr.Number.System.number_system_from_locale(options.locale)
+
+    Cldr.Number.Transliterate.transliterate(gmt_format, options.locale, number_system, backend)
+  end
+
+  @doc """
+  Return the localized ISO 8601 time zone format
+  for a time zone ID or a `t:DateTime.t/0`.
+
+  > #### Time zones other than UTC {: .warning}
+  >
+  > When `date_time_or_zone` is a string and it is not `UTC` or `GMT`, a
+  > [Time Zone database](https://hexdocs.pm/elixir/DateTime.html#module-time-zone-database)
+  > must be configured or provided as the option `:time_zone_database`.
+
+  ### Arguments
+
+  * `date_time_or_zone` is any time zone ID or any
+    `t:DateTime.t/0`.
+
+  * `options` is a keyword list of options.
+
+  ### Options
+
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
+
+  * `:backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
+
+  * `:format` is either `:long` (the default) or `:short`.
+    * `:short` will always render the hour offset and only render the minute
+      offset if it is not zero.
+    * `:long` will always render the hour and minute offsets.
+    * `:full` will always render the hour and minute offsets and only
+      render the second offset if it is not zero. This is an extension to the
+      ISO 8601 standard.
+
+  * `:type` is either `:basic` (the default), or `:extended`.
+    * `:basic` renders the time zone hour, optional minute and optional
+      second with no spacing or separator between then.
+    * `:extended` renders the time zone hour, optional minute and optional
+      second with a `:` separator between them.
+
+  * `:z_for_zero` is a truthy or falsy value to indicate whether or not
+    to use the [Z](https://en.wikipedia.org/wiki/ISO_8601#:~:text=Z%20is%20the%20zone%20designator,30Z%22%20or%20%22T0930Z%22.)`
+    indicator when the time zone offset is zero. The default is `true`.
+
+  * `:time_zone_database` determines the time zone database to use when
+    shifting time zones. Shifting time zones only occurs if the `date_time_or_zone`
+    is set to a string time zone ID. The default is `Calendar.get_time_zone_database/0`.
+
+  ### Returns
+
+  * `{:ok, iso_format}` or
+
+  * `{:error, {exception, reason}}`.
+
+  ### Examples
+
+  """
+  @doc since: "2.33.0"
+
+  @spec iso_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t() | map()) ::
+          {:ok, String.t()} | {:error, {module, String.t()}}
+
+  def iso_format(date_time_or_zone, options \\ [])
+
+  def iso_format(%{time_zone: time_zone} = date_time, options) do
+    options = Keyword.put_new(options, :date_time, date_time)
+    iso_format(time_zone, options)
+  end
+
+  def iso_format(time_zone, options) when is_binary(time_zone) do
+    with {:ok, options} <- validate_iso_options(options),
+         {:ok, canonical_zone} <- canonical_time_zone(time_zone),
+         {:ok, shifted_date_time} <-
+             shift_zone(options.date_time, canonical_zone, options.time_zone_database) do
+      {hour, minute, second} = time_from_zone_offset(shifted_date_time)
+      time = %{hour: hour, minute: abs(minute), second: second}
+      {:ok, iso_format_type(time, options.type, options.format, options.z_for_zero)}
+    end
+  end
+
+  # Z format
+
+  def iso_format_type(%{hour: 0, minute: 0, second: 0}, _type, _format, z_for_zero) when z_for_zero do
+    "Z"
+  end
+
+  # Basic format
+
+  def iso_format_type(%{hour: hour, minute: 0} = time, :basic, :short, _z_for_zero) do
+    sign(hour) <> h23(time, 2)
+  end
+
+  def iso_format_type(%{hour: hour, minute: _minute} = time, :basic, :short, _z_for_zero) do
+    sign(hour) <> h23(time, 2) <> minute(time, 2)
+  end
+
+  def iso_format_type(%{hour: hour, minute: _minute} = time, :basic, :long, _z_for_zero) do
+    sign(hour) <> h23(time, 2) <> minute(time, 2)
+  end
+
+  def iso_format_type(%{hour: hour, minute: _minute, second: 0} = time, :basic, :full, _z_for_zero) do
+    sign(hour) <> h23(time, 2) <> minute(time, 2)
+  end
+
+  def iso_format_type(%{hour: hour, minute: _minute, second: _second} = time, :basic, :full, _z_for_zero) do
+    sign(hour) <> h23(time, 2) <> minute(time, 2) <> second(time, 2)
+  end
+
+  # Extended format
+
+  def iso_format_type(%{hour: hour, minute: 0} = time, :extended,  :short, _z_for_zero) do
+    sign(hour) <> h23(time, 2)
+  end
+
+  def iso_format_type(%{hour: hour, minute: _minute} = time, :extended,  :short, _z_for_zero) do
+    sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2)
+  end
+
+  def iso_format_type(%{hour: hour, minute: _minute} = time, :extended, :long, _z_for_zero) do
+    sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2)
+  end
+
+  def iso_format_type(%{hour: hour, minute: _minute, second: 0} = time, :extended, :full,  _z_for_zero) do
+    sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2)
+  end
+
+  def iso_format_type(%{hour: hour, minute: _minute, second: _second} = time, :extended, :full,  _z_for_zero) do
+    sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2) <> ":" <> second(time, 2)
+  end
+
+  defp sign(number) when number >= 0, do: "+"
+  defp sign(_number), do: "-"
 
   defp shift_zone(%{time_zone: time_zone} = date_time, time_zone, _time_zone_database) do
     {:ok, date_time}
@@ -724,8 +895,10 @@ defmodule Cldr.DateTime.Timezone do
     {hours, minutes, seconds}
   end
 
-  def time_from_zone_offset(other) do
-    Cldr.DateTime.Formatter.error_return(other, "x", [:utc_offset])
+  @doc false
+  def time_map_from_zone_offset(offset) do
+    {hours,  minutes, seconds} = time_from_zone_offset(offset)
+    %{hour: hours, minute: minutes, second: seconds}
   end
 
   @doc """
@@ -1049,7 +1222,75 @@ defmodule Cldr.DateTime.Timezone do
            {:error,
             {
               ArgumentError,
-              "Invalid option #{inspect(option)}. Valid options are :date_time, :type and :format"
+              "Invalid option #{inspect(option)}. Valid options are :date_time, :type, :format, :locale and :backend"
+            }}}
+      end)
+
+    case options do
+      {:error, reason} ->
+        {:error, reason}
+
+      options ->
+        {:ok, Map.new(options)}
+    end
+  end
+
+  defp validate_iso_options(options) when is_map(options) do
+    {:ok, options}
+  end
+
+  defp validate_iso_options(options) when is_list(options) do
+    options =
+      default_iso_options()
+      |> Keyword.merge(options)
+
+    options =
+      Enum.reduce_while(options, options, fn
+        {:type, type}, acc when type in @valid_iso_types ->
+          {:cont, acc}
+
+        {:type, type}, _acc ->
+          {:halt,
+           {:error,
+            {
+              ArgumentError,
+              "Invalid type #{inspect(type)}. Valid format are #{inspect(@valid_iso_types)}"
+            }}}
+
+        {:format, format}, acc when format in @valid_iso_formats ->
+          {:cont, acc}
+
+        {:format, format}, _acc ->
+          {:halt,
+           {:error,
+            {
+              ArgumentError,
+              "Invalid format #{inspect(format)}. Valid format are #{inspect(@valid_iso_formats)}"
+            }}}
+
+        {:z_for_zero, _z_for_zero}, acc ->
+          {:cont, acc}
+
+        {:date_time, date_time}, acc when is_date_time(date_time) ->
+          {:cont, acc}
+
+        {:date_time, datetime}, _acc ->
+          {:halt,
+           {:error,
+            {
+              ArgumentError,
+              "Invalid date_time #{inspect(datetime)}"
+            }}}
+
+        {:time_zone_database, _number_system}, acc ->
+          {:cont, acc}
+
+        {option, _}, _acc ->
+          {:halt,
+           {:error,
+            {
+              ArgumentError,
+              "Invalid option #{inspect(option)}. Valid options are :date_time, :format"
             }}}
       end)
 
@@ -1078,6 +1319,16 @@ defmodule Cldr.DateTime.Timezone do
       format: @default_format,
       locale: Cldr.get_locale(),
       date_time: DateTime.utc_now(),
+      time_zone_database: Calendar.get_time_zone_database()
+    ]
+  end
+
+  defp default_iso_options do
+    [
+      format: @default_iso_format,
+      type: @default_iso_type,
+      date_time: DateTime.utc_now(),
+      z_for_zero: true,
       time_zone_database: Calendar.get_time_zone_database()
     ]
   end
