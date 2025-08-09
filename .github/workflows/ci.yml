@@ -87,7 +87,7 @@ jobs:
       run: mix deps.get
       
     # Download updated timezone data
-    - name: Install dependencies
+    - name: Update Ttimezone data
       run: mix tz.download  
       run: mix deps.compile tz --force
 
