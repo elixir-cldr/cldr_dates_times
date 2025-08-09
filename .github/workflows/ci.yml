@@ -89,6 +89,9 @@ jobs:
     # Download updated timezone data
     - name: Update Ttimezone data
       run: mix tz.download  
+    
+    # TZ needs to be recompiled after data download  
+    - name: Recompile TZ
       run: mix deps.compile tz --force
 
     # Step: Compile the project treating any warnings as errors.
