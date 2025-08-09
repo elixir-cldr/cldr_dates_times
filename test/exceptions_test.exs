@@ -24,9 +24,10 @@ defmodule Cldr.Exceptions.Test do
   if Version.compare(System.version(), "1.10.0-dev") in [:gt, :eq] do
     test "that an unfulfilled format directive returns an error" do
       assert Cldr.Date.to_string(~D[2019-01-01], format: "x") ==
-               {:error,
-                {Cldr.DateTime.FormatError,
-                 "The format symbol 'x' requires at map with at least :utc_offset. Found: ~D[2019-01-01 Cldr.Calendar.Gregorian]"}}
+        {
+          :error,
+          "Expected a map with :utc_offset and :std_offset fields. Found ~D[2019-01-01 Cldr.Calendar.Gregorian]"
+        }
     end
   end
 end

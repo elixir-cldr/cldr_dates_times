@@ -3410,10 +3410,10 @@ defmodule Cldr.DateTime.Formatter do
   def zone_basic(time, n, locale, backend, options \\ %{})
 
   def zone_basic(time, n, _locale, _backend, options) when n in 1..3 do
-    {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
-
-    iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
-    |> maybe_wrap(:zone_basic, options)
+    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
+      iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+      |> maybe_wrap(:zone_basic, options)
+    end
   end
 
   def zone_basic(time, 4 = n, locale, backend, options) do
@@ -3422,10 +3422,10 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   def zone_basic(time, 5, _locale, _backend, options) do
-    {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
-
-    iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
-    |> maybe_wrap(:zone_basic, options)
+    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
+      iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
+      |> maybe_wrap(:zone_basic, options)
+    end
   end
 
   def zone_basic(time, _n, _locale, _backend, _options) do
@@ -3530,63 +3530,73 @@ defmodule Cldr.DateTime.Formatter do
   def zone_iso_z(time, n, locale, backend, options \\ %{})
 
   def zone_iso_z(time, 1, _locale, _backend, options) do
-    case Timezone.time_from_zone_offset(time) do
-      {0, 0, _} ->
-        "Z"
+    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
+      case {hours, minutes, seconds} do
+        {0, 0, _} ->
+          "Z"
 
-      {hours, minutes, seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
-        |> String.replace(~r/00\Z/, "")
+        {hours, minutes, seconds} ->
+          iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+          |> String.replace(~r/00\Z/, "")
+      end
+      |> maybe_wrap(:zone_iso_z, options)
     end
-    |> maybe_wrap(:zone_iso_z, options)
   end
 
   def zone_iso_z(time, 2, _locale, _backend, options) do
-    case Timezone.time_from_zone_offset(time) do
-      {0, 0, _} ->
-        "Z"
+    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
+      case {hours, minutes, seconds} do
+        {0, 0, _} ->
+          "Z"
 
-      {hours, minutes, seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+        {hours, minutes, seconds} ->
+          iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+      end
+      |> maybe_wrap(:zone_iso_z, options)
     end
-    |> maybe_wrap(:zone_iso_z, options)
   end
 
   def zone_iso_z(time, 3, _locale, _backend, options) do
-    case Timezone.time_from_zone_offset(time) do
-      {0, 0, _} ->
-        "Z"
+    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
+      case {hours, minutes, seconds} do
+        {0, 0, _} ->
+          "Z"
 
-      {hours, minutes, seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
+        {hours, minutes, seconds} ->
+          iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
+      end
+      |> maybe_wrap(:zone_iso_z, options)
     end
-    |> maybe_wrap(:zone_iso_z, options)
   end
 
   def zone_iso_z(time, 4, _locale, _backend, options) do
-    case Timezone.time_from_zone_offset(time) do
-      {0, 0, _} ->
-        "Z"
+    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
+      case {hours, minutes, seconds} do
+        {0, 0, _} ->
+          "Z"
 
-      {hours, minutes, 0 = seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
+        {hours, minutes, 0 = seconds} ->
+          iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic)
 
-      {hours, minutes, seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic) <>
-          pad(seconds, 2)
+        {hours, minutes, seconds} ->
+          iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :basic) <>
+            pad(seconds, 2)
+      end
+      |> maybe_wrap(:zone_iso_z, options)
     end
-    |> maybe_wrap(:zone_iso_z, options)
   end
 
   def zone_iso_z(time, 5, _locale, _backend, options) do
-    case Timezone.time_from_zone_offset(time) do
-      {0, 0, _} ->
-        "Z"
+    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
+      case {hours, minutes, seconds} do
+        {0, 0, _} ->
+          "Z"
 
-      {hours, minutes, seconds} ->
-        iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
+        {hours, minutes, seconds} ->
+          iso8601_tz_format(%{hour: hours, minute: minutes, second: seconds}, format: :extended)
+      end
+      |> maybe_wrap(:zone_iso_z, options)
     end
-    |> maybe_wrap(:zone_iso_z, options)
   end
 
   def zone_iso_z(time, _n, _locale, _backend, _options) do
@@ -3819,19 +3829,21 @@ defmodule Cldr.DateTime.Formatter do
   def zone_gmt(time, n, locale, backend, options \\ %{})
 
   def zone_gmt(time, 1, locale, backend, options) do
-    {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
-    backend = Module.concat(backend, DateTime.Formatter)
+    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
+      backend = Module.concat(backend, DateTime.Formatter)
 
-    backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :short)
-    |> maybe_wrap(:zone_gmt, options)
+      backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :short)
+      |> maybe_wrap(:zone_gmt, options)
+    end
   end
 
   def zone_gmt(time, 4, locale, backend, options) do
-    {hours, minutes, seconds} = Timezone.time_from_zone_offset(time)
-    backend = Module.concat(backend, DateTime.Formatter)
+    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
+      backend = Module.concat(backend, DateTime.Formatter)
 
-    backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :long)
-    |> maybe_wrap(:zone_gmt, options)
+      backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :long)
+      |> maybe_wrap(:zone_gmt, options)
+    end
   end
 
   def zone_gmt(time, _n, _locale, _backend, _options) do

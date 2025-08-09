@@ -895,6 +895,10 @@ defmodule Cldr.DateTime.Timezone do
     {hours, minutes, seconds}
   end
 
+  def time_from_zone_offset(time) do
+    {:error, "Expected a map with :utc_offset and :std_offset fields. Found #{inspect time}"}
+  end
+
   @doc false
   def time_map_from_zone_offset(offset) do
     {hours,  minutes, seconds} = time_from_zone_offset(offset)
