@@ -85,6 +85,11 @@ jobs:
     # the cached version.
     - name: Install dependencies
       run: mix deps.get
+      
+    # Download updated timezone data
+    - name: Install dependencies
+      run: mix tz.download  
+      run: mix deps.compile tz --force
 
     # Step: Compile the project treating any warnings as errors.
     # Customize this step if a different behavior is desired.
