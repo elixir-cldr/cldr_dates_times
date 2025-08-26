@@ -234,7 +234,7 @@ defmodule Cldr.DateTime.Timezone do
     is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
 
   * `:date_time` is the date_time to be used to ascertain if the
-    standard or dayligth time zone information is required. The default
+    standard or daylight time zone information is required. The default
     is `DateTime.utc_now/0`.
 
   * `:format` is either `:long` (the default) or `:short`.
@@ -276,7 +276,7 @@ defmodule Cldr.DateTime.Timezone do
       {:ok, "中央ヨーロッパ時間（イタリア）"}
 
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
 
   @spec non_location_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
@@ -414,7 +414,7 @@ defmodule Cldr.DateTime.Timezone do
     is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
 
   * `:date_time` is the date_time to be used to ascertain if the
-    standard or dayligth time zone information is required. The default
+    standard or daylight time zone information is required. The default
     is `DateTime.utc_now/0`.
 
   * `:type` is either `:generic` (the default), `:specific`, `:standard`
@@ -435,6 +435,10 @@ defmodule Cldr.DateTime.Timezone do
       iex> Cldr.DateTime.Timezone.location_format("Australia/Sydney", type: :daylight)
       {:ok, "Sydney Daylight Time"}
 
+      # Only one time zone in Italy so we use the territory name
+      iex> Cldr.DateTime.Timezone.location_format "Europe/Rome", type: :daylight
+      {:ok, "Italy Daylight Time"}
+
       iex> Cldr.DateTime.Timezone.location_format("Asia/Shanghai")
       {:ok, "China Time"}
 
@@ -443,9 +447,6 @@ defmodule Cldr.DateTime.Timezone do
 
       iex> Cldr.DateTime.Timezone.location_format("Australia/Sydney", locale: :fr)
       {:ok, "heure : Sydney"}
-
-      iex> Cldr.DateTime.Timezone.location_format("America/Phoenix", format: :short)
-      {:ok, "Phoenix Time"}
 
       iex> Cldr.DateTime.Timezone.location_format("Europe/Rome", locale: :ja)
       {:ok, "イタリア時間"}
@@ -457,7 +458,7 @@ defmodule Cldr.DateTime.Timezone do
       {:ok, "New York (heure standard)"}
 
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
 
   @spec location_format(
           date_time_or_zone :: String.t() | DateTime.t(),
@@ -573,7 +574,7 @@ defmodule Cldr.DateTime.Timezone do
 
   """
 
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
 
   @spec gmt_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t() | map()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
@@ -653,12 +654,6 @@ defmodule Cldr.DateTime.Timezone do
 
   ### Options
 
-  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
-
-  * `:backend` is any module that includes `use Cldr` and therefore
-    is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
-
   * `:format` is either `:long` (the default) or `:short`.
     * `:short` will always render the hour offset and only render the minute
       offset if it is not zero.
@@ -689,8 +684,31 @@ defmodule Cldr.DateTime.Timezone do
 
   ### Examples
 
+      iex> Cldr.DateTime.Timezone.iso_format(DateTime.utc_now())
+      {:ok, "Z"}
+      iex> Cldr.DateTime.Timezone.iso_format(DateTime.utc_now(), z_for_zero: false)
+      {:ok, "+0000"}
+      iex> Cldr.DateTime.Timezone.iso_format(DateTime.utc_now(), z_for_zero: false, type: :extended)
+      {:ok, "+00:00"}
+
+      iex> {:ok, standard_time} = DateTime.new(~D[2025-06-01], ~T[00:00:00], "Australia/Sydney")
+      iex> Cldr.DateTime.Timezone.iso_format(standard_time)
+      {:ok, "+1000"}
+      iex> Cldr.DateTime.Timezone.iso_format(standard_time, format: :short)
+      {:ok, "+10"}
+      iex> Cldr.DateTime.Timezone.iso_format(standard_time, format: :long)
+      {:ok, "+1000"}
+
+      iex> {:ok, standard_time} = DateTime.new(~D[2025-06-01], ~T[00:00:00], "Australia/Adelaide")
+      iex> Cldr.DateTime.Timezone.iso_format(standard_time, format: :short)
+      {:ok, "+0930"}
+      iex> Cldr.DateTime.Timezone.iso_format(standard_time, format: :long)
+      {:ok, "+0930"}
+      iex> Cldr.DateTime.Timezone.iso_format(standard_time, format: :long, type: :extended)
+      {:ok, "+09:30"}
+
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
 
   @spec iso_format(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t() | map()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
@@ -846,7 +864,7 @@ defmodule Cldr.DateTime.Timezone do
          {Cldr.UnknownTimezoneError, "Unknown time zone \\"Europe/Frankenstein\\""}}
 
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
 
   @spec exemplar_city(date_time_or_zone :: String.t() | DateTime.t(), options :: Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
@@ -873,7 +891,7 @@ defmodule Cldr.DateTime.Timezone do
   zone identifier.
 
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
   def canonical_time_zone(time_zone) do
     case Map.fetch(canonical_time_zones(), time_zone) do
       {:ok, time_zone} -> {:ok, time_zone}
@@ -909,7 +927,7 @@ defmodule Cldr.DateTime.Timezone do
   Returns the metazone data.
 
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
   @meta_zones Cldr.Config.metazones()
   def meta_zones do
     @meta_zones
@@ -920,7 +938,7 @@ defmodule Cldr.DateTime.Timezone do
   IDs to metazone data.
 
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
   @meta_zone_ids Cldr.Config.metazone_ids()
   def meta_zone_ids do
     @meta_zone_ids
@@ -931,7 +949,7 @@ defmodule Cldr.DateTime.Timezone do
   a time zone long ID.
 
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
   @meta_zone_mapping Cldr.Config.metazone_mapping()
   def meta_zone_mapping do
     @meta_zone_mapping
@@ -942,7 +960,7 @@ defmodule Cldr.DateTime.Timezone do
   territories.
 
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
   @primary_zones Cldr.Config.primary_zones()
   def primary_zones do
     @primary_zones
@@ -952,7 +970,7 @@ defmodule Cldr.DateTime.Timezone do
   Returns the canonical time zone mapping.
 
   """
-  @doc since: "2.33.0"
+  @doc since: "2.23.0"
   @canonical_timezones Cldr.Config.canonical_timezones()
   def canonical_time_zones do
     @canonical_timezones
@@ -985,6 +1003,69 @@ defmodule Cldr.DateTime.Timezone do
 
   def no_exemplar_city_error(time_zone) do
     {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for #{inspect(time_zone)}"}
+  end
+
+  @doc since: "2.23.0"
+  @doc """
+  Returns the preferred time zone name for a given time zone
+  and locale.
+
+  ### Arguments
+
+  * `time_zone` is any valid IANA time zone name.
+
+  * `options` is a keyword list of options.
+
+  ### Options
+
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
+
+  * `:backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend!/0`.
+
+  * `:date_time` is the date_time to be used to ascertain the correct time
+    zone information applicable for this date time. The default is
+    `DateTime.utc_now/0`.
+
+  ### Returns
+
+  * `{:ok, preferred_time_zone_name}`
+
+  * `{:error, {exception, reason}}`
+
+  ### Examples
+
+      iex> Cldr.DateTime.Timezone.preferred_zone_for_locale("America/New_York", locale: "en")
+      {:ok, "America/New_York"}
+
+      iex> Cldr.DateTime.Timezone.preferred_zone_for_locale("America/New_York", locale: "en-CA")
+      {:ok, "America/Toronto"}
+
+      iex> Cldr.DateTime.Timezone.preferred_zone_for_locale("PST8PDT", locale: "en")
+      {:ok, "America/Los_Angeles"}
+
+      iex> Cldr.DateTime.Timezone.preferred_zone_for_locale("PST8PDT", locale: "en-CA")
+      {:ok, "America/Vancouver"}
+
+      iex> Cldr.DateTime.Timezone.preferred_zone_for_locale "America/Los_Angeles", locale: "ja"
+      {:ok, "America/Los_Angeles"}
+
+  """
+  def preferred_zone_for_locale(time_zone, options \\ []) do
+    {locale, backend} = Cldr.locale_and_backend_from(options)
+    date_time = Keyword.get(options, :date_time, DateTime.utc_now())
+
+    with {:ok, locale} <- Cldr.validate_locale(locale, backend),
+         {:ok, canonical_zone} <- canonical_time_zone(time_zone) do
+      case meta_zone(canonical_zone, date_time) do
+        nil ->
+          {:ok, time_zone}
+        meta_zone ->
+          preferred_zone = preferred_zone_for_meta_zone(meta_zone, locale) || canonical_zone
+          {:ok, preferred_zone}
+      end
+    end
   end
 
   defp preferred_zone_for_zone?(time_zone, meta_zone) do
@@ -1294,7 +1375,8 @@ defmodule Cldr.DateTime.Timezone do
            {:error,
             {
               ArgumentError,
-              "Invalid option #{inspect(option)}. Valid options are :date_time, :format"
+              "Invalid option #{inspect(option)}. Valid options are :date_time, :format, " <>
+              ":type, :z_for_zero, :time_zone_database"
             }}}
       end)
 

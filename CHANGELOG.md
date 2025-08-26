@@ -25,6 +25,16 @@ This release fixes a long-standing bug in the formatting of the `S` (fractional 
   * Specific location format
   * Localized GMT format
 
+* Adds `Cldr.DateTime.Timezone.preferred_zone_for_locale/2` to return the preferred time zone name for a given zone and locale. This function is useful when the same time zone has different names in different locales. For example:
+
+```elixir
+iex> Cldr.DateTime.Timezone.preferred_zone_for_locale("America/New_York", locale: "en")
+{:ok, "America/New_York"}
+
+iex> Cldr.DateTime.Timezone.preferred_zone_for_locale("America/New_York", locale: "en-CA")
+{:ok, "America/Toronto"}
+```
+
 * Implements user-specified relative time steps as the `:derive_unit_from` option to `Cldr.DateTime.Relative.to_string/3` function. This allows developers to specify when a relative time interval steps from seconds to minutes to days and so on.  Thanks to @tjchambers for the collaboration and patience. Closes #54.
 
 * Adds functions to return a specific format string for time, date and datetime. Thanks to @tjchambers for the collaboration. Closes #57. See:
