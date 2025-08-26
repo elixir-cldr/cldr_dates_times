@@ -4,7 +4,7 @@
 
 ## Cldr_Dates_Times v2.23.0
 
-This is the changelog for Cldr_Dates_Times v2.23.0 released on August 25th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.23.0 released on August 27th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Breaking change to `S` format code implementation
 
@@ -26,6 +26,11 @@ This release fixes a long-standing bug in the formatting of the `S` (fractional 
   * Localized GMT format
 
 * Implements user-specified relative time steps as the `:derive_unit_from` option to `Cldr.DateTime.Relative.to_string/3` function. This allows developers to specify when a relative time interval steps from seconds to minutes to days and so on.  Thanks to @tjchambers for the collaboration and patience. Closes #54.
+
+* Adds functions to return a specific format string for time, date and datetime. Thanks to @tjchambers for the collaboration. Closes #57. See:
+  * `Cldr.DateTime.Format.time_format/1`
+  * `Cldr.DateTime.Format.date_format/1`
+  * `Cldr.DateTime.Format.date_time_format/1`
 
 * Adds support for `t:Time.t/0` arguments to `Cldr.DateTime.Relative.to_string/3`.
 

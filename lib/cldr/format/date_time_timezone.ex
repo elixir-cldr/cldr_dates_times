@@ -140,23 +140,23 @@ defmodule Cldr.DateTime.Timezone do
 
   The following shows representative examples of the different formats:
 
-    iex> {:ok, date_time} = DateTime.new(~D[2025-07-01], ~T[00:00:00], "Australia/Sydney")
-    iex> Cldr.DateTime.Timezone.non_location_format(date_time, type: :daylight)
-    {:ok, "Australian Eastern Daylight Time"}
-    iex> Cldr.DateTime.Timezone.non_location_format(date_time, type: :specific)
-    {:ok, "Australian Eastern Standard Time"}
-    iex> Cldr.DateTime.Timezone.non_location_format(date_time, type: :generic)
-    {:ok, "Australian Eastern Time"}
-    iex> Cldr.DateTime.Timezone.location_format(date_time, type: :daylight)
-    {:ok, "Sydney Daylight Time"}
-    iex> Cldr.DateTime.Timezone.location_format(date_time, type: :specific)
-    {:ok, "Sydney Standard Time"}
-    iex> Cldr.DateTime.Timezone.location_format(date_time, type: :generic)
-    {:ok, "Sydney Time"}
-    iex> Cldr.DateTime.Timezone.gmt_format(date_time)
-    {:ok, "GMT+10:00"}
-    iex> Cldr.DateTime.Timezone.iso_format(date_time)
-    {:ok, "+1000"}
+        iex> {:ok, date_time} = DateTime.new(~D[2025-07-01], ~T[00:00:00], "Australia/Sydney")
+        iex> Cldr.DateTime.Timezone.non_location_format(date_time, type: :daylight)
+        {:ok, "Australian Eastern Daylight Time"}
+        iex> Cldr.DateTime.Timezone.non_location_format(date_time, type: :specific)
+        {:ok, "Australian Eastern Standard Time"}
+        iex> Cldr.DateTime.Timezone.non_location_format(date_time, type: :generic)
+        {:ok, "Australian Eastern Time"}
+        iex> Cldr.DateTime.Timezone.location_format(date_time, type: :daylight)
+        {:ok, "Sydney Daylight Time"}
+        iex> Cldr.DateTime.Timezone.location_format(date_time, type: :specific)
+        {:ok, "Sydney Standard Time"}
+        iex> Cldr.DateTime.Timezone.location_format(date_time, type: :generic)
+        {:ok, "Sydney Time"}
+        iex> Cldr.DateTime.Timezone.gmt_format(date_time)
+        {:ok, "GMT+10:00"}
+        iex> Cldr.DateTime.Timezone.iso_format(date_time)
+        {:ok, "+1000"}
 
   ### GMT and UTC time zone formats
 
@@ -166,34 +166,34 @@ defmodule Cldr.DateTime.Timezone do
 
   #### Non-location format
 
-    iex> Cldr.DateTime.Timezone.non_location_format("GMT")
-    {:ok, "Greenwich Mean Time"}
+        iex> Cldr.DateTime.Timezone.non_location_format("GMT")
+        {:ok, "Greenwich Mean Time"}
 
-    iex> Cldr.DateTime.Timezone.non_location_format("UTC")
-    {:ok, "Coordinated Universal Time"}
+        iex> Cldr.DateTime.Timezone.non_location_format("UTC")
+        {:ok, "Coordinated Universal Time"}
 
   ### Location format
 
-      iex> Cldr.DateTime.Timezone.location_format("GMT")
-      {:error,
-       {Cldr.DateTime.NoTerritoryForTimezone,
-        "No territory was found for time zone \\"Etc/GMT\\""}}
+        iex> Cldr.DateTime.Timezone.location_format("GMT")
+        {:error,
+         {Cldr.DateTime.NoTerritoryForTimezone,
+          "No territory was found for time zone \\"Etc/GMT\\""}}
 
-      iex> Cldr.DateTime.Timezone.location_format("UTC")
-      {:error,
-       {Cldr.DateTime.NoTerritoryForTimezone,
-        "No territory was found for time zone \\"Etc/UTC\\""}}
+        iex> Cldr.DateTime.Timezone.location_format("UTC")
+        {:error,
+         {Cldr.DateTime.NoTerritoryForTimezone,
+          "No territory was found for time zone \\"Etc/UTC\\""}}
 
   #### GMT format
 
-      iex> Cldr.DateTime.Timezone.gmt_format("Australia/Adelaide")
-      {:ok, "GMT+09:30"}
+        iex> Cldr.DateTime.Timezone.gmt_format("Australia/Adelaide")
+        {:ok, "GMT+09:30"}
 
-      iex> Cldr.DateTime.Timezone.gmt_format("UTC")
-      {:ok, "GMT"}
+        iex> Cldr.DateTime.Timezone.gmt_format("UTC")
+        {:ok, "GMT"}
 
-      iex> Cldr.DateTime.Timezone.gmt_format("GMT")
-      {:ok, "GMT"}
+        iex> Cldr.DateTime.Timezone.gmt_format("GMT")
+        {:ok, "GMT"}
 
   """
 
@@ -674,7 +674,7 @@ defmodule Cldr.DateTime.Timezone do
       second with a `:` separator between them.
 
   * `:z_for_zero` is a truthy or falsy value to indicate whether or not
-    to use the [Z](https://en.wikipedia.org/wiki/ISO_8601#:~:text=Z%20is%20the%20zone%20designator,30Z%22%20or%20%22T0930Z%22.)`
+    to use the [Z](https://en.wikipedia.org/wiki/ISO_8601#:~:text=Z%20is%20the%20zone%20designator,30Z%22%20or%20%22T0930Z%22.)
     indicator when the time zone offset is zero. The default is `true`.
 
   * `:time_zone_database` determines the time zone database to use when
@@ -685,7 +685,7 @@ defmodule Cldr.DateTime.Timezone do
 
   * `{:ok, iso_format}` or
 
-  * `{:error, {exception, reason}}`.
+  * `{:error, {exception, reason}}`
 
   ### Examples
 
@@ -820,30 +820,30 @@ defmodule Cldr.DateTime.Timezone do
 
   ### Examples
 
-    iex> Cldr.DateTime.Timezone.exemplar_city("Australia/Sydney")
-    {:ok, "Sydney"}
+        iex> Cldr.DateTime.Timezone.exemplar_city("Australia/Sydney")
+        {:ok, "Sydney"}
 
-    iex> Cldr.DateTime.Timezone.exemplar_city("Europe/Kiev")
-    {:ok, "Kyiv"}
+        iex> Cldr.DateTime.Timezone.exemplar_city("Europe/Kiev")
+        {:ok, "Kyiv"}
 
-    iex> Cldr.DateTime.Timezone.exemplar_city("America/Indiana/Knox")
-    {:ok, "Knox, Indiana"}
+        iex> Cldr.DateTime.Timezone.exemplar_city("America/Indiana/Knox")
+        {:ok, "Knox, Indiana"}
 
-    iex> Cldr.DateTime.Timezone.exemplar_city("Europe/Kiev", locale: :ja)
-    {:ok, "キーウ"}
+        iex> Cldr.DateTime.Timezone.exemplar_city("Europe/Kiev", locale: :ja)
+        {:ok, "キーウ"}
 
-    iex> Cldr.DateTime.Timezone.exemplar_city("Etc/Unknown")
-    {:ok, "Unknown City"}
+        iex> Cldr.DateTime.Timezone.exemplar_city("Etc/Unknown")
+        {:ok, "Unknown City"}
 
-    iex> Cldr.DateTime.Timezone.exemplar_city("Etc/UTC")
-    {:error, {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for \\"Etc/UTC\\""}}
+        iex> Cldr.DateTime.Timezone.exemplar_city("Etc/UTC")
+        {:error, {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for \\"Etc/UTC\\""}}
 
-    iex> Cldr.DateTime.Timezone.exemplar_city("Etc/GMT+5")
-    {:error, {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for \\"Etc/GMT+5\\""}}
+        iex> Cldr.DateTime.Timezone.exemplar_city("Etc/GMT+5")
+        {:error, {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for \\"Etc/GMT+5\\""}}
 
-    iex> Cldr.DateTime.Timezone.exemplar_city("Europe/Frankenstein")
-    {:error,
-     {Cldr.UnknownTimezoneError, "Unknown time zone \\"Europe/Frankenstein\\""}}
+        iex> Cldr.DateTime.Timezone.exemplar_city("Europe/Frankenstein")
+        {:error,
+         {Cldr.UnknownTimezoneError, "Unknown time zone \\"Europe/Frankenstein\\""}}
 
   """
   @doc since: "2.33.0"
