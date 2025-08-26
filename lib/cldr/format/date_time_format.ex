@@ -498,6 +498,193 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
+  Returns a datetime format for a given locale and format style.
+
+  ### Arguments
+
+  * `options` is a keyword list of options.
+
+  ### Options
+
+  * `:locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `:backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  * `:format` is the format style requested. The valid values are
+    `:short`, `:medium`, `:long` or `:full`. The default is `:medium`.
+
+  ### Returns
+
+  * `{:ok, format_string}` or
+
+  * `{:error, {exception, reason}}`.
+
+  ### Examples
+
+      iex> Cldr.DateTime.Format.date_time_format
+      {:ok, "{1}, {0}"}
+
+      iex> Cldr.DateTime.Format.date_time_format format: :full
+      {:ok, "{1}, {0}"}
+
+      iex> Cldr.DateTime.Format.date_time_format locale: :de, format: :full
+      {:ok, "{1}, {0}"}
+
+      iex> Cldr.DateTime.Format.date_time_format locale: :de, format: :unknown
+      {:error,
+       {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: :unknown"}}
+
+  """
+  @doc since: "2.23.0"
+  @spec date_time_format(options :: Keyword.t()) ::
+    {:ok, String.t()} | {:error, {module(), String.t()}}
+
+  def date_time_format(options \\ []) do
+    with {locale, backend} <- Cldr.locale_and_backend_from(options),
+         {:ok, calendar} <- Cldr.Calendar.calendar_from_locale(locale),
+         {:ok, formats} <- date_time_formats(locale, calendar.cldr_calendar_type(), backend) do
+      prefer = Keyword.get(options, :prefer, :unicode)
+      style = Keyword.get(options, :format, :medium)
+      resolve_format_style_and_preference(formats, style, prefer)
+    end
+  end
+
+  @doc """
+  Returns a date format for a given locale and format style.
+
+  ### Arguments
+
+  * `options` is a keyword list of options.
+
+  ### Options
+
+  * `:locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `:backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  * `:format` is the format style requested. The valid values are
+    `:short`, `:medium`, `:long` or `:full`. The default is `:medium`.
+
+  ### Returns
+
+  * `{:ok, format_string}` or
+
+  * `{:error, {exception, reason}}`.
+
+  ### Examples
+
+      iex> Cldr.DateTime.Format.date_format
+      {:ok, "MMM d, y"}
+
+      iex> Cldr.DateTime.Format.date_format format: :full
+      {:ok, "EEEE, MMMM d, y"}
+
+      iex> Cldr.DateTime.Format.date_format locale: :de, format: :full
+      {:ok, "EEEE, d. MMMM y"}
+
+      iex> Cldr.DateTime.Format.date_format locale: :de, format: :unknown
+      {:error,
+       {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: :unknown"}}
+
+  """
+  @doc since: "2.23.0"
+  @spec date_format(options :: Keyword.t()) ::
+    {:ok, String.t()} | {:error, {module(), String.t()}}
+
+  def date_format(options \\ []) do
+    with {locale, backend} <- Cldr.locale_and_backend_from(options),
+         {:ok, calendar} <- Cldr.Calendar.calendar_from_locale(locale),
+         {:ok, formats} <- date_formats(locale, calendar.cldr_calendar_type(), backend) do
+      prefer = Keyword.get(options, :prefer, :unicode)
+      style = Keyword.get(options, :format, :medium)
+      resolve_format_style_and_preference(formats, style, prefer)
+    end
+  end
+
+  @doc """
+  Returns a date format for a given locale and format style.
+
+  ### Arguments
+
+  * `options` is a keyword list of options.
+
+  ### Options
+
+  * `:locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `:backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  * `:format` is the format style requested. The valid values are
+    `:short`, `:medium`, `:long` or `:full`. The default is `:medium`.
+
+  * `:prefer` is either `:unicode` (the default) or `:ascii`. When a locale
+    offers both a unicode and ascii variant of the requested format style,
+    the preferred variant is returned if one is available for the given locale.
+    If the preferred variant is not available then the ascii version is returned.
+
+  ### Returns
+
+  * `{:ok, format_string}` or
+
+  * `{:error, {exception, reason}}`.
+
+  ### Examples
+
+      iex> Cldr.DateTime.Format.time_format
+      {:ok, "h:mm:ss a"}
+
+      iex> Cldr.DateTime.Format.time_format(format: :full)
+      {:ok, "h:mm:ss a zzzz"}
+
+      iex> Cldr.DateTime.Format.time_format(format: :full, locale: :ja)
+      {:ok, "H時mm分ss秒 zzzz"}
+
+      iex> Cldr.DateTime.Format.time_format(format: :full, prefer: :unicode)
+      {:ok, "h:mm:ss a zzzz"}
+
+      iex> Cldr.DateTime.Format.time_format format: :unknown
+      {:error,
+       {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: :unknown"}}
+
+  """
+  @doc since: "2.23.0"
+  @spec date_format(options :: Keyword.t()) ::
+    {:ok, String.t()} | {:error, {module(), String.t()}}
+
+  def time_format(options \\ []) do
+    with {locale, backend} <- Cldr.locale_and_backend_from(options),
+         {:ok, calendar} <- Cldr.Calendar.calendar_from_locale(locale),
+         {:ok, formats} <- time_formats(locale, calendar.cldr_calendar_type(), backend) do
+      prefer = Keyword.get(options, :prefer, :unicode)
+      style = Keyword.get(options, :format, :medium)
+      resolve_format_style_and_preference(formats, style, prefer)
+    end
+  end
+
+  defp resolve_format_style_and_preference(formats, style, prefer)
+      when is_map_key(formats, style) do
+    style = Map.fetch!(formats, style)
+
+    cond do
+      is_map(style) ->
+        {:ok, Map.get(style, prefer) || Map.get(style, :ascii)}
+      is_binary(style) ->
+        {:ok, style}
+    end
+  end
+
+  defp resolve_format_style_and_preference(_formats, style, _prefer) do
+    {:error, {Cldr.DateTime.UnresolvedFormat,
+      "Unknown value for option format: #{inspect style}"}}
+  end
+
+  @doc """
   Returns a map of the available datetime formats for a
   given locale and calendar.
 
