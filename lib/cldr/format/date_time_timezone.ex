@@ -933,6 +933,29 @@ defmodule Cldr.DateTime.Timezone do
     @meta_zones
   end
 
+  @doc false
+  def locations_with_zone_changes do
+    meta_zones()
+    |> Enum.reduce([], &zones_with_changes/2)
+    |> List.flatten()
+    |> Map.new()
+  end
+
+  defp zones_with_changes({k, v}, acc) when is_map(v) do
+    with_changes =
+      v
+      |> Enum.reduce([], &zones_with_changes/2)
+      |> Enum.map(fn
+        {z, v} -> {z <> " (" <> k <> ")", v}
+        other -> other
+      end)
+
+    [with_changes | acc]
+  end
+
+  defp zones_with_changes({k, v}, acc) when is_list(v) and length(v) > 1, do: [{k, v} | acc]
+  defp zones_with_changes({_k, _v}, acc), do: acc
+
   @doc """
   Returns the mapping of time zone short
   IDs to metazone data.
