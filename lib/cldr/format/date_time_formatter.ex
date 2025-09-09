@@ -110,9 +110,9 @@ defmodule Cldr.DateTime.Formatter do
   | Timezone ID             | V         | "unk"           | `:zone_abbr` key, unlocalised      |
   |                         | VV        | "Etc/UTC        | Delegates to `zone_gmt/4`          |
   |                         | VVV       | "Unknown City"  | Exemplar city.  Not supported.     |
-  |                         | VVVV      | "GMT"           | Delegates to `zone_gmt/4           |
+  |                         | VVVV      | "GMT"           | Delegates to `zone_gmt/4`          |
   | ISO8601 Format          | Z..ZZZ    | "+0100"         | ISO8601 Basic Format with hours and minutes |
-  |                         | ZZZZ      | "+01:00"        | Delegates to `zone_gmt/4           |
+  |                         | ZZZZ      | "+01:00"        | Delegates to `zone_gmt/4`          |
   |                         | ZZZZZ     | "+01:00:10"     | ISO8601 Extended format with optional seconds |
   | ISO8601 plus Z          | X         | "+01"           | ISO8601 Basic Format with hours and optional minutes or "Z" |
   |                         | XX        | "+0100"         | ISO8601 Basic Format with hours and minutes or "Z"          |
@@ -3264,7 +3264,7 @@ defmodule Cldr.DateTime.Formatter do
   | V      | "unk"          | `:zone_abbr` key, unlocalised                           |
   | VV     | "Etc/UTC       | Delegates to `zone_gmt/4`                               |
   | VVV    | "Unknown City" | Examplar city.  Not supported.                          |
-  | VVVV   | "GMT"          | Delegates to `zone_gmt/4                                |
+  | VVVV   | "GMT"          | Delegates to `zone_gmt/4`                               |
 
   ## Examples
 
@@ -3361,7 +3361,7 @@ defmodule Cldr.DateTime.Formatter do
   | Symbol | Results        | Description                                             |
   | :----  | :------------- | :------------------------------------------------------ |
   | Z..ZZZ | "+0100"        | ISO8601 Basic Format with hours and minutes             |
-  | ZZZZ   | "+01:00"       | Delegates to `zone_gmt/4                                |
+  | ZZZZ   | "+01:00"       | Delegates to `zone_gmt/4`                               |
   | ZZZZZ  | "+01:00:10"    | ISO8601 Extended format with optional seconds           |
 
   ## Examples
