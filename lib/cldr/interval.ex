@@ -221,10 +221,13 @@ defmodule Cldr.Interval do
           | Calendar.naive_datetime()
           | Calendar.time()
 
+  # These are type-detecting patterns to be used
+  # in function heads
   import Cldr.Calendar,
     only: [
       date: 0,
       datetime: 0,
+      naivedatetime: 0,
       time: 0
     ]
 
@@ -396,13 +399,13 @@ defmodule Cldr.Interval do
 
   ## Examples
 
-      iex> Cldr.Interval.to_string Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string(Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
+      ...> format: :long)
       {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
       iex> use CalendarInterval
-      iex> Cldr.Interval.to_string ~I"2020-01-01/12", MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string(~I"2020-01-01/12", MyApp.Cldr,
+      ...> format: :long)
       {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
   """
@@ -496,19 +499,20 @@ defmodule Cldr.Interval do
   * `to_string/3` will decide which formatter to call based upon
     the arguments provided to it.
 
-    * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`.
+    * A `t:Date.Range.t/0` will call `Cldr.Date.Interval.to_string/3`.
 
     * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
       if its `:precision` is `:year`, `:month` or `:day`. Otherwise
       it will call `Cldr.Time.Interval.to_string/3`.
 
-    * If `from` and `to` both conform to the `Calendar.datetime()`
-      type then `Cldr.DateTime.Interval.to_string/3` is called.
+    * If `from` and `to` both conform to either of the `t:Calendar.datetime/0` or
+      `t:Calendar.naive_datetime/0` types then `Cldr.DateTime.Interval.to_string/3`
+      is called.
 
-    * Otherwise if `from` and `to` conform to the `Calendar.date()`
+    * Otherwise if `from` and `to` conform to the `t:Calendar.date/0`
       type then `Cldr.Date.Interval.to_string/3` is called.
 
-    * Otherwise if `from` and `to` conform to the `Calendar.time()`
+    * Otherwise if `from` and `to` conform to the `t:Calendar.time/0`
       type then `Cldr.Time.Interval.to_string/3` is called.
 
   * `CalendarInterval` support requires adding the
@@ -519,42 +523,54 @@ defmodule Cldr.Interval do
     see `Cldr.Interval`.
 
   * The available predefined formats that can be applied are the
-    keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
-    where `"en"` can be replaced by any configuration locale name and `:gregorian`
+    keys of the map returned by `Cldr.DateTime.Format.interval_formats(:en, :gregorian)`
+    where `:en` can be replaced by any configuration locale name and `:gregorian`
     is the underlying CLDR calendar type.
 
-  * In the case where `from` and `to` are equal, a single
+  * In the case where `from` and `to` are considered equal, a single
     date, time or datetime is formatted instead of an interval.
 
   ## Examples
 
-      iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr
+      iex> Cldr.Interval.to_string(~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr)
       {:ok, "Jan 1 – Dec 31, 2020"}
 
-      iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr
+      iex> Cldr.Interval.to_string(~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr)
       {:ok, "Jan 1 – 12, 2020"}
 
-      iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string(~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
+      ...> format: :long)
       {:ok, "Wed, Jan 1 – Sun, Jan 12, 2020"}
 
-      iex> Cldr.Interval.to_string ~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
-      ...> format: :long, style: :year_and_month
+      iex> Cldr.Interval.to_string(~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
+      ...> format: :long, style: :year_and_month)
       {:ok, "January – December 2020"}
 
-      iex> Cldr.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z], MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z],
+      ...> MyApp.Cldr, format: :long)
       {:ok, "January 1, 2020, 12:00:00 AM UTC – December 1, 2020, 10:05:00 AM UTC"}
 
-      iex> Cldr.Interval.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z], MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z],
+      ...> MyApp.Cldr, format: :long)
       {:ok, "January 1, 2020, 12:00:00 AM UTC – 10:05:00 AM UTC"}
+
+      iex> Cldr.Interval.to_string(~N[2025-10-05 14:50:00], ~N[2025-10-05 16:30:00],
+      ...> format: :short)
+      {:ok, "10/5/25, 2:50 PM\u2009–\u20094:30 PM"}
+
+      iex> Cldr.Interval.to_string(~N[2025-10-05 14:50:00], ~N[2025-10-05 16:30:00],
+      ...> format: :medium)
+      {:ok, "Oct 5, 2025, 2:50:00 PM\u2009–\u20094:30:00 PM"}
 
   """
   @spec to_string(datetime, datetime, Cldr.backend(), Keyword.t()) ::
           {:ok, String.t()} | {:error, {module, String.t()}}
 
   def to_string(unquote(datetime()) = from, unquote(datetime()) = to, backend, options) do
+    Cldr.DateTime.Interval.to_string(from, to, backend, options)
+  end
+
+  def to_string(unquote(naivedatetime()) = from, unquote(naivedatetime()) = to, backend, options) do
     Cldr.DateTime.Interval.to_string(from, to, backend, options)
   end
 
@@ -655,13 +671,14 @@ defmodule Cldr.Interval do
       if its `:precision` is `:year`, `:month` or `:day`. Otherwise
       it will call `Cldr.Time.Interval.to_string/3`.
 
-    * If `from` and `to` both conform to the `Calendar.datetime()`
-      type then `Cldr.DateTime.Interval.to_string/3` is called.
+    * If `from` and `to` both conform to either of the `t:Calendar.datetime/0` or
+      `t:Calendar.naive_datetime/0` types then `Cldr.DateTime.Interval.to_string/3`
+      is called.
 
-    * Otherwise if `from` and `to` conform to the `Calendar.date()`
+    * Otherwise if `from` and `to` conform to the `t:Calendar.date/0`
       type then `Cldr.Date.Interval.to_string/3` is called.
 
-    * Otherwise if `from` and `to` conform to the `Calendar.time()`
+    * Otherwise if `from` and `to` conform to the `t:Calendar.time/0`
       type then `Cldr.Time.Interval.to_string/3` is called.
 
   * `CalendarInterval` support requires adding the
@@ -682,12 +699,12 @@ defmodule Cldr.Interval do
   ## Examples
 
       iex> use CalendarInterval
-      iex> Cldr.Interval.to_string! ~I"2020-01-01/12", MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string!(~I"2020-01-01/12", MyApp.Cldr,
+      ...> format: :long)
       "Wed, Jan 1 – Sun, Jan 12, 2020"
 
-      iex> Cldr.Interval.to_string! Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string!(Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
+      ...> format: :long)
       "Wed, Jan 1 – Sun, Jan 12, 2020"
 
   """
@@ -775,13 +792,14 @@ defmodule Cldr.Interval do
       if its `:precision` is `:year`, `:month` or `:day`. Otherwise
       it will call `Cldr.Time.Interval.to_string/3`.
 
-    * If `from` and `to` both conform to the `Calendar.datetime()`
-      type then `Cldr.DateTime.Interval.to_string/3` is called.
+    * If `from` and `to` both conform to either of the `t:Calendar.datetime/0` or
+      `t:Calendar.naive_datetime/0` types then `Cldr.DateTime.Interval.to_string/3`
+      is called.
 
-    * Otherwise if `from` and `to` conform to the `Calendar.date()`
+    * Otherwise if `from` and `to` conform to the `t:Calendar.date/0`
       type then `Cldr.Date.Interval.to_string/3` is called.
 
-    * Otherwise if `from` and `to` conform to the `Calendar.time()`
+    * Otherwise if `from` and `to` conform to the `t:Calendar.time/0`
       type then `Cldr.Time.Interval.to_string/3` is called.
 
   * `CalendarInterval` support requires adding the
@@ -801,26 +819,26 @@ defmodule Cldr.Interval do
 
   ## Examples
 
-      iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr
+      iex> Cldr.Interval.to_string!(~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr)
       "Jan 1 – Dec 31, 2020"
 
-      iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr
+      iex> Cldr.Interval.to_string!(~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr)
       "Jan 1 – 12, 2020"
 
-      iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string!(~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
+      ...> format: :long)
       "Wed, Jan 1 – Sun, Jan 12, 2020"
 
-      iex> Cldr.Interval.to_string! ~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
-      ...> format: :long, style: :year_and_month
+      iex> Cldr.Interval.to_string!(~D[2020-01-01], ~D[2020-12-01], MyApp.Cldr,
+      ...> format: :long, style: :year_and_month)
       "January – December 2020"
 
-      iex> Cldr.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z], MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string!(~U[2020-01-01 00:00:00.0Z], ~U[2020-12-01 10:05:00.0Z],
+      ...> MyApp.Cldr, format: :long)
       "January 1, 2020, 12:00:00 AM UTC – December 1, 2020, 10:05:00 AM UTC"
 
-      iex> Cldr.Interval.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z], MyApp.Cldr,
-      ...> format: :long
+      iex> Cldr.Interval.to_string!(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:05:00.0Z],
+      ...> MyApp.Cldr, format: :long)
       "January 1, 2020, 12:00:00 AM UTC – 10:05:00 AM UTC"
 
   """

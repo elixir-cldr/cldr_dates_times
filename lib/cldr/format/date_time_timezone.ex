@@ -186,8 +186,9 @@ defmodule Cldr.DateTime.Timezone do
 
   #### GMT format
 
-        iex> Cldr.DateTime.Timezone.gmt_format("Australia/Adelaide")
-        {:ok, "GMT+09:30"}
+        iex> {:ok, gmt_format} = Cldr.DateTime.Timezone.gmt_format("Australia/Adelaide")
+        iex> gmt_format in ["GMT+09:30", "GMT+10:30"]
+        true
 
         iex> Cldr.DateTime.Timezone.gmt_format("UTC")
         {:ok, "GMT"}

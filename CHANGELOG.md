@@ -2,6 +2,14 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.24.1
+
+This is the changelog for Cldr_Dates_Times v2.24.1 released on October 9th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Allow `NaiveDatetime.t/0` types to be passed to `Cldr.Interval.to_string/3`. Previously there was no function clause that supported these types even though the formatting code does. Thanks to @sysashi for the report. Partially fixes #62.  Full resolution requires fixing #61 targetted for the end of October 2025.
+
 ## Cldr_Dates_Times v2.24.0
 
 This is the changelog for Cldr_Dates_Times v2.24.0 released on September 11th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
