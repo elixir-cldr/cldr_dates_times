@@ -749,7 +749,7 @@ defmodule Cldr.Interval do
   ## Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representing of an interval
+    specific format type or a string representing an interval
     format. The default is `:medium`.
 
   * `:style` supports different formatting styles. The valid

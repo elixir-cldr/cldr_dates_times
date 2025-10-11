@@ -55,7 +55,7 @@ defmodule Cldr.DateTime.Interval do
     ### Options
 
     * `:format` is one of `:short`, `:medium` or `:long` or a
-      specific format type or a string representing of an interval
+      specific format type or a string representation of an interval
       format. The default is `:medium`.
 
     * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
@@ -476,7 +476,7 @@ defmodule Cldr.DateTime.Interval do
     ### Options
 
     * `:format` is one of `:short`, `:medium` or `:long` or a
-      specific format type or a string representing of an interval
+      specific format type or a string representation of an interval
       format. The default is `:medium`.
 
     * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
