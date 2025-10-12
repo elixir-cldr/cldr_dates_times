@@ -1326,7 +1326,7 @@ defmodule Cldr.DateTime.Format do
   end
 
   # Remove "a", "b" and "B" if we want 24 hour (H and k)
-  defp replace_time_symbols(<<format_code :: utf8, rest::binary>>, preferred, allowed)
+  defp replace_time_symbols(<<format_code :: binary-1, rest::binary>>, preferred, allowed)
       when format_code in ["a", "b", "B"] and preferred in ["H", "k"] do
     replace_time_symbols(rest, preferred, allowed)
   end
@@ -1353,8 +1353,8 @@ defmodule Cldr.DateTime.Format do
   end
 
   # Just pass it through
-  defp replace_time_symbols(<<symbol::utf8, rest::binary>>, preferred, allowed) do
-    <<symbol::utf8>> <> replace_time_symbols(rest, preferred, allowed)
+  defp replace_time_symbols(<<symbol::binary-1, rest::binary>>, preferred, allowed) do
+    symbol <> replace_time_symbols(rest, preferred, allowed)
   end
 
   @locale_preferred_time_symbol %{
