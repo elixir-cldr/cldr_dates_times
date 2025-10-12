@@ -20,7 +20,7 @@ defmodule Cldr.Time do
 
   alias Cldr.LanguageTag
   alias Cldr.Locale
-  alias Cldr.DateTime.Format
+  alias Cldr.DateTime.Format.Match
 
   import Cldr.DateTime,
     only: [resolve_plural_format: 4, apply_preference: 2, has_time: 1]
@@ -386,7 +386,7 @@ defmodule Cldr.Time do
 
     with {:ok, time_formats} <- formats(locale_name, calendar, backend),
          {:ok, standard_format} <- Map.fetch(time_formats, format),
-         {:ok, skeleton} <- Format.best_match(standard_format, locale, calendar, backend) do
+         {:ok, skeleton} <- Match.best_match(standard_format, locale, calendar, backend) do
       format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend)
     end
   end

@@ -18,6 +18,7 @@ defmodule Cldr.Date do
 
   alias Cldr.LanguageTag
   alias Cldr.Locale
+  alias Cldr.DateTime.Format.Match
 
   import Cldr.DateTime,
     only: [resolve_plural_format: 4, apply_preference: 2, has_date: 1]
@@ -558,12 +559,12 @@ defmodule Cldr.Date do
 
   @doc false
   def best_match(format, available_formats, locale, calendar, backend) do
-    with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend),
+    with {:ok, match} <- Match.best_match(format, locale, calendar, backend),
          {:ok, format} <- Map.fetch(available_formats, match) do
       {:ok, format}
     else
       :error ->
-        {:error, Cldr.DateTime.Format.no_format_resolved_error(format)}
+        {:error, Match.no_format_resolved_error(format)}
 
       other ->
         other
