@@ -380,20 +380,22 @@ defmodule Cldr.Date do
   ### Examples:
 
       iex> Cldr.Date.formats(:en, :gregorian, MyApp.Cldr)
-      {:ok, %Cldr.Date.Formats{
-        full: "EEEE, MMMM d, y",
-        long: "MMMM d, y",
-        medium: "MMM d, y",
-        short: "M/d/yy"
-      }}
+      {:ok,
+       %Cldr.Date.Formats{
+         short: :yyMd,
+         medium: :yMMMd,
+         long: :yMMMMd,
+         full: :yMMMMEEEEd
+       }}
 
       iex> Cldr.Date.formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.Date.Formats{
-        full: "EEEE, MMMM d, y G",
-        long: "MMMM d, y G",
-        medium: "MMM d, y G",
-        short: "M/d/y GGGGG"
-      }}
+      {:ok,
+       %Cldr.Date.Formats{
+         short: :GGGGGyMd,
+         medium: :GyMMMd,
+         long: :GyMMMMd,
+         full: :GyMMMMEEEEd
+       }}
 
   """
   @spec formats(
@@ -431,8 +433,8 @@ defmodule Cldr.Date do
       iex> Cldr.Date.available_formats(:en)
       {:ok,
        %{
-         d: "d",
          y: "y",
+         d: "d",
          E: "ccc",
          M: "L",
          MMMEd: "E, MMM d",
@@ -444,7 +446,9 @@ defmodule Cldr.Date do
          GyMMMEd: "E, MMM d, y G",
          MMMd: "MMM d",
          GyMd: "M/d/y G",
+         GyMEd: "E, M/d/y G",
          MMMMd: "MMMM d",
+         GyM: "M/y G",
          MEd: "E, M/d",
          MMM: "LLL",
          yMd: "M/d/y",
@@ -458,14 +462,17 @@ defmodule Cldr.Date do
          yQQQ: "QQQ y",
          yw: %{
            other: "'week' w 'of' Y",
-           pluralize: :week_of_year,
-           one: "'week' w 'of' Y"
+           one: "'week' w 'of' Y",
+           pluralize: :week_of_year
          },
          MMMMW: %{
            other: "'week' W 'of' MMMM",
-           pluralize: :week_of_month,
-           one: "'week' W 'of' MMMM"
-         }
+           one: "'week' W 'of' MMMM",
+           pluralize: :week_of_month
+         },
+         yMMMMd: "MMMM d, y",
+         yMMMMEEEEd: "EEEE, MMMM d, y",
+         yyMd: "M/d/yy"
        }}
 
   """
@@ -492,8 +499,20 @@ defmodule Cldr.Date do
       when format in @format_types and is_full_date(date) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
-    with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
-      {:ok, Map.fetch!(date_formats, format)}
+    with {:ok, date_formats} <- formats(locale_name, calendar, backend),
+         {:ok, standard_format} <- Map.fetch(date_formats, format),
+         {:ok, available_formats} <- available_formats(locale, calendar, backend) do
+      case Map.fetch(available_formats, standard_format) do
+        {:ok, format} ->
+          {:ok, format}
+        :error ->
+          {:error,
+            {
+              Cldr.DateTime.UnresolvedFormat,
+              "Standard format #{inspect(format)} could not be resolved from " <>
+              "#{inspect standard_format}"
+          }}
+      end
     end
   end
 

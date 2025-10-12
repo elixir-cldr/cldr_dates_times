@@ -58,7 +58,9 @@ defmodule Cldr.DateTime.Format.Backend do
           "m",
           "s",
           "S",
+          "a",
           "A",
+          "B",
           "Z",
           "z",
           "V",
@@ -108,6 +110,10 @@ defmodule Cldr.DateTime.Format.Backend do
         @doc """
         Returns a map of the standard date formats for a given locale and calendar.
 
+        The value of each format type is itself a key into the map returned by
+        `#{inspect(__MODULE__)}.date_time_available_formats/2` which returns the
+        actual format string.
+
         ## Arguments
 
         * `locale` is any locale returned by `Cldr.known_locale_names/0`
@@ -119,20 +125,22 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Examples:
 
             iex> #{inspect(__MODULE__)}.date_formats(:en)
-            {:ok, %Cldr.Date.Formats{
-              full: "EEEE, MMMM d, y",
-              long: "MMMM d, y",
-              medium: "MMM d, y",
-              short: "M/d/yy"
-            }}
+            {:ok,
+             %Cldr.Date.Formats{
+               short: :yyMd,
+               medium: :yMMMd,
+               long: :yMMMMd,
+               full: :yMMMMEEEEd
+             }}
 
             iex> #{inspect(__MODULE__)}.date_formats(:en, :buddhist)
-            {:ok, %Cldr.Date.Formats{
-              full: "EEEE, MMMM d, y G",
-              long: "MMMM d, y G",
-              medium: "MMM d, y G",
-              short: "M/d/y GGGGG"
-            }}
+            {:ok,
+             %Cldr.Date.Formats{
+               short: :GGGGGyMd,
+               medium: :GyMMMd,
+               long: :GyMMMMd,
+               full: :GyMMMMEEEEd
+             }}
 
         """
         @spec date_formats(Locale.locale_reference(), calendar) ::
@@ -156,6 +164,10 @@ defmodule Cldr.DateTime.Format.Backend do
         @doc """
         Returns a map of the standard time formats for a given locale and calendar.
 
+        The value of each format type is itself a key into the map returned by
+        `#{inspect(__MODULE__)}.date_time_available_formats/2` which returns the
+        actual format string.
+
         ## Arguments
 
         * `locale` is any locale returned by `Cldr.known_locale_names/0`
@@ -167,26 +179,22 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Examples:
 
             iex> #{inspect(__MODULE__)}.time_formats(:en)
-            {
-              :ok,
-              %Cldr.Time.Formats{
-                full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
-                long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
-                medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-                short: %{unicode: "h:mm a", ascii: "h:mm a"}
-              }
-            }
+            {:ok,
+             %Cldr.Time.Formats{
+               short: :ahmm,
+               medium: :ahmmss,
+               long: :ahmmssz,
+               full: :ahmmsszzzz
+             }}
 
             iex> #{inspect(__MODULE__)}.time_formats(:en, :buddhist)
-            {
-              :ok,
-              %Cldr.Time.Formats{
-                full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
-                long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
-                medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-                short: %{unicode: "h:mm a", ascii: "h:mm a"}
-              }
-            }
+            {:ok,
+             %Cldr.Time.Formats{
+               short: :ahmm,
+               medium: :ahmmss,
+               long: :ahmmssz,
+               full: :ahmmsszzzz
+             }}
 
         """
         @spec time_formats(Locale.locale_reference(), calendar) ::
@@ -221,20 +229,22 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Examples:
 
             iex> #{inspect(__MODULE__)}.date_time_formats(:en)
-            {:ok, %Cldr.DateTime.Formats{
-              full: "{1}, {0}",
-              long: "{1}, {0}",
-              medium: "{1}, {0}",
-              short: "{1}, {0}"
-            }}
+            {:ok,
+             %Cldr.DateTime.Formats{
+               short: "{1}, {0}",
+               medium: "{1}, {0}",
+               long: "{1}, {0}",
+               full: "{1}, {0}"
+             }}
 
             iex> #{inspect(__MODULE__)}.date_time_formats(:en, :buddhist)
-            {:ok, %Cldr.DateTime.Formats{
-              full: "{1}, {0}",
-              long: "{1}, {0}",
-              medium: "{1}, {0}",
-              short: "{1}, {0}"
-            }}
+            {:ok,
+             %Cldr.DateTime.Formats{
+               short: "{1}, {0}",
+               medium: "{1}, {0}",
+               long: "{1}, {0}",
+               full: "{1}, {0}"
+             }}
 
         """
         @spec date_time_formats(Locale.locale_reference(), calendar) ::
@@ -274,20 +284,22 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Examples:
 
             iex> #{inspect(__MODULE__)}.date_time_at_formats(:en)
-            {:ok, %Cldr.DateTime.Formats{
-              full: "{1} 'at' {0}",
-              long: "{1} 'at' {0}",
-              medium: "{1}, {0}",
-              short: "{1}, {0}"}
-            }
+            {:ok,
+             %Cldr.DateTime.Formats{
+               short: "{1}, {0}",
+               medium: "{1}, {0}",
+               long: "{1} 'at' {0}",
+               full: "{1} 'at' {0}"
+             }}
 
             iex> #{inspect(__MODULE__)}.date_time_at_formats(:en, :buddhist)
-            {:ok, %Cldr.DateTime.Formats{
-              full: "{1} 'at' {0}",
-              long: "{1} 'at' {0}",
-              medium: "{1}, {0}",
-              short: "{1}, {0}"}
-            }
+            {:ok,
+             %Cldr.DateTime.Formats{
+               short: "{1}, {0}",
+               medium: "{1}, {0}",
+               long: "{1} 'at' {0}",
+               full: "{1} 'at' {0}"
+             }}
 
         """
         @spec date_time_at_formats(Locale.locale_reference(), calendar) ::
@@ -309,6 +321,55 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         @doc """
+        Returns a map of the standard relative datetime formats for a given
+        locale and calendar.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+          The default is `:gregorian`,
+
+        ## Examples:
+
+            iex> #{inspect(__MODULE__)}.date_time_relative_formats(:en)
+            {:ok, %Cldr.DateTime.Formats{
+              full: "{1} 'at' {0}",
+              long: "{1} 'at' {0}",
+              medium: "{1}, {0}",
+              short: "{1}, {0}"}
+            }
+
+            iex> #{inspect(__MODULE__)}.date_time_relative_formats(:en, :buddhist)
+            {:ok, %Cldr.DateTime.Formats{
+              full: "{1} 'at' {0}",
+              long: "{1} 'at' {0}",
+              medium: "{1}, {0}",
+              short: "{1}, {0}"}
+            }
+
+        """
+        @spec date_time_relative_formats(Locale.locale_reference(), calendar) ::
+                {:ok, map()} | {:error, {module(), String.t()}}
+
+        def date_time_relative_formats(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
+
+        def date_time_relative_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, cldr_calendar) do
+          date_time_relative_formats(cldr_locale_name, cldr_calendar)
+        end
+
+        def date_time_relative_formats(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_time_relative_formats(locale, calendar)
+          end
+        end
+
+        @doc """
         Returns a map of the available datetime formats for a
         given locale and calendar.
 
@@ -322,63 +383,76 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{inspect(__MODULE__)}.date_time_available_formats "en"
+            iex> #{inspect(__MODULE__)}.date_time_available_formats(:en)
             {:ok,
              %{
+               ahmmssz: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+               y: "y",
+               Hv: "HH'h' v",
+               EHm: "E HH:mm",
+               EBh: "E h B",
+               Bh: "h B",
+               Eh: %{unicode: "E h a", ascii: "E h a"},
+               hm: %{unicode: "h:mm a", ascii: "h:mm a"},
+               GyMEd: "E, M/d/y G",
+               Bhms: "h:mm:ss B",
+               H: "HH",
                yw: %{
                  other: "'week' w 'of' Y",
                  one: "'week' w 'of' Y",
                  pluralize: :week_of_year
                },
-               GyMMMEd: "E, MMM d, y G",
-               Hms: "HH:mm:ss",
+               Ed: "d E",
+               Bhm: "h:mm B",
+               Gy: "y G",
+               GyM: "M/y G",
+               ahmmss: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+               M: "L",
+               h: %{unicode: "h a", ascii: "h a"},
+               yM: "M/y",
                MMMMW: %{
                  other: "'week' W 'of' MMMM",
                  one: "'week' W 'of' MMMM",
                  pluralize: :week_of_month
                },
-               E: "ccc",
-               MMMd: "MMM d",
-               yMEd: "E, M/d/y",
-               yQQQ: "QQQ y",
-               Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
-               M: "L",
-               hm: %{unicode: "h:mm a", ascii: "h:mm a"},
-               yM: "M/y",
                GyMMMd: "MMM d, y G",
-               GyMd: "M/d/y G",
-               Gy: "y G",
-               Hm: "HH:mm",
-               EBhms: "E h:mm:ss B",
-               d: "d",
-               hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-               Ed: "d E",
-               Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
-               EHms: "E HH:mm:ss",
-               Bh: "h B",
-               h: %{unicode: "h a", ascii: "h a"},
-               Bhms: "h:mm:ss B",
-               Hmv: "HH:mm v",
-               hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
-               yMd: "M/d/y",
-               ms: "mm:ss",
-               MMM: "LLL",
-               y: "y",
-               Bhm: "h:mm B",
-               yMMM: "MMM y",
-               yQQQQ: "QQQQ y",
                yMMMEd: "E, MMM d, y",
-               yMMMM: "MMMM y",
-               EBhm: "E h:mm B",
-               Hmsv: "HH:mm:ss v",
-               yMMMd: "MMM d, y",
-               MEd: "E, M/d",
-               EHm: "E HH:mm",
-               GyMMM: "MMM y G",
+               ahmm: %{unicode: "h:mm a", ascii: "h:mm a"},
+               Hm: "HH:mm",
+               ahmmsszzzz: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+               yMMM: "MMM y",
+               d: "d",
+               Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
+               EBhms: "E h:mm:ss B",
+               ms: "mm:ss",
                hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
-               H: "HH",
-               Md: "M/d",
+               yQQQ: "QQQ y",
+               MMM: "LLL",
+               yyMd: "M/d/yy",
+               Hmv: "HH:mm v",
+               yMMMMd: "MMMM d, y",
+               hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
+               GyMd: "M/d/y G",
+               yMd: "M/d/y",
+               EHms: "E HH:mm:ss",
+               Hms: "HH:mm:ss",
+               yMEd: "E, M/d/y",
+               hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
                MMMEd: "E, MMM d",
+               EBhm: "E h:mm B",
+               Md: "M/d",
+               GyMMM: "MMM y G",
+               hv: %{unicode: "h a v", ascii: "h a v"},
+               yMMMMEEEEd: "EEEE, MMMM d, y",
+               MEd: "E, M/d",
+               Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
+               yMMMM: "MMMM y",
+               yMMMd: "MMM d, y",
+               Hmsv: "HH:mm:ss v",
+               GyMMMEd: "E, MMM d, y G",
+               yQQQQ: "QQQQ y",
+               MMMd: "MMM d",
+               E: "ccc",
                MMMMd: "MMMM d"
              }}
 
@@ -418,7 +492,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         ## Examples:
 
-            iex> #{inspect(__MODULE__)}.date_available_formats "en"
+            iex> #{inspect(__MODULE__)}.date_available_formats(:en)
 
         """
         @spec date_available_formats(Locale.locale_reference(), calendar) ::
@@ -641,10 +715,11 @@ defmodule Cldr.DateTime.Format.Backend do
         ## Example:
 
             iex> #{inspect(__MODULE__)}.common_date_time_format_names()
-            [:Bh, :Bhm, :Bhms, :E, :EBhm, :EBhms, :EHm, :EHms, :Ed, :Ehm, :Ehms, :Gy,
-             :GyMMM, :GyMMMEd, :GyMMMd, :GyMd, :H, :Hm, :Hms, :Hmsv, :Hmv, :M, :MEd, :MMM,
-             :MMMEd, :MMMMW, :MMMMd, :MMMd, :Md, :d, :h, :hm, :hms, :hmsv, :hmv, :ms, :y,
-             :yM, :yMEd, :yMMM, :yMMMEd, :yMMMM, :yMMMd, :yMd, :yQQQ, :yQQQQ, :yw]
+            [:Bh, :Bhm, :Bhms, :E, :EBh, :EBhm, :EBhms, :EHm, :EHms, :Ed, :Eh, :Ehm, :Ehms,
+             :Gy, :GyM, :GyMEd, :GyMMM, :GyMMMEd, :GyMMMd, :GyMd, :H, :Hm, :Hms, :Hmsv,
+             :Hmv, :Hv, :M, :MEd, :MMM, :MMMEd, :MMMMW, :MMMMd, :MMMd, :Md, :d, :h, :hm,
+             :hms, :hmsv, :hmv, :hv, :ms, :y, :yM, :yMEd, :yMMM, :yMMMEd, :yMMMM, :yMMMd,
+             :yMd, :yQQQ, :yQQQQ, :yw]
 
         """
         @spec common_date_time_format_names() :: [Format.format_id()]
@@ -782,6 +857,38 @@ defmodule Cldr.DateTime.Format.Backend do
         def gmt_zero_format(locale_name) when is_binary(locale_name) do
           with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
             gmt_zero_format(locale)
+          end
+        end
+
+        @doc """
+        Returns the format string for a for an unknown GMT offset.
+
+        ## Arguments
+
+        * `locale` is any locale returned by `Cldr.known_locale_names/0`
+          or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+        ## Example
+
+            iex> #{inspect(__MODULE__)}.gmt_unknown_format(:en)
+            {:ok, "GMT+?"}
+
+            iex> #{inspect(__MODULE__)}.gmt_unknown_format(:fr)
+            {:ok, "GMT+?"}
+
+        """
+        @spec gmt_unknown_format(Locale.locale_reference()) ::
+                {:ok, String.t()} | {:error, {module(), String.t()}}
+
+        def gmt_unknown_format(locale \\ unquote(backend).get_locale())
+
+        def gmt_unknown_format(%LanguageTag{cldr_locale_name: cldr_locale_name}) do
+          gmt_unknown_format(cldr_locale_name)
+        end
+
+        def gmt_unknown_format(locale_name) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            gmt_unknown_format(locale)
           end
         end
 
@@ -979,6 +1086,9 @@ defmodule Cldr.DateTime.Format.Backend do
           def gmt_zero_format(unquote(locale)),
             do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_zero_format]))}
 
+          def gmt_unknown_format(unquote(locale)),
+            do: {:ok, unquote(get_in(locale_data, [:dates, :time_zone_names, :gmt_unknown_format]))}
+
           def time_zones(unquote(locale)),
             do: {:ok, unquote(time_zones)}
 
@@ -1005,7 +1115,7 @@ defmodule Cldr.DateTime.Format.Backend do
           for calendar <- calendars do
             calendar_data =
               locale_data
-              |> Map.get(:dates)
+              |> Map.fetch!(:dates)
               |> get_in([:calendars, calendar])
 
             date_formats = struct(Cldr.Date.Formats, Map.get(calendar_data, :date_formats))
@@ -1023,7 +1133,7 @@ defmodule Cldr.DateTime.Format.Backend do
             date_time_formats =
               struct(
                 Cldr.DateTime.Formats,
-                Map.get(calendar_data, :date_time_formats)
+                Map.fetch!(calendar_data, :date_time_formats)
                 |> Map.take(@standard_formats)
               )
 
@@ -1034,13 +1144,31 @@ defmodule Cldr.DateTime.Format.Backend do
             date_time_at_formats =
               struct(
                 Cldr.DateTime.Formats,
-                Map.get(calendar_data, :date_time_formats_at_time)
+                Map.fetch!(calendar_data, :date_time_at_formats)
                 |> Map.get(:standard)
                 |> Map.take(@standard_formats)
               )
 
             def date_time_at_formats(unquote(locale), unquote(calendar)) do
               {:ok, unquote(Macro.escape(date_time_at_formats))}
+            end
+
+            date_time_relative_formats =
+              if relative_formats = Map.get(calendar_data, :date_time_relative_formats) do
+                struct(
+                  Cldr.DateTime.Formats,
+                  relative_formats
+                  |> Map.get(:standard)
+                  |> Map.take(@standard_formats)
+                )
+              else
+                nil
+              end
+
+            if date_time_relative_formats do
+              def date_time_relative_formats(unquote(locale), unquote(calendar)) do
+                {:ok, unquote(Macro.escape(date_time_relative_formats))}
+              end
             end
 
             # For available formats we need to check for formats that have
@@ -1050,7 +1178,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
             available_formats =
               calendar_data
-              |> get_in([:date_time_formats, :available_formats])
+              |> Map.fetch!(:available_formats)
               |> Enum.map(fn
                 {name, %{other: _other} = plurals} ->
                   {:ok, tokens, _} = Cldr.DateTime.Format.Compiler.tokenize(to_string(name))
@@ -1108,12 +1236,12 @@ defmodule Cldr.DateTime.Format.Backend do
             end
 
             interval_formats =
-              get_in(calendar_data, [:date_time_formats, :interval_formats])
+              Map.fetch!(calendar_data, :interval_formats)
 
             interval_format_fallback =
               get_in(
                 calendar_data,
-                [:date_time_formats, :interval_formats, :interval_format_fallback]
+                [:interval_formats, :interval_format_fallback]
               )
 
             interval_formats =
@@ -1165,6 +1293,7 @@ defmodule Cldr.DateTime.Format.Backend do
         def calendars_for(locale), do: {:error, Locale.locale_error(locale)}
         def gmt_format(locale), do: {:error, Locale.locale_error(locale)}
         def gmt_zero_format(locale), do: {:error, Locale.locale_error(locale)}
+        def gmt_unknown_format(locale), do: {:error, Locale.locale_error(locale)}
         def time_zones(locale), do: {:error, Locale.locale_error(locale)}
         def meta_zones(locale), do: {:error, Locale.locale_error(locale)}
         def zone_region_format(locale), do: {:error, Locale.locale_error(locale)}
@@ -1175,6 +1304,7 @@ defmodule Cldr.DateTime.Format.Backend do
         def time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
         def date_time_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
         def date_time_at_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
+        def date_time_relative_formats(locale, _calendar), do: {:error, Locale.locale_error(locale)}
 
         def date_time_available_formats(locale, _calendar),
           do: {:error, Locale.locale_error(locale)}

@@ -410,20 +410,22 @@ defmodule Cldr.DateTime do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_time_formats(:en)
-      {:ok, %Cldr.DateTime.Formats{
-        full: "{1}, {0}",
-        long: "{1}, {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"
-      }}
+      {:ok,
+       %Cldr.DateTime.Formats{
+         short: "{1}, {0}",
+         medium: "{1}, {0}",
+         long: "{1}, {0}",
+         full: "{1}, {0}"
+       }}
 
       iex> Cldr.DateTime.Format.date_time_formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.DateTime.Formats{
-        full: "{1}, {0}",
-        long: "{1}, {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"
-      }}
+      {:ok,
+       %Cldr.DateTime.Formats{
+         short: "{1}, {0}",
+         medium: "{1}, {0}",
+         long: "{1}, {0}",
+         full: "{1}, {0}"
+       }}
 
   """
   @spec formats(
@@ -461,61 +463,74 @@ defmodule Cldr.DateTime do
       iex> Cldr.DateTime.available_formats(:en)
       {:ok,
        %{
-         yw: %{
-           other: "'week' w 'of' Y",
-           one: "'week' w 'of' Y",
-           pluralize: :week_of_year
-         },
-         GyMMMEd: "E, MMM d, y G",
-         Hms: "HH:mm:ss",
          MMMMW: %{
            other: "'week' W 'of' MMMM",
            one: "'week' W 'of' MMMM",
            pluralize: :week_of_month
          },
-         E: "ccc",
-         MMMd: "MMM d",
-         yMEd: "E, M/d/y",
-         yQQQ: "QQQ y",
          Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
-         M: "L",
-         hm: %{unicode: "h:mm a", ascii: "h:mm a"},
-         yM: "M/y",
-         GyMMMd: "MMM d, y G",
-         GyMd: "M/d/y G",
-         Gy: "y G",
-         Hm: "HH:mm",
-         EBhms: "E h:mm:ss B",
-         d: "d",
-         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-         Ed: "d E",
-         Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
-         EHms: "E HH:mm:ss",
-         Bh: "h B",
-         h: %{unicode: "h a", ascii: "h a"},
-         Bhms: "h:mm:ss B",
-         Hmv: "HH:mm v",
-         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
-         yMd: "M/d/y",
-         ms: "mm:ss",
-         MMM: "LLL",
          y: "y",
-         Bhm: "h:mm B",
-         yMMM: "MMM y",
-         yQQQQ: "QQQQ y",
-         yMMMEd: "E, MMM d, y",
-         yMMMM: "MMMM y",
-         EBhm: "E h:mm B",
-         Hmsv: "HH:mm:ss v",
-         yMMMd: "MMM d, y",
-         MEd: "E, M/d",
-         EHm: "E HH:mm",
+         MMMd: "MMM d",
+         yyMd: "M/d/yy",
+         GyM: "M/y G",
+         hv: %{unicode: "h a v", ascii: "h a v"},
+         Hm: "HH:mm",
+         Bhms: "h:mm:ss B",
+         ms: "mm:ss",
+         yMd: "M/d/y",
          GyMMM: "MMM y G",
-         hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
+         GyMMMEd: "E, MMM d, y G",
+         yMMMd: "MMM d, y",
+         EBh: "E h B",
+         Gy: "y G",
+         Hmsv: "HH:mm:ss v",
+         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
+         M: "L",
+         h: %{unicode: "h a", ascii: "h a"},
+         Hms: "HH:mm:ss",
+         yMMMMd: "MMMM d, y",
+         EHm: "E HH:mm",
+         ahmmsszzzz: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+         MMM: "LLL",
+         ahmmssz: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+         d: "d",
+         Hmv: "HH:mm v",
+         GyMd: "M/d/y G",
+         yQQQ: "QQQ y",
+         yMMMEd: "E, MMM d, y",
+         ahmmss: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+         MMMMd: "MMMM d",
          H: "HH",
+         MEd: "E, M/d",
          Md: "M/d",
+         GyMEd: "E, M/d/y G",
+         yMMM: "MMM y",
+         EBhms: "E h:mm:ss B",
+         yw: %{
+           other: "'week' w 'of' Y",
+           one: "'week' w 'of' Y",
+           pluralize: :week_of_year
+         },
+         hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
          MMMEd: "E, MMM d",
-         MMMMd: "MMMM d"
+         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+         EBhm: "E h:mm B",
+         EHms: "E HH:mm:ss",
+         Hv: "HH'h' v",
+         ahmm: %{unicode: "h:mm a", ascii: "h:mm a"},
+         hm: %{unicode: "h:mm a", ascii: "h:mm a"},
+         GyMMMd: "MMM d, y G",
+         yMEd: "E, M/d/y",
+         Eh: %{unicode: "E h a", ascii: "E h a"},
+         Bh: "h B",
+         Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
+         yMMMM: "MMMM y",
+         yQQQQ: "QQQQ y",
+         yMMMMEEEEd: "EEEE, MMMM d, y",
+         E: "ccc",
+         yM: "M/y",
+         Bhm: "h:mm B",
+         Ed: "d E"
        }}
 
   """

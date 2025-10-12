@@ -383,8 +383,20 @@ defmodule Cldr.Time do
       when format in @format_types and is_full_time(time) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
-    with {:ok, time_formats} <- formats(locale_name, calendar, backend) do
-      {:ok, Map.fetch!(time_formats, format)}
+    with {:ok, time_formats} <- formats(locale_name, calendar, backend),
+         {:ok, standard_format} <- Map.fetch(time_formats, format),
+         {:ok, available_formats} <- available_formats(locale, calendar, backend) do
+      case Map.fetch(available_formats, standard_format) do
+        {:ok, format} ->
+          {:ok, format}
+        :error ->
+          {:error,
+            {
+              Cldr.DateTime.UnresolvedFormat,
+              "Standard format #{inspect(format)} could not be resolved from " <>
+              "#{inspect standard_format}"
+          }}
+      end
     end
   end
 
@@ -449,26 +461,22 @@ defmodule Cldr.Time do
   ### Examples:
 
       iex> Cldr.Time.formats(:en, :gregorian, MyApp.Cldr)
-      {
-        :ok,
-        %Cldr.Time.Formats{
-          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
-          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
-          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-          short: %{unicode: "h:mm a", ascii: "h:mm a"}
-        }
-      }
+      {:ok,
+       %Cldr.Time.Formats{
+         short: :ahmm,
+         medium: :ahmmss,
+         long: :ahmmssz,
+         full: :ahmmsszzzz
+       }}
 
       iex> Cldr.Time.formats(:en, :buddhist, MyApp.Cldr)
-      {
-        :ok,
-        %Cldr.Time.Formats{
-          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
-          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
-          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-          short: %{unicode: "h:mm a", ascii: "h:mm a"}
-        }
-      }
+      {:ok,
+       %Cldr.Time.Formats{
+         short: :ahmm,
+         medium: :ahmmss,
+         long: :ahmmssz,
+         full: :ahmmsszzzz
+       }}
 
   """
   @spec formats(
@@ -507,16 +515,25 @@ defmodule Cldr.Time do
       {:ok,
        %{
          h: %{unicode: "h a", ascii: "h a"},
-         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
          ms: "mm:ss",
+         Bhm: "h:mm B",
          H: "HH",
          Hm: "HH:mm",
+         Bhms: "h:mm:ss B",
          Hms: "HH:mm:ss",
-         Hmsv: "HH:mm:ss v",
-         Hmv: "HH:mm v",
+         hv: %{unicode: "h a v", ascii: "h a v"},
+         Bh: "h B",
+         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
          hm: %{unicode: "h:mm a", ascii: "h:mm a"},
+         Hv: "HH'h' v",
+         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
+         Hmv: "HH:mm v",
          hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
-         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"}
+         Hmsv: "HH:mm:ss v",
+         ahmmsszzzz: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+         ahmmss: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+         ahmmssz: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+         ahmm: %{unicode: "h:mm a", ascii: "h:mm a"}
        }}
 
   """
