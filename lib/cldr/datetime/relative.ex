@@ -113,6 +113,12 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
       {:ok, "demain"}
 
+      iex> Cldr.DateTime.Relative.to_string(2, MyApp.Cldr, unit: :day, locale: "de")
+      {:ok, "übermorgen"}
+
+      iex> Cldr.DateTime.Relative.to_string(-2, MyApp.Cldr, unit: :day, locale: "de")
+      {:ok, "vorgestern"}
+
       iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
       {:ok, "tomorrow"}
 
@@ -344,14 +350,14 @@ defmodule Cldr.DateTime.Relative do
 
   # For the case when its relative by one unit, for example "tomorrow" or "yesterday"
   # or "last"
-  defp to_string(relative, unit, locale, backend, options) when relative in -1..1 do
+  defp to_string(relative, unit, locale, backend, options) when relative in -2..2 do
     style = options[:style] || options[:format]
 
     result =
       locale
       |> get_locale(backend)
       |> get_in([unit, style, :relative_ordinal])
-      |> Enum.at(relative + 1)
+      |> Map.get(relative)
 
     if is_nil(result), do: to_string(relative / 1, unit, locale, backend, options), else: result
   end

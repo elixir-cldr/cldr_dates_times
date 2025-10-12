@@ -2,6 +2,22 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.25.0
+
+This is the changelog for Cldr_Dates_Times v2.25.0 released on _____, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fixes `Cldr.DateTime.Relative.to_string/2` when the relative value is an integer of `2` or `-2` and the locale provides a specific word for that value. For example, in English there are words for 1 day in advance or behind ("today" and "yesterday"). When specifing 2 days ago, English has no specific word so the result is "2 days ago". In German the result is "vorgestern". Similary for English's "in 2 days", the German result will be "übermorgen".
+
+### Enhancements
+
+* Updates to [CLDR 48](https://cldr.unicode.org/downloads/cldr-48) data.
+
+* Adds `Cldr.DateTime.Format.gmt_unknown_format/1` to return a string representing an unknown GMT offset.
+
+* Adds `Cldr.DateTime.date_time_relative_formats/2` and associated formatting.
+
 ## Cldr_Dates_Times v2.24.1
 
 This is the changelog for Cldr_Dates_Times v2.24.1 released on October 9th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

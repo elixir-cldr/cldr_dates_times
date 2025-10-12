@@ -852,7 +852,7 @@ defmodule Cldr.DateTime.Timezone do
         {:ok, "キーウ"}
 
         iex> Cldr.DateTime.Timezone.exemplar_city("Etc/Unknown")
-        {:ok, "Unknown City"}
+        {:ok, "Unknown Location"}
 
         iex> Cldr.DateTime.Timezone.exemplar_city("Etc/UTC")
         {:error, {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for \\"Etc/UTC\\""}}
