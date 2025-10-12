@@ -1,5 +1,5 @@
 defmodule Cldr.DateTime.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   doctest Cldr.DateTime.Timezone
   doctest Cldr.DateTime.Relative

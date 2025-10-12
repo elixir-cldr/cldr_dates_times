@@ -20,6 +20,7 @@ defmodule Cldr.Time do
 
   alias Cldr.LanguageTag
   alias Cldr.Locale
+  alias Cldr.DateTime.Format
 
   import Cldr.DateTime,
     only: [resolve_plural_format: 4, apply_preference: 2, has_time: 1]
@@ -385,18 +386,8 @@ defmodule Cldr.Time do
 
     with {:ok, time_formats} <- formats(locale_name, calendar, backend),
          {:ok, standard_format} <- Map.fetch(time_formats, format),
-         {:ok, available_formats} <- available_formats(locale, calendar, backend) do
-      case Map.fetch(available_formats, standard_format) do
-        {:ok, format} ->
-          {:ok, format}
-        :error ->
-          {:error,
-            {
-              Cldr.DateTime.UnresolvedFormat,
-              "Standard format #{inspect(format)} could not be resolved from " <>
-              "#{inspect standard_format}"
-          }}
-      end
+         {:ok, skeleton} <- Format.best_match(standard_format, locale, calendar, backend) do
+      format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend)
     end
   end
 
@@ -428,7 +419,7 @@ defmodule Cldr.Time do
     if Map.has_key?(available_formats, format) do
       Map.fetch(available_formats, format)
     else
-      resolve_format(format, available_formats, locale, calendar, backend)
+      best_match(format, available_formats, locale, calendar, backend)
     end
   end
 
@@ -440,8 +431,24 @@ defmodule Cldr.Time do
     {:ok, format_string}
   end
 
+  defp format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend) do
+    {:ok, available_formats} = available_formats(locale, calendar, backend)
+
+    case Map.fetch(available_formats, skeleton) do
+      {:ok, format} ->
+        {:ok, format}
+      :error ->
+        {:error,
+          {
+            Cldr.DateTime.UnresolvedFormat,
+            "Standard format #{inspect(format)} could not be resolved from " <>
+            "#{inspect standard_format}"
+        }}
+    end
+  end
+
   @doc false
-  defdelegate resolve_format(format, available_formats, locale, calendar, backend), to: Cldr.Date
+  defdelegate best_match(format, available_formats, locale, calendar, backend), to: Cldr.Date
 
   @doc """
   Returns a map of the standard time formats for a given

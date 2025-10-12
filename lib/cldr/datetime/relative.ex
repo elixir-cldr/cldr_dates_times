@@ -110,13 +110,13 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day)
       {:ok, "tomorrow"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: :fr)
       {:ok, "demain"}
 
-      iex> Cldr.DateTime.Relative.to_string(2, MyApp.Cldr, unit: :day, locale: "de")
+      iex> Cldr.DateTime.Relative.to_string(2, MyApp.Cldr, unit: :day, locale: :de)
       {:ok, "übermorgen"}
 
-      iex> Cldr.DateTime.Relative.to_string(-2, MyApp.Cldr, unit: :day, locale: "de")
+      iex> Cldr.DateTime.Relative.to_string(-2, MyApp.Cldr, unit: :day, locale: :de)
       {:ok, "vorgestern"}
 
       iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
@@ -125,7 +125,7 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year)
       {:ok, "in 1,234 years"}
 
-      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year, locale: :fr)
       {:ok, "dans 1 234 ans"}
 
       iex> Cldr.DateTime.Relative.to_string(31, MyApp.Cldr)
@@ -134,28 +134,28 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, relative_to: ~D[2017-04-26])
       {:ok, "in 3 days"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :short, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :short, locale: :fr)
       {:ok, "dans 5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :narrow, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :narrow, locale: :fr)
       {:ok, "+5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string 2, MyApp.Cldr, unit: :wed, format: :short, locale: "en"
+      iex> Cldr.DateTime.Relative.to_string(2, MyApp.Cldr, unit: :wed, format: :short, locale: :en)
       {:ok, "in 2 Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :wed, format: :short)
       {:ok, "next Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr, unit: :wed, format: :short)
       {:ok, "last Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed
+      iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr, unit: :wed)
       {:ok, "last Wednesday"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :quarter
+      iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr, unit: :quarter)
       {:ok, "last quarter"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :mon, locale: "fr"
+      iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr, unit: :mon, locale: :fr)
       {:ok, "lundi dernier"}
 
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, unit: :ziggeraut)
@@ -207,7 +207,7 @@ defmodule Cldr.DateTime.Relative do
     {:ok, relative}
   end
 
-  # If realtive is a datetime then relative_to must be too
+  # If relative is a datetime then relative_to must be too
   defp time_difference(relative, relative_to) when is_date_time(relative) do
     seconds = DateTime.diff(relative, relative_to)
     {:ok, seconds}

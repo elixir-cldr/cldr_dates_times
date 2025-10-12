@@ -1107,19 +1107,16 @@ defmodule Cldr.DateTime.Format do
          skeleton = to_string(original_skeleton),
          {:ok, skeleton} <- put_preferred_time_symbols(skeleton, locale),
          {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton) do
-      # match_with_day_periods? =
-      #   !String.contains?(skeleton, "J")
-
       available_format_tokens =
         date_time_available_format_tokens(locale, calendar, backend)
 
-      skeleton_keys =
-        skeleton_tokens
-        |> :proplists.get_keys()
-        |> canonical_keys()
-
       skeleton_ordered =
         sort_tokens(skeleton_tokens)
+
+      skeleton_keys =
+        skeleton_ordered
+        |> :proplists.get_keys()
+        |> canonical_keys()
 
       candidates =
         available_format_tokens
@@ -1267,28 +1264,95 @@ defmodule Cldr.DateTime.Format do
   # https://www.unicode.org/reports/tr35/tr35-dates.html#Time_Data
 
   defp put_preferred_time_symbols(skeleton, locale) do
-    preferred_time_symbol = preferred_time_symbol(locale)
-    allowed_time_symbol = hd(allowed_time_symbols(locale))
+    if locale_specifies_hour_cycle?(locale) || String.contains?(skeleton, ["j", "J", "C"]) do
+      preferred_time_symbol = preferred_time_symbol(locale)
+      allowed_time_symbol = hd(allowed_time_symbols(locale))
 
-    {:ok, replace_time_symbols(skeleton, preferred_time_symbol, allowed_time_symbol)}
+      new_skeleton =
+        skeleton
+        |> replace_time_symbols(preferred_time_symbol, allowed_time_symbol)
+        |> assert_am_pm_if_required(preferred_time_symbol)
+
+      {:ok, new_skeleton}
+    else
+      {:ok, skeleton}
+    end
+  end
+
+  def locale_specifies_hour_cycle?(%{locale: %{hc: _}}), do: true
+  def locale_specifies_hour_cycle?(_locale), do: false
+
+  # If it has one, nothing to do
+  defp assert_am_pm_if_required(skeleton, preferred) when preferred in ["h", "K"] do
+    if String.contains?(skeleton, ["a", "b", "B"]) do
+      skeleton
+    else
+      "a" <> skeleton
+    end
+  end
+
+  defp assert_am_pm_if_required(skeleton, _preferred) do
+    skeleton
   end
 
   defp replace_time_symbols("", _preferred, _allowed) do
     ""
   end
 
+  # Requests the preferred hour format for the locale (h, H, K, or k), as determined by
+  # the preferred attribute of the hours.
   defp replace_time_symbols(<<"j", rest::binary>>, preferred, allowed) do
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 
+  # Requests the preferred hour format for the locale (h, H, K, or k), as determined by the
+  # preferred attribute of the hours element in supplemental data. However, unlike 'j', it
+  # requests no dayPeriod marker such as “am/pm” (it is typically used where there is enough
+  # context that that is not necessary). For example, with "jmm", 18:00 could appear as
+  # “6:00 PM”, while with "Jmm", it would appear as “6:00” (no PM).
+  # TODO Does not signal that a day period format code is not required. Therefore is the same
+  # as "j".
   defp replace_time_symbols(<<"J", rest::binary>>, preferred, allowed) do
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 
+  # Requests the preferred hour format for the locale. However, unlike 'j', it can also select
+  # formats such as hb or hB, since it is based not on the preferred attribute of the hours element
+  # in supplemental data, but instead on the first element of the allowed attribute (which is an
+  # ordered preferrence list). For example, with "Cmm", 18:00 could appear as “6:00 in the
+  # afternoon”.
   defp replace_time_symbols(<<"C", rest::binary>>, preferred, allowed) do
     allowed <> replace_time_symbols(rest, preferred, allowed)
   end
 
+  # Remove "a", "b" and "B" if we want 24 hour (H and k)
+  defp replace_time_symbols(<<format_code :: utf8, rest::binary>>, preferred, allowed)
+      when format_code in ["a", "b", "B"] and preferred in ["H", "k"] do
+    replace_time_symbols(rest, preferred, allowed)
+  end
+
+  # Assert the correct symbol respecting the preference
+  defp replace_time_symbols(<<"h", rest::binary>>, "H" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"h", rest::binary>>, "k" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"k", rest::binary>>, "K" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"H", rest::binary>>, "h" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"K", rest::binary>>, "k" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  # Just pass it through
   defp replace_time_symbols(<<symbol::utf8, rest::binary>>, preferred, allowed) do
     <<symbol::utf8>> <> replace_time_symbols(rest, preferred, allowed)
   end
@@ -1301,7 +1365,8 @@ defmodule Cldr.DateTime.Format do
   }
 
   # Locale's time preference takes priority
-  defp preferred_time_symbol(%LanguageTag{locale: %{hc: hc}}) when is_atom(hc) do
+  @doc false
+  def preferred_time_symbol(%LanguageTag{locale: %{hc: hc}}) when is_atom(hc) do
     Map.fetch!(@locale_preferred_time_symbol, hc)
   end
 
@@ -1310,15 +1375,17 @@ defmodule Cldr.DateTime.Format do
   # 2. territory
   # 3. 001 ("The world")
 
-  defp preferred_time_symbol(%LanguageTag{} = locale) do
+  def preferred_time_symbol(%LanguageTag{} = locale) do
     time_preferences(locale).preferred
   end
 
-  defp allowed_time_symbols(locale) do
+  @doc false
+  def allowed_time_symbols(locale) do
     time_preferences(locale).allowed
   end
 
-  defp time_preferences(locale) do
+  @doc false
+  def time_preferences(locale) do
     time_preferences = Cldr.Time.time_preferences()
 
     Map.get(time_preferences, locale.cldr_locale_name) ||

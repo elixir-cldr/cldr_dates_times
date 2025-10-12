@@ -544,7 +544,7 @@ defmodule Cldr.Date do
     if Map.has_key?(available_formats, format) do
       Map.fetch(available_formats, format)
     else
-      resolve_format(format, available_formats, locale, calendar, backend)
+      best_match(format, available_formats, locale, calendar, backend)
     end
   end
 
@@ -557,7 +557,7 @@ defmodule Cldr.Date do
   end
 
   @doc false
-  def resolve_format(format, available_formats, locale, calendar, backend) do
+  def best_match(format, available_formats, locale, calendar, backend) do
     with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend),
          {:ok, format} <- Map.fetch(available_formats, match) do
       {:ok, format}

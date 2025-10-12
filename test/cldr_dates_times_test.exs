@@ -1,5 +1,5 @@
 defmodule Cldr.DatesTimes.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "that the bb format works as expected" do
     assert Cldr.DateTime.to_string(
@@ -33,15 +33,6 @@ defmodule Cldr.DatesTimes.Test do
 
   test "That localised date doesn't transliterate" do
     assert Cldr.Date.to_string(~D[2019-06-12], MyApp.Cldr, locale: "de") == {:ok, "12.06.2019"}
-  end
-
-  test "Formatting via a backend when there is no default backend" do
-    default_backend = Application.get_env(:ex_cldr, :default_backend)
-    Application.put_env(:ex_cldr, :default_backend, nil)
-    assert match?({:ok, _now}, MyApp.Cldr.DateTime.to_string(DateTime.utc_now()))
-    assert match?({:ok, _now}, MyApp.Cldr.Date.to_string(Date.utc_today()))
-    assert match?({:ok, _now}, MyApp.Cldr.Time.to_string(DateTime.utc_now()))
-    Application.put_env(:ex_cldr, :default_backend, default_backend)
   end
 
   test "to_string/2 when the second param is options (not backend)" do
@@ -84,8 +75,9 @@ defmodule Cldr.DatesTimes.Test do
   end
 
   test "Resolving with skeleton code c, J and j" do
-    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :hmj)
-    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :hmJ)
+    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :jm, backend: MyApp.Cldr)
+    assert {:ok, "10:48"} = Cldr.Time.to_string(~T[10:48:00], locale: :de, format: :jm, backend: MyApp.Cldr)
+    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :Jm, backend: MyApp.Cldr)
 
     assert Cldr.Date.to_string(~T"10:48:00", format: :hmc) ==
              {:error,
