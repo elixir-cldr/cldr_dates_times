@@ -2,6 +2,14 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.24.2
+
+This is the changelog for Cldr_Dates_Times v2.24.2 released on October 14th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix generated doc links in generated backend modules. Previously they used implicit links to the projects README file. Since they generate code, the implicit links end up referencing the users project README which is not the intention and which generates `ex_doc` warnings. Thanks to @zorn for the report. Fixes [#63](https://github.com/elixir-cldr/cldr_dates_times/issues/63) for this library.
+
 ## Cldr_Dates_Times v2.24.1
 
 This is the changelog for Cldr_Dates_Times v2.24.1 released on October 9th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

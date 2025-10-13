@@ -24,7 +24,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
           any of the keys in the map returned by `Cldr.DateTime.Format.date_time_formats/3`.
-          The default is `:medium`. See [here](README.md#date-time-and-datetime-localization-formats)
+          The default is `:medium`. See [here](https://hexdocs.pm/ex_cldr_dates_times/readme.html#date-time-and-datetime-localization-formats)
           for more information about specifying formats.
 
         * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
@@ -59,9 +59,9 @@ defmodule Cldr.DateAndTime.Backend do
           is available in the requested locale. In the `:en` locale, for example, `era: :variant`
           will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
-        * `period: :variant` will use a variant for the time period and flexible time period if
-          one is available in the locale.  For example, in the `:en` locale `period: :variant` will
-          return "pm" instead of "PM".
+        * `:period` which, if set to `:variant`, will use a variant for the time period and
+          flexible time period if one is available in the locale.  For example, in the `:en`
+          locale `period: :variant` will return "pm" instead of "PM".
 
         ## Returns
 
@@ -111,7 +111,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
           any of the keys in the map returned by `Cldr.DateTime.Format.date_time_formats/3`.
-          The default is `:medium`. See [here](README.md#date-time-and-datetime-localization-formats)
+          The default is `:medium`. See [here](https://hexdocs.pm/ex_cldr_dates_times/readme.html#date-time-and-datetime-localization-formats)
           for more information about specifying formats.
 
         * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
@@ -194,7 +194,7 @@ defmodule Cldr.DateAndTime.Backend do
           dates having `:year`, `:month`, `:day` and `:calendar` fields). The
           default for partial dates is to derive a candidate format id from the date and
           find the best match from the formats returned by
-          `Cldr.Date.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
+          `Cldr.Date.available_formats/3`. See [here](https://hexdocs.pm/ex_cldr_dates_times/readme.html#date-time-and-datetime-localization-formats)
           for more information about specifying formats.
 
         * `:locale` any locale returned by `Cldr.known_locale_names/1`.
@@ -279,7 +279,7 @@ defmodule Cldr.DateAndTime.Backend do
           dates having `:year`, `:month`, `:day` and `:calendar` fields). The
           default for partial dates is to derive a candidate format id from the date and
           find the best match from the formats returned by
-          `Cldr.Date.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
+          `Cldr.Date.available_formats/3`. See [here](https://hexdocs.pm/ex_cldr_dates_times/readme.html#date-time-and-datetime-localization-formats)
           for more information about specifying formats.
 
         * `:locale` any locale returned by `Cldr.known_locale_names/1`.
@@ -365,7 +365,7 @@ defmodule Cldr.DateAndTime.Backend do
           times having `:hour`, `:minute` and `:second` fields). The
           default for partial times is to derive a candidate format from the time and
           find the best match from the formats returned by
-          `Cldr.Time.available_formats/2`. See [here](README.md#date-time-and-datetime-localization-formats)
+          `Cldr.Time.available_formats/2`. See [here](https://hexdocs.pm/ex_cldr_dates_times/readme.html#date-time-and-datetime-localization-formats)
           for more information about specifying formats.
 
         * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is
@@ -443,7 +443,7 @@ defmodule Cldr.DateAndTime.Backend do
           times having `:hour`, `:minute` and `:second` fields). The
           default for partial times is to derive a candidate format from the time and
           find the best match from the formats returned by
-          `Cldr.Time.available_formats/2`. See [here](README.md#date-time-and-datetime-localization-formats)
+          `Cldr.Time.available_formats/2`. See [here](https://hexdocs.pm/ex_cldr_dates_times/readme.html#date-time-and-datetime-localization-formats)
           for more information about specifying formats.
 
         * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is
