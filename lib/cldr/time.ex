@@ -386,6 +386,7 @@ defmodule Cldr.Time do
 
     with {:ok, time_formats} <- formats(locale_name, calendar, backend),
          {:ok, standard_format} <- Map.fetch(time_formats, format),
+         {:ok, standard_format} <- remove_tz_if_naive_date_time(time, standard_format),
          {:ok, skeleton} <- Match.best_match(standard_format, locale, calendar, backend) do
       format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend)
     end
@@ -429,6 +430,30 @@ defmodule Cldr.Time do
   def find_format(_time, format_string, _locale, _calendar, _backend)
       when is_binary(format_string) do
     {:ok, format_string}
+  end
+
+  @doc false
+  def remove_tz_if_naive_date_time(time, format) do
+    format = Kernel.to_string(format)
+
+    cond do
+      format_has?(format, ["V", "v"]) and is_map_key(time, :zone_abbr) ->
+        {:ok, format}
+
+      format_has?(format, ["z", "x", "X", "O"]) and is_map_key(time, :std_offset) and is_map_key(time, :utc_offset) ->
+        {:ok, format}
+
+      true ->
+        {:ok, remove_tz_codes(format)}
+    end
+  end
+
+  defp format_has?(format, format_codes) do
+    String.contains?(format, format_codes)
+  end
+
+  defp remove_tz_codes(format) do
+    String.replace(format, ["v", "V", "x", "X", "O", "z"], "")
   end
 
   defp format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend) do

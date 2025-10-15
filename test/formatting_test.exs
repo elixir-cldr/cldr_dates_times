@@ -30,6 +30,10 @@ defmodule Cldr.DateTime.Formatting.Test do
     assert Cldr.DateTime.to_string(~U[2025-10-15T13:55:00Z], format: :long, date_format: :yMMMd, time_format: :dhms) ==
       {:error,
        {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :dhms"}}
-   end
+  end
 
+  test "That tz format codes are removed from the skeleton before best match if the time is naive" do
+    assert {:ok, "October 15, 2025, 1:55:00 PM"} = Cldr.DateTime.to_string(~N[2025-10-15T13:55:00], format: :long, time_format: :full)
+    assert {:ok, "October 15, 2025, 1:55:00 PM GMT"} = Cldr.DateTime.to_string(~U[2025-10-15T13:55:00Z], format: :long, time_format: :full)
+  end
 end
