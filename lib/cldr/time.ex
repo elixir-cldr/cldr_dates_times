@@ -420,7 +420,7 @@ defmodule Cldr.Time do
     if Map.has_key?(available_formats, format) do
       Map.fetch(available_formats, format)
     else
-      best_match(format, available_formats, locale, calendar, backend)
+      Cldr.DateTime.best_match(format, locale, calendar, backend)
     end
   end
 
@@ -456,24 +456,8 @@ defmodule Cldr.Time do
     String.replace(format, ["v", "V", "x", "X", "O", "z"], "")
   end
 
-  defp format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend) do
-    {:ok, available_formats} = available_formats(locale, calendar, backend)
-
-    case Map.fetch(available_formats, skeleton) do
-      {:ok, format} ->
-        {:ok, format}
-      :error ->
-        {:error,
-          {
-            Cldr.DateTime.UnresolvedFormat,
-            "Standard format #{inspect(format)} could not be resolved from " <>
-            "#{inspect standard_format}"
-        }}
-    end
-  end
-
   @doc false
-  defdelegate best_match(format, available_formats, locale, calendar, backend), to: Cldr.Date
+  defdelegate format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend), to: Cldr.DateTime
 
   @doc """
   Returns a map of the standard time formats for a given

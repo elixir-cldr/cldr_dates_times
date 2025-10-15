@@ -14,7 +14,6 @@ defmodule Cldr.DateTime.Format.Match do
   @hour_cycles Map.keys(@locale_preferred_time_symbol)
   @prefer_cycle_24 ["H", "k"]
   @prefer_cycle_12 ["h", "K"]
-  @day_period ["a", "b", "B"]
 
   @date_fields [
     "G", "y", "Y", "u",  "U", "r", "Q", "q", "M", "L", "W", "w", "d", "D", "F", "g", "E", "e", "c"
@@ -50,8 +49,11 @@ defmodule Cldr.DateTime.Format.Match do
          skeleton = to_string(original_skeleton),
          {:ok, skeleton} <- put_preferred_time_symbols(skeleton, locale),
          {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton) do
+
       available_format_tokens =
         Format.date_time_available_format_tokens(locale, calendar, backend)
+        |> Enum.map(fn {k, v} -> {k, sort_tokens(v)} end)
+        |> Map.new()
 
       skeleton_ordered =
         sort_tokens(skeleton_tokens)
@@ -66,6 +68,7 @@ defmodule Cldr.DateTime.Format.Match do
         |> Enum.filter(&candidates_with_the_same_tokens(&1, skeleton_keys))
         |> Enum.map(&distance_from(&1, skeleton_ordered))
         |> Enum.sort(&compare_counts/2)
+        # |> IO.inspect(label: "Candidates for #{original_skeleton} -> #{skeleton}")
 
       case candidates do
         [] ->
@@ -132,6 +135,11 @@ defmodule Cldr.DateTime.Format.Match do
       |> :proplists.get_keys()
       |> canonical_keys()
 
+    # if match?(["H" | _rest], skeleton_keys) do
+    #   IO.inspect token_keys
+    #   IO.inspect skeleton_keys
+    # end
+
     token_keys == skeleton_keys
   end
 
@@ -163,6 +171,7 @@ defmodule Cldr.DateTime.Format.Match do
       "c" -> "E"
       s when s in ["b", "B"] -> "a"
       s when s in ["k", "h", "K"] -> "H"
+      s when s in ["x", "X", "v", "V", "z", "Z", "O"] -> "v"
       other -> other
     end
   end
@@ -181,8 +190,8 @@ defmodule Cldr.DateTime.Format.Match do
            when (elem(token_a, 0) in ["L", "M"] and elem(token_b, 0) in ["L", "M"]) or
                   (elem(token_a, 0) in ["c", "E"] and elem(token_b, 0) in ["c", "E"]) or
                   (elem(token_a, 0) in ["a", "b", "B"] and elem(token_b, 0) in ["a", "b", "B"]) or
-                  (elem(token_a, 0) in ["k", "h", "K", "H"] and
-                     elem(token_b, 0) in ["k", "h", "K", "H"])
+                  (elem(token_a, 0) in ["k", "h", "K", "H"] and elem(token_b, 0) in ["k", "h", "K", "H"]) or
+                  (elem(token_a, 0) in ["x", "X", "v", "V", "z", "Z", "O"] and elem(token_b, 0) in ["x", "X", "v", "V", "z", "Z", "O"])
 
   defguard same_types(token_a, token_b)
            when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) in [1, 2]) or
@@ -235,13 +244,13 @@ defmodule Cldr.DateTime.Format.Match do
 
   defp put_preferred_time_symbols(skeleton, locale) do
     if locale_specifies_hour_cycle?(locale) || String.contains?(skeleton, ["j", "J", "C"]) do
-      preferred_time_symbol = preferred_time_symbol(locale)
-      allowed_time_symbol = hd(allowed_time_symbols(locale))
+      preferred_time_symbol = preferred_time_symbol(locale) # |> IO.inspect(label: "Preferreed")
+      allowed_time_symbol = hd(allowed_time_symbols(locale)) # |> IO.inspect(label: "Allowed")
 
       new_skeleton =
         skeleton
         |> replace_time_symbols(preferred_time_symbol, allowed_time_symbol)
-        |> add_day_period_if_required(preferred_time_symbol)
+        # |> IO.inspect(label: "New skeleton from #{skeleton}")
 
       {:ok, new_skeleton}
     else
@@ -249,31 +258,12 @@ defmodule Cldr.DateTime.Format.Match do
     end
   end
 
+  @doc false
   def locale_specifies_hour_cycle?(%{locale: %{hc: _}}), do: true
   def locale_specifies_hour_cycle?(_locale), do: false
 
-  defp add_day_period_if_required(skeleton, preferred) do
-    if time_skeleton?(skeleton) && skeleton_requires_day_period?(skeleton, preferred) do
-      preferred_day_period(preferred) <> skeleton
-    else
-      skeleton
-    end
-  end
-
-  defp skeleton_requires_day_period?(skeleton, preferred) do
-    String.contains?(preferred, @prefer_cycle_12) && !String.contains?(skeleton, @day_period)
-  end
-
-  defp preferred_day_period(preferred) do
-    day_period =
-      preferred
-      |> String.graphemes()
-      |> Enum.find(&(&1 in @day_period))
-
-    day_period || "a"
-  end
-
-  defp time_skeleton?(skeleton) do
+  @doc false
+  def time_skeleton?(skeleton) do
     skeleton
     |> String.graphemes()
     |> Enum.all?(&(&1 in @time_fields))
@@ -333,19 +323,19 @@ defmodule Cldr.DateTime.Format.Match do
   end
 
   # Assert the correct symbol respecting the preference: 12 hour
-  defp replace_time_symbols(<<"H", rest::binary>>, "h" = preferred, allowed) do
+  defp replace_time_symbols(<<"H", rest::binary>>, <<"h", _other::binary>> = preferred, allowed) do
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 
-  defp replace_time_symbols(<<"k", rest::binary>>, "h" = preferred, allowed) do
+  defp replace_time_symbols(<<"k", rest::binary>>, <<"h", _other::binary>> = preferred, allowed) do
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 
-  defp replace_time_symbols(<<"H", rest::binary>>, "K" = preferred, allowed) do
+  defp replace_time_symbols(<<"H", rest::binary>>, <<"K", _other::binary>> = preferred, allowed) do
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 
-  defp replace_time_symbols(<<"k", rest::binary>>, "K" = preferred, allowed) do
+  defp replace_time_symbols(<<"k", rest::binary>>, <<"K", _other::binary>> = preferred, allowed) do
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 

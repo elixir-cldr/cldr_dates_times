@@ -20,7 +20,7 @@ defmodule Cldr.DateTime.Formatting.Test do
     assert {:ok, {:Md, :Bhms}} = Cldr.DateTime.Format.Match.best_match(:Mdjms, "de-u-hc-c12", :gregorian)
     assert {:ok, {:Md, :Hms}} =  Cldr.DateTime.Format.Match.best_match(:Mdjms, "de-u-hc-c24", :gregorian)
     assert {:ok, {:Md, :Hms}} = Cldr.DateTime.Format.Match.best_match :Mdjms, "en-u-hc-c24", :gregorian
-    assert {:ok, {:Md, :ahmmss}} = Cldr.DateTime.Format.Match.best_match :Mdjms, "en-u-hc-c12", :gregorian
+    assert {:ok, {:Md, :hms}} = Cldr.DateTime.Format.Match.best_match :Mdjms, "en-u-hc-c12", :gregorian
   end
 
   test "DateTime formatting with specified date and time formats" do

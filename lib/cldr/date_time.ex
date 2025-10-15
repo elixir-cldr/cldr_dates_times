@@ -19,6 +19,7 @@ defmodule Cldr.DateTime do
 
   """
 
+  alias Cldr.DateTime.Format.Match
   alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
   alias Cldr.Locale
@@ -614,6 +615,23 @@ defmodule Cldr.DateTime do
     end
   end
 
+  @doc false
+  def format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend) do
+    {:ok, available_formats} = available_formats(locale, calendar, backend)
+
+    case Map.fetch(available_formats, skeleton) do
+      {:ok, format} ->
+        {:ok, format}
+      :error ->
+        {:error,
+          {
+            Cldr.DateTime.UnresolvedFormat,
+            "Standard format #{inspect(format)} could not be resolved from " <>
+            "#{inspect standard_format}"
+        }}
+    end
+  end
+
   # Only a single format, which is applied to date and time and to
   # the compisition format.
   defp validate_formats_consistent(format, nil = _date_format, nil = _time_format)
@@ -638,7 +656,7 @@ defmodule Cldr.DateTime do
   # Joining format is short, medium, long or full and date_foramt and
   # time_format are an atom (including nil) or a string.
   defp validate_formats_consistent(format, date_format, time_format)
-       when format in @format_types and
+       when (format in @format_types or is_nil(format)) and
          (is_atom(date_format) or is_binary(date_format)) and
            (is_binary(format) or is_atom(time_format)) do
     :ok
@@ -649,7 +667,7 @@ defmodule Cldr.DateTime do
     {:error,
      {Cldr.DateTime.InvalidFormat,
       ":date_format and :time_format cannot be specified if :format is also specified as " <>
-        "a format id or a format string. Found [time_format: #{inspect(time_format)}, " <>
+        "a format id or a format string. Found [format: #{inspect format}, time_format: #{inspect(time_format)}, " <>
         "date_format: #{inspect(date_format)}]"}}
   end
 
@@ -811,6 +829,21 @@ defmodule Cldr.DateTime do
     end
   end
 
+  @doc false
+  def best_match(format, locale, calendar, backend) do
+    with {:ok, available_formats} <- Cldr.DateTime.Format.date_time_available_formats(locale, calendar, backend),
+         {:ok, match} <- Match.best_match(format, locale, calendar, backend),
+         {:ok, format} <- Map.fetch(available_formats, match) do
+      {:ok, format}
+    else
+      :error ->
+        {:error, Match.no_format_resolved_error(format)}
+
+      other ->
+        other
+    end
+  end
+
   # From https://www.unicode.org/reports/tr35/tr35-dates.html#Missing_Skeleton_Fields
   # Combine the patterns for the two dateFormatItems using the appropriate dateTimeFormat pattern, determined as follows from the requested date
   # fields:
@@ -885,6 +918,7 @@ defmodule Cldr.DateTime do
     |> Map.keys()
     |> Enum.map(&Map.fetch!(field_map, &1))
     |> Enum.join()
+    |> String.replace("vV", "v")
     |> String.to_atom()
   end
 
@@ -897,7 +931,7 @@ defmodule Cldr.DateTime do
         {:error,
          {Cldr.DateTime.InvalidFormat,
           "Invalid datetime format #{inspect(format)}. " <>
-            "The valid formats are #{inspect(formats)}."}}
+            "The valid formats are #{inspect(Map.keys(formats))}."}}
     end
   end
 

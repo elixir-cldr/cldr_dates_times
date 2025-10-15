@@ -116,20 +116,24 @@ defmodule Cldr.DatesTimes.Test do
              date_format: :short,
              time_format: :medium
            ) ==
-             {:error,
-              {Cldr.DateTime.InvalidFormat,
-               ":date_format and :time_format cannot be specified if :format is also specified as a " <>
-                 "format id or a format string. Found [time_format: :medium, date_format: :short]"}}
+           {
+             :error,
+             {
+               Cldr.DateTime.InvalidFormat,
+               ":date_format and :time_format cannot be specified if :format is also specified " <>
+               "as a format id or a format string. Found [format: \"yyy\", time_format: :medium, date_format: :short]"
+             }
+           }
 
     assert Cldr.DateTime.to_string(datetime,
              format: :yMd,
              date_format: :short,
              time_format: :medium
            ) ==
-             {:error,
-              {Cldr.DateTime.InvalidFormat,
-               ":date_format and :time_format cannot be specified if :format is also specified as a " <>
-                 "format id or a format string. Found [time_format: :medium, date_format: :short]"}}
+           {:error,
+            {Cldr.DateTime.InvalidFormat,
+             ":date_format and :time_format cannot be specified if :format is also specified " <>
+             "as a format id or a format string. Found [format: :yMd, time_format: :medium, date_format: :short]"}}
   end
 
   test "Pluralized formats" do
