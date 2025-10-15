@@ -11,6 +11,11 @@ defmodule Cldr.DateTime.Format.Match do
     h24: "k"
   }
 
+  @hour_cycles Map.keys(@locale_preferred_time_symbol)
+  @prefer_cycle_24 ["H", "k"]
+  @prefer_cycle_12 ["h", "K"]
+  @day_period ["a", "b", "B"]
+
   @date_fields [
     "G", "y", "Y", "u",  "U", "r", "Q", "q", "M", "L", "W", "w", "d", "D", "F", "g", "E", "e", "c"
   ]
@@ -121,18 +126,13 @@ defmodule Cldr.DateTime.Format.Match do
   # larger distance from each other.
   #   ≋ D; ...
 
-  defp candidates_with_the_same_tokens({_format_id, tokens}, skeleton_keys)
-      when length(tokens) == length(skeleton_keys) do
+  defp candidates_with_the_same_tokens({_format_id, tokens}, skeleton_keys) do
     token_keys =
       tokens
       |> :proplists.get_keys()
       |> canonical_keys()
 
     token_keys == skeleton_keys
-  end
-
-  defp candidates_with_the_same_tokens({_format_id, _tokens}, _skeleton_keys) do
-    false
   end
 
   # Sort the tokesn in canonical order, using
@@ -241,7 +241,7 @@ defmodule Cldr.DateTime.Format.Match do
       new_skeleton =
         skeleton
         |> replace_time_symbols(preferred_time_symbol, allowed_time_symbol)
-        |> assert_am_pm_if_required(preferred_time_symbol)
+        |> add_day_period_if_required(preferred_time_symbol)
 
       {:ok, new_skeleton}
     else
@@ -252,17 +252,31 @@ defmodule Cldr.DateTime.Format.Match do
   def locale_specifies_hour_cycle?(%{locale: %{hc: _}}), do: true
   def locale_specifies_hour_cycle?(_locale), do: false
 
-  # If it has one, nothing to do
-  defp assert_am_pm_if_required(skeleton, preferred) when preferred in ["h", "K"] do
-    if String.contains?(skeleton, ["a", "b", "B"]) do
-      skeleton
+  defp add_day_period_if_required(skeleton, preferred) do
+    if time_skeleton?(skeleton) && skeleton_requires_day_period?(skeleton, preferred) do
+      preferred_day_period(preferred) <> skeleton
     else
-      "a" <> skeleton
+      skeleton
     end
   end
 
-  defp assert_am_pm_if_required(skeleton, _preferred) do
+  defp skeleton_requires_day_period?(skeleton, preferred) do
+    String.contains?(preferred, @prefer_cycle_12) && !String.contains?(skeleton, @day_period)
+  end
+
+  defp preferred_day_period(preferred) do
+    day_period =
+      preferred
+      |> String.graphemes()
+      |> Enum.find(&(&1 in @day_period))
+
+    day_period || "a"
+  end
+
+  defp time_skeleton?(skeleton) do
     skeleton
+    |> String.graphemes()
+    |> Enum.all?(&(&1 in @time_fields))
   end
 
   defp replace_time_symbols("", _preferred, _allowed) do
@@ -297,12 +311,16 @@ defmodule Cldr.DateTime.Format.Match do
 
   # Remove "a", "b" and "B" if we want 24 hour (H and k)
   defp replace_time_symbols(<<format_code :: binary-1, rest::binary>>, preferred, allowed)
-      when format_code in ["a", "b", "B"] and preferred in ["H", "k"] do
+      when format_code in ["a", "b", "B"] and preferred in @prefer_cycle_24 do
     replace_time_symbols(rest, preferred, allowed)
   end
 
-  # Assert the correct symbol respecting the preference
+  # Assert the correct symbol respecting the preference: 24 hour
   defp replace_time_symbols(<<"h", rest::binary>>, "H" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"K", rest::binary>>, "H" = preferred, allowed) do
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 
@@ -310,45 +328,79 @@ defmodule Cldr.DateTime.Format.Match do
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 
-  defp replace_time_symbols(<<"k", rest::binary>>, "K" = preferred, allowed) do
-    preferred <> replace_time_symbols(rest, preferred, allowed)
-  end
-
-  defp replace_time_symbols(<<"H", rest::binary>>, "h" = preferred, allowed) do
-    preferred <> replace_time_symbols(rest, preferred, allowed)
-  end
-
   defp replace_time_symbols(<<"K", rest::binary>>, "k" = preferred, allowed) do
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 
+  # Assert the correct symbol respecting the preference: 12 hour
+  defp replace_time_symbols(<<"H", rest::binary>>, "h" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"k", rest::binary>>, "h" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"H", rest::binary>>, "K" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
+  defp replace_time_symbols(<<"k", rest::binary>>, "K" = preferred, allowed) do
+    preferred <> replace_time_symbols(rest, preferred, allowed)
+  end
+
   # Just pass it through
-  defp replace_time_symbols(<<symbol::binary-1, rest::binary>>, preferred, allowed) do
-    symbol <> replace_time_symbols(rest, preferred, allowed)
+  defp replace_time_symbols(<<format_code::binary-1, rest::binary>>, preferred, allowed) do
+    format_code <> replace_time_symbols(rest, preferred, allowed)
   end
 
   # Locale's time preference takes priority
-  @doc false
-  def preferred_time_symbol(%LanguageTag{locale: %{hc: hc}}) when is_atom(hc) do
+  defp preferred_time_symbol(%LanguageTag{locale: %{hc: hc}}) when hc in @hour_cycles do
     Map.fetch!(@locale_preferred_time_symbol, hc)
   end
 
+  # Prefer 12-hour cycle
+  defp preferred_time_symbol(%LanguageTag{locale: %{hc: :c12}} = locale) do
+    case time_preferences(locale) do
+      %{preferred: preferred, allowed: allowed} when preferred in @prefer_cycle_24 ->
+        find_allowed(allowed, @prefer_cycle_12)
+      %{preferred: preferred} ->
+        preferred
+    end
+  end
+
+  # Prefer 24-hour cycle
+  defp preferred_time_symbol(%LanguageTag{locale: %{hc: :c24}} = locale) do
+    case time_preferences(locale) do
+      %{preferred: preferred, allowed: allowed} when preferred in @prefer_cycle_12 ->
+        find_allowed(allowed, @prefer_cycle_24)
+      %{preferred: preferred} ->
+        preferred
+    end
+  end
+
+  defp preferred_time_symbol(%LanguageTag{} = locale) do
+    time_preferences(locale).preferred
+  end
+
+  @doc false
+  defp allowed_time_symbols(locale) do
+    time_preferences(locale).allowed
+  end
+
+  # Find the first member of the allowed format list that has
+  # the requested format code.
+  defp find_allowed(allowed, requested) do
+    Enum.find(allowed, &String.contains?(&1, requested))
+  end
+
+  @doc false
   # The lookup path is:
   # 1. cldr_locale_name
   # 2. territory
   # 3. 001 ("The world")
 
-  def preferred_time_symbol(%LanguageTag{} = locale) do
-    time_preferences(locale).preferred
-  end
-
-  @doc false
-  def allowed_time_symbols(locale) do
-    time_preferences(locale).allowed
-  end
-
-  @doc false
-  def time_preferences(locale) do
+  def time_preferences(%LanguageTag{} = locale) do
     time_preferences = Cldr.Time.time_preferences()
 
     Map.get(time_preferences, locale.cldr_locale_name) ||

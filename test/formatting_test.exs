@@ -8,4 +8,19 @@ defmodule Cldr.DateTime.Formatting.Test do
     assert "11:00:00 PM" = Cldr.Time.to_string!(~T[23:00:00], locale: "en")
   end
 
+  test "Hour cycle override with locale preference" do
+   assert "12:01:00 AM" = Cldr.Time.to_string!(~T[00:01:00], locale: "en-u-hc-c12")
+   assert "00:01:00" = Cldr.Time.to_string!(~T[00:01:00], locale: "en-u-hc-c24")
+
+   assert "12:01:00 nachts" = Cldr.Time.to_string!(~T[00:01:00], locale: "de-u-hc-c12")
+   assert "00:01:00" = Cldr.Time.to_string!(~T[00:01:00], locale: "de-u-hc-c24")
+  end
+
+  test "Best match for c12 and c24" do
+    assert {:ok, {:Md, :Bhms}} = Cldr.DateTime.Format.Match.best_match(:Mdjms, "de-u-hc-c12", :gregorian)
+    assert {:ok, {:Md, :Hms}} =  Cldr.DateTime.Format.Match.best_match(:Mdjms, "de-u-hc-c24", :gregorian)
+    assert {:ok, {:Md, :Hms}} = Cldr.DateTime.Format.Match.best_match :Mdjms, "en-u-hc-c24", :gregorian
+    assert {:ok, {:Md, :ahmmss}} = Cldr.DateTime.Format.Match.best_match :Mdjms, "en-u-hc-c12", :gregorian
+  end
+
 end
