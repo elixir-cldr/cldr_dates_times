@@ -6,6 +6,8 @@ defmodule Cldr.DateTime.Format.Match do
   A “best match” from requested skeleton to the id portion of a `Cldr.DateTime.date_time_available_formats/3`
   map is found using a closest distance match as follows:
 
+  ### Matching process
+
   * Skeleton symbols requesting a best choice for the locale are replaced. This allows a
     user to specify a desired hour cycle in the locale using the `-u-hc` option and to use the `j`
     and `C` fields in the skeleton itself. For example:
@@ -45,6 +47,31 @@ defmodule Cldr.DateTime.Format.Match do
 
   * See [the specification](https://www.unicode.org/reports/tr35/tr35-dates.html#Matching_Skeletons)
     for further information.
+
+  ### Deviations from the specification
+
+  Some additional steps post matching are described in the specification that are not currently
+  implemented in this library. The relevant sections are reproduced here:
+
+  Once a best match is found between requested skeleton and dateFormatItem id, the
+  corresponding dateFormatItem pattern is used, but with adjustments primarily to make
+  the pattern field lengths match the skeleton field lengths. However, the pattern field
+  lengths should not be matched in some cases:
+
+  * When the best-match dateFormatItem has an alphabetic field (such as MMM or MMMM) that
+    corresponds to a numeric field in the pattern (such as M or MM), that numeric field in
+    the pattern should not be adjusted to match the skeleton length, and vice versa; i.e.
+    adjustments should never convert a numeric element in the pattern to an alphabetic element,
+    or the opposite. See the second set of examples below.
+
+  * When the pattern field corresponds to an availableFormats skeleton with a field length
+    that matches the field length in the requested skeleton, the pattern field length should
+    not be adjusted.
+
+  * Pattern field lengths for hour, minute, and second should by default not be adjusted to
+    match the requested field length (i.e. locale data takes priority). However APIs that
+    map skeletons to patterns should provide the option to override this behavior for cases
+    when a client really does want to force a specific pattern field length.
 
   """
   alias Cldr.DateTime.Format.Compiler
