@@ -41,6 +41,31 @@ defmodule Cldr.DateTime.Format do
   """
   @type format_id :: atom()
 
+  @standard_formats [:short, :medium, :long, :full]
+
+  @date_fields [
+    "G", "y", "Y", "u",  "U", "r", "Q", "q", "M", "L", "W", "w", "d", "D", "F", "g", "E", "e", "c"
+  ]
+
+  @time_fields [
+    "h", "H", "k", "K", "m", "s", "S", "v", "V", "z", "Z", "x", "X", "O", "a", "b", "B",
+  ]
+
+  @doc false
+  def standard_formats do
+    @standard_formats
+  end
+
+  @doc false
+  def date_fields do
+    @date_fields
+  end
+
+  @doc false
+  def time_fields do
+    @time_fields
+  end
+
   @doc false
   def format_list(config) do
     locale_names = Cldr.Locale.Loader.known_locale_names(config)

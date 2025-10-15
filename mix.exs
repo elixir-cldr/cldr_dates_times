@@ -64,10 +64,13 @@ defmodule Cldr.DatesTimes.Mixfile do
         Cldr.Time.Interval,
         Cldr.DateTime.Interval
       ],
-      Helpers: [
+      Formats: [
         Cldr.DateTime.Format.Compiler,
         Cldr.DateTime.Format,
         Cldr.DateTime.Formatter,
+        Cldr.DateTime.Format.Match,
+        ],
+      Timezones: [
         Cldr.DateTime.Timezone
       ]
     ]

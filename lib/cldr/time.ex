@@ -20,6 +20,7 @@ defmodule Cldr.Time do
 
   alias Cldr.LanguageTag
   alias Cldr.Locale
+  alias Cldr.DateTime.Format
   alias Cldr.DateTime.Format.Match
 
   import Cldr.DateTime,
@@ -27,7 +28,7 @@ defmodule Cldr.Time do
 
   @typep options :: Keyword.t() | map()
 
-  @format_types [:short, :medium, :long, :full]
+  @format_types Format.standard_formats()
   @default_format_type :medium
   @default_prefer :unicode
   @default_separators :standard

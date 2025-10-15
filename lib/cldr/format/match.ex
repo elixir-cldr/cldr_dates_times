@@ -1,5 +1,52 @@
 defmodule Cldr.DateTime.Format.Match do
+  @moduledoc """
+  Implements best match for a requested skeleton
+  to an available format ID.
 
+  A “best match” from requested skeleton to the id portion of a `Cldr.DateTime.date_time_available_formats/3`
+  map is found using a closest distance match as follows:
+
+  * Skeleton symbols requesting a best choice for the locale are replaced. This allows a
+    user to specify a desired hour cycle in the locale using the `-u-hc` option and to use the `j`
+    and `C` fields in the skeleton itself. For example:
+
+    j → one of {H, k, h, K};
+    C → one of {a, b, B}
+
+  * For skeleton and id fields with symbols representing the same type (year, month, day, etc),
+    calculate a distance from the desired field to the available field:
+
+    * Most symbols have a small distance from each other. For example:
+
+      M ≅ L; E ≅ c; a ≅ b ≅ B; H ≅ k ≅ h ≅ K; ...
+
+    * Width differences among fields, other than those marking text vs numeric, are given small
+      distance from each other. For example:
+
+      MMM ≅ MMMM
+      MM ≅ M
+
+    * Numeric and text fields are given a larger distance from each other. For example:
+
+      MMM ≈ MM
+
+    * Symbols representing substantial differences (week of year vs week of month) are
+      given a much larger distance from each other.
+
+  * [Stated in the spec, not currently implemented] A requested skeleton that includes both
+    seconds and fractional seconds (e.g. “mmssSSS”)  is allowed to match a dateFormatItem
+    skeleton that includes seconds but not fractional seconds (e.g. “ms”). In this case the
+    requested sequence of ‘S’ characters (or its length)  should be retained separately and
+    used when adjusting the pattern.
+
+  * Otherwise, missing or extra fields between requested skeleton and id cause a match to fail. In
+    those cases, an attempt is made to separate the skeleton into separate time skeletons and date
+    skeletons and an attempt is made to best match each of them independently.
+
+  * See [the specification](https://www.unicode.org/reports/tr35/tr35-dates.html#Matching_Skeletons)
+    for further information.
+
+  """
   alias Cldr.DateTime.Format.Compiler
   alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
@@ -15,16 +62,39 @@ defmodule Cldr.DateTime.Format.Match do
   @prefer_cycle_24 ["H", "k"]
   @prefer_cycle_12 ["h", "K"]
 
-  @date_fields [
-    "G", "y", "Y", "u",  "U", "r", "Q", "q", "M", "L", "W", "w", "d", "D", "F", "g", "E", "e", "c"
-  ]
-
-  @time_fields [
-    "h", "H", "k", "K", "m", "s", "S", "v", "V", "z", "Z", "x", "X", "O", "a", "b", "B",
-  ]
-
   @doc """
-  Find the best match for a requested format.
+  Find the best match format ID for a requested skeleton.
+
+  ### Arguments
+
+  * `skeleton` is a string or atom composed of format fields.
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`.
+    The default is `Cldr.get_locale/0`.
+
+  * `calendar` is any CLDR calendar type. The default is `:gregorian`.
+    See `Cldr.DateTime.Format.calendars_for/1` for the available calendars.
+
+  ### Returns
+
+  * `{:ok, format_id} or
+
+  * `{:ok, {date_format_id, time_format_id}}`
+
+  * `{:error, reason}`.
+
+  ### Examples
+
+      iex> Cldr.DateTime.Format.Match.best_match "hms", "en", :gregorian, MyApp.Cldr
+      {:ok, :hms}
+
+      iex> Cldr.DateTime.Format.Match.best_match("yMdhms", "en", :gregorian, MyApp.Cldr)
+      {:ok, {:yMd, :hms}}
+
+      iex> Cldr.DateTime.Format.Match.best_match "EMdyv", "en", :gregorian, MyApp.Cldr
+      {:error,
+       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \"EMdyv\""}}
 
   """
 
@@ -52,8 +122,6 @@ defmodule Cldr.DateTime.Format.Match do
 
       available_format_tokens =
         Format.date_time_available_format_tokens(locale, calendar, backend)
-        |> Enum.map(fn {k, v} -> {k, sort_tokens(v)} end)
-        |> Map.new()
 
       skeleton_ordered =
         sort_tokens(skeleton_tokens)
@@ -68,7 +136,6 @@ defmodule Cldr.DateTime.Format.Match do
         |> Enum.filter(&candidates_with_the_same_tokens(&1, skeleton_keys))
         |> Enum.map(&distance_from(&1, skeleton_ordered))
         |> Enum.sort(&compare_counts/2)
-        # |> IO.inspect(label: "Candidates for #{original_skeleton} -> #{skeleton}")
 
       case candidates do
         [] ->
@@ -80,7 +147,7 @@ defmodule Cldr.DateTime.Format.Match do
     end
   end
 
-  def try_date_and_time_skeletons(skeleton, original, locale, calendar, backend) do
+  defp try_date_and_time_skeletons(skeleton, original, locale, calendar, backend) do
     with {date_skeleton, time_skeleton} <- separate_date_and_time_fields(skeleton),
          {:ok, date_format} <- best_match(date_skeleton, locale, calendar, backend),
          {:ok, time_format} <- best_match(time_skeleton, locale, calendar, backend) do
@@ -95,8 +162,8 @@ defmodule Cldr.DateTime.Format.Match do
       skeleton
       |> String.graphemes()
       |> Enum.reduce({[], []}, fn char, {date_fields, time_fields} ->
-        date_fields = if char in @date_fields, do: [char | date_fields], else: date_fields
-        time_fields = if char in @time_fields, do: [char | time_fields], else: time_fields
+        date_fields = if char in Format.date_fields(), do: [char | date_fields], else: date_fields
+        time_fields = if char in Format.time_fields(), do: [char | time_fields], else: time_fields
         {date_fields, time_fields}
       end)
 
@@ -115,37 +182,24 @@ defmodule Cldr.DateTime.Format.Match do
     }
   end
 
-  # https://www.unicode.org/reports/tr35/tr35-dates.html#Matching_Skeletons
-  # For skeleton and id fields with symbols representing the same type (year, month, day, etc):
-  # Most symbols have a small distance from each other.
-  #   M ≅ L; E ≅ c; a ≅ b ≅ B; H ≅ k ≅ h ≅ K; ...
-  # Width differences among fields, other than those marking text vs numeric, are given small
-  # distance from each other.
-  #   MMM ≅ MMMM
-  #   MM ≅ M
-  # Numeric and text fields are given a larger distance from each other.
-  #   MMM ≈ MM
-  # Symbols representing substantial differences (week of year vs week of month) are given a much
-  # larger distance from each other.
-  #   ≋ D; ...
-
-  defp candidates_with_the_same_tokens({_format_id, tokens}, skeleton_keys) do
+  defp candidates_with_the_same_tokens({_format_id, tokens}, skeleton_keys)
+      when length(tokens) == length(skeleton_keys) do
     token_keys =
       tokens
       |> :proplists.get_keys()
       |> canonical_keys()
 
-    # if match?(["H" | _rest], skeleton_keys) do
-    #   IO.inspect token_keys
-    #   IO.inspect skeleton_keys
-    # end
-
     token_keys == skeleton_keys
+  end
+
+  defp candidates_with_the_same_tokens(_format_tokens, _skeleton_keys) do
+    false
   end
 
   # Sort the tokesn in canonical order, using
   # the substitution table.
-  defp sort_tokens(tokens) do
+  @doc false
+  def sort_tokens(tokens) do
     Enum.sort(tokens, fn {symbol_a, _}, {symbol_b, _} ->
       canonical_key(symbol_a) < canonical_key(symbol_b)
     end)
@@ -159,6 +213,12 @@ defmodule Cldr.DateTime.Format.Match do
   # similar. But they will have different distance weights
   # when sorting to find the best match.
 
+  @time_zone ["x", "X", "v", "V", "z", "Z", "O"]
+  @hour ["k", "h", "K", "H"]
+  @day_period ["a", "b", "B"]
+  @month ["L", "M"]
+  @day_of_week ["c", "E"]
+
   defp canonical_keys(keys) do
     keys
     |> Enum.map(&canonical_key/1)
@@ -167,11 +227,11 @@ defmodule Cldr.DateTime.Format.Match do
 
   defp canonical_key(key) do
     case key do
-      "L" -> "M"
-      "c" -> "E"
-      s when s in ["b", "B"] -> "a"
-      s when s in ["k", "h", "K"] -> "H"
-      s when s in ["x", "X", "v", "V", "z", "Z", "O"] -> "v"
+      s when s in @month -> "M"
+      s when s in @day_of_week -> "E"
+      s when s in @day_period -> "a"
+      s when s in @hour -> "H"
+      s when s in @time_zone -> "v"
       other -> other
     end
   end
@@ -187,11 +247,11 @@ defmodule Cldr.DateTime.Format.Match do
   #    substitutable for each other.
 
   defguard different_but_compatible(token_a, token_b)
-           when (elem(token_a, 0) in ["L", "M"] and elem(token_b, 0) in ["L", "M"]) or
-                  (elem(token_a, 0) in ["c", "E"] and elem(token_b, 0) in ["c", "E"]) or
-                  (elem(token_a, 0) in ["a", "b", "B"] and elem(token_b, 0) in ["a", "b", "B"]) or
-                  (elem(token_a, 0) in ["k", "h", "K", "H"] and elem(token_b, 0) in ["k", "h", "K", "H"]) or
-                  (elem(token_a, 0) in ["x", "X", "v", "V", "z", "Z", "O"] and elem(token_b, 0) in ["x", "X", "v", "V", "z", "Z", "O"])
+           when (elem(token_a, 0) in @month and elem(token_b, 0) in @month) or
+                  (elem(token_a, 0) in @day_of_week and elem(token_b, 0) in @day_of_week) or
+                  (elem(token_a, 0) in @day_period and elem(token_b, 0) in @day_period) or
+                  (elem(token_a, 0) in @hour and elem(token_b, 0) in @hour) or
+                  (elem(token_a, 0) in @time_zone  and elem(token_b, 0) in @time_zone)
 
   defguard same_types(token_a, token_b)
            when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) in [1, 2]) or
@@ -202,10 +262,8 @@ defmodule Cldr.DateTime.Format.Match do
                   (elem(token_a, 1) > 2 and elem(token_b, 1) in [1, 2])
 
   defp distance_from({token_id, tokens}, skeleton) do
-    sorted_tokens = sort_tokens(tokens)
-
     distance =
-      Enum.zip_reduce(sorted_tokens, skeleton, 0, fn
+      Enum.zip_reduce(tokens, skeleton, 0, fn
         # Same symbol, both numeric forms so the distance is
         # just the different in their counts
         {symbol_a, count_a}, {symbol_a, count_b}, acc
@@ -233,7 +291,7 @@ defmodule Cldr.DateTime.Format.Match do
           acc + abs(count_a - count_b) + 10
 
         _other_a, _other_b, acc ->
-          acc + 10
+          acc + 15
       end)
 
     {token_id, distance}
@@ -266,7 +324,7 @@ defmodule Cldr.DateTime.Format.Match do
   def time_skeleton?(skeleton) do
     skeleton
     |> String.graphemes()
-    |> Enum.all?(&(&1 in @time_fields))
+    |> Enum.all?(&(&1 in Format.time_fields()))
   end
 
   defp replace_time_symbols("", _preferred, _allowed) do

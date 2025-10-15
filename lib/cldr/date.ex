@@ -16,6 +16,7 @@ defmodule Cldr.Date do
 
   """
 
+  alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
   alias Cldr.Locale
 
@@ -24,7 +25,7 @@ defmodule Cldr.Date do
 
   @typep options :: Keyword.t() | map()
 
-  @format_types [:short, :medium, :long, :full]
+  @format_types Format.standard_formats()
   @default_format_type :medium
   @default_prefer :unicode
 

@@ -28,48 +28,6 @@ defmodule Cldr.DateTime.Format.Backend do
 
         @standard_formats [:short, :medium, :long, :full]
 
-        @date_symbols [
-          "Y",
-          "y",
-          "G",
-          "M",
-          "L",
-          "D",
-          "d",
-          "U",
-          "u",
-          "Q",
-          "q",
-          "F",
-          "g",
-          "W",
-          "w",
-          "E",
-          "e",
-          "c"
-        ]
-
-        @time_symbols [
-          "H",
-          "h",
-          "K",
-          "k",
-          "C",
-          "m",
-          "s",
-          "S",
-          "a",
-          "A",
-          "B",
-          "Z",
-          "z",
-          "V",
-          "v",
-          "X",
-          "x",
-          "O"
-        ]
-
         @doc "A struct from a format id as an atom to a format string"
         @type formats :: map()
 
@@ -1199,7 +1157,7 @@ defmodule Cldr.DateTime.Format.Backend do
                 remaining =
                   format_id
                   |> to_string()
-                  |> String.replace(@date_symbols, "")
+                  |> String.replace(Format.date_fields(), "")
 
                 remaining == ""
               end)
@@ -1214,7 +1172,7 @@ defmodule Cldr.DateTime.Format.Backend do
                 remaining =
                   format_id
                   |> to_string()
-                  |> String.replace(@time_symbols, "")
+                  |> String.replace(Format.time_fields(), "")
 
                 remaining == ""
               end)
@@ -1227,6 +1185,7 @@ defmodule Cldr.DateTime.Format.Backend do
             available_format_tokens =
               Enum.map(available_formats, fn {format_id, format} ->
                 {:ok, tokens} = Cldr.DateTime.Format.Compiler.tokenize_skeleton(format_id)
+                tokens = Cldr.DateTime.Format.Match.sort_tokens(tokens)
                 {format_id, tokens}
               end)
               |> Map.new()
