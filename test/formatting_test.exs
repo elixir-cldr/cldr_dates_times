@@ -23,4 +23,13 @@ defmodule Cldr.DateTime.Formatting.Test do
     assert {:ok, {:Md, :ahmmss}} = Cldr.DateTime.Format.Match.best_match :Mdjms, "en-u-hc-c12", :gregorian
   end
 
+  test "DateTime formatting with specified date and time formats" do
+    assert {:ok, "10/15/2025, 13:55:00"} = Cldr.DateTime.to_string(~U[2025-10-15T13:55:00Z], format: :long, date_format: :yMd, time_format: :Hms)
+    assert {:ok, "10/15/2025, 1:55:00 PM"} = Cldr.DateTime.to_string(~U[2025-10-15T13:55:00Z], format: :long, date_format: :yMd, time_format: :hms)
+    assert {:ok, "Oct 15, 2025, 1:55:00 PM"} = Cldr.DateTime.to_string(~U[2025-10-15T13:55:00Z], format: :long, date_format: :yMMMd, time_format: :hms)
+    assert Cldr.DateTime.to_string(~U[2025-10-15T13:55:00Z], format: :long, date_format: :yMMMd, time_format: :dhms) ==
+      {:error,
+       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :dhms"}}
+   end
+
 end

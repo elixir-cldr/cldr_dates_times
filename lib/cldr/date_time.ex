@@ -614,19 +614,33 @@ defmodule Cldr.DateTime do
     end
   end
 
+  # Only a single format, which is applied to date and time and to
+  # the compisition format.
   defp validate_formats_consistent(format, nil = _date_format, nil = _time_format)
        when is_atom(format) or is_binary(format) do
     :ok
   end
 
+  # No general format, just date and time format. We will derive the
+  # joining format later.
   defp validate_formats_consistent(nil, date_format, time_format)
        when not is_nil(date_format) and not is_nil(time_format) do
     :ok
   end
 
+  # All the formats are short, medium, long or full
   defp validate_formats_consistent(format, date_format, time_format)
        when format in @format_types and date_format in @format_types and
               time_format in @format_types do
+    :ok
+  end
+
+  # Joining format is short, medium, long or full and date_foramt and
+  # time_format are an atom (including nil) or a string.
+  defp validate_formats_consistent(format, date_format, time_format)
+       when format in @format_types and
+         (is_atom(date_format) or is_binary(date_format)) and
+           (is_binary(format) or is_atom(time_format)) do
     :ok
   end
 
