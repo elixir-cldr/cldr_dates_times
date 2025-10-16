@@ -20,6 +20,7 @@ defmodule Cldr.DateTime do
   """
 
   alias Cldr.DateTime.Format.Match
+  alias Cldr.DateTime.Format.Compiler
   alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
   alias Cldr.Locale
@@ -790,10 +791,12 @@ defmodule Cldr.DateTime do
         find_format(datetime, nil, locale, calendar, backend, options)
 
       {:ok, format} ->
-        {:ok, formats} = Format.date_time_available_formats(locale_name, calendar, backend)
-        {:ok, format} = preferred_format(formats, format, options.prefer)
-        {:ok, format, options}
-
+        with {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(options.format),
+             {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend),
+             {:ok, preferred_format} <- preferred_format(formats, format, options.prefer),
+             {:ok, format_string} <- Match.adjust_field_lengths(preferred_format, skeleton_tokens) do
+          {:ok, format_string, options}
+        end
       other ->
         other
     end
@@ -830,9 +833,10 @@ defmodule Cldr.DateTime do
     date_format = options.date_format
     time_format = options.time_format
 
-    with {:ok, date_format} <- date_format(datetime, date_format, locale, calendar, backend),
-         {:ok, time_format} <- time_format(datetime, time_format, locale, calendar, backend),
+    with {:ok, _date_format_id, date_format} <- date_format(datetime, date_format, locale, calendar, backend),
+         {:ok, _time_format_id, time_format} <- time_format(datetime, time_format, locale, calendar, backend),
          {:ok, format} <- resolve_format(date_format, locale, calendar, backend) do
+
       options =
         options
         |> Map.put(:date_format, date_format)
@@ -888,21 +892,29 @@ defmodule Cldr.DateTime do
   # is used to establish what datetime format we derive.
 
   defp date_format(datetime, nil, locale, calendar, backend) do
-    format = Cldr.Date.derive_format_id(datetime)
-    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
+    format_id = Cldr.Date.derive_format_id(datetime)
+    with {:ok, format} <- Cldr.Date.find_format(datetime, format_id, locale, calendar, backend) do
+      {:ok, format_id, format}
+    end
   end
 
-  defp date_format(datetime, format, locale, calendar, backend) do
-    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
+  defp date_format(datetime, format_id, locale, calendar, backend) do
+    with {:ok, format} <- Cldr.Date.find_format(datetime, format_id, locale, calendar, backend) do
+      {:ok, format_id, format}
+    end
   end
 
   defp time_format(datetime, nil, locale, calendar, backend) do
-    format = Cldr.Time.derive_format_id(datetime)
-    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
+    format_id = Cldr.Time.derive_format_id(datetime)
+    with {:ok, format} <- Cldr.Time.find_format(datetime, format_id, locale, calendar, backend) do
+      {:ok, format_id, format}
+    end
   end
 
-  defp time_format(datetime, format, locale, calendar, backend) do
-    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
+  defp time_format(datetime, format_id, locale, calendar, backend) do
+    with {:ok, format} <- Cldr.Time.find_format(datetime, format_id, locale, calendar, backend) do
+      {:ok, format_id, format}
+    end
   end
 
   # FIXME These functions don't consider the impace

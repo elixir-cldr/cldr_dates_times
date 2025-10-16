@@ -328,13 +328,12 @@ defmodule Cldr.DateTime.Format.Match do
 
   defp put_preferred_time_symbols(skeleton, locale) do
     if locale_specifies_hour_cycle?(locale) || String.contains?(skeleton, ["j", "J", "C"]) do
-      preferred_time_symbol = preferred_time_symbol(locale) # |> IO.inspect(label: "Preferreed")
-      allowed_time_symbol = hd(allowed_time_symbols(locale)) # |> IO.inspect(label: "Allowed")
+      preferred_time_symbol = preferred_time_symbol(locale)
+      allowed_time_symbol = hd(allowed_time_symbols(locale))
 
       new_skeleton =
         skeleton
         |> replace_time_symbols(preferred_time_symbol, allowed_time_symbol)
-        # |> IO.inspect(label: "New skeleton from #{skeleton}")
 
       {:ok, new_skeleton}
     else
@@ -466,6 +465,82 @@ defmodule Cldr.DateTime.Format.Match do
   # the requested format code.
   defp find_allowed(allowed, requested) do
     Enum.find(allowed, &String.contains?(&1, requested))
+  end
+
+  # We have a format string and we have the tokens of the *original*
+  # skeleton we asked for. The resolved skeleton (and therefore format)
+  # may have different field lenghts. ie we asked for MMMM and we got a
+  # format that has MMM. This function is the process to resize some fields
+  # back to the original requested suze.
+  @doc false
+  def adjust_field_lengths(format, skeleton_tokens) when is_map(format) do
+    revised_format =
+      Enum.map(format, fn {style, format_string} ->
+        {:ok, adjusted_format_string} = adjust_field_lengths(format_string, skeleton_tokens)
+        {style, adjusted_format_string}
+      end)
+      |> Map.new()
+
+    {:ok, revised_format}
+  end
+
+  def adjust_field_lengths(format, skeleton_tokens) do
+    format_tokens = Cldr.DateTime.Format.Compiler.tokenize_format_string(format)
+
+    revised_format =
+      Enum.reduce(format_tokens, [], &adjust_field_length(&1, &2, skeleton_tokens))
+      |> Enum.reverse()
+      |> List.flatten()
+      |> List.to_string()
+
+    {:ok, revised_format}
+  end
+
+  @doc false
+  def tokens_to_string(tokens) do
+    Enum.map(tokens, fn {token, count} ->
+      String.duplicate(token, count)
+    end)
+    |> Enum.join()
+  end
+
+  # Month needs special handling so as to not transition from nummber to
+  # alphabetic lengths. Ie if the format is "M", its ok to go to "MM", but
+  # not to "MMM" or "MMMM". Same for "L"
+  @doc false
+  def adjust_field_length([char | _rest] = field, acc, skeleton_tokens) when char in  ["M", "L"] do
+    requested_length = :proplists.get_value(char, skeleton_tokens)
+    field_length = length(field)
+
+    cond do
+      field_length == requested_length ->
+        [field | acc]
+
+      field_length in [1, 2] and requested_length in [1, 2] ->
+        [List.duplicate(char, requested_length) | acc]
+
+      field_length > 2 and requested_length > 2 ->
+        [List.duplicate(char, requested_length) | acc]
+
+      true ->
+        [field | acc]
+    end
+  end
+
+  # Don't resize hour, minute or second
+  def adjust_field_length([char | _rest] = field, acc, _skeleton_tokens) when char in ["H", "h", "K", "k", "m", "s", "S"] do
+    [field | acc]
+  end
+
+  # Everything else, resize to the original request
+  def adjust_field_length([char | _rest] = field, acc, skeleton_tokens) do
+    field_length = length(field)
+    requested_length = :proplists.get_value(char, skeleton_tokens, field_length)
+    if length(field) == requested_length do
+      [field | acc]
+    else
+      [List.duplicate(char, requested_length) | acc]
+    end
   end
 
   @doc false
