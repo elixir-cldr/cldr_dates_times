@@ -1,0 +1,13 @@
+#! /bin/zsh
+
+# The location of the `ex_cldr_dates_times` repo
+export EX_CLDR_DATES_TIMES="${EX_CLDR_LOCALE_DISPLAY:=$HOME/Development/cldr_dates_times}"
+[ ! -d $EX_CLDR_DATES_TIMES ] && \
+  { echo "ex_cldr_locale_data repository $EX_CLDR_DATES_TIMES was not found."; exit 1; }
+
+# The location of the cloned CLDR repo
+export CLDR_REPO="${CLDR_REPO:=$HOME/Development/cldr_repo}"
+[ ! -d $CLDR_REPO ] && { echo "Unicode CLDR repository $CLDR_REPO was not found."; exit 1; }
+
+cp $CLDR_REPO/common/testData/datetime/datetime.json \
+   $EX_CLDR_DATES_TIMES/test/data/date_time_formatting.json

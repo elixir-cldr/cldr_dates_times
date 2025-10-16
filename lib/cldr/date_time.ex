@@ -776,13 +776,26 @@ defmodule Cldr.DateTime do
   end
 
   # Look up for the format in :available_formats
-  defp find_format(_datetime, format, locale, calendar, backend, options)
+  defp find_format(datetime, format, locale, calendar, backend, options)
        when is_atom(format) and not is_nil(format) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
-    with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend),
-         {:ok, format} <- preferred_format(formats, format, options.prefer) do
-      {:ok, format, options}
+    case Match.best_match(format, locale, calendar, backend) do
+      {:ok, {date_format, time_format}} ->
+        options =
+          options
+          |> Map.put(:date_format, date_format)
+          |> Map.put(:time_format, time_format)
+
+        find_format(datetime, nil, locale, calendar, backend, options)
+
+      {:ok, format} ->
+        {:ok, formats} = Format.date_time_available_formats(locale_name, calendar, backend)
+        {:ok, format} = preferred_format(formats, format, options.prefer)
+        {:ok, format, options}
+
+      other ->
+        other
     end
   end
 
