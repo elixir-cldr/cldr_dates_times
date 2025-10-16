@@ -835,7 +835,7 @@ defmodule Cldr.DateTime do
 
     with {:ok, _date_format_id, date_format} <- date_format(datetime, date_format, locale, calendar, backend),
          {:ok, _time_format_id, time_format} <- time_format(datetime, time_format, locale, calendar, backend),
-         {:ok, format} <- resolve_format(date_format, locale, calendar, backend) do
+         {:ok, format} <- resolve_format(date_format, options.style, locale, calendar, backend) do
 
       options =
         options
@@ -870,8 +870,8 @@ defmodule Cldr.DateTime do
   #  Otherwise, if the requested date fields include abbreviated month (MMM, LLL), use <dateTimeFormatLength type="medium">
   #  Otherwise use <dateTimeFormatLength type="short">
 
-  defp resolve_format(date_format, locale, calendar, backend) do
-    {:ok, formats} = Cldr.DateTime.Format.date_time_formats(locale, calendar, backend)
+  defp resolve_format(date_format, style, locale, calendar, backend) do
+    {:ok, formats} = formats_for_style(style, locale, calendar, backend)
 
     cond do
       has_wide_month?(date_format) && has_weekday_name?(date_format) ->
@@ -887,6 +887,15 @@ defmodule Cldr.DateTime do
         {:ok, formats.short}
     end
   end
+
+  def formats_for_style(:at, locale, calendar, backend) do
+    Cldr.DateTime.Format.date_time_at_formats(locale, calendar, backend)
+  end
+
+  def formats_for_style(_standard, locale, calendar, backend) do
+    Cldr.DateTime.Format.date_time_formats(locale, calendar, backend)
+  end
+
 
   # We need to derive the date format now since that data
   # is used to establish what datetime format we derive.

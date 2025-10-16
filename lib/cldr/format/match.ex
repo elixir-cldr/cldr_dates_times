@@ -475,9 +475,13 @@ defmodule Cldr.DateTime.Format.Match do
   @doc false
   def adjust_field_lengths(format, skeleton_tokens) when is_map(format) do
     revised_format =
-      Enum.map(format, fn {style, format_string} ->
-        {:ok, adjusted_format_string} = adjust_field_lengths(format_string, skeleton_tokens)
-        {style, adjusted_format_string}
+      Enum.map(format, fn
+        {style, format_string} when is_binary(format_string) ->
+          {:ok, adjusted_format_string} = adjust_field_lengths(format_string, skeleton_tokens)
+          {style, adjusted_format_string}
+
+        other ->
+          other
       end)
       |> Map.new()
 
