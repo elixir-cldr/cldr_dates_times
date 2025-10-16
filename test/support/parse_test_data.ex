@@ -39,22 +39,22 @@ defmodule Cldr.DateTime.TestData do
 
   defp parse_input(test) do
     case test.input do
-      <<datetime::binary-19, "Z[", rest :: binary>> ->
+      <<datetime::binary-19, "Z[", rest::binary>> ->
         timezone = String.trim_trailing(rest, "]")
         datetime = datetime <> "Z"
         Map.put(test, :input, parse_date(datetime, timezone))
 
-      <<datetime::binary-16, "Z[", rest :: binary>> ->
+      <<datetime::binary-16, "Z[", rest::binary>> ->
         timezone = String.trim_trailing(rest, "]")
         datetime = datetime <> ":00" <> "Z"
         Map.put(test, :input, parse_date(datetime, timezone))
 
-      <<datetime::binary-16, "+", offset :: binary-5, "[", rest :: binary>> ->
+      <<datetime::binary-16, "+", offset::binary-5, "[", rest::binary>> ->
         timezone = String.trim_trailing(rest, "]")
         datetime = datetime <> ":00" <> "+" <> offset
         Map.put(test, :input, parse_date(datetime, timezone))
 
-      <<datetime::binary-19, "+", offset :: binary-5, "[", rest :: binary>> ->
+      <<datetime::binary-19, "+", offset::binary-5, "[", rest::binary>> ->
         timezone = String.trim_trailing(rest, "]")
         datetime = datetime <> "+" <> offset
         Map.put(test, :input, parse_date(datetime, timezone))
@@ -89,25 +89,30 @@ defmodule Cldr.DateTime.TestData do
       |> Enum.filter(&(&1.calendar == :gregorian))
 
     test_count = Enum.count(tests)
-    IO.puts "Running #{test_count} tests"
+    IO.puts("Running #{test_count} tests")
 
     Enum.map(tests, fn test ->
-      IO.puts "Test #{test.index}"
+      IO.puts("Test #{test.index}")
+
       case test.test_module do
         Cldr.Date ->
-          {:ok, result} = Cldr.Date.to_string(test.input, format: test.date_format, locale: test.locale)
+          {:ok, result} =
+            Cldr.Date.to_string(test.input, format: test.date_format, locale: test.locale)
+
           if result != test.expected do
-            IO.puts "Error in test #{test.index}"
-            IO.puts "  Expected: #{test.expected}"
-            IO.puts "  Result: #{result}"
+            IO.puts("Error in test #{test.index}")
+            IO.puts("  Expected: #{test.expected}")
+            IO.puts("  Result: #{result}")
           end
 
         Cldr.Time ->
-          {:ok, result} = Cldr.Time.to_string(test.input, format: test.time_format, locale: test.locale)
+          {:ok, result} =
+            Cldr.Time.to_string(test.input, format: test.time_format, locale: test.locale)
+
           if result != test.expected do
-            IO.puts "Error in test #{test.index}"
-            IO.puts "  Expected: #{test.expected}"
-            IO.puts "  Result: #{result}"
+            IO.puts("Error in test #{test.index}")
+            IO.puts("  Expected: #{test.expected}")
+            IO.puts("  Result: #{result}")
           end
 
         _other ->
@@ -117,5 +122,4 @@ defmodule Cldr.DateTime.TestData do
 
     :done
   end
-
 end

@@ -173,6 +173,6 @@ defmodule Cldr.DateTime.Format.Compiler do
   def tokenize_format_string(string) do
     string
     |> String.graphemes()
-    |> Enum.chunk_by(&(&1))
+    |> Enum.chunk_by(& &1)
   end
 end

@@ -317,7 +317,10 @@ defmodule Cldr.DateTime.Format.Backend do
               calendar \\ Cldr.Calendar.default_cldr_calendar()
             )
 
-        def date_time_relative_formats(%LanguageTag{cldr_locale_name: cldr_locale_name}, cldr_calendar) do
+        def date_time_relative_formats(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              cldr_calendar
+            ) do
           date_time_relative_formats(cldr_locale_name, cldr_calendar)
         end
 

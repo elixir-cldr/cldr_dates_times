@@ -44,11 +44,45 @@ defmodule Cldr.DateTime.Format do
   @standard_formats [:short, :medium, :long, :full]
 
   @date_fields [
-    "G", "y", "Y", "u",  "U", "r", "Q", "q", "M", "L", "W", "w", "d", "D", "F", "g", "E", "e", "c"
+    "G",
+    "y",
+    "Y",
+    "u",
+    "U",
+    "r",
+    "Q",
+    "q",
+    "M",
+    "L",
+    "W",
+    "w",
+    "d",
+    "D",
+    "F",
+    "g",
+    "E",
+    "e",
+    "c"
   ]
 
   @time_fields [
-    "h", "H", "k", "K", "m", "s", "S", "v", "V", "z", "Z", "x", "X", "O", "a", "b", "B",
+    "h",
+    "H",
+    "k",
+    "K",
+    "m",
+    "s",
+    "S",
+    "v",
+    "V",
+    "z",
+    "Z",
+    "x",
+    "X",
+    "O",
+    "a",
+    "b",
+    "B"
   ]
 
   @doc false
@@ -643,7 +677,7 @@ defmodule Cldr.DateTime.Format do
   """
   @doc since: "2.23.0"
   @spec date_time_format(options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module(), String.t()}}
+          {:ok, String.t()} | {:error, {module(), String.t()}}
 
   def date_time_format(options \\ []) do
     with {locale, backend} <- Cldr.locale_and_backend_from(options),
@@ -697,7 +731,7 @@ defmodule Cldr.DateTime.Format do
   """
   @doc since: "2.23.0"
   @spec date_format(options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module(), String.t()}}
+          {:ok, String.t()} | {:error, {module(), String.t()}}
 
   def date_format(options \\ []) do
     with {locale, backend} <- Cldr.locale_and_backend_from(options),
@@ -759,7 +793,7 @@ defmodule Cldr.DateTime.Format do
   """
   @doc since: "2.23.0"
   @spec time_format(options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module(), String.t()}}
+          {:ok, String.t()} | {:error, {module(), String.t()}}
 
   def time_format(options \\ []) do
     with {locale, backend} <- Cldr.locale_and_backend_from(options),
@@ -772,24 +806,26 @@ defmodule Cldr.DateTime.Format do
   end
 
   defp resolve_format_style_and_preference(formats, style, prefer)
-      when is_map_key(formats, style) do
+       when is_map_key(formats, style) do
     style = Map.fetch!(formats, style)
 
     cond do
       is_map(style) ->
         {:ok, Map.get(style, prefer) || Map.get(style, :ascii)}
+
       is_binary(style) ->
         {:ok, style}
+
       is_list(style) ->
         {:ok, style}
+
       is_atom(style) ->
         {:ok, style}
     end
   end
 
   defp resolve_format_style_and_preference(_formats, style, _prefer) do
-    {:error, {Cldr.DateTime.UnresolvedFormat,
-      "Unknown value for option format: #{inspect style}"}}
+    {:error, {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: #{inspect(style)}"}}
   end
 
   @doc """
@@ -1104,8 +1140,6 @@ defmodule Cldr.DateTime.Format do
   def gmt_format_type([sign, hour, minute], format_type) do
     gmt_format_type([sign, hour, "", minute], format_type)
   end
-
-
 
   ### Helpers
 

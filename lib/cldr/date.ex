@@ -506,13 +506,14 @@ defmodule Cldr.Date do
       case Map.fetch(available_formats, standard_format) do
         {:ok, format} ->
           {:ok, format}
+
         :error ->
           {:error,
-            {
-              Cldr.DateTime.UnresolvedFormat,
-              "Standard format #{inspect(format)} could not be resolved from " <>
-              "#{inspect standard_format}"
-          }}
+           {
+             Cldr.DateTime.UnresolvedFormat,
+             "Standard format #{inspect(format)} could not be resolved from " <>
+               "#{inspect(standard_format)}"
+           }}
       end
     end
   end

@@ -19,10 +19,9 @@ defmodule Cldr.DateTime do
 
   """
 
-  alias Cldr.DateTime.Format.Match
   alias Cldr.DateTime.Format.Compiler
+  alias Cldr.DateTime.Format.Match
   alias Cldr.DateTime.Format
-  alias Cldr.LanguageTag
   alias Cldr.Locale
 
   @typep options :: Keyword.t() | map()
@@ -83,6 +82,11 @@ defmodule Cldr.DateTime do
   """
   defguard has_date_and_time(datetime)
            when has_date(datetime) and has_time(datetime)
+
+  @doc """
+  Guard whether a format is a format skeleton
+  """
+  defguard is_skeleton(format) when is_atom(format) and not is_nil(format)
 
   defmodule Formats do
     @moduledoc false
@@ -623,13 +627,14 @@ defmodule Cldr.DateTime do
     case Map.fetch(available_formats, skeleton) do
       {:ok, format} ->
         {:ok, format}
+
       :error ->
         {:error,
-          {
-            Cldr.DateTime.UnresolvedFormat,
-            "Standard format #{inspect(format)} could not be resolved from " <>
-            "#{inspect standard_format}"
-        }}
+         {
+           Cldr.DateTime.UnresolvedFormat,
+           "Standard format #{inspect(format)} could not be resolved from " <>
+             "#{inspect(standard_format)}"
+         }}
     end
   end
 
@@ -658,8 +663,8 @@ defmodule Cldr.DateTime do
   # time_format are an atom (including nil) or a string.
   defp validate_formats_consistent(format, date_format, time_format)
        when (format in @format_types or is_nil(format)) and
-         (is_atom(date_format) or is_binary(date_format)) and
-           (is_binary(format) or is_atom(time_format)) do
+              (is_atom(date_format) or is_binary(date_format)) and
+              (is_binary(format) or is_atom(time_format)) do
     :ok
   end
 
@@ -668,7 +673,7 @@ defmodule Cldr.DateTime do
     {:error,
      {Cldr.DateTime.InvalidFormat,
       ":date_format and :time_format cannot be specified if :format is also specified as " <>
-        "a format id or a format string. Found [format: #{inspect format}, time_format: #{inspect(time_format)}, " <>
+        "a format id or a format string. Found [format: #{inspect(format)}, time_format: #{inspect(time_format)}, " <>
         "date_format: #{inspect(date_format)}]"}}
   end
 
@@ -754,12 +759,20 @@ defmodule Cldr.DateTime do
   # Unless we need to derive the format, this only touches `format`,
   # not `date_format` or `time_format`.
 
+  # If its a partial datetime and a standard format is requested, its an error
+  defp find_format(datetime, format, _locale, _calendar, _backend, _options)
+       when format in @format_types and not is_any_date_time(datetime) do
+    {:error,
+     {
+       Cldr.DateTime.UnresolvedFormat,
+       "Standard formats are not available for partial date times"
+     }}
+  end
+
   # Standard format, at style
   defp find_format(_datetime, format, locale, calendar, backend, %{style: :at} = options)
        when format in @format_types do
-    %LanguageTag{cldr_locale_name: locale_name} = locale
-
-    with {:ok, formats} <- Format.date_time_at_formats(locale_name, calendar, backend),
+    with {:ok, formats} <- Format.date_time_at_formats(locale, calendar, backend),
          {:ok, format} <- preferred_format(formats, format, options.prefer) do
       {:ok, format, options}
     end
@@ -768,37 +781,59 @@ defmodule Cldr.DateTime do
   # Standard format, standard style
   defp find_format(_datetime, format, locale, calendar, backend, options)
        when format in @format_types do
-    %LanguageTag{cldr_locale_name: locale_name} = locale
-
-    with {:ok, formats} <- Format.date_time_formats(locale_name, calendar, backend),
+    with {:ok, formats} <- Format.date_time_formats(locale, calendar, backend),
          {:ok, format} <- preferred_format(formats, format, options.prefer) do
       {:ok, format, options}
     end
   end
 
-  # Look up for the format in :available_formats
+  # The format is specified as a skeleton so we need to find
+  # the best match for it. The best match can be a single skeleton
+  # (that is guaranteed to be in the date_time_available_formats list)
+  # or two skeletons - one for the date part and one for the time part.
   defp find_format(datetime, format, locale, calendar, backend, options)
-       when is_atom(format) and not is_nil(format) do
-    %LanguageTag{cldr_locale_name: locale_name} = locale
-
-    case Match.best_match(format, locale, calendar, backend) do
+       when is_skeleton(format) do
+    case Match.best_match(format, locale, calendar, backend)
+         |> IO.inspect(label: "Resolved format(s)") do
       {:ok, {date_format, time_format}} ->
         options =
           options
           |> Map.put(:date_format, date_format)
           |> Map.put(:time_format, time_format)
 
+        # Since the return is a date and a time format, we need
+        # to derive the joining format.
         find_format(datetime, nil, locale, calendar, backend, options)
 
       {:ok, format} ->
         with {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(options.format),
-             {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend),
+             {:ok, formats} <- Format.date_time_available_formats(locale, calendar, backend),
              {:ok, preferred_format} <- preferred_format(formats, format, options.prefer),
              {:ok, format_string} <- Match.adjust_field_lengths(preferred_format, skeleton_tokens) do
           {:ok, format_string, options}
         end
-      other ->
-        other
+
+      error ->
+        error
+    end
+  end
+
+  # We need to derive the format, and maybe even date_format and time_format too.
+  defp find_format(datetime, nil, locale, calendar, backend, options) do
+    date_format = options.date_format
+    time_format = options.time_format
+
+    with {:ok, _date_format_id, date_format} <-
+           date_format(datetime, date_format, locale, calendar, backend),
+         {:ok, _time_format_id, time_format} <-
+           time_format(datetime, time_format, locale, calendar, backend),
+         {:ok, format} <- resolve_format(date_format, options.style, locale, calendar, backend) do
+      options =
+        options
+        |> Map.put(:date_format, date_format)
+        |> Map.put(:time_format, time_format)
+
+      {:ok, format, options}
     end
   end
 
@@ -818,37 +853,10 @@ defmodule Cldr.DateTime do
     {:ok, %{number_system: number_system, format: format_string}, options}
   end
 
-  # If its a partial datetime and a standard format is requested, its an error
-  defp find_format(datetime, format, _locale, _calendar, _backend, _options)
-       when format in @format_types and not is_any_date_time(datetime) do
-    {:error,
-     {
-       Cldr.DateTime.UnresolvedFormat,
-       "Standard formats are not available for partial date times"
-     }}
-  end
-
-  # We need to derive the format, or maybe even date_format and time_format
-  defp find_format(datetime, nil, locale, calendar, backend, options) do
-    date_format = options.date_format
-    time_format = options.time_format
-
-    with {:ok, _date_format_id, date_format} <- date_format(datetime, date_format, locale, calendar, backend),
-         {:ok, _time_format_id, time_format} <- time_format(datetime, time_format, locale, calendar, backend),
-         {:ok, format} <- resolve_format(date_format, options.style, locale, calendar, backend) do
-
-      options =
-        options
-        |> Map.put(:date_format, date_format)
-        |> Map.put(:time_format, time_format)
-
-      {:ok, format, options}
-    end
-  end
-
   @doc false
   def best_match(format, locale, calendar, backend) do
-    with {:ok, available_formats} <- Cldr.DateTime.Format.date_time_available_formats(locale, calendar, backend),
+    with {:ok, available_formats} <-
+           Cldr.DateTime.Format.date_time_available_formats(locale, calendar, backend),
          {:ok, match} <- Match.best_match(format, locale, calendar, backend),
          {:ok, format} <- Map.fetch(available_formats, match) do
       {:ok, format}
@@ -896,12 +904,12 @@ defmodule Cldr.DateTime do
     Cldr.DateTime.Format.date_time_formats(locale, calendar, backend)
   end
 
-
   # We need to derive the date format now since that data
   # is used to establish what datetime format we derive.
 
   defp date_format(datetime, nil, locale, calendar, backend) do
     format_id = Cldr.Date.derive_format_id(datetime)
+
     with {:ok, format} <- Cldr.Date.find_format(datetime, format_id, locale, calendar, backend) do
       {:ok, format_id, format}
     end
@@ -915,6 +923,7 @@ defmodule Cldr.DateTime do
 
   defp time_format(datetime, nil, locale, calendar, backend) do
     format_id = Cldr.Time.derive_format_id(datetime)
+
     with {:ok, format} <- Cldr.Time.find_format(datetime, format_id, locale, calendar, backend) do
       {:ok, format_id, format}
     end
@@ -965,7 +974,7 @@ defmodule Cldr.DateTime do
         {:error,
          {Cldr.DateTime.InvalidFormat,
           "Invalid datetime format #{inspect(format)}. " <>
-            "The valid formats are #{inspect(Map.keys(formats))}."}}
+            "The valid formats are #{inspect(@format_types)}."}}
     end
   end
 

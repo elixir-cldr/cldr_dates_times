@@ -441,7 +441,8 @@ defmodule Cldr.Time do
       format_has?(format, ["V", "v"]) and is_map_key(time, :zone_abbr) ->
         {:ok, format}
 
-      format_has?(format, ["z", "x", "X", "O"]) and is_map_key(time, :std_offset) and is_map_key(time, :utc_offset) ->
+      format_has?(format, ["z", "x", "X", "O"]) and is_map_key(time, :std_offset) and
+          is_map_key(time, :utc_offset) ->
         {:ok, format}
 
       true ->
@@ -458,7 +459,8 @@ defmodule Cldr.Time do
   end
 
   @doc false
-  defdelegate format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend), to: Cldr.DateTime
+  defdelegate format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend),
+    to: Cldr.DateTime
 
   @doc """
   Returns a map of the standard time formats for a given

@@ -145,7 +145,6 @@ defmodule Cldr.DateTime.Format.Match do
          skeleton = to_string(original_skeleton),
          {:ok, skeleton} <- put_preferred_time_symbols(skeleton, locale),
          {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton) do
-
       available_format_tokens =
         Format.date_time_available_format_tokens(locale, calendar, backend)
 
@@ -178,8 +177,9 @@ defmodule Cldr.DateTime.Format.Match do
          {:ok, date_format} <- best_match(date_skeleton, locale, calendar, backend),
          {:ok, time_format} <- best_match(time_skeleton, locale, calendar, backend) do
       {:ok, {date_format, time_format}}
-    else _other ->
-      {:error, no_format_resolved_error(original)}
+    else
+      _other ->
+        {:error, no_format_resolved_error(original)}
     end
   end
 
@@ -209,7 +209,7 @@ defmodule Cldr.DateTime.Format.Match do
   end
 
   defp candidates_with_the_same_tokens({_format_id, tokens}, skeleton_keys)
-      when length(tokens) == length(skeleton_keys) do
+       when length(tokens) == length(skeleton_keys) do
     token_keys =
       tokens
       |> :proplists.get_keys()
@@ -277,7 +277,7 @@ defmodule Cldr.DateTime.Format.Match do
                   (elem(token_a, 0) in @day_of_week and elem(token_b, 0) in @day_of_week) or
                   (elem(token_a, 0) in @day_period and elem(token_b, 0) in @day_period) or
                   (elem(token_a, 0) in @hour and elem(token_b, 0) in @hour) or
-                  (elem(token_a, 0) in @time_zone  and elem(token_b, 0) in @time_zone)
+                  (elem(token_a, 0) in @time_zone and elem(token_b, 0) in @time_zone)
 
   defguard same_types(token_a, token_b)
            when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) in [1, 2]) or
@@ -383,8 +383,8 @@ defmodule Cldr.DateTime.Format.Match do
   end
 
   # Remove "a", "b" and "B" if we want 24 hour (H and k)
-  defp replace_time_symbols(<<format_code :: binary-1, rest::binary>>, preferred, allowed)
-      when format_code in ["a", "b", "B"] and preferred in @prefer_cycle_24 do
+  defp replace_time_symbols(<<format_code::binary-1, rest::binary>>, preferred, allowed)
+       when format_code in ["a", "b", "B"] and preferred in @prefer_cycle_24 do
     replace_time_symbols(rest, preferred, allowed)
   end
 
@@ -437,6 +437,7 @@ defmodule Cldr.DateTime.Format.Match do
     case time_preferences(locale) do
       %{preferred: preferred, allowed: allowed} when preferred in @prefer_cycle_24 ->
         find_allowed(allowed, @prefer_cycle_12)
+
       %{preferred: preferred} ->
         preferred
     end
@@ -447,6 +448,7 @@ defmodule Cldr.DateTime.Format.Match do
     case time_preferences(locale) do
       %{preferred: preferred, allowed: allowed} when preferred in @prefer_cycle_12 ->
         find_allowed(allowed, @prefer_cycle_24)
+
       %{preferred: preferred} ->
         preferred
     end
@@ -512,7 +514,7 @@ defmodule Cldr.DateTime.Format.Match do
   # alphabetic lengths. Ie if the format is "M", its ok to go to "MM", but
   # not to "MMM" or "MMMM". Same for "L"
   @doc false
-  def adjust_field_length([char | _rest] = field, acc, skeleton_tokens) when char in  ["M", "L"] do
+  def adjust_field_length([char | _rest] = field, acc, skeleton_tokens) when char in ["M", "L"] do
     requested_length = :proplists.get_value(char, skeleton_tokens)
     field_length = length(field)
 
@@ -532,7 +534,8 @@ defmodule Cldr.DateTime.Format.Match do
   end
 
   # Don't resize hour, minute or second
-  def adjust_field_length([char | _rest] = field, acc, _skeleton_tokens) when char in ["H", "h", "K", "k", "m", "s", "S"] do
+  def adjust_field_length([char | _rest] = field, acc, _skeleton_tokens)
+      when char in ["H", "h", "K", "k", "m", "s", "S"] do
     [field | acc]
   end
 
@@ -540,6 +543,7 @@ defmodule Cldr.DateTime.Format.Match do
   def adjust_field_length([char | _rest] = field, acc, skeleton_tokens) do
     field_length = length(field)
     requested_length = :proplists.get_value(char, skeleton_tokens, field_length)
+
     if length(field) == requested_length do
       [field | acc]
     else
@@ -560,5 +564,4 @@ defmodule Cldr.DateTime.Format.Match do
       Map.get(time_preferences, locale.territory) ||
       Map.fetch!(time_preferences, :"001")
   end
-
 end

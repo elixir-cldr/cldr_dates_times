@@ -68,8 +68,8 @@ defmodule Cldr.DatesTimes.Mixfile do
         Cldr.DateTime.Format.Compiler,
         Cldr.DateTime.Format,
         Cldr.DateTime.Formatter,
-        Cldr.DateTime.Format.Match,
-        ],
+        Cldr.DateTime.Format.Match
+      ],
       Timezones: [
         Cldr.DateTime.Timezone
       ]
@@ -78,7 +78,6 @@ defmodule Cldr.DatesTimes.Mixfile do
 
   defp deps do
     [
-
       {:ex_cldr, github: "elixir-cldr/cldr48", override: true},
       {:ex_cldr_numbers, github: "elixir-cldr/cldr_numbers", branch: "cldr48", override: true},
 

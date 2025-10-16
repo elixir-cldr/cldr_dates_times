@@ -3832,7 +3832,9 @@ defmodule Cldr.DateTime.Formatter do
     with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
       backend = Module.concat(backend, DateTime.Formatter)
 
-      backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :short)
+      backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds},
+        format: :short
+      )
       |> maybe_wrap(:zone_gmt, options)
     end
   end
