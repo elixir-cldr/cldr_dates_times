@@ -477,7 +477,7 @@ defmodule Cldr.DateTime.Format.Match do
   # back to the original requested suze.
   @doc false
   def adjust_field_lengths(format, skeleton_tokens) when is_map(format) do
-    revised_format =
+    revised_formats =
       Enum.map(format, fn
         {style, format_string} when is_binary(format_string) ->
           {:ok, adjusted_format_string} = adjust_field_lengths(format_string, skeleton_tokens)
@@ -488,7 +488,7 @@ defmodule Cldr.DateTime.Format.Match do
       end)
       |> Map.new()
 
-    {:ok, revised_format}
+    {:ok, revised_formats}
   end
 
   def adjust_field_lengths(format, skeleton_tokens) do
@@ -538,7 +538,7 @@ defmodule Cldr.DateTime.Format.Match do
 
   # Substitute back the originally requested zone field and length
   # TODO doing this needs further validation, the spec isn't super clear
-  @zone_fields ["v", "V", "O"]
+  @zone_fields ["v", "V", "O", "z", "Z"]
   def adjust_field_length([char | _rest], acc, skeleton_tokens) when char in @zone_fields  do
     {replacement_char, requested_length} = find_substitutable_field(@zone_fields, skeleton_tokens)
     [List.duplicate(replacement_char, requested_length) | acc]

@@ -240,7 +240,7 @@ defmodule Cldr.DateAndTime.Backend do
 
             # A partial date with a derived "best match" format
             iex> #{inspect(__MODULE__)}.to_string(%{year: 2024, month: 6}, locale: "fr")
-            {:ok, "06/2024"}
+            {:ok, "6/2024"}
 
             # A partial date with a best match CLDR-defined format
             iex> #{inspect(__MODULE__)}.to_string(%{year: 2024, month: 6}, format: :yMMM, locale: "fr")
@@ -324,7 +324,7 @@ defmodule Cldr.DateAndTime.Backend do
 
             # A partial date with a derived "best match" format
             iex> #{inspect(__MODULE__)}.to_string!(%{year: 2024, month: 6}, locale: "fr")
-            "06/2024"
+            "6/2024"
 
             # A partial date with a best match CLDR-defined format
             iex> #{inspect(__MODULE__)}.to_string!(%{year: 2024, month: 6}, format: :yMMM, locale: "fr")

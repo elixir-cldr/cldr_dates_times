@@ -799,6 +799,7 @@ defmodule Cldr.DateTime do
           options
           |> Map.put(:date_format, date_format)
           |> Map.put(:time_format, time_format)
+          |> Map.put(:requested_skeleton, format)
 
         # Since the return is a date and a time format, we need
         # to derive the joining format.
@@ -823,9 +824,9 @@ defmodule Cldr.DateTime do
     time_format = options.time_format
 
     with {:ok, date_format} <-
-           date_format(datetime, date_format, locale, calendar, backend),
+           date_format(datetime, date_format, locale, calendar, backend, options),
          {:ok, time_format} <-
-           time_format(datetime, time_format, locale, calendar, backend),
+           time_format(datetime, time_format, locale, calendar, backend, options),
          {:ok, format} <- resolve_format(date_format, options.style, locale, calendar, backend) do
       options =
         options
@@ -853,12 +854,15 @@ defmodule Cldr.DateTime do
   end
 
   @doc false
-  def best_match(format, locale, calendar, backend) do
+  def best_match(format, locale, calendar, backend, options) do
+    skeleton = options[:requested_skeleton] || format
+
     with {:ok, available_formats} <-
            Cldr.DateTime.Format.date_time_available_formats(locale, calendar, backend),
+         {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton),
          {:ok, match} <- Match.best_match(format, locale, calendar, backend),
-         {:ok, format} <- Map.fetch(available_formats, match) do
-      {:ok, format}
+         {:ok, format_string} <- Map.fetch(available_formats, match) do
+      Match.adjust_field_lengths(format_string, skeleton_tokens)
     else
       :error ->
         {:error, Match.no_format_resolved_error(format)}
@@ -906,22 +910,22 @@ defmodule Cldr.DateTime do
   # We need to derive the date format now since that data
   # is used to establish what datetime format we derive.
 
-  defp date_format(datetime, nil, locale, calendar, backend) do
+  defp date_format(datetime, nil, locale, calendar, backend, options) do
     format_id = Cldr.Date.derive_format_id(datetime)
-    date_format(datetime, format_id, locale, calendar, backend)
+    date_format(datetime, format_id, locale, calendar, backend, options)
   end
 
-  defp date_format(datetime, format_id, locale, calendar, backend) do
-    Cldr.Date.find_format(datetime, format_id, locale, calendar, backend)
+  defp date_format(datetime, format_id, locale, calendar, backend, options) do
+    Cldr.Date.find_format(datetime, format_id, locale, calendar, backend, options)
   end
 
-  defp time_format(datetime, nil, locale, calendar, backend) do
+  defp time_format(datetime, nil, locale, calendar, backend, options) do
     format_id = Cldr.Time.derive_format_id(datetime)
-    time_format(datetime, format_id, locale, calendar, backend)
+    time_format(datetime, format_id, locale, calendar, backend, options)
   end
 
-  defp time_format(datetime, format_id, locale, calendar, backend) do
-    Cldr.Time.find_format(datetime, format_id, locale, calendar, backend)
+  defp time_format(datetime, format_id, locale, calendar, backend, options) do
+    Cldr.Time.find_format(datetime, format_id, locale, calendar, backend, options)
   end
 
   # FIXME These functions don't consider the impact

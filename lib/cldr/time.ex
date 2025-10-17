@@ -194,7 +194,7 @@ defmodule Cldr.Time do
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format} <- find_format(time, format, locale, cldr_calendar, backend),
+         {:ok, format} <- find_format(time, format, locale, cldr_calendar, backend, options),
          {:ok, format} <- apply_preference(format, prefer),
          {:ok, format_string} <- resolve_plural_format(format, time, backend, options) do
       format_backend.format(time, format_string, locale, options)
@@ -380,7 +380,7 @@ defmodule Cldr.Time do
   # and if its a full date and no format is specified then the default :medium will be
   # applied.
   @doc false
-  def find_format(time, format, locale, calendar, backend)
+  def find_format(time, format, locale, calendar, backend, _options)
       when format in @format_types and is_full_time(time) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
@@ -394,7 +394,7 @@ defmodule Cldr.Time do
 
   # If its a partial date and a standard format is requested, its an error
 
-  def find_format(time, format, _locale, _calendar, _backend)
+  def find_format(time, format, _locale, _calendar, _backend, _options)
       when format in @format_types and not is_full_time(time) do
     {:error,
      {
@@ -403,9 +403,9 @@ defmodule Cldr.Time do
      }}
   end
 
-  def find_format(time, %{format: format} = format_map, locale, calendar, backend) do
+  def find_format(time, %{format: format} = format_map, locale, calendar, backend, options) do
     %{number_system: number_system} = format_map
-    {:ok, format_string} = find_format(time, format, locale, calendar, backend)
+    {:ok, format_string} = find_format(time, format, locale, calendar, backend, options)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
@@ -414,20 +414,14 @@ defmodule Cldr.Time do
   # format is a direct match, use it. If not - try to find the best match between the
   # requested format and available formats.
 
-  def find_format(_time, format, locale, calendar, backend) when is_atom(format) do
-    {:ok, available_formats} = available_formats(locale, calendar, backend)
-
-    if Map.has_key?(available_formats, format) do
-      Map.fetch(available_formats, format)
-    else
-      Cldr.DateTime.best_match(format, locale, calendar, backend)
-    end
+  def find_format(_time, format, locale, calendar, backend, options) when is_atom(format) do
+    Cldr.DateTime.best_match(format, locale, calendar, backend, options)
   end
 
   # If its a binary then its considered a format string so we use
   # it directly.
 
-  def find_format(_time, format_string, _locale, _calendar, _backend)
+  def find_format(_time, format_string, _locale, _calendar, _backend, _options)
       when is_binary(format_string) do
     {:ok, format_string}
   end
