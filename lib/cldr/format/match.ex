@@ -538,9 +538,9 @@ defmodule Cldr.DateTime.Format.Match do
 
   # Substitute back the originally requested zone field and length
   # TODO doing this needs further validation, the spec isn't super clear
-  @zone_fields ["v", "V", "O", "z", "Z"]
-  def adjust_field_length([char | _rest], acc, skeleton_tokens) when char in @zone_fields  do
-    {replacement_char, requested_length} = find_substitutable_field(@zone_fields, skeleton_tokens)
+  @substitutable_zone_fields ["v", "V", "O", "z", "Z"]
+  def adjust_field_length([char | _rest], acc, skeleton_tokens) when char in @substitutable_zone_fields  do
+    {replacement_char, requested_length} = find_substitutable_field(@substitutable_zone_fields, skeleton_tokens)
     [List.duplicate(replacement_char, requested_length) | acc]
   end
 
