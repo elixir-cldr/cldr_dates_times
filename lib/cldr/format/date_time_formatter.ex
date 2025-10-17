@@ -190,6 +190,7 @@ defmodule Cldr.DateTime.Formatter do
   @duration_modules [Cldr.Calendar.Duration, Duration]
   @default_format 1
   @default_separators :standard
+  @unknown_zone "Etc/Unknown"
 
   @doc false
   defguard is_date(date)
@@ -3139,14 +3140,28 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_generic(time, n, locale, backend, options \\ %{})
 
-  def zone_generic(%{time_zone: time_zone}, 1, _locale, _backend, options) do
-    maybe_wrap(time_zone, :zone_generic, options)
+  def zone_generic(%{time_zone: _time_zone} = time, 1 = n, locale, backend, options) do
+    zone_options = [locale: locale, backend: backend, type: :generic, format: :short]
+
+    case Timezone.non_location_format(time, zone_options) do
+      {:ok, timezone} ->
+        maybe_wrap(timezone, :zone_id, options)
+
+      {:error, _reason} ->
+        zone_id(time, n, locale, backend, options)
+    end
   end
 
-  def zone_generic(time, 4, locale, backend, options) do
-    time
-    |> zone_id(4, locale, backend, options)
-    |> maybe_wrap(:zone_generic, options)
+  def zone_generic(%{time_zone: _time_zone} = time, 4 = n, locale, backend, options) do
+    zone_options = [locale: locale, backend: backend, type: :generic, format: :long]
+
+    case Timezone.non_location_format(time, zone_options) do
+      {:ok, timezone} ->
+        maybe_wrap(timezone, :zone_id, options)
+
+      {:error, _reason} ->
+        zone_id(time, n, locale, backend, options)
+    end
   end
 
   def zone_generic(time, _n, _locale, _backend, _options) do
@@ -3221,18 +3236,22 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_short(time, n, locale, backend, options \\ %{})
 
-  def zone_short(%{zone_abbr: zone_abbr}, n, _locale, _backend, options) when n in 1..3 do
-    maybe_wrap(zone_abbr, :zone_short, options)
+  def zone_short(%{time_zone: _time_zone} = time, n, locale, backend, options) when n in 1..3 do
+    zone_options = [locale: locale, backend: backend, format: :short, type: :specific]
+    {:ok, timezone} = Timezone.non_location_format(time, zone_options)
+
+    maybe_wrap(timezone, :zone_short, options)
   end
 
-  def zone_short(%{zone_abbr: _zone_abbr} = time, 4 = n, locale, backend, options) do
-    time
-    |> zone_gmt(n, locale, backend, options)
-    |> maybe_wrap(:zone_short, options)
+  def zone_short(%{time_zone: _time_zone} = time, 4, locale, backend, options) do
+    zone_options = [locale: locale, backend: backend, type: :specific]
+    {:ok, timezone} = Timezone.non_location_format(time, zone_options)
+
+    maybe_wrap(timezone, :zone_short, options)
   end
 
   def zone_short(time, _n, _locale, _backend, _options) do
-    error_return(time, "z", [:zone_abbr])
+    error_return(time, "z", [:time_zone])
   end
 
   @doc """
@@ -3311,26 +3330,39 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_id(time, n, locale, backend, options \\ %{})
 
-  def zone_id(%{zone_abbr: _time_zone}, 1, _locale, _backend, options) do
-    maybe_wrap("unk", :zone_id, options)
+  def zone_id(%{time_zone: _time_zone} = time, 1, _locale, _backend, options) do
+    zone = Map.get(time, :zone_abbr, "unk")
+    maybe_wrap(zone, :zone_id, options)
   end
 
-  def zone_id(%{zone_abbr: time_zone}, 2, _locale, _backend, options) do
+  def zone_id(%{time_zone: time_zone}, 2, _locale, _backend, options) do
     maybe_wrap(time_zone, :zone_id, options)
   end
 
-  def zone_id(%{zone_abbr: _time_zone}, 3, _locale, _backend, options) do
-    maybe_wrap("Unknown City", :zone_id, options)
+  def zone_id(%{time_zone: time_zone}, 3, locale, backend, options) do
+    case Timezone.exemplar_city(time_zone, locale: locale, backend: backend) do
+      {:ok, exemplar_city} ->
+         maybe_wrap(exemplar_city, :zone_id, options)
+
+      {:error, {Cldr.DateTime.UnknownExemplarCity, _reason}} ->
+        {:ok, unknown} = Timezone.exemplar_city(@unknown_zone, locale: locale, backend: backend)
+        maybe_wrap(unknown, :zone_id, options)
+    end
   end
 
-  def zone_id(time, 4, locale, backend, options) do
-    time
-    |> zone_gmt(4, locale, backend, options)
-    |> maybe_wrap(:zone_id, options)
+  def zone_id(%{time_zone: time_zone}, 4, locale, backend, options) do
+    case Timezone.location_format(time_zone, locale: locale, backend: backend, type: :generic) do
+      {:ok, timezone} ->
+        maybe_wrap(timezone, :zone_id, options)
+
+      {:error, {Cldr.DateTime.NoTerritoryForTimezone, _reason}} ->
+        {:ok, timezone} = Timezone.gmt_format(time_zone, locale: locale, backend: backend)
+        maybe_wrap(timezone, :zone_id, options)
+    end
   end
 
   def zone_id(time, _n, _locale, _backend, _options) do
-    error_return(time, "V", [:zone_abbr])
+    error_return(time, "V", [:time_zone, :zone_abbr])
   end
 
   @doc """
@@ -3828,24 +3860,14 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_gmt(time, n, locale, backend, options \\ %{})
 
-  def zone_gmt(time, 1, locale, backend, options) do
-    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
-      backend = Module.concat(backend, DateTime.Formatter)
-
-      backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds},
-        format: :short
-      )
-      |> maybe_wrap(:zone_gmt, options)
-    end
+  def zone_gmt(%{utc_offset: _offset} = time, 1, locale, backend, options) do
+    {:ok, gmt_format} = Timezone.gmt_format(time, locale: locale, backend: backend, format: :short)
+    maybe_wrap(gmt_format, :zone_gmt, options)
   end
 
-  def zone_gmt(time, 4, locale, backend, options) do
-    with {hours, minutes, seconds} <- Timezone.time_from_zone_offset(time) do
-      backend = Module.concat(backend, DateTime.Formatter)
-
-      backend.gmt_tz_format(locale, %{hour: hours, minute: minutes, second: seconds}, format: :long)
-      |> maybe_wrap(:zone_gmt, options)
-    end
+  def zone_gmt(%{utc_offset: _offset} = time, 4, locale, backend, options) do
+    {:ok, gmt_format} = Timezone.gmt_format(time, locale: locale, backend: backend, format: :long)
+    maybe_wrap(gmt_format, :zone_gmt, options)
   end
 
   def zone_gmt(time, _n, _locale, _backend, _options) do

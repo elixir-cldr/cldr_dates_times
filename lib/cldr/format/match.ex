@@ -98,7 +98,6 @@ defmodule Cldr.DateTime.Format.Match do
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`.
     The default is `Cldr.get_locale/0`.
-
   * `calendar` is any CLDR calendar type. The default is `:gregorian`.
     See `Cldr.DateTime.Format.calendars_for/1` for the available calendars.
 
@@ -112,15 +111,15 @@ defmodule Cldr.DateTime.Format.Match do
 
   ### Examples
 
-      iex> Cldr.DateTime.Format.Match.best_match "hms", "en", :gregorian, MyApp.Cldr
+      iex> Cldr.DateTime.Format.Match.best_match("hms", "en", :gregorian, MyApp.Cldr)
       {:ok, :hms}
 
       iex> Cldr.DateTime.Format.Match.best_match("yMdhms", "en", :gregorian, MyApp.Cldr)
       {:ok, {:yMd, :hms}}
 
-      iex> Cldr.DateTime.Format.Match.best_match "EMdyv", "en", :gregorian, MyApp.Cldr
+      iex> Cldr.DateTime.Format.Match.best_match("EMdyv", "en", :gregorian, MyApp.Cldr)
       {:error,
-       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \"EMdyv\""}}
+       {Cldr.DateTime.UnresolvedFormat, "No available format resolved for \\"EMdyv\\""}}
 
   """
 
@@ -161,6 +160,7 @@ defmodule Cldr.DateTime.Format.Match do
         |> Enum.filter(&candidates_with_the_same_tokens(&1, skeleton_keys))
         |> Enum.map(&distance_from(&1, skeleton_ordered))
         |> Enum.sort(&compare_counts/2)
+        # |> IO.inspect(label: "Candidates")
 
       case candidates do
         [] ->
@@ -170,6 +170,7 @@ defmodule Cldr.DateTime.Format.Match do
           {:ok, format_id}
       end
     end
+    # |> IO.inspect(label: "Matched to #{inspect original_skeleton}")
   end
 
   defp try_date_and_time_skeletons(skeleton, original, locale, calendar, backend) do
@@ -510,11 +511,13 @@ defmodule Cldr.DateTime.Format.Match do
     |> Enum.join()
   end
 
-  # Month needs special handling so as to not transition from nummber to
-  # alphabetic lengths. Ie if the format is "M", its ok to go to "MM", but
-  # not to "MMM" or "MMMM". Same for "L"
   @doc false
-  def adjust_field_length([char | _rest] = field, acc, skeleton_tokens) when char in ["M", "L"] do
+  # Month, quarter and day of week need special handling so as to not
+  # transition from nummber to alphabetic lengths. Ie if the format
+  # is "M", its ok to go to "MM", but not to "MMM" or "MMMM".
+  @numeric_and_alpha_fields ["M", "L", "e", "q", "Q"]
+  def adjust_field_length([char | _rest] = field, acc, skeleton_tokens)
+      when char in @numeric_and_alpha_fields do
     requested_length = :proplists.get_value(char, skeleton_tokens)
     field_length = length(field)
 
@@ -533,9 +536,18 @@ defmodule Cldr.DateTime.Format.Match do
     end
   end
 
+  # Substitute back the originally requested zone field and length
+  # TODO doing this needs further validation, the spec isn't super clear
+  @zone_fields ["v", "V", "O"]
+  def adjust_field_length([char | _rest], acc, skeleton_tokens) when char in @zone_fields  do
+    {replacement_char, requested_length} = find_substitutable_field(@zone_fields, skeleton_tokens)
+    [List.duplicate(replacement_char, requested_length) | acc]
+  end
+
   # Don't resize hour, minute or second
+  @hms_fields ["H", "h", "K", "k", "m", "s", "S"]
   def adjust_field_length([char | _rest] = field, acc, _skeleton_tokens)
-      when char in ["H", "h", "K", "k", "m", "s", "S"] do
+      when char in @hms_fields do
     [field | acc]
   end
 
@@ -549,6 +561,16 @@ defmodule Cldr.DateTime.Format.Match do
     else
       [List.duplicate(char, requested_length) | acc]
     end
+  end
+
+  defp find_substitutable_field(fields, skeleton) do
+    Enum.reduce_while(fields, {"", 0}, fn field, acc ->
+      if count = :proplists.get_value(field, skeleton, nil) do
+        {:halt, {field, count}}
+      else
+        {:cont, acc}
+      end
+    end)
   end
 
   @doc false

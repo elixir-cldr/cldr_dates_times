@@ -8,7 +8,7 @@ defmodule Cldr.DateTime.TestData do
     |> Enum.with_index(&format_test/2)
   end
 
-  @atomize_values [:calendar, :time_format, :date_format, :date_time_format_type, :skeleton, :style]
+  @atomize_values [:calendar, :time_format, :date_format, :date_time_format_type, :style]
 
   def format_test(test, index) do
     test
@@ -23,10 +23,32 @@ defmodule Cldr.DateTime.TestData do
     |> Cldr.Map.rename_keys("dateTimeFormatType", "style")
     |> Cldr.Map.atomize_keys()
     |> Cldr.Map.atomize_values(only: @atomize_values)
+    |> maybe_atomize_skeleton()
     |> Map.put(:index, index + 1)
     |> parse_input()
     |> determine_test_module()
     |> ensure_style_for_date_time()
+  end
+
+  defp maybe_atomize_skeleton(%{skeleton: skeleton} = test) do
+    if all_one_field?(skeleton) do
+      test
+    else
+      Map.put(test, :skeleton, String.to_atom(skeleton))
+    end
+  end
+
+  defp maybe_atomize_skeleton(test) do
+    test
+  end
+
+  defp all_one_field?(skeleton) do
+    field_list =
+      skeleton
+      |> String.graphemes()
+      |> Enum.chunk_by(&(&1))
+
+    length(field_list) == 1
   end
 
   defp ensure_style_for_date_time(%{test_module: Cldr.DateTime} = test) do

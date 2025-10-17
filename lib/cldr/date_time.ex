@@ -793,8 +793,7 @@ defmodule Cldr.DateTime do
   # or two skeletons - one for the date part and one for the time part.
   defp find_format(datetime, format, locale, calendar, backend, options)
        when is_skeleton(format) do
-    case Match.best_match(format, locale, calendar, backend)
-         |> IO.inspect(label: "Resolved format(s)") do
+    case Match.best_match(format, locale, calendar, backend) do
       {:ok, {date_format, time_format}} ->
         options =
           options
@@ -823,9 +822,9 @@ defmodule Cldr.DateTime do
     date_format = options.date_format
     time_format = options.time_format
 
-    with {:ok, _date_format_id, date_format} <-
+    with {:ok, date_format} <-
            date_format(datetime, date_format, locale, calendar, backend),
-         {:ok, _time_format_id, time_format} <-
+         {:ok, time_format} <-
            time_format(datetime, time_format, locale, calendar, backend),
          {:ok, format} <- resolve_format(date_format, options.style, locale, calendar, backend) do
       options =
@@ -896,11 +895,11 @@ defmodule Cldr.DateTime do
     end
   end
 
-  def formats_for_style(:at, locale, calendar, backend) do
+  defp formats_for_style(:at, locale, calendar, backend) do
     Cldr.DateTime.Format.date_time_at_formats(locale, calendar, backend)
   end
 
-  def formats_for_style(_standard, locale, calendar, backend) do
+  defp formats_for_style(_standard, locale, calendar, backend) do
     Cldr.DateTime.Format.date_time_formats(locale, calendar, backend)
   end
 
@@ -909,33 +908,23 @@ defmodule Cldr.DateTime do
 
   defp date_format(datetime, nil, locale, calendar, backend) do
     format_id = Cldr.Date.derive_format_id(datetime)
-
-    with {:ok, format} <- Cldr.Date.find_format(datetime, format_id, locale, calendar, backend) do
-      {:ok, format_id, format}
-    end
+    date_format(datetime, format_id, locale, calendar, backend)
   end
 
   defp date_format(datetime, format_id, locale, calendar, backend) do
-    with {:ok, format} <- Cldr.Date.find_format(datetime, format_id, locale, calendar, backend) do
-      {:ok, format_id, format}
-    end
+    Cldr.Date.find_format(datetime, format_id, locale, calendar, backend)
   end
 
   defp time_format(datetime, nil, locale, calendar, backend) do
     format_id = Cldr.Time.derive_format_id(datetime)
-
-    with {:ok, format} <- Cldr.Time.find_format(datetime, format_id, locale, calendar, backend) do
-      {:ok, format_id, format}
-    end
+    time_format(datetime, format_id, locale, calendar, backend)
   end
 
   defp time_format(datetime, format_id, locale, calendar, backend) do
-    with {:ok, format} <- Cldr.Time.find_format(datetime, format_id, locale, calendar, backend) do
-      {:ok, format_id, format}
-    end
+    Cldr.Time.find_format(datetime, format_id, locale, calendar, backend)
   end
 
-  # FIXME These functions don't consider the impace
+  # FIXME These functions don't consider the impact
   # of literals in the format. For now, the only known
   # literal is a "," or "at" so we are safe for the moment.
 
