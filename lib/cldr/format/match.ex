@@ -85,6 +85,7 @@ defmodule Cldr.DateTime.Format.Match do
   }
 
   @hour_cycles Map.keys(@locale_preferred_time_symbol)
+  @day_periods ["a", "b", "B"]
   @prefer_cycle_24 ["H", "k"]
   @prefer_cycle_12 ["h", "K"]
 
@@ -331,11 +332,7 @@ defmodule Cldr.DateTime.Format.Match do
     if locale_specifies_hour_cycle?(locale) || String.contains?(skeleton, ["j", "J", "C"]) do
       preferred_time_symbol = preferred_time_symbol(locale)
       allowed_time_symbol = hd(allowed_time_symbols(locale))
-
-      new_skeleton =
-        skeleton
-        |> replace_time_symbols(preferred_time_symbol, allowed_time_symbol)
-
+      new_skeleton = replace_time_symbols(skeleton, preferred_time_symbol, allowed_time_symbol)
       {:ok, new_skeleton}
     else
       {:ok, skeleton}
@@ -353,6 +350,10 @@ defmodule Cldr.DateTime.Format.Match do
     |> Enum.all?(&(&1 in Format.time_fields()))
   end
 
+  # Replaces the skeleton characters with locale-specific choices signalled
+  # by either the skeleton symbols "j", "J" and "C" or via the locales
+  # preferred hour cycle (preferered and allowed).
+
   defp replace_time_symbols("", _preferred, _allowed) do
     ""
   end
@@ -368,9 +369,8 @@ defmodule Cldr.DateTime.Format.Match do
   # requests no dayPeriod marker such as “am/pm” (it is typically used where there is enough
   # context that that is not necessary). For example, with "jmm", 18:00 could appear as
   # “6:00 PM”, while with "Jmm", it would appear as “6:00” (no PM).
-  # TODO Does not signal that a day period format code is not required. Therefore is the same
-  # as "j".
   defp replace_time_symbols(<<"J", rest::binary>>, preferred, allowed) do
+    preferred = String.replace(preferred, @day_periods, "")
     preferred <> replace_time_symbols(rest, preferred, allowed)
   end
 
@@ -385,7 +385,7 @@ defmodule Cldr.DateTime.Format.Match do
 
   # Remove "a", "b" and "B" if we want 24 hour (H and k)
   defp replace_time_symbols(<<format_code::binary-1, rest::binary>>, preferred, allowed)
-       when format_code in ["a", "b", "B"] and preferred in @prefer_cycle_24 do
+       when format_code in @day_periods and preferred in @prefer_cycle_24 do
     replace_time_symbols(rest, preferred, allowed)
   end
 
