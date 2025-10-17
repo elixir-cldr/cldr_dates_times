@@ -26,7 +26,7 @@ defmodule Cldr.DateTime.PartialTest do
     assert {:ok, "5:23 AM Sydney Time"} =
              Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"})
 
-    assert {:ok, "5:23 Sydney Time"} =
+    assert {:ok, "5:23 GMT+11:00"} =
              Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"}, format: "h:m V")
 
     assert {:ok, "5:23 Australia/Sydney"} =

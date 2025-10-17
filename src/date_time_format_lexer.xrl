@@ -104,8 +104,8 @@ Rules.
 {ShortZone}+             : {token,{zone_short,TokenLine,count(TokenChars)}}.
 {BasicZone}+             : {token,{zone_basic,TokenLine,count(TokenChars)}}.
 {GMT_Zone}+              : {token,{zone_gmt,TokenLine,count(TokenChars)}}.
-{GenericZone}+           : {token,{zone_generic,TokenLine,count(TokenChars)}}.
-{ZoneID}+                : {token,{zone_id,TokenLine,count(TokenChars)}}.
+{GenericZone}+           : {token,{generic_non_location,TokenLine,count(TokenChars)}}.
+{ZoneID}+                : {token,{specific_non_location,TokenLine,count(TokenChars)}}.
 {ISO_ZoneZ}+             : {token,{zone_iso_z,TokenLine,count(TokenChars)}}.
 {ISO_Zone}+              : {token,{zone_iso,TokenLine,count(TokenChars)}}.
 

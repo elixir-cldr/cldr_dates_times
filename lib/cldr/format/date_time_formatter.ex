@@ -3075,23 +3075,19 @@ defmodule Cldr.DateTime.Formatter do
   Returns the generic non-location format of a timezone (format symbol `v`)
   from a `DateTime` or `Time`.
 
-  Since Elixir does not provide full time zone support, we return here only
-  the `:time_zone` element of the provided `DateTime` or other struct without
-  any localization.
-
   ## Arguments
 
   * `time` is a `t:DateTime.t/0` struct or any map that contains at least the key `:time_zone`
-    key of the format used by `Time`
+    key of the format used by `Time`.
 
   * `n` is the generic non-location timezone format and is either `1` (the
-    default) or `4`
+    default) or `4`.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`.
 
   * `options` is a `Keyword` list of options.  There are no options used in
-    `zone_generic/4`
+    `generic_non_location/4`
 
   ## Format Symbol
 
@@ -3100,36 +3096,36 @@ defmodule Cldr.DateTime.Formatter do
 
   | Symbol | Results    | Description                                             |
   | :----  | :--------- | :------------------------------------------------------ |
-  | v      | "Etc/UTC"  | `:time_zone` key, unlocalised                           |
-  | vvvv   | "unk"      | Generic timezone name.  Currently returns only "unk"    |
+  | v      | "PT"  | The short generic non-location format Where that is unavailable, falls back to the generic location format ("VVVV"), then the short localized GMT format as the final fallback |
+  | vvvv   | "Pacific Time" | The long generic non-location format. Where that is unavailable, falls back to generic location format ("VVVV"). |
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.generic_non_location %{time_zone: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 4
       "Coordinated Universal Time"
 
-      iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.generic_non_location %{time_zone: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 1
       "UTC"
 
   """
-  @spec zone_generic(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
+  @spec generic_non_location(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
           String.t() | {:error, String.t()}
 
-  def zone_generic(zone_generic, n \\ @default_format, options \\ [])
+  def generic_non_location(time, n \\ @default_format, options \\ [])
 
-  def zone_generic(zone_generic, options, []) when is_list(options) do
+  def generic_non_location(time, options, []) when is_list(options) do
     {locale, backend} = extract_locale!(options)
-    zone_generic(zone_generic, @default_format, locale, backend, Map.new(options))
+    generic_non_location(time, @default_format, locale, backend, Map.new(options))
   end
 
-  def zone_generic(zone_generic, n, options) do
+  def generic_non_location(time, n, options) do
     {locale, backend} = extract_locale!(options)
-    zone_generic(zone_generic, n, locale, backend, Map.new(options))
+    generic_non_location(time, n, locale, backend, Map.new(options))
   end
 
-  @spec zone_generic(
+  @spec generic_non_location(
           Cldr.Calendar.date_time(),
           integer,
           Locale.locale_reference(),
@@ -3138,38 +3134,155 @@ defmodule Cldr.DateTime.Formatter do
         ) ::
           String.t() | {:error, String.t()}
 
-  def zone_generic(time, n, locale, backend, options \\ %{})
+  def generic_non_location(time, n, locale, backend, options \\ %{})
 
-  def zone_generic(%{time_zone: _time_zone} = time, 1 = n, locale, backend, options) do
+  def generic_non_location(%{time_zone: _time_zone} = time, 1 = n, locale, backend, options) do
     zone_options = [locale: locale, backend: backend, type: :generic, format: :short]
 
     case Timezone.non_location_format(time, zone_options) do
       {:ok, timezone} ->
-        maybe_wrap(timezone, :zone_id, options)
+        maybe_wrap(timezone, :generic_non_location, options)
 
       {:error, _reason} ->
-        zone_id(time, n, locale, backend, options)
+        specific_non_location(time, n, locale, backend, options)
     end
   end
 
-  def zone_generic(%{time_zone: _time_zone} = time, 4 = n, locale, backend, options) do
+  def generic_non_location(%{time_zone: _time_zone} = time, 4 = n, locale, backend, options) do
     zone_options = [locale: locale, backend: backend, type: :generic, format: :long]
 
     case Timezone.non_location_format(time, zone_options) do
       {:ok, timezone} ->
-        maybe_wrap(timezone, :zone_id, options)
+        maybe_wrap(timezone, :generic_non_location, options)
 
       {:error, _reason} ->
-        zone_id(time, n, locale, backend, options)
+        specific_non_location(time, n, locale, backend, options)
     end
   end
 
-  def zone_generic(_time, n, _locale, _backend, _options) when n in [2, 3] or n > 4 do
+  def generic_non_location(_time, n, _locale, _backend, _options) when n in [2, 3] or n > 4 do
     n_error_return("v", n)
   end
 
-  def zone_generic(time, _n, _locale, _backend, _options) do
+  def generic_non_location(time, _n, _locale, _backend, _options) do
     error_return(time, "v", [:time_zone])
+  end
+
+  @doc """
+  Returns the specific non-location timezone format
+  (format symbol `V`) part of a `DateTime` or `Time`.
+
+  ## Arguments
+
+  * `time` is a `t:DateTime.t/0` struct or any map that contains at least the `:time_zone`
+    key set to a known IANA time zone name.
+
+  * `n` is the specific non-location timezone format and is in the range `1..4`
+
+  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
+
+  * `options` is a `Keyword` list of options.  There are no options used in
+   `specific_non_location/4`
+
+  ## Format Symbol
+
+  The representation of the `timezone ID` is made in accordance with the following
+  table:
+
+  | Symbol | Results        | Description                                             |
+  | :----  | :------------- | :------------------------------------------------------ |
+  | V      | "UTC"          | Short specific non-location format                      |
+  | VV     | "Etc/UTC       | The `:time_zone` field of `time`,                       |
+  | VVV    | "Unknown City" | Examplar city, or localized "Unknown location"          |
+  | VVVV   | "GMT"          | Delegates to `zone_gmt/4`                               |
+
+  ## Examples
+
+      iex> Cldr.DateTime.Formatter.specific_non_location(%{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 1)
+      "UTC"
+
+      iex> Cldr.DateTime.Formatter.specific_non_location(%{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 2)
+      "Etc/UTC"
+
+      iex> Cldr.DateTime.Formatter.specific_non_location(%{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 3)
+      "Unknown Location"
+
+      iex> Cldr.DateTime.Formatter.specific_non_location(%{time_zone: "Etc/UTC",
+      ...>   utc_offset: 0, std_offset: 0}, 4)
+      "GMT"
+
+  """
+  @spec specific_non_location(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
+          String.t() | {:error, String.t()}
+
+  def specific_non_location(time, n \\ @default_format, options \\ [])
+
+  def specific_non_location(time, options, []) when is_list(options) do
+    {locale, backend} = extract_locale!(options)
+    specific_non_location(time, @default_format, locale, backend, Map.new(options))
+  end
+
+  def specific_non_location(time, n, options) do
+    {locale, backend} = extract_locale!(options)
+    specific_non_location(time, n, locale, backend, Map.new(options))
+  end
+
+  @spec specific_non_location(
+          Cldr.Calendar.date_time(),
+          integer,
+          Locale.locale_reference(),
+          Cldr.backend(),
+          map()
+        ) ::
+          String.t() | {:error, String.t()}
+
+  def specific_non_location(time, n, locale, backend, options \\ %{})
+
+  def specific_non_location(%{time_zone: time_zone}, 1, locale, backend, options) do
+    zone_options = [locale: locale, backend: backend, type: :specific, format: :short]
+
+    case Timezone.non_location_format(time_zone, zone_options) do
+      {:ok, timezone} ->
+        maybe_wrap(timezone, :specific_non_location, options)
+
+      {:error, {Cldr.DateTime.NoTerritoryForTimezone, _reason}} ->
+        {:ok, timezone} = Timezone.gmt_format(time_zone, locale: locale, backend: backend, format: :short)
+        maybe_wrap(timezone, :specific_non_location, options)
+    end
+  end
+
+  def specific_non_location(%{time_zone: time_zone}, 2, _locale, _backend, options) do
+    maybe_wrap(time_zone, :specific_non_location, options)
+  end
+
+  def specific_non_location(%{time_zone: time_zone}, 3, locale, backend, options) do
+    case Timezone.exemplar_city(time_zone, locale: locale, backend: backend, format: :long) do
+      {:ok, exemplar_city} ->
+         maybe_wrap(exemplar_city, :specific_non_location, options)
+
+      {:error, {Cldr.DateTime.UnknownExemplarCity, _reason}} ->
+        {:ok, unknown} = Timezone.exemplar_city(@unknown_zone, locale: locale, backend: backend)
+        maybe_wrap(unknown, :specific_non_location, options)
+    end
+  end
+
+  def specific_non_location(%{time_zone: time_zone}, 4, locale, backend, options) do
+    case Timezone.location_format(time_zone, locale: locale, backend: backend, type: :generic) do
+      {:ok, timezone} ->
+        maybe_wrap(timezone, :specific_non_location, options)
+
+      {:error, {Cldr.DateTime.NoTerritoryForTimezone, _reason}} ->
+        {:ok, timezone} = Timezone.gmt_format(time_zone, locale: locale, backend: backend)
+        maybe_wrap(timezone, :specific_non_location, options)
+    end
+  end
+
+  def specific_non_location(time, _n, _locale, _backend, _options) do
+    error_return(time, "V", [:time_zone])
   end
 
   @doc """
@@ -3256,123 +3369,6 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_short(time, _n, _locale, _backend, _options) do
     error_return(time, "z", [:time_zone])
-  end
-
-  @doc """
-  Returns the time zone ID (format symbol `V`) part of a `DateTime` or `Time`
-
-  For now the short timezone name, exemplar city and generic location
-  formats are not supported and therefore return the fallbacks defined in CLDR.
-
-  ## Arguments
-
-  * `time` is a `t:DateTime.t/0` struct or any map that contains at least the `:utc_offset`
-    and `:std_offset` keys of the format used by `Time`
-
-  * `n` is the specific non-location timezone format and is in the range `1..4`
-
-  * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
-    or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`
-
-  * `options` is a `Keyword` list of options.  There are no options used in
-   `zone_id/4`
-
-  ## Format Symbol
-
-  The representation of the `timezone ID` is made in accordance with the following
-  table:
-
-  | Symbol | Results        | Description                                             |
-  | :----  | :------------- | :------------------------------------------------------ |
-  | V      | "unk"          | `:zone_abbr` key, unlocalised                           |
-  | VV     | "Etc/UTC       | Delegates to `zone_gmt/4`                               |
-  | VVV    | "Unknown City" | Examplar city.  Not supported.                          |
-  | VVVV   | "GMT"          | Delegates to `zone_gmt/4`                               |
-
-  ## Examples
-
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
-      ...>   utc_offset: 0, std_offset: 0}, 1
-      "GMT"
-
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
-      ...>   utc_offset: 0, std_offset: 0}, 2
-      "Etc/UTC"
-
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
-      ...>   utc_offset: 0, std_offset: 0}, 3
-      "Unknown Location"
-
-      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
-      ...>   utc_offset: 0, std_offset: 0}, 4
-      "GMT"
-
-  """
-  @spec zone_id(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
-          String.t() | {:error, String.t()}
-
-  def zone_id(zone_id, n \\ @default_format, options \\ [])
-
-  def zone_id(zone_id, options, []) when is_list(options) do
-    {locale, backend} = extract_locale!(options)
-    zone_id(zone_id, @default_format, locale, backend, Map.new(options))
-  end
-
-  def zone_id(zone_id, n, options) do
-    {locale, backend} = extract_locale!(options)
-    zone_id(zone_id, n, locale, backend, Map.new(options))
-  end
-
-  @spec zone_id(
-          Cldr.Calendar.date_time(),
-          integer,
-          Locale.locale_reference(),
-          Cldr.backend(),
-          map()
-        ) ::
-          String.t() | {:error, String.t()}
-
-  def zone_id(time, n, locale, backend, options \\ %{})
-
-  def zone_id(%{time_zone: time_zone}, 1, locale, backend, options) do
-    case Timezone.location_format(time_zone, locale: locale, backend: backend, type: :generic, format: :short) do
-      {:ok, timezone} ->
-        maybe_wrap(timezone, :zone_id, options)
-
-      {:error, {Cldr.DateTime.NoTerritoryForTimezone, _reason}} ->
-        {:ok, timezone} = Timezone.gmt_format(time_zone, locale: locale, backend: backend, format: :short)
-        maybe_wrap(timezone, :zone_id, options)
-    end
-  end
-
-  def zone_id(%{time_zone: time_zone}, 2, _locale, _backend, options) do
-    maybe_wrap(time_zone, :zone_id, options)
-  end
-
-  def zone_id(%{time_zone: time_zone}, 3, locale, backend, options) do
-    case Timezone.exemplar_city(time_zone, locale: locale, backend: backend, format: :long) do
-      {:ok, exemplar_city} ->
-         maybe_wrap(exemplar_city, :zone_id, options)
-
-      {:error, {Cldr.DateTime.UnknownExemplarCity, _reason}} ->
-        {:ok, unknown} = Timezone.exemplar_city(@unknown_zone, locale: locale, backend: backend)
-        maybe_wrap(unknown, :zone_id, options)
-    end
-  end
-
-  def zone_id(%{time_zone: time_zone}, 4, locale, backend, options) do
-    case Timezone.location_format(time_zone, locale: locale, backend: backend, type: :generic) do
-      {:ok, timezone} ->
-        maybe_wrap(timezone, :zone_id, options)
-
-      {:error, {Cldr.DateTime.NoTerritoryForTimezone, _reason}} ->
-        {:ok, timezone} = Timezone.gmt_format(time_zone, locale: locale, backend: backend, format: :long)
-        maybe_wrap(timezone, :zone_id, options)
-    end
-  end
-
-  def zone_id(time, _n, _locale, _backend, _options) do
-    error_return(time, "V", [:time_zone, :zone_abbr])
   end
 
   @doc """
