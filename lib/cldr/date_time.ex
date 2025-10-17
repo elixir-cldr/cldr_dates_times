@@ -210,13 +210,13 @@ defmodule Cldr.DateTime do
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :hms, locale: :en)
       {:ok, "11:59:59 PM"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :full, locale: :en)
-      {:ok, "Saturday, January 1, 2000, 11:59:59 PM GMT"}
+      {:ok, "Saturday, January 1, 2000, 11:59:59 PM Coordinated Universal Time"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :full, locale: :fr)
-      {:ok, "samedi 1 janvier 2000, 23:59:59 UTC"}
+      {:ok, "samedi 1 janvier 2000, 23:59:59 temps universel coordonné"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :full, style: :at, locale: :en)
-      {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
+      {:ok, "Saturday, January 1, 2000 at 11:59:59 PM Coordinated Universal Time"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :full, style: :at, locale: :fr)
-      {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
+      {:ok, "samedi 1 janvier 2000 à 23:59:59 temps universel coordonné"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :MMMMW, locale: :fr)
       {:ok, "semaine 1 (janvier)"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :yw, locale: :fr)
@@ -375,9 +375,9 @@ defmodule Cldr.DateTime do
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :long, locale: :en)
       "January 1, 2000, 11:59:59 PM UTC"
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :full, locale: :en)
-      "Saturday, January 1, 2000, 11:59:59 PM GMT"
+      "Saturday, January 1, 2000, 11:59:59 PM Coordinated Universal Time"
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :full, locale: :fr)
-      "samedi 1 janvier 2000, 23:59:59 UTC"
+      "samedi 1 janvier 2000, 23:59:59 temps universel coordonné"
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :MMMMW, locale: :fr)
       "semaine 1 (janvier)"
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :yw, locale: :fr)
@@ -950,7 +950,6 @@ defmodule Cldr.DateTime do
     |> Map.keys()
     |> Enum.map(&Map.fetch!(field_map, &1))
     |> Enum.join()
-    |> String.replace("vV", "v")
     |> String.to_atom()
   end
 

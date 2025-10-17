@@ -241,7 +241,7 @@ defmodule Cldr.Time.Interval do
 
       iex> Cldr.Time.Interval.to_string(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
       ...> MyApp.Cldr, format: :long, style: :zone)
-      {:ok, "12:00 – 10:00 AM Etc/UTC"}
+      {:ok, "12:00 – 10:00 AM UTC"}
 
       iex> Cldr.Time.Interval.to_string(~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex, locale: "th")
@@ -431,7 +431,7 @@ defmodule Cldr.Time.Interval do
 
       iex> Cldr.Time.Interval.to_string!(~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
       ...> MyApp.Cldr, format: :long, style: :zone)
-      "12:00 – 10:00 AM Etc/UTC"
+      "12:00 – 10:00 AM UTC"
 
       iex> Cldr.Time.Interval.to_string!(~T[10:00:00], ~T[10:03:00], MyApp.Cldr,
       ...> format: :long, style: :flex, locale: "th")

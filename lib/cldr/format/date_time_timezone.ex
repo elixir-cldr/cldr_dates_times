@@ -292,7 +292,6 @@ defmodule Cldr.DateTime.Timezone do
   def non_location_format(time_zone, options) when is_binary(time_zone) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
     format = Module.concat(backend, DateTime.Format)
-
     with {:ok, options} <- validate_options(options),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
@@ -1336,7 +1335,7 @@ defmodule Cldr.DateTime.Timezone do
               "Invalid format #{inspect(format)}. Valid format are #{inspect(@valid_formats)}"
             }}}
 
-        {:date_time, date_time}, acc when is_date_time(date_time) ->
+        {:date_time, %{time_zone: _}}, acc ->
           {:cont, acc}
 
         {:date_time, datetime}, _acc ->

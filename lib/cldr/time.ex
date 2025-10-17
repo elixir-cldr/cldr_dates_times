@@ -37,8 +37,7 @@ defmodule Cldr.Time do
     hour: "h",
     minute: "m",
     second: "s",
-    time_zone: "v",
-    zone_abbr: "V"
+    time_zone: "v"
   }
 
   @field_names Map.keys(@field_map)

@@ -23,22 +23,22 @@ defmodule Cldr.DateTime.PartialTest do
     assert {:ok, "11:15:45 PM"} = Cldr.Time.to_string(%{hour: 23, minute: 15, second: 45})
     assert {:ok, "23:45"} = Cldr.Time.to_string(%{minute: 23, second: 45})
 
-    assert {:ok, "5:23 AM Australia/Sydney"} =
+    assert {:ok, "5:23 AM Sydney Time"} =
              Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"})
 
-    assert {:ok, "5:23 unk"} =
-             Cldr.Time.to_string(%{hour: 5, minute: 23, zone_abbr: "AEST"}, format: "h:m V")
+    assert {:ok, "5:23 Sydney Time"} =
+             Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"}, format: "h:m V")
 
-    assert {:ok, "5:23 AEST"} =
-             Cldr.Time.to_string(%{hour: 5, minute: 23, zone_abbr: "AEST"}, format: "h:m VV")
+    assert {:ok, "5:23 Australia/Sydney"} =
+             Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"}, format: "h:m VV")
 
-    assert {:ok, "5:23 GMT"} =
+    assert {:ok, "5:23 Sydney Time"} =
              Cldr.Time.to_string(
-               %{hour: 5, minute: 23, zone_abbr: "AEST", utc_offset: 0, std_offset: 0},
+               %{hour: 5, minute: 23, time_zone: "Australia/Sydney", utc_offset: 0, std_offset: 0},
                format: "h:m VVVV"
              )
 
-    assert Cldr.Time.to_string(%{hour: 5, minute: 23, zone_abbr: "AEST"}, format: "h:m VVVV")
+    assert Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"}, format: "h:m VVVV")
 
     {:error,
      {Cldr.DateTime.FormatError,

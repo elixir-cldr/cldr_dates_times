@@ -3107,11 +3107,11 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 4
-      "GMT"
+      "Coordinated Universal Time"
 
       iex> Cldr.DateTime.Formatter.zone_generic %{time_zone: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 1
-      "Etc/UTC"
+      "UTC"
 
   """
   @spec zone_generic(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
@@ -3164,6 +3164,10 @@ defmodule Cldr.DateTime.Formatter do
     end
   end
 
+  def zone_generic(_time, n, _locale, _backend, _options) when n in [2, 3] or n > 4 do
+    n_error_return("v", n)
+  end
+
   def zone_generic(time, _n, _locale, _backend, _options) do
     error_return(time, "v", [:time_zone])
   end
@@ -3201,13 +3205,13 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_short %{zone_abbr: "UTC",
+      iex> Cldr.DateTime.Formatter.zone_short %{time_zone: "Etc/GMT",
       ...>   utc_offset: 0, std_offset: 0}, 1
-      "UTC"
-
-      iex> Cldr.DateTime.Formatter.zone_short %{zone_abbr: "UTC",
-      ...>   utc_offset: 0, std_offset: 0}, 4
       "GMT"
+
+      iex> Cldr.DateTime.Formatter.zone_short %{time_zone: "Etc/GMT",
+      ...>   utc_offset: 0, std_offset: 0}, 4
+      "Greenwich Mean Time"
 
   """
   @spec zone_short(Cldr.Calendar.date_time(), integer, Keyword.t()) ::
@@ -3287,19 +3291,19 @@ defmodule Cldr.DateTime.Formatter do
 
   ## Examples
 
-      iex> Cldr.DateTime.Formatter.zone_id %{zone_abbr: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 1
-      "unk"
+      "GMT"
 
-      iex> Cldr.DateTime.Formatter.zone_id %{zone_abbr: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 2
       "Etc/UTC"
 
-      iex> Cldr.DateTime.Formatter.zone_id %{zone_abbr: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 3
-      "Unknown City"
+      "Unknown Location"
 
-      iex> Cldr.DateTime.Formatter.zone_id %{zone_abbr: "Etc/UTC",
+      iex> Cldr.DateTime.Formatter.zone_id %{time_zone: "Etc/UTC",
       ...>   utc_offset: 0, std_offset: 0}, 4
       "GMT"
 
@@ -3330,9 +3334,15 @@ defmodule Cldr.DateTime.Formatter do
 
   def zone_id(time, n, locale, backend, options \\ %{})
 
-  def zone_id(%{time_zone: _time_zone} = time, 1, _locale, _backend, options) do
-    zone = Map.get(time, :zone_abbr, "unk")
-    maybe_wrap(zone, :zone_id, options)
+  def zone_id(%{time_zone: time_zone}, 1, locale, backend, options) do
+    case Timezone.location_format(time_zone, locale: locale, backend: backend, type: :generic, format: :short) do
+      {:ok, timezone} ->
+        maybe_wrap(timezone, :zone_id, options)
+
+      {:error, {Cldr.DateTime.NoTerritoryForTimezone, _reason}} ->
+        {:ok, timezone} = Timezone.gmt_format(time_zone, locale: locale, backend: backend, format: :short)
+        maybe_wrap(timezone, :zone_id, options)
+    end
   end
 
   def zone_id(%{time_zone: time_zone}, 2, _locale, _backend, options) do
@@ -3340,7 +3350,7 @@ defmodule Cldr.DateTime.Formatter do
   end
 
   def zone_id(%{time_zone: time_zone}, 3, locale, backend, options) do
-    case Timezone.exemplar_city(time_zone, locale: locale, backend: backend) do
+    case Timezone.exemplar_city(time_zone, locale: locale, backend: backend, format: :long) do
       {:ok, exemplar_city} ->
          maybe_wrap(exemplar_city, :zone_id, options)
 
@@ -3356,7 +3366,7 @@ defmodule Cldr.DateTime.Formatter do
         maybe_wrap(timezone, :zone_id, options)
 
       {:error, {Cldr.DateTime.NoTerritoryForTimezone, _reason}} ->
-        {:ok, timezone} = Timezone.gmt_format(time_zone, locale: locale, backend: backend)
+        {:ok, timezone} = Timezone.gmt_format(time_zone, locale: locale, backend: backend, format: :long)
         maybe_wrap(timezone, :zone_id, options)
     end
   end
@@ -3827,7 +3837,7 @@ defmodule Cldr.DateTime.Formatter do
 
       iex> Cldr.DateTime.Formatter.zone_gmt %{time_zone: "Etc/UTC",
       ...>   utc_offset: 3610, std_offset: 0}, 1
-      "GMT+1"
+      "GMT+01:00"
 
       iex> Cldr.DateTime.Formatter.zone_gmt %{time_zone: "Etc/UTC",
       ...>   utc_offset: 3610, std_offset: 0}, 4
@@ -4023,6 +4033,14 @@ defmodule Cldr.DateTime.Formatter do
   defp number_of_digits(n) when n < 1_000_000_000, do: 9
   defp number_of_digits(n) when n < 10_000_000_000, do: 10
   defp number_of_digits(n), do: Enum.count(Integer.digits(n))
+
+  @doc false
+  @dialyzer {:nowarn_function, error_return: 3}
+  def n_error_return(symbol, n) do
+    raise Cldr.DateTime.FormatError,
+          "The format symbol '#{symbol}' does not support a format length of #{n}"
+    :error
+  end
 
   @doc false
   @dialyzer {:nowarn_function, error_return: 3}

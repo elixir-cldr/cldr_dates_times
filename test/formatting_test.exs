@@ -64,7 +64,7 @@ defmodule Cldr.DateTime.Formatting.Test do
     assert {:ok, "October 15, 2025, 1:55:00 PM"} =
              Cldr.DateTime.to_string(~N[2025-10-15T13:55:00], format: :long, time_format: :full)
 
-    assert {:ok, "October 15, 2025, 1:55:00 PM GMT"} =
+    assert {:ok, "October 15, 2025, 1:55:00 PM Coordinated Universal Time"} =
              Cldr.DateTime.to_string(~U[2025-10-15T13:55:00Z], format: :long, time_format: :full)
   end
 end

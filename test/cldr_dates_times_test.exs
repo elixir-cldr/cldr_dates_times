@@ -55,16 +55,16 @@ defmodule Cldr.DatesTimes.Test do
     date_time = ~U[2023-09-08 15:50:00Z]
 
     assert Cldr.DateTime.to_string(date_time, format: :full, style: :at) ==
-             {:ok, "Friday, September 8, 2023 at 3:50:00 PM GMT"}
+             {:ok, "Friday, September 8, 2023 at 3:50:00 PM Coordinated Universal Time"}
 
     assert Cldr.DateTime.to_string(date_time, format: :long, style: :at) ==
              {:ok, "September 8, 2023 at 3:50:00 PM UTC"}
 
     assert Cldr.DateTime.to_string(date_time, format: :full, style: :at, locale: :fr) ==
-             {:ok, "vendredi 8 septembre 2023 à 15:50:00 UTC"}
+             {:ok, "vendredi 8 septembre 2023 à 15:50:00 temps universel coordonné"}
 
     assert Cldr.DateTime.to_string(date_time, format: :long, style: :at, locale: :fr) ==
-             {:ok, "8 septembre 2023 à 15:50:00 UTC"}
+             {:ok, "8 septembre 2023 à 15:50:00 TU"}
   end
 
   test "Era variants" do
@@ -100,10 +100,10 @@ defmodule Cldr.DatesTimes.Test do
     assert {:ok, "Jul 7, 2024, 9:36:00 PM"} =
              Cldr.DateTime.to_string(datetime)
 
-    assert {:ok, "7/7/24, 9:36:00 PM GMT"} =
+    assert {:ok, "7/7/24, 9:36:00 PM Coordinated Universal Time"} =
              Cldr.DateTime.to_string(datetime, date_format: :short, time_format: :full)
 
-    assert {:ok, "7/7/24, 9:36:00 PM GMT"} =
+    assert {:ok, "7/7/24, 9:36:00 PM Coordinated Universal Time"} =
              Cldr.DateTime.to_string(datetime,
                format: :medium,
                date_format: :short,
