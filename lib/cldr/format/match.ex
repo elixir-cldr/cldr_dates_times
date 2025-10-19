@@ -322,7 +322,7 @@ defmodule Cldr.DateTime.Format.Match do
         # just the different in their counts
         {symbol_a, count_a}, {symbol_a, count_b}, distance
         when same_types({symbol_a, count_a}, {symbol_a, count_b}) ->
-          distance + count_a - count_b
+          distance + abs(count_a - count_b)
 
         # Same symbol, but one is numeric form, the other
         # is alpha form. Assign a difference of 10 which is greater than
@@ -338,14 +338,14 @@ defmodule Cldr.DateTime.Format.Match do
         {symbol_a, count_a}, {symbol_b, count_b}, distance
         when different_but_compatible({symbol_a, count_a}, {symbol_b, count_b}) and
                same_types({symbol_a, count_a}, {symbol_b, count_b}) ->
-          distance + count_a - count_b + 10
+          distance + abs(count_a - count_b) + 10
 
         # Different but compatible symbols, one numeric
         # and one alphabetic form.
         {symbol_a, count_a}, {symbol_b, count_b}, distance
         when different_but_compatible({symbol_a, count_a}, {symbol_b, count_b}) and
                different_types({symbol_a, count_a}, {symbol_b, count_b}) ->
-          distance + count_a - count_b + 20
+          distance + abs(count_a - count_b) + 20
 
         _other_a, _other_b, distance ->
           distance + 30
