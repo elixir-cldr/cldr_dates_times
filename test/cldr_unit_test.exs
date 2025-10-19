@@ -2,9 +2,10 @@ defmodule DateTime.CldrUnitTest do
   use ExUnit.Case, async: true
 
   @maybe_incorrect_test_result [47, 48, 51, 52, 55, 56, 59, 60]
+  @test_calendars [:gregorian, :japanese]
 
   for test <- Cldr.DateTime.TestData.parse(),
-      test.calendar == :gregorian, test.index not in @maybe_incorrect_test_result do
+      test.calendar in @test_calendars, test.index not in @maybe_incorrect_test_result do
     case test.test_module do
       Cldr.Date ->
         test "##{test.index} Date format #{inspect(test.date_format)} with locale #{inspect(test.locale)}" do

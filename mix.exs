@@ -1,7 +1,7 @@
 defmodule Cldr.DatesTimes.Mixfile do
   use Mix.Project
 
-  @version "2.25.0-dev"
+  @version "2.25.0"
 
   def project do
     [
@@ -80,17 +80,18 @@ defmodule Cldr.DatesTimes.Mixfile do
     [
       {:ex_cldr, github: "elixir-cldr/cldr48", override: true},
       {:ex_cldr_numbers, github: "elixir-cldr/cldr_numbers", branch: "cldr48", override: true},
+      {:ex_cldr_calendars, github: "elixir-cldr/cldr_calendars", branch: "cldr48", override: true},
+      {:ex_cldr_calendars_japanese, path: "../cldr_calendars_japanese", only: [:dev, :test]},
 
-      # {:ex_cldr, "~> 2.44"},
-      # {:ex_cldr_numbers, "~> 2.35"},
+      # {:ex_cldr_calendars, "~> 2.4"},
+      # {:ex_cldr_calendars_japanese, "~> 1.1", only: [:dev, :test]},
 
-      {:ex_cldr_calendars, "~> 2.1"},
       {:ex_cldr_units, "~> 3.18", optional: true},
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},
       {:tz, "~> 0.26", optional: true},
-      {:benchee, "~> 1.0", optional: true, only: :dev, runtime: false},
+      # {:benchee, "~> 1.0", optional: true, only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", optional: true, only: [:dev, :test], runtime: false},
       {:exprof, "~> 0.2", optional: true, only: :dev, runtime: false},
       {:mint, "~> 1.7", optional: true, only: [:dev, :test]}

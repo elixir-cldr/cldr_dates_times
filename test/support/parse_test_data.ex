@@ -8,6 +8,11 @@ defmodule Cldr.DateTime.TestData do
     |> Enum.with_index(&format_test/2)
   end
 
+  def test(n) do
+    parse()
+    |> Enum.find(&(&1.index == n))
+  end
+
   @atomize_values [:calendar, :time_format, :date_format, :date_time_format_type, :style]
 
   def format_test(test, index) do
@@ -26,6 +31,7 @@ defmodule Cldr.DateTime.TestData do
     |> maybe_atomize_skeleton()
     |> Map.put(:index, index + 1)
     |> parse_input()
+    |> convert_calendar()
     |> determine_test_module()
     |> ensure_style_for_date_time()
   end
@@ -81,6 +87,15 @@ defmodule Cldr.DateTime.TestData do
         datetime = datetime <> "+" <> offset
         Map.put(test, :input, parse_date(datetime, timezone))
     end
+  end
+
+  defp convert_calendar(%{calendar: :japanese} = test) do
+    converted = DateTime.convert!(test.input, Cldr.Calendar.Japanese)
+    Map.put(test, :input, converted)
+  end
+
+  defp convert_calendar(test) do
+    test
   end
 
   def parse_date(datetime, timezone) do

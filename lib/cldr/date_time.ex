@@ -881,6 +881,10 @@ defmodule Cldr.DateTime do
   #  Otherwise, if the requested date fields include abbreviated month (MMM, LLL), use <dateTimeFormatLength type="medium">
   #  Otherwise use <dateTimeFormatLength type="short">
 
+  defp resolve_format(%{format: format}, style, locale, calendar, backend) do
+    resolve_format(format, style, locale, calendar, backend)
+  end
+
   defp resolve_format(date_format, style, locale, calendar, backend) do
     {:ok, formats} = formats_for_style(style, locale, calendar, backend)
 

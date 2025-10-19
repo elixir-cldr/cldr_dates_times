@@ -486,7 +486,7 @@ defmodule Cldr.DateTime.Timezone do
          {:ok, zone_territory} <- territory_for_zone(canonical_zone) do
       format = zone_format(region_format, options)
 
-      case location_from_territory_and_zone(zone_territory, territories, canonical_zone) do
+      case location_from_territory_and_zone(zone_territory, territories, canonical_zone, locale) do
         {:ok, location} ->
           io_list = Substitution.substitute(location, format)
           {:ok, List.to_string(io_list)}
@@ -497,12 +497,12 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
-  defp location_from_territory_and_zone(territory, territories, time_zone) do
+  defp location_from_territory_and_zone(territory, territories, time_zone, locale) do
     if territory_has_one_zone?(territory) || primary_zone?(time_zone) do
       territory_names = Map.fetch!(territories, territory)
       {:ok, territory_names[:short] || territory_names[:standard]}
     else
-      exemplar_city(time_zone)
+      exemplar_city(time_zone, locale: locale)
     end
   end
 

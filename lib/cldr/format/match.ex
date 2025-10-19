@@ -174,6 +174,32 @@ defmodule Cldr.DateTime.Format.Match do
     # |> IO.inspect(label: "Matched to #{inspect original_skeleton}")
   end
 
+  @doc false
+  # Debugging aid to return the best match skeleton and the format
+  # string it resolves to.
+  def best_match_format(
+        skeleton,
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    {:ok, formats} = Format.date_time_available_formats(locale, calendar, backend)
+
+    case best_match(skeleton, locale, calendar, backend) do
+      {:ok, {date_format_id, time_format_id}} ->
+          %{
+            date_format_id => Map.get(formats, date_format_id),
+            time_format_id => Map.get(formats, time_format_id)
+          }
+
+      {:ok, format_id} ->
+        %{format_id => Map.get(formats, format_id)}
+
+      other ->
+        other
+    end
+  end
+
   defp try_date_and_time_skeletons(skeleton, original, locale, calendar, backend) do
     with {date_skeleton, time_skeleton} <- separate_date_and_time_fields(skeleton),
          {:ok, date_format} <- best_match(date_skeleton, locale, calendar, backend),
@@ -294,32 +320,35 @@ defmodule Cldr.DateTime.Format.Match do
       Enum.zip_reduce(tokens, skeleton, 0, fn
         # Same symbol, both numeric forms so the distance is
         # just the different in their counts
-        {symbol_a, count_a}, {symbol_a, count_b}, acc
+        {symbol_a, count_a}, {symbol_a, count_b}, distance
         when same_types({symbol_a, count_a}, {symbol_a, count_b}) ->
-          acc + abs(count_a - count_b)
+          distance + count_a - count_b
 
         # Same symbol, but one is numeric form, the other
-        # is alpha form. Assgn a difference of 5.
-        {symbol_a, count_a}, {symbol_a, count_b}, acc
+        # is alpha form. Assign a difference of 10 which is greater than
+        # any delta between counts so distance is greater than between
+        # two symbols that are the same but with different counts (ie
+        # the clause above)
+        {symbol_a, count_a}, {symbol_a, count_b}, distance
         when different_types({symbol_a, count_a}, {symbol_a, count_b}) ->
-          acc + 10
+          distance + 10
 
         # Different but compatible symbols, both of numeric
         # form.
-        {symbol_a, count_a}, {symbol_b, count_b}, acc
+        {symbol_a, count_a}, {symbol_b, count_b}, distance
         when different_but_compatible({symbol_a, count_a}, {symbol_b, count_b}) and
                same_types({symbol_a, count_a}, {symbol_b, count_b}) ->
-          acc + abs(count_a - count_b) + 5
+          distance + count_a - count_b + 10
 
         # Different but compatible symbols, one numeric
         # and one alphabetic form.
-        {symbol_a, count_a}, {symbol_b, count_b}, acc
+        {symbol_a, count_a}, {symbol_b, count_b}, distance
         when different_but_compatible({symbol_a, count_a}, {symbol_b, count_b}) and
                different_types({symbol_a, count_a}, {symbol_b, count_b}) ->
-          acc + abs(count_a - count_b) + 10
+          distance + count_a - count_b + 20
 
-        _other_a, _other_b, acc ->
-          acc + 15
+        _other_a, _other_b, distance ->
+          distance + 30
       end)
 
     {token_id, distance}
