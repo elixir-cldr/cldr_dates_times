@@ -2,7 +2,8 @@ defmodule Cldr.DateTime.Format.Match do
   @moduledoc """
   Implements best match for a requested skeleton to an available format ID.
 
-  A “best match” from requested skeleton to the id portion of a `Cldr.DateTime.date_time_available_formats/3`
+  A “best match” from requested skeleton to the id portion of a
+  `Cldr.DateTime.Format.date_time_available_formats/3`
   map is found using a closest distance match as follows:
 
   ### Matching process
@@ -104,7 +105,7 @@ defmodule Cldr.DateTime.Format.Match do
 
   ### Returns
 
-  * `{:ok, format_id} or
+  * `{:ok, format_id}` or
 
   * `{:ok, {date_format_id, time_format_id}}`
 
