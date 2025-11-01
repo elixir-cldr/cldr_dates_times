@@ -79,7 +79,7 @@ defmodule Cldr.DatesTimes.Mixfile do
   defp deps do
     [
       {:ex_cldr, github: "elixir-cldr/cldr48", override: true},
-      {:ex_cldr_numbers, github: "elixir-cldr/cldr_numbers", branch: "cldr48", override: true},
+      {:ex_cldr_numbers, github: "elixir-cldr/cldr_numbers", override: true},
       {:ex_cldr_calendars, github: "elixir-cldr/cldr_calendars", branch: "cldr48", override: true},
       {:ex_cldr_calendars_japanese, path: "../cldr_calendars_japanese", only: [:dev, :test]},
 
