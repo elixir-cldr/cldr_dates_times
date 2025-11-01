@@ -1,8 +1,8 @@
 defmodule Cldr.DateTime.Relative do
   @moduledoc """
-  Functions to support the string formatting of relative time/datetime numbers.
+  Functions to support the string formatting of relative date/time/datetime numbers.
 
-  This module provides formatting of numbers (as integers, floats, Dates or DateTimes)
+  This module provides formatting of numbers (as integers, floats, Dates, Times or DateTimes)
   as "ago" or "in" with an appropriate time unit.  For example, "2 days ago" or
   "in 10 seconds"
 
@@ -29,38 +29,64 @@ defmodule Cldr.DateTime.Relative do
 
   @other_units [:mon, :tue, :wed, :thu, :fri, :sat, :sun, :quarter]
   @unit_keys Enum.sort(Map.keys(@unit_steps) ++ @other_units)
-  @known_styles [:default, :narrow, :short]
+  @known_formats [:standard, :narrow, :short]
 
   @doc """
-  Returns a `{:ok, string}` representing a relative time (ago, in) for a given
-  number, Date or Datetime.  Returns `{:error, reason}` when errors are detected.
+  Returns a string representing a relative time (ago, in) for a given
+  number, date, time or datetime.
 
-  * `relative` is an integer or `t:DateTime.t/0`, `t:Date.t/0` or `t:Time.t/0` representing the
-    time distance from `now` or from `options[:relative_to]`.
+  ### Arguments
+
+  * `relative` is an integer or `t:Calendar.datetime/0`, `t:Calendar.date/0`, or
+    `t:Calendar.time/0` representing the time distance from `now` or from
+    `options[:relative_to]`.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   * `options` is a `t:Keyword.t/0` list of options.
 
-  ## Options
+  ### Options
 
-  * `:locale` is the locale in which the binary is formatted.
-    The default is `Cldr.get_locale/0`
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`.
+  * `:format` is the type of the formatted string.  Allowable values are `:standard`,
+    `:narrow` or `:short`. The default is `:standard`.
+
+  * `:style` determines whether to return a standard relative string ("tomorrow") or
+    an "at" string ("tomorrow at 3:00 PM"). The supported values are `:standard` (the default)
+    or `:at`.  Note that `style: :at` is only applied when:
+
+    * `:unit` is not a time unit (ie not `:hour`, `:minute` or :second`)
+    * *and* when `:relative` is a `t:Calendar.datetime/0` or
+    * *or* the `:at` option is set to a `t:Calendar.time/0`
 
   * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
     `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
     `:sun`, `:quarter`. If no `:unit` is specified, one will be derived using the
     `:derive_unit_from` option.
 
-  * `:relative_to` is the baseline `t:Date/0` or `t:Datetime.t/0` from which the difference
-    from `relative` is calculated when `relative` is a Date or a DateTime. The default for
-    a `t:Date.t/0` is `Date.utc_today/0`, for a `t:DateTime.t/0` it is `DateTime.utc_now/0`.
+  * `:relative_to` is the baseline `date` or `datetime` from which the difference
+    from `relative` is calculated when `relative` is a `t:Calendar.date/0` or a
+    `t:Calendar.datetime/0`. The default for a `t:Calendar.date/0` is `Date.utc_today/0`;
+    for a `t:Calendar.datetime/0` it is `DateTime.utc_now/0` and for a t:Calendar.time/0` it
+    is `Time.utc_now/0`.
+
+  * `:time` is any `t:Calendar.time/0` that is used when `style: :at` is being applied. The
+    default is to use the time component of `relative`.
+
+  * `:time_format` is the format option to be passed to `Cldr.Time.to_string/3` if the `:style`
+    option is `:at` and `relative` is a `t:Calendar.datetime/0` or the `:time` option is set.
+    The default is `:short`.
+
+  * `:at_format` is one of `:short`, `:medium`, `:long` or `:full`. It is used to determine the
+    format joining together the `relative` string and the `:time` string when `:style` is `:at.
+    The default is `:short` if `:format` is either `:short` or `:narrow`. Otherwise the
+    default is `:medium`.
 
   * `:derive_unit_from` is used to derive the most appropriate time unit if none is provided.
-    THere are two ways to specify `:derive_unit_from`.
+    There are two ways to specify `:derive_unit_from`.
 
     * The first option is a map. The map is required to have the keys `:second`, `:minute`, `:hour`,
       `:day`, `:week`, `:month`, and `:year` with the values being the number of seconds below
@@ -71,7 +97,7 @@ defmodule Cldr.DateTime.Relative do
     * The second option is to specify a function reference. The function must take four
       arguments as described below.
 
-  ### The :derive_unit_from` *map*
+  #### The :derive_unit_from` *map*
 
   * Any `:derive_unit_from` map is first merged into the default map. This means that developers
     can use the default values and override only specific entries by providing a sparse map.
@@ -82,7 +108,7 @@ defmodule Cldr.DateTime.Relative do
   * Any entry in the `:derive_unit_from` map that has the value `:infinity` will always be the
     largest time unit used to represent the relative time.
 
-  ### The :derive_unit_from *function*
+  #### The :derive_unit_from *function*
 
   * The function must take four arguments:
     * `relative`, being the first argument to `to_string/3`.
@@ -92,14 +118,20 @@ defmodule Cldr.DateTime.Relative do
     * `unit` being the requested time unit which may be `nil`. If `nil` then
       the time unit must be derived and the `time_difference` scaled to that
       time unit. If specified then the `time_difference` must be scaled to
-      that time unit.
+      the specified time unit.
 
   * The function must return a tuple of the form `{relative, unit}` where
     `relative` is an integer value and `unit` is the appropriate time unit atom.
 
   * See the `Cldr.DateTime.Relative.derive_unit_from/4` function for an example.
 
-  ## Examples
+  ### Returns
+
+  * `{:ok, formatted_string}` or
+
+  * `{:error, {exception, reason}}`
+
+  ### Examples
 
       iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr)
       {:ok, "1 second ago"}
@@ -110,8 +142,14 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day)
       {:ok, "tomorrow"}
 
-      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, locale: :fr)
       {:ok, "demain"}
+
+      iex> Cldr.DateTime.Relative.to_string(2, MyApp.Cldr, unit: :day, locale: :de)
+      {:ok, "übermorgen"}
+
+      iex> Cldr.DateTime.Relative.to_string(-2, MyApp.Cldr, unit: :day, locale: :de)
+      {:ok, "vorgestern"}
 
       iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :day, format: :narrow)
       {:ok, "tomorrow"}
@@ -119,7 +157,7 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year)
       {:ok, "in 1,234 years"}
 
-      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(1234, MyApp.Cldr, unit: :year, locale: :fr)
       {:ok, "dans 1 234 ans"}
 
       iex> Cldr.DateTime.Relative.to_string(31, MyApp.Cldr)
@@ -128,28 +166,28 @@ defmodule Cldr.DateTime.Relative do
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, relative_to: ~D[2017-04-26])
       {:ok, "in 3 days"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :short, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :short, locale: :fr)
       {:ok, "dans 5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :narrow, locale: "fr")
+      iex> Cldr.DateTime.Relative.to_string(310, MyApp.Cldr, format: :narrow, locale: :fr)
       {:ok, "+5 min"}
 
-      iex> Cldr.DateTime.Relative.to_string 2, MyApp.Cldr, unit: :wed, format: :short, locale: "en"
+      iex> Cldr.DateTime.Relative.to_string(2, MyApp.Cldr, unit: :wed, format: :short, locale: :en)
       {:ok, "in 2 Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string 1, MyApp.Cldr, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string(1, MyApp.Cldr, unit: :wed, format: :short)
       {:ok, "next Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed, format: :short
+      iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr, unit: :wed, format: :short)
       {:ok, "last Wed."}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :wed
+      iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr, unit: :wed)
       {:ok, "last Wednesday"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :quarter
+      iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr, unit: :quarter)
       {:ok, "last quarter"}
 
-      iex> Cldr.DateTime.Relative.to_string -1, MyApp.Cldr, unit: :mon, locale: "fr"
+      iex> Cldr.DateTime.Relative.to_string(-1, MyApp.Cldr, unit: :mon, locale: :fr)
       {:ok, "lundi dernier"}
 
       iex> Cldr.DateTime.Relative.to_string(~D[2017-04-29], MyApp.Cldr, unit: :ziggeraut)
@@ -168,40 +206,98 @@ defmodule Cldr.DateTime.Relative do
   end
 
   def to_string(relative, backend, options) do
-    options = normalize_options(backend, options)
+    {locale, _backend} = Cldr.locale_and_backend_from(options)
 
-    locale = Keyword.get(options, :locale)
-    {unit, options} = Keyword.pop(options, :unit)
-    {derive_unit_from, options} = Keyword.pop(options, :derive_unit_from, @unit_steps)
-    relative_to = Keyword.get_lazy(options, :relative_to, &DateTime.utc_now/0)
-    style = options[:style] || options[:format]
+    with {:ok, options} <- normalize_options(options),
+         {:ok, unit} <- validate_unit(options.unit),
+         {:ok, _format} <- validate_format(options.format),
+         {:ok, locale} <- Cldr.validate_locale(locale, backend),
+         {:ok, time_difference} <- time_difference(relative, options.relative_to) do
+      {relative_scaled, unit} =
+        define_unit(relative, options.relative_to, time_difference, unit, options.derive_unit_from)
+      relative_string = to_string(relative_scaled, unit, locale, backend, options)
 
-    with {:ok, locale} <- Cldr.validate_locale(locale, backend),
-         {:ok, unit} <- validate_unit(unit),
-         {:ok, _style} <- validate_style(style),
-         {:ok, time_difference} <- time_difference(relative, relative_to) do
-      {relative, unit} = define_unit(relative, relative_to, time_difference, unit, derive_unit_from)
-      string = to_string(relative, unit, locale, backend, options)
-      {:ok, string}
+      if options.style == :at && unit not in [:hour, :minute, :second] do
+        format_relative_at(relative, options.time, relative_string, locale, backend, options)
+      else
+        {:ok, relative_string}
+      end
     end
   end
 
-  defp normalize_options(backend, options) do
-    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
-    style = options[:style] || options[:format] || :default
+  defp format_relative_at(relative, nil, relative_string, locale, backend, options)
+      when is_time(relative) do
+    case relative_at_formats(locale, backend) do
+      {:ok, formats} ->
+        time_format = format(options.time_format, options.format)
+        time_options = [locale: locale, format: time_format]
 
-    options
-    |> Keyword.put(:locale, locale)
-    |> Keyword.put(:style, style)
-    |> Keyword.delete(:format)
+        at_format = format(options.at_format, options.format)
+        template = Map.fetch!(formats, at_format)
+
+        with {:ok, time_string} <- Cldr.Time.to_string(relative, backend, time_options),
+             {:ok, tokens, _} <- Cldr.DateTime.Format.Compiler.tokenize(template) do
+          formatted =
+            tokens
+            |> apply_transforms(relative_string, time_string)
+            |> List.to_string()
+
+          {:ok, formatted}
+        end
+
+      {:error, _} ->
+        {:ok, relative_string}
+    end
   end
+
+  defp format_relative_at(_relative, time, relative_string, locale, backend, options)
+      when is_time(time) do
+    format_relative_at(time, nil, relative_string, locale, backend, options)
+  end
+
+  defp format_relative_at(_relative, _time, relative_string, _locale, _backend, _options) do
+    {:ok, relative_string}
+  end
+
+  defp apply_transforms(tokens, relative_string, time_string) do
+    Enum.map(tokens, fn
+      {:date, _a, _b} -> relative_string
+      {:time, _a, _b} -> time_string
+      {:literal, _a, literal} -> literal
+    end)
+  end
+
+  defp normalize_options(options) do
+    options =
+      default_options()
+      |> Keyword.merge(options)
+      |> Keyword.put_new_lazy(:relative_to, &DateTime.utc_now/0)
+
+    {:ok, Map.new(options)}
+  end
+
+  defp default_options do
+    [
+      format: :standard,
+      style: :standard,
+      time_format: :short,
+      time: nil,
+      at_format: nil,
+      unit: nil,
+      derive_unit_from: @unit_steps
+    ]
+  end
+
+  defp format(nil, format) when format in [:short, :narrow], do: :short
+  defp format(nil, _format), do: :medium
+  defp format(time_format, _), do: time_format
 
   # If an integer (not a date or datetime) is given, use that value directly
   defp time_difference(relative, _relative_to) when is_integer(relative) do
     {:ok, relative}
   end
 
-  # If realtive is a datetime then relative_to must be too
+  # If relative is a datetime then relative_to must be too
   defp time_difference(relative, relative_to) when is_date_time(relative) do
     seconds = DateTime.diff(relative, relative_to)
     {:ok, seconds}
@@ -250,37 +346,60 @@ defmodule Cldr.DateTime.Relative do
 
   @doc """
   Returns a string representing a relative time (ago, in) for a given
-  number, Date or Datetime or raises an exception on error.
+  number, date, time or datetime or raises an exception.
 
-  ## Arguments
+  ### Arguments
 
-  * `relative` is an integer or `t:DateTime.t/0`, `t:Date.t/0` or `t:Time.t/0` representing the
-    time distance from `now` or from `options[:relative_to]`.
+  * `relative` is an integer or `t:Calendar.datetime/0`, `t:Calendar.date/0`, or
+    `t:Calendar.time/0` representing the time distance from `now` or from
+    `options[:relative_to]`.
 
   * `backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
   * `options` is a `t:Keyword.t/0` list of options.
 
-  ## Options
+  ### Options
 
-  * `:locale` is the locale in which the binary is formatted.
-    The default is `Cldr.get_locale/0`.
+  * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-  * `:format` is the format of the binary.  Format may be `:default`, `:narrow` or `:short`.
-    The default is `:default`.
+  * `:format` is the type of the formatted string.  Allowable values are `:standard`,
+    `:narrow` or `:short`. The default is `:standard`.
+
+  * `:style` determines whether to return a standard relative string ("tomorrow") or
+    an "at" string ("tomorrow at 3:00 PM"). The supported values are `:standard` (the default)
+    or `:at`.  Note that `style: :at` is only applied when:
+
+    * `:unit` is not a time unit (ie not `:hour`, `:minute` or :second`)
+    * *and* when `:relative` is a `t:Calendar.datetime/0` or
+    * *or* the `:at` option is set to a `t:Calendar.time/0`
 
   * `:unit` is the time unit for the formatting.  The allowable units are `:second`, `:minute`,
     `:hour`, `:day`, `:week`, `:month`, `:year`, `:mon`, `:tue`, `:wed`, `:thu`, `:fri`, `:sat`,
     `:sun`, `:quarter`. If no `:unit` is specified, one will be derived using the
     `:derive_unit_from` option.
 
-  * `:relative_to` is the baseline `t:Date/0` or `t:Datetime.t/0` from which the difference
-    from `relative` is calculated when `relative` is a Date or a DateTime. The default for
-    a `t:Date.t/0` is `Date.utc_today/0`, for a `t:DateTime.t/0` it is `DateTime.utc_now/0`.
+  * `:relative_to` is the baseline `date` or `datetime` from which the difference
+    from `relative` is calculated when `relative` is a `t:Calendar.date/0` or a
+    `t:Calendar.datetime/0`. The default for a `t:Calendar.date/0` is `Date.utc_today/0`;
+    for a `t:Calendar.datetime/0` it is `DateTime.utc_now/0` and for a t:Calendar.time/0` it
+    is `Time.utc_now/0`.
+
+  * `:time` is any `t:Calendar.time/0` that is used when `style: :at` is being applied. The
+    default is to use the time component of `relative`.
+
+  * `:time_format` is the format option to be passed to `Cldr.Time.to_string/3` if the `:style`
+    option is `:at` and `relative` is a `t:Calendar.datetime/0` or the `:time` option is set.
+    The default is `:short`.
+
+  * `:at_format` is one of `:short`, `:medium`, `:long` or `:full`. It is used to determine the
+    format joining together the `relative` string and the `:time` string when `:style` is `:at.
+    The default is `:short` if `:format` is either `:short` or `:narrow`. Otherwise the
+    default is `:medium`.
 
   * `:derive_unit_from` is used to derive the most appropriate time unit if none is provided.
-    THere are two ways to specify `:derive_unit_from`.
+    There are two ways to specify `:derive_unit_from`.
 
     * The first option is a map. The map is required to have the keys `:second`, `:minute`, `:hour`,
       `:day`, `:week`, `:month`, and `:year` with the values being the number of seconds below
@@ -291,7 +410,7 @@ defmodule Cldr.DateTime.Relative do
     * The second option is to specify a function reference. The function must take four
       arguments as described below.
 
-  ### The :derive_unit_from` *map*
+  #### The :derive_unit_from` *map*
 
   * Any `:derive_unit_from` map is first merged into the default map. This means that developers
     can use the default values and override only specific entries by providing a sparse map.
@@ -302,7 +421,7 @@ defmodule Cldr.DateTime.Relative do
   * Any entry in the `:derive_unit_from` map that has the value `:infinity` will always be the
     largest time unit used to represent the relative time.
 
-  ### The :derive_unit_from *function*
+  #### The :derive_unit_from *function*
 
   * The function must take four arguments:
     * `relative`, being the first argument to `to_string/3`.
@@ -312,14 +431,22 @@ defmodule Cldr.DateTime.Relative do
     * `unit` being the requested time unit which may be `nil`. If `nil` then
       the time unit must be derived and the `time_difference` scaled to that
       time unit. If specified then the `time_difference` must be scaled to
-      that time unit.
+      the specified time unit.
 
   * The function must return a tuple of the form `{relative, unit}` where
     `relative` is an integer value and `unit` is the appropriate time unit atom.
 
   * See the `Cldr.DateTime.Relative.derive_unit_from/4` function for an example.
 
-  See `to_string/3` for example usage.
+  ### Returns
+
+  * `{:ok, formatted_string}` or
+
+  * `{:error, {exception, reason}}`
+
+  ### Examples
+
+  * See `Cldr.DateTime.Relative.to_string/3` for example usage.
 
   """
   @spec to_string!(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
@@ -344,14 +471,12 @@ defmodule Cldr.DateTime.Relative do
 
   # For the case when its relative by one unit, for example "tomorrow" or "yesterday"
   # or "last"
-  defp to_string(relative, unit, locale, backend, options) when relative in -1..1 do
-    style = options[:style] || options[:format]
-
+  defp to_string(relative, unit, locale, backend, options) when relative in -2..2 do
     result =
       locale
       |> get_locale(backend)
-      |> get_in([unit, style, :relative_ordinal])
-      |> Enum.at(relative + 1)
+      |> get_in([unit, options.format, :relative_ordinal])
+      |> Map.get(relative)
 
     if is_nil(result), do: to_string(relative / 1, unit, locale, backend, options), else: result
   end
@@ -361,12 +486,11 @@ defmodule Cldr.DateTime.Relative do
   defp to_string(relative, unit, locale, backend, options)
        when is_float(relative) or is_integer(relative) do
     direction = if relative > 0, do: :relative_future, else: :relative_past
-    style = options[:style] || options[:format]
 
     rules =
       locale
       |> get_locale(backend)
-      |> get_in([unit, style, direction])
+      |> get_in([unit, options.format, direction])
 
     rule = Module.concat(backend, Number.Cardinal).pluralize(trunc(relative), locale, rules)
 
@@ -382,9 +506,9 @@ defmodule Cldr.DateTime.Relative do
      "Unknown time unit #{inspect(unit)}.  Valid time units are #{inspect(@unit_keys)}"}
   end
 
-  defp style_error(style) do
-    {Cldr.UnknownStyleError,
-     "Unknown style #{inspect(style)}.  Valid styles are #{inspect(@known_styles)}"}
+  defp format_error(format) do
+    {Cldr.UnknownFormatError,
+     "Unknown format #{inspect(format)}.  Valid formats are #{inspect(@known_formats)}"}
   end
 
   @doc """
@@ -566,6 +690,15 @@ defmodule Cldr.DateTime.Relative do
     @unit_keys
   end
 
+  @doc """
+  Returns the default map of unit steps.
+
+  """
+  @doc since: "2.25.0"
+  def default_unit_steps do
+    @unit_steps
+  end
+
   defp validate_unit(unit) when unit in @unit_keys or is_nil(unit) do
     {:ok, unit}
   end
@@ -574,20 +707,30 @@ defmodule Cldr.DateTime.Relative do
     {:error, time_unit_error(unit)}
   end
 
+  def known_formats do
+    @known_formats
+  end
+
+  @doc deprecated: "Use known_formats/0"
   def known_styles do
-    @known_styles
+    known_formats()
   end
 
-  defp validate_style(style) when style in @known_styles do
-    {:ok, style}
+  defp validate_format(format) when format in @known_formats do
+    {:ok, format}
   end
 
-  defp validate_style(style) do
-    {:error, style_error(style)}
+  defp validate_format(style) do
+    {:error, format_error(style)}
   end
 
   defp get_locale(locale, backend) do
     backend = Module.concat(backend, DateTime.Relative)
     backend.get_locale(locale)
+  end
+
+  defp relative_at_formats(locale, backend) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_time_relative_formats(locale)
   end
 end

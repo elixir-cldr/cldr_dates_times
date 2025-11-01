@@ -19,8 +19,9 @@ defmodule Cldr.DateTime do
 
   """
 
+  alias Cldr.DateTime.Format.Compiler
+  alias Cldr.DateTime.Format.Match
   alias Cldr.DateTime.Format
-  alias Cldr.LanguageTag
   alias Cldr.Locale
 
   @typep options :: Keyword.t() | map()
@@ -81,6 +82,11 @@ defmodule Cldr.DateTime do
   """
   defguard has_date_and_time(datetime)
            when has_date(datetime) and has_time(datetime)
+
+  @doc """
+  Guard whether a format is a format skeleton
+  """
+  defguard is_skeleton(format) when is_atom(format) and not is_nil(format)
 
   defmodule Formats do
     @moduledoc false
@@ -204,13 +210,13 @@ defmodule Cldr.DateTime do
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :hms, locale: :en)
       {:ok, "11:59:59 PM"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :full, locale: :en)
-      {:ok, "Saturday, January 1, 2000, 11:59:59 PM GMT"}
+      {:ok, "Saturday, January 1, 2000, 11:59:59 PM Coordinated Universal Time"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :full, locale: :fr)
-      {:ok, "samedi 1 janvier 2000, 23:59:59 UTC"}
+      {:ok, "samedi 1 janvier 2000, 23:59:59 temps universel coordonné"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :full, style: :at, locale: :en)
-      {:ok, "Saturday, January 1, 2000 at 11:59:59 PM GMT"}
+      {:ok, "Saturday, January 1, 2000 at 11:59:59 PM Coordinated Universal Time"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :full, style: :at, locale: :fr)
-      {:ok, "samedi 1 janvier 2000 à 23:59:59 UTC"}
+      {:ok, "samedi 1 janvier 2000 à 23:59:59 temps universel coordonné"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :MMMMW, locale: :fr)
       {:ok, "semaine 1 (janvier)"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :yw, locale: :fr)
@@ -369,9 +375,9 @@ defmodule Cldr.DateTime do
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :long, locale: :en)
       "January 1, 2000, 11:59:59 PM UTC"
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :full, locale: :en)
-      "Saturday, January 1, 2000, 11:59:59 PM GMT"
+      "Saturday, January 1, 2000, 11:59:59 PM Coordinated Universal Time"
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :full, locale: :fr)
-      "samedi 1 janvier 2000, 23:59:59 UTC"
+      "samedi 1 janvier 2000, 23:59:59 temps universel coordonné"
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :MMMMW, locale: :fr)
       "semaine 1 (janvier)"
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :yw, locale: :fr)
@@ -410,20 +416,22 @@ defmodule Cldr.DateTime do
   ## Examples:
 
       iex> Cldr.DateTime.Format.date_time_formats(:en)
-      {:ok, %Cldr.DateTime.Formats{
-        full: "{1}, {0}",
-        long: "{1}, {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"
-      }}
+      {:ok,
+       %Cldr.DateTime.Formats{
+         short: "{1}, {0}",
+         medium: "{1}, {0}",
+         long: "{1}, {0}",
+         full: "{1}, {0}"
+       }}
 
       iex> Cldr.DateTime.Format.date_time_formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.DateTime.Formats{
-        full: "{1}, {0}",
-        long: "{1}, {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"
-      }}
+      {:ok,
+       %Cldr.DateTime.Formats{
+         short: "{1}, {0}",
+         medium: "{1}, {0}",
+         long: "{1}, {0}",
+         full: "{1}, {0}"
+       }}
 
   """
   @spec formats(
@@ -461,61 +469,74 @@ defmodule Cldr.DateTime do
       iex> Cldr.DateTime.available_formats(:en)
       {:ok,
        %{
-         yw: %{
-           other: "'week' w 'of' Y",
-           one: "'week' w 'of' Y",
-           pluralize: :week_of_year
-         },
-         GyMMMEd: "E, MMM d, y G",
-         Hms: "HH:mm:ss",
          MMMMW: %{
            other: "'week' W 'of' MMMM",
            one: "'week' W 'of' MMMM",
            pluralize: :week_of_month
          },
-         E: "ccc",
-         MMMd: "MMM d",
-         yMEd: "E, M/d/y",
-         yQQQ: "QQQ y",
          Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
-         M: "L",
-         hm: %{unicode: "h:mm a", ascii: "h:mm a"},
-         yM: "M/y",
-         GyMMMd: "MMM d, y G",
-         GyMd: "M/d/y G",
-         Gy: "y G",
-         Hm: "HH:mm",
-         EBhms: "E h:mm:ss B",
-         d: "d",
-         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-         Ed: "d E",
-         Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
-         EHms: "E HH:mm:ss",
-         Bh: "h B",
-         h: %{unicode: "h a", ascii: "h a"},
-         Bhms: "h:mm:ss B",
-         Hmv: "HH:mm v",
-         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
-         yMd: "M/d/y",
-         ms: "mm:ss",
-         MMM: "LLL",
          y: "y",
-         Bhm: "h:mm B",
-         yMMM: "MMM y",
-         yQQQQ: "QQQQ y",
-         yMMMEd: "E, MMM d, y",
-         yMMMM: "MMMM y",
-         EBhm: "E h:mm B",
-         Hmsv: "HH:mm:ss v",
-         yMMMd: "MMM d, y",
-         MEd: "E, M/d",
-         EHm: "E HH:mm",
+         MMMd: "MMM d",
+         yyMd: "M/d/yy",
+         GyM: "M/y G",
+         hv: %{unicode: "h a v", ascii: "h a v"},
+         Hm: "HH:mm",
+         Bhms: "h:mm:ss B",
+         ms: "mm:ss",
+         yMd: "M/d/y",
          GyMMM: "MMM y G",
-         hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
+         GyMMMEd: "E, MMM d, y G",
+         yMMMd: "MMM d, y",
+         EBh: "E h B",
+         Gy: "y G",
+         Hmsv: "HH:mm:ss v",
+         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
+         M: "L",
+         h: %{unicode: "h a", ascii: "h a"},
+         Hms: "HH:mm:ss",
+         yMMMMd: "MMMM d, y",
+         EHm: "E HH:mm",
+         ahmmsszzzz: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+         MMM: "LLL",
+         ahmmssz: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+         d: "d",
+         Hmv: "HH:mm v",
+         GyMd: "M/d/y G",
+         yQQQ: "QQQ y",
+         yMMMEd: "E, MMM d, y",
+         ahmmss: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+         MMMMd: "MMMM d",
          H: "HH",
+         MEd: "E, M/d",
          Md: "M/d",
+         GyMEd: "E, M/d/y G",
+         yMMM: "MMM y",
+         EBhms: "E h:mm:ss B",
+         yw: %{
+           other: "'week' w 'of' Y",
+           one: "'week' w 'of' Y",
+           pluralize: :week_of_year
+         },
+         hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
          MMMEd: "E, MMM d",
-         MMMMd: "MMMM d"
+         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+         EBhm: "E h:mm B",
+         EHms: "E HH:mm:ss",
+         Hv: "HH'h' v",
+         ahmm: %{unicode: "h:mm a", ascii: "h:mm a"},
+         hm: %{unicode: "h:mm a", ascii: "h:mm a"},
+         GyMMMd: "MMM d, y G",
+         yMEd: "E, M/d/y",
+         Eh: %{unicode: "E h a", ascii: "E h a"},
+         Bh: "h B",
+         Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
+         yMMMM: "MMMM y",
+         yQQQQ: "QQQQ y",
+         yMMMMEEEEd: "EEEE, MMMM d, y",
+         E: "ccc",
+         yM: "M/y",
+         Bhm: "h:mm B",
+         Ed: "d E"
        }}
 
   """
@@ -599,19 +620,51 @@ defmodule Cldr.DateTime do
     end
   end
 
+  @doc false
+  def format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend) do
+    {:ok, available_formats} = available_formats(locale, calendar, backend)
+
+    case Map.fetch(available_formats, skeleton) do
+      {:ok, format} ->
+        {:ok, format}
+
+      :error ->
+        {:error,
+         {
+           Cldr.DateTime.UnresolvedFormat,
+           "Standard format #{inspect(format)} could not be resolved from " <>
+             "#{inspect(standard_format)}"
+         }}
+    end
+  end
+
+  # Only a single format, which is applied to date and time and to
+  # the compisition format.
   defp validate_formats_consistent(format, nil = _date_format, nil = _time_format)
        when is_atom(format) or is_binary(format) do
     :ok
   end
 
+  # No general format, just date and time format. We will derive the
+  # joining format later.
   defp validate_formats_consistent(nil, date_format, time_format)
        when not is_nil(date_format) and not is_nil(time_format) do
     :ok
   end
 
+  # All the formats are short, medium, long or full
   defp validate_formats_consistent(format, date_format, time_format)
        when format in @format_types and date_format in @format_types and
               time_format in @format_types do
+    :ok
+  end
+
+  # Joining format is short, medium, long or full and date_foramt and
+  # time_format are an atom (including nil) or a string.
+  defp validate_formats_consistent(format, date_format, time_format)
+       when (format in @format_types or is_nil(format)) and
+              (is_atom(date_format) or is_binary(date_format)) and
+              (is_binary(format) or is_atom(time_format)) do
     :ok
   end
 
@@ -620,7 +673,7 @@ defmodule Cldr.DateTime do
     {:error,
      {Cldr.DateTime.InvalidFormat,
       ":date_format and :time_format cannot be specified if :format is also specified as " <>
-        "a format id or a format string. Found [time_format: #{inspect(time_format)}, " <>
+        "a format id or a format string. Found [format: #{inspect(format)}, time_format: #{inspect(time_format)}, " <>
         "date_format: #{inspect(date_format)}]"}}
   end
 
@@ -706,12 +759,20 @@ defmodule Cldr.DateTime do
   # Unless we need to derive the format, this only touches `format`,
   # not `date_format` or `time_format`.
 
+  # If its a partial datetime and a standard format is requested, its an error
+  defp find_format(datetime, format, _locale, _calendar, _backend, _options)
+       when format in @format_types and not is_any_date_time(datetime) do
+    {:error,
+     {
+       Cldr.DateTime.UnresolvedFormat,
+       "Standard formats are not available for partial date times"
+     }}
+  end
+
   # Standard format, at style
   defp find_format(_datetime, format, locale, calendar, backend, %{style: :at} = options)
        when format in @format_types do
-    %LanguageTag{cldr_locale_name: locale_name} = locale
-
-    with {:ok, formats} <- Format.date_time_at_formats(locale_name, calendar, backend),
+    with {:ok, formats} <- Format.date_time_at_formats(locale, calendar, backend),
          {:ok, format} <- preferred_format(formats, format, options.prefer) do
       {:ok, format, options}
     end
@@ -720,21 +781,58 @@ defmodule Cldr.DateTime do
   # Standard format, standard style
   defp find_format(_datetime, format, locale, calendar, backend, options)
        when format in @format_types do
-    %LanguageTag{cldr_locale_name: locale_name} = locale
-
-    with {:ok, formats} <- Format.date_time_formats(locale_name, calendar, backend),
+    with {:ok, formats} <- Format.date_time_formats(locale, calendar, backend),
          {:ok, format} <- preferred_format(formats, format, options.prefer) do
       {:ok, format, options}
     end
   end
 
-  # Look up for the format in :available_formats
-  defp find_format(_datetime, format, locale, calendar, backend, options)
-       when is_atom(format) and not is_nil(format) do
-    %LanguageTag{cldr_locale_name: locale_name} = locale
+  # The format is specified as a skeleton so we need to find
+  # the best match for it. The best match can be a single skeleton
+  # (that is guaranteed to be in the date_time_available_formats list)
+  # or two skeletons - one for the date part and one for the time part.
+  defp find_format(datetime, format, locale, calendar, backend, options)
+       when is_skeleton(format) do
+    case Match.best_match(format, locale, calendar, backend) do
+      {:ok, {date_format, time_format}} ->
+        options =
+          options
+          |> Map.put(:date_format, date_format)
+          |> Map.put(:time_format, time_format)
+          |> Map.put(:requested_skeleton, format)
 
-    with {:ok, formats} <- Format.date_time_available_formats(locale_name, calendar, backend),
-         {:ok, format} <- preferred_format(formats, format, options.prefer) do
+        # Since the return is a date and a time format, we need
+        # to derive the joining format.
+        find_format(datetime, nil, locale, calendar, backend, options)
+
+      {:ok, format} ->
+        with {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(options.format),
+             {:ok, formats} <- Format.date_time_available_formats(locale, calendar, backend),
+             {:ok, preferred_format} <- preferred_format(formats, format, options.prefer),
+             {:ok, format_string} <- Match.adjust_field_lengths(preferred_format, skeleton_tokens) do
+          {:ok, format_string, options}
+        end
+
+      error ->
+        error
+    end
+  end
+
+  # We need to derive the format, and maybe even date_format and time_format too.
+  defp find_format(datetime, nil, locale, calendar, backend, options) do
+    date_format = options.date_format
+    time_format = options.time_format
+
+    with {:ok, date_format} <-
+           date_format(datetime, date_format, locale, calendar, backend, options),
+         {:ok, time_format} <-
+           time_format(datetime, time_format, locale, calendar, backend, options),
+         {:ok, format} <- resolve_format(date_format, options.style, locale, calendar, backend) do
+      options =
+        options
+        |> Map.put(:date_format, date_format)
+        |> Map.put(:time_format, time_format)
+
       {:ok, format, options}
     end
   end
@@ -755,30 +853,22 @@ defmodule Cldr.DateTime do
     {:ok, %{number_system: number_system, format: format_string}, options}
   end
 
-  # If its a partial datetime and a standard format is requested, its an error
-  defp find_format(datetime, format, _locale, _calendar, _backend, _options)
-       when format in @format_types and not is_any_date_time(datetime) do
-    {:error,
-     {
-       Cldr.DateTime.UnresolvedFormat,
-       "Standard formats are not available for partial date times"
-     }}
-  end
+  @doc false
+  def best_match(format, locale, calendar, backend, options) do
+    skeleton = options[:requested_skeleton] || format
 
-  # We need to derive the format, or maybe even date_format and time_format
-  defp find_format(datetime, nil, locale, calendar, backend, options) do
-    date_format = options.date_format
-    time_format = options.time_format
+    with {:ok, available_formats} <-
+           Cldr.DateTime.Format.date_time_available_formats(locale, calendar, backend),
+         {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton),
+         {:ok, match} <- Match.best_match(format, locale, calendar, backend),
+         {:ok, format_string} <- Map.fetch(available_formats, match) do
+      Match.adjust_field_lengths(format_string, skeleton_tokens)
+    else
+      :error ->
+        {:error, Match.no_format_resolved_error(format)}
 
-    with {:ok, date_format} <- date_format(datetime, date_format, locale, calendar, backend),
-         {:ok, time_format} <- time_format(datetime, time_format, locale, calendar, backend),
-         {:ok, format} <- resolve_format(date_format, locale, calendar, backend) do
-      options =
-        options
-        |> Map.put(:date_format, date_format)
-        |> Map.put(:time_format, time_format)
-
-      {:ok, format, options}
+      other ->
+        other
     end
   end
 
@@ -791,8 +881,12 @@ defmodule Cldr.DateTime do
   #  Otherwise, if the requested date fields include abbreviated month (MMM, LLL), use <dateTimeFormatLength type="medium">
   #  Otherwise use <dateTimeFormatLength type="short">
 
-  defp resolve_format(date_format, locale, calendar, backend) do
-    {:ok, formats} = Cldr.DateTime.Format.date_time_formats(locale, calendar, backend)
+  defp resolve_format(%{format: format}, style, locale, calendar, backend) do
+    resolve_format(format, style, locale, calendar, backend)
+  end
+
+  defp resolve_format(date_format, style, locale, calendar, backend) do
+    {:ok, formats} = formats_for_style(style, locale, calendar, backend)
 
     cond do
       has_wide_month?(date_format) && has_weekday_name?(date_format) ->
@@ -809,28 +903,36 @@ defmodule Cldr.DateTime do
     end
   end
 
+  defp formats_for_style(:at, locale, calendar, backend) do
+    Cldr.DateTime.Format.date_time_at_formats(locale, calendar, backend)
+  end
+
+  defp formats_for_style(_standard, locale, calendar, backend) do
+    Cldr.DateTime.Format.date_time_formats(locale, calendar, backend)
+  end
+
   # We need to derive the date format now since that data
   # is used to establish what datetime format we derive.
 
-  defp date_format(datetime, nil, locale, calendar, backend) do
-    format = Cldr.Date.derive_format_id(datetime)
-    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
+  defp date_format(datetime, nil, locale, calendar, backend, options) do
+    format_id = Cldr.Date.derive_format_id(datetime)
+    date_format(datetime, format_id, locale, calendar, backend, options)
   end
 
-  defp date_format(datetime, format, locale, calendar, backend) do
-    Cldr.Date.find_format(datetime, format, locale, calendar, backend)
+  defp date_format(datetime, format_id, locale, calendar, backend, options) do
+    Cldr.Date.find_format(datetime, format_id, locale, calendar, backend, options)
   end
 
-  defp time_format(datetime, nil, locale, calendar, backend) do
-    format = Cldr.Time.derive_format_id(datetime)
-    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
+  defp time_format(datetime, nil, locale, calendar, backend, options) do
+    format_id = Cldr.Time.derive_format_id(datetime)
+    time_format(datetime, format_id, locale, calendar, backend, options)
   end
 
-  defp time_format(datetime, format, locale, calendar, backend) do
-    Cldr.Time.find_format(datetime, format, locale, calendar, backend)
+  defp time_format(datetime, format_id, locale, calendar, backend, options) do
+    Cldr.Time.find_format(datetime, format_id, locale, calendar, backend, options)
   end
 
-  # FIXME These functions don't consider the impace
+  # FIXME These functions don't consider the impact
   # of literals in the format. For now, the only known
   # literal is a "," or "at" so we are safe for the moment.
 
@@ -868,7 +970,7 @@ defmodule Cldr.DateTime do
         {:error,
          {Cldr.DateTime.InvalidFormat,
           "Invalid datetime format #{inspect(format)}. " <>
-            "The valid formats are #{inspect(formats)}."}}
+            "The valid formats are #{inspect(@format_types)}."}}
     end
   end
 

@@ -12,7 +12,6 @@ defmodule Cldr.DateTime.Format do
 
   alias Cldr.Locale
   alias Cldr.LanguageTag
-  alias Cldr.DateTime.Format.Compiler
 
   @typedoc """
   The standard formats of `:full`,
@@ -42,6 +41,65 @@ defmodule Cldr.DateTime.Format do
   """
   @type format_id :: atom()
 
+  @standard_formats [:short, :medium, :long, :full]
+
+  @date_fields [
+    "G",
+    "y",
+    "Y",
+    "u",
+    "U",
+    "r",
+    "Q",
+    "q",
+    "M",
+    "L",
+    "W",
+    "w",
+    "d",
+    "D",
+    "F",
+    "g",
+    "E",
+    "e",
+    "c"
+  ]
+
+  @time_fields [
+    "h",
+    "H",
+    "k",
+    "K",
+    "m",
+    "s",
+    "S",
+    "v",
+    "V",
+    "z",
+    "Z",
+    "x",
+    "X",
+    "O",
+    "a",
+    "b",
+    "B"
+  ]
+
+  @doc false
+  def standard_formats do
+    @standard_formats
+  end
+
+  @doc false
+  def date_fields do
+    @date_fields
+  end
+
+  @doc false
+  def time_fields do
+    @time_fields
+  end
+
   @doc false
   def format_list(config) do
     locale_names = Cldr.Locale.Loader.known_locale_names(config)
@@ -63,6 +121,7 @@ defmodule Cldr.DateTime.Format do
       %{number_system: _} = format, acc -> [format | acc]
       map, acc when is_map(map) -> Map.values(map) ++ acc
       list, acc when is_list(list) -> acc
+      _other, acc -> acc
     end)
   end
 
@@ -153,6 +212,31 @@ defmodule Cldr.DateTime.Format do
   def gmt_zero_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
     backend = Module.concat(backend, DateTime.Format)
     backend.gmt_zero_format(locale)
+  end
+
+  @doc """
+  Returns the GMT format string for a for an unkown GMT offset.
+
+  ### Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  ### Example
+
+      iex> Cldr.DateTime.Format.gmt_unknown_format(:en, MyApp.Cldr)
+      {:ok, "GMT+?"}
+
+  """
+  @spec gmt_unknown_format(Locale.locale_reference(), Cldr.backend()) ::
+          {:ok, String.t()} | {:error, {atom, String.t()}}
+
+  def gmt_unknown_format(locale \\ Cldr.get_locale(), backend \\ Cldr.Date.default_backend()) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.gmt_unknown_format(locale)
   end
 
   @doc """
@@ -307,20 +391,22 @@ defmodule Cldr.DateTime.Format do
   ### Examples:
 
       iex> Cldr.DateTime.Format.date_formats(:en, :gregorian, MyApp.Cldr)
-      {:ok, %Cldr.Date.Formats{
-        full: "EEEE, MMMM d, y",
-        long: "MMMM d, y",
-        medium: "MMM d, y",
-        short: "M/d/yy"
-      }}
+      {:ok,
+       %Cldr.Date.Formats{
+         short: :yyMd,
+         medium: :yMMMd,
+         long: :yMMMMd,
+         full: :yMMMMEEEEd
+       }}
 
       iex> Cldr.DateTime.Format.date_formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.Date.Formats{
-        full: "EEEE, MMMM d, y G",
-        long: "MMMM d, y G",
-        medium: "MMM d, y G",
-        short: "M/d/y GGGGG"
-      }}
+      {:ok,
+       %Cldr.Date.Formats{
+         short: :GGGGGyMd,
+         medium: :GyMMMd,
+         long: :GyMMMMd,
+         full: :GyMMMMEEEEd
+       }}
 
   """
   @spec date_formats(
@@ -356,26 +442,22 @@ defmodule Cldr.DateTime.Format do
   ### Examples:
 
       iex> Cldr.DateTime.Format.time_formats(:en)
-      {
-        :ok,
-        %Cldr.Time.Formats{
-          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
-          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
-          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-          short: %{unicode: "h:mm a", ascii: "h:mm a"}
-        }
-      }
+      {:ok,
+       %Cldr.Time.Formats{
+         short: :ahmm,
+         medium: :ahmmss,
+         long: :ahmmssz,
+         full: :ahmmsszzzz
+       }}
 
       iex> Cldr.DateTime.Format.time_formats(:en, :buddhist)
-      {
-        :ok,
-        %Cldr.Time.Formats{
-          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
-          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
-          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-          short: %{unicode: "h:mm a", ascii: "h:mm a"}
-        }
-      }
+      {:ok,
+       %Cldr.Time.Formats{
+         short: :ahmm,
+         medium: :ahmmss,
+         long: :ahmmssz,
+         full: :ahmmsszzzz
+       }}
 
   """
   @spec time_formats(
@@ -411,19 +493,21 @@ defmodule Cldr.DateTime.Format do
   ### Examples:
 
       iex> Cldr.DateTime.Format.date_time_formats(:en)
-      {:ok, %Cldr.DateTime.Formats{
-        full: "{1}, {0}",
-        long: "{1}, {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"
+      {:ok,
+        %Cldr.DateTime.Formats{
+          full: "{1}, {0}",
+          long: "{1}, {0}",
+          medium: "{1}, {0}",
+          short: "{1}, {0}"
       }}
 
       iex> Cldr.DateTime.Format.date_time_formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.DateTime.Formats{
-        full: "{1}, {0}",
-        long: "{1}, {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"
+      {:ok,
+        %Cldr.DateTime.Formats{
+          full: "{1}, {0}",
+          long: "{1}, {0}",
+          medium: "{1}, {0}",
+          short: "{1}, {0}"
       }}
 
   """
@@ -465,20 +549,22 @@ defmodule Cldr.DateTime.Format do
   ### Examples:
 
       iex> Cldr.DateTime.Format.date_time_at_formats(:en)
-      {:ok, %Cldr.DateTime.Formats{
-        full: "{1} 'at' {0}",
-        long: "{1} 'at' {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"}
-      }
+      {:ok,
+       %Cldr.DateTime.Formats{
+         short: "{1}, {0}",
+         medium: "{1}, {0}",
+         long: "{1} 'at' {0}",
+         full: "{1} 'at' {0}"
+       }}
 
       iex> Cldr.DateTime.Format.date_time_at_formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.DateTime.Formats{
-        full: "{1} 'at' {0}",
-        long: "{1} 'at' {0}",
-        medium: "{1}, {0}",
-        short: "{1}, {0}"}
-      }
+      {:ok,
+       %Cldr.DateTime.Formats{
+         short: "{1}, {0}",
+         medium: "{1}, {0}",
+         long: "{1} 'at' {0}",
+         full: "{1} 'at' {0}"
+       }}
 
   """
   @spec date_time_at_formats(
@@ -495,6 +581,58 @@ defmodule Cldr.DateTime.Format do
       ) do
     backend = Module.concat(backend, DateTime.Format)
     backend.date_time_at_formats(locale, calendar)
+  end
+
+  @doc """
+  Returns a map of the standard datetime relative formats for a given
+  locale and calendar.
+
+  ### Arguments
+
+  * `locale` is any locale returned by `Cldr.known_locale_names/0`
+    or a `t:Cldr.LanguageTag.t/0`. The default is `Cldr.get_locale/0`.
+
+  * `calendar` is any calendar returned by `Cldr.DateTime.Format.calendars_for/1`
+    The default is `:gregorian`.
+
+  * `backend` is any module that includes `use Cldr` and therefore
+    is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
+
+  ### Examples:
+
+      iex> Cldr.DateTime.Format.date_time_relative_formats(:en)
+      {:ok,
+       %Cldr.DateTime.Formats{
+         short: "{1}, {0}",
+         medium: "{1}, {0}",
+         long: "{1} 'at' {0}",
+         full: "{1} 'at' {0}"
+       }}
+
+      iex> Cldr.DateTime.Format.date_time_relative_formats(:en, :buddhist, MyApp.Cldr)
+      {:ok,
+       %Cldr.DateTime.Formats{
+         short: "{1}, {0}",
+         medium: "{1}, {0}",
+         long: "{1} 'at' {0}",
+         full: "{1} 'at' {0}"
+       }}
+
+  """
+  @spec date_time_relative_formats(
+          Locale.locale_reference(),
+          Cldr.Calendar.calendar(),
+          Cldr.backend()
+        ) ::
+          {:ok, map()} | {:error, {atom, String.t()}}
+
+  def date_time_relative_formats(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_time_relative_formats(locale, calendar)
   end
 
   @doc """
@@ -523,23 +661,23 @@ defmodule Cldr.DateTime.Format do
 
   ### Examples
 
-      iex> Cldr.DateTime.Format.date_time_format
+      iex> Cldr.DateTime.Format.date_time_format()
       {:ok, "{1}, {0}"}
 
-      iex> Cldr.DateTime.Format.date_time_format format: :full
+      iex> Cldr.DateTime.Format.date_time_format(format: :full)
       {:ok, "{1}, {0}"}
 
-      iex> Cldr.DateTime.Format.date_time_format locale: :de, format: :full
+      iex> Cldr.DateTime.Format.date_time_format(locale: :de, format: :full)
       {:ok, "{1}, {0}"}
 
-      iex> Cldr.DateTime.Format.date_time_format locale: :de, format: :unknown
+      iex> Cldr.DateTime.Format.date_time_format(locale: :de, format: :unknown)
       {:error,
        {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: :unknown"}}
 
   """
   @doc since: "2.23.0"
   @spec date_time_format(options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module(), String.t()}}
+          {:ok, String.t()} | {:error, {module(), String.t()}}
 
   def date_time_format(options \\ []) do
     with {locale, backend} <- Cldr.locale_and_backend_from(options),
@@ -577,23 +715,23 @@ defmodule Cldr.DateTime.Format do
 
   ### Examples
 
-      iex> Cldr.DateTime.Format.date_format
-      {:ok, "MMM d, y"}
+      iex> Cldr.DateTime.Format.date_format()
+      {:ok, :yMMMd}
 
-      iex> Cldr.DateTime.Format.date_format format: :full
-      {:ok, "EEEE, MMMM d, y"}
+      iex> Cldr.DateTime.Format.date_format(format: :full)
+      {:ok, :yMMMMEEEEd}
 
-      iex> Cldr.DateTime.Format.date_format locale: :de, format: :full
-      {:ok, "EEEE, d. MMMM y"}
+      iex> Cldr.DateTime.Format.date_format(locale: :de, format: :full)
+      {:ok, :yMMMMEEEEd}
 
-      iex> Cldr.DateTime.Format.date_format locale: :de, format: :unknown
+      iex> Cldr.DateTime.Format.date_format(locale: :de, format: :unknown)
       {:error,
        {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: :unknown"}}
 
   """
   @doc since: "2.23.0"
   @spec date_format(options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module(), String.t()}}
+          {:ok, String.t()} | {:error, {module(), String.t()}}
 
   def date_format(options \\ []) do
     with {locale, backend} <- Cldr.locale_and_backend_from(options),
@@ -636,26 +774,26 @@ defmodule Cldr.DateTime.Format do
 
   ### Examples
 
-      iex> Cldr.DateTime.Format.time_format
-      {:ok, "h:mm:ss a"}
+      iex> Cldr.DateTime.Format.time_format()
+      {:ok, :ahmmss}
 
       iex> Cldr.DateTime.Format.time_format(format: :full)
-      {:ok, "h:mm:ss a zzzz"}
+      {:ok, :ahmmsszzzz}
 
       iex> Cldr.DateTime.Format.time_format(format: :full, locale: :ja)
-      {:ok, "H時mm分ss秒 zzzz"}
+      {:ok, :Hmmsszzzz}
 
       iex> Cldr.DateTime.Format.time_format(format: :full, prefer: :unicode)
-      {:ok, "h:mm:ss a zzzz"}
+      {:ok, :ahmmsszzzz}
 
-      iex> Cldr.DateTime.Format.time_format format: :unknown
+      iex> Cldr.DateTime.Format.time_format(format: :unknown)
       {:error,
        {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: :unknown"}}
 
   """
   @doc since: "2.23.0"
-  @spec date_format(options :: Keyword.t()) ::
-    {:ok, String.t()} | {:error, {module(), String.t()}}
+  @spec time_format(options :: Keyword.t()) ::
+          {:ok, String.t()} | {:error, {module(), String.t()}}
 
   def time_format(options \\ []) do
     with {locale, backend} <- Cldr.locale_and_backend_from(options),
@@ -668,20 +806,26 @@ defmodule Cldr.DateTime.Format do
   end
 
   defp resolve_format_style_and_preference(formats, style, prefer)
-      when is_map_key(formats, style) do
+       when is_map_key(formats, style) do
     style = Map.fetch!(formats, style)
 
     cond do
       is_map(style) ->
         {:ok, Map.get(style, prefer) || Map.get(style, :ascii)}
+
       is_binary(style) ->
+        {:ok, style}
+
+      is_list(style) ->
+        {:ok, style}
+
+      is_atom(style) ->
         {:ok, style}
     end
   end
 
   defp resolve_format_style_and_preference(_formats, style, _prefer) do
-    {:error, {Cldr.DateTime.UnresolvedFormat,
-      "Unknown value for option format: #{inspect style}"}}
+    {:error, {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: #{inspect(style)}"}}
   end
 
   @doc """
@@ -704,61 +848,74 @@ defmodule Cldr.DateTime.Format do
       iex> Cldr.DateTime.Format.date_time_available_formats(:en)
       {:ok,
        %{
-         yw: %{
-           other: "'week' w 'of' Y",
-           one: "'week' w 'of' Y",
-           pluralize: :week_of_year
-         },
-         GyMMMEd: "E, MMM d, y G",
-         Hms: "HH:mm:ss",
+         yQQQ: "QQQ y",
+         yyMd: "M/d/yy",
+         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
+         Bh: "h B",
+         y: "y",
+         M: "L",
          MMMMW: %{
            other: "'week' W 'of' MMMM",
            one: "'week' W 'of' MMMM",
            pluralize: :week_of_month
          },
-         E: "ccc",
-         MMMd: "MMM d",
-         yMEd: "E, M/d/y",
-         yQQQ: "QQQ y",
-         Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
-         M: "L",
-         hm: %{unicode: "h:mm a", ascii: "h:mm a"},
-         yM: "M/y",
-         GyMMMd: "MMM d, y G",
-         GyMd: "M/d/y G",
-         Gy: "y G",
-         Hm: "HH:mm",
-         EBhms: "E h:mm:ss B",
-         d: "d",
+         Hv: "HH'h' v",
          hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-         Ed: "d E",
-         Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"},
-         EHms: "E HH:mm:ss",
-         Bh: "h B",
-         h: %{unicode: "h a", ascii: "h a"},
-         Bhms: "h:mm:ss B",
+         hv: %{unicode: "h a v", ascii: "h a v"},
+         hm: %{unicode: "h:mm a", ascii: "h:mm a"},
          Hmv: "HH:mm v",
-         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
-         yMd: "M/d/y",
-         ms: "mm:ss",
-         MMM: "LLL",
-         y: "y",
-         Bhm: "h:mm B",
-         yMMM: "MMM y",
-         yQQQQ: "QQQQ y",
-         yMMMEd: "E, MMM d, y",
-         yMMMM: "MMMM y",
-         EBhm: "E h:mm B",
-         Hmsv: "HH:mm:ss v",
-         yMMMd: "MMM d, y",
-         MEd: "E, M/d",
-         EHm: "E HH:mm",
-         GyMMM: "MMM y G",
          hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
-         H: "HH",
+         EBhm: "E h:mm B",
+         ahmmss: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+         GyMMMEd: "E, MMM d, y G",
+         Bhms: "h:mm:ss B",
+         GyMEd: "E, M/d/y G",
+         MMMMd: "MMMM d",
+         Hm: "HH:mm",
+         Ed: "d E",
+         GyM: "M/y G",
+         GyMMMd: "MMM d, y G",
+         Bhm: "h:mm B",
+         yMMMEd: "E, MMM d, y",
+         h: %{unicode: "h a", ascii: "h a"},
+         yMMMM: "MMMM y",
+         yMEd: "E, M/d/y",
+         Ehm: %{unicode: "E h:mm a", ascii: "E h:mm a"},
+         MEd: "E, M/d",
+         d: "d",
+         EHms: "E HH:mm:ss",
+         yQQQQ: "QQQQ y",
+         yMMMMd: "MMMM d, y",
+         yMMM: "MMM y",
+         yMMMd: "MMM d, y",
+         GyMMM: "MMM y G",
+         Hmsv: "HH:mm:ss v",
+         ahmm: %{unicode: "h:mm a", ascii: "h:mm a"},
          Md: "M/d",
+         yMMMMEEEEd: "EEEE, MMMM d, y",
+         yMd: "M/d/y",
+         ahmmsszzzz: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+         EBhms: "E h:mm:ss B",
+         ahmmssz: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+         ms: "mm:ss",
+         yw: %{
+           other: "'week' w 'of' Y",
+           one: "'week' w 'of' Y",
+           pluralize: :week_of_year
+         },
+         MMMd: "MMM d",
+         Gy: "y G",
+         GyMd: "M/d/y G",
+         EHm: "E HH:mm",
+         yM: "M/y",
+         MMM: "LLL",
+         H: "HH",
+         Hms: "HH:mm:ss",
+         EBh: "E h B",
+         E: "ccc",
+         Eh: %{unicode: "E h a", ascii: "E h a"},
          MMMEd: "E, MMM d",
-         MMMMd: "MMMM d"
+         Ehms: %{unicode: "E h:mm:ss a", ascii: "E h:mm:ss a"}
        }}
 
   """
@@ -844,10 +1001,11 @@ defmodule Cldr.DateTime.Format do
   ### Example:
 
       iex> Cldr.DateTime.Format.common_date_time_format_names()
-      [:Bh, :Bhm, :Bhms, :E, :EBhm, :EBhms, :EHm, :EHms, :Ed, :Ehm, :Ehms, :Gy,
-       :GyMMM, :GyMMMEd, :GyMMMd, :GyMd, :H, :Hm, :Hms, :Hmsv, :Hmv, :M, :MEd, :MMM,
-       :MMMEd, :MMMMW, :MMMMd, :MMMd, :Md, :d, :h, :hm, :hms, :hmsv, :hmv, :ms, :y,
-       :yM, :yMEd, :yMMM, :yMMMEd, :yMMMM, :yMMMd, :yMd, :yQQQ, :yQQQQ, :yw]
+      [:Bh, :Bhm, :Bhms, :E, :EBh, :EBhm, :EBhms, :EHm, :EHms, :Ed, :Eh, :Ehm, :Ehms,
+       :Gy, :GyM, :GyMEd, :GyMMM, :GyMMMEd, :GyMMMd, :GyMd, :H, :Hm, :Hms, :Hmsv,
+       :Hmv, :Hv, :M, :MEd, :MMM, :MMMEd, :MMMMW, :MMMMd, :MMMd, :Md, :d, :h, :hm,
+       :hms, :hmsv, :hmv, :hv, :ms, :y, :yM, :yMEd, :yMMM, :yMMMEd, :yMMMM, :yMMMd,
+       :yMd, :yQQQ, :yQQQQ, :yw]
 
   """
   @spec common_date_time_format_names(backend :: Cldr.backend()) :: [format_id()]
@@ -981,251 +1139,6 @@ defmodule Cldr.DateTime.Format do
   # The case when there is no separator
   def gmt_format_type([sign, hour, minute], format_type) do
     gmt_format_type([sign, hour, "", minute], format_type)
-  end
-
-  @doc """
-  Find the best match for a requested format.
-
-  """
-
-  # Date/Time format symbols are defined at
-  # https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table
-
-  @doc since: "2.19.0"
-  @spec best_match(
-          skeleton :: format_skeleton(),
-          locale :: Locale.locale_reference(),
-          calendar :: Cldr.Calendar.calendar(),
-          backend :: Cldr.backend()
-        ) :: {:ok, format_id()} | {:error, {module(), String.t()}}
-
-  def best_match(
-        original_skeleton,
-        locale \\ Cldr.get_locale(),
-        calendar \\ Cldr.Calendar.default_cldr_calendar(),
-        backend \\ Cldr.Date.default_backend()
-      ) do
-    with {:ok, locale} <- Cldr.validate_locale(locale, backend),
-         skeleton = to_string(original_skeleton),
-         {:ok, skeleton} <- put_preferred_time_symbols(skeleton, locale),
-         {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton) do
-      # match_with_day_periods? =
-      #   !String.contains?(skeleton, "J")
-
-      available_format_tokens =
-        date_time_available_format_tokens(locale, calendar, backend)
-
-      skeleton_keys =
-        skeleton_tokens
-        |> :proplists.get_keys()
-        |> canonical_keys()
-
-      skeleton_ordered =
-        sort_tokens(skeleton_tokens)
-
-      candidates =
-        available_format_tokens
-        |> Enum.filter(&filter_candidates(&1, skeleton_keys))
-        |> Enum.map(&distance_from(&1, skeleton_ordered))
-        |> Enum.sort(&compare_counts/2)
-
-      case candidates do
-        [] ->
-          {:error, no_format_resolved_error(original_skeleton)}
-
-        [{format_id, _} | _rest] ->
-          {:ok, format_id}
-      end
-    end
-  end
-
-  @doc false
-  def no_format_resolved_error(skeleton) do
-    {
-      Cldr.DateTime.UnresolvedFormat,
-      "No available format resolved for #{inspect(skeleton)}"
-    }
-  end
-
-  # https://www.unicode.org/reports/tr35/tr35-dates.html#Matching_Skeletons
-  # For skeleton and id fields with symbols representing the same type (year, month, day, etc):
-  # Most symbols have a small distance from each other.
-  #   M ≅ L; E ≅ c; a ≅ b ≅ B; H ≅ k ≅ h ≅ K; ...
-  # Width differences among fields, other than those marking text vs numeric, are given small
-  # distance from each other.
-  #   MMM ≅ MMMM
-  #   MM ≅ M
-  # Numeric and text fields are given a larger distance from each other.
-  #   MMM ≈ MM
-  # Symbols representing substantial differences (week of year vs week of month) are given a much
-  # larger distance from each other.
-  #   ≋ D; ...
-
-  defp filter_candidates({_format_id, tokens}, skeleton_keys) do
-    token_keys =
-      tokens
-      |> :proplists.get_keys()
-      |> canonical_keys()
-
-    token_keys == skeleton_keys
-  end
-
-  # Sort the tokesn in canonical order, using
-  # the substiturion table.
-  defp sort_tokens(tokens) do
-    Enum.sort(tokens, fn {symbol_a, _}, {symbol_b, _} ->
-      canonical_key(symbol_a) < canonical_key(symbol_b)
-    end)
-  end
-
-  defp compare_counts({_, count_a}, {_, count_b}) do
-    count_a < count_b
-  end
-
-  # These are all considered matchable since they are
-  # similar. But they will have different distance weights
-  # when sorting to find the best match.
-
-  defp canonical_keys(keys) do
-    keys
-    |> Enum.map(&canonical_key/1)
-    |> Enum.sort()
-  end
-
-  defp canonical_key(key) do
-    case key do
-      "L" -> "M"
-      "c" -> "E"
-      s when s in ["b", "B"] -> "a"
-      s when s in ["k", "h", "K"] -> "H"
-      other -> other
-    end
-  end
-
-  # When comparing distances we want the smallest difference in each
-  # token as long as we don't allow numeric symbols (like M and MM) to
-  # become alpha tokens (like MMM and MMMM).
-
-  # Note the guarantees at this point:
-  # 1. The token list and the skeleton list are the same length
-  # 2. The two lists are in the same semnatic order. They may not
-  #    have the same symbol - but both symbols are considered
-  #    substitutable for each other.
-
-  defguard different_but_compatible(token_a, token_b)
-           when (elem(token_a, 0) in ["L", "M"] and elem(token_b, 0) in ["L", "M"]) or
-                  (elem(token_a, 0) in ["c", "E"] and elem(token_b, 0) in ["c", "E"]) or
-                  (elem(token_a, 0) in ["a", "b", "B"] and elem(token_b, 0) in ["a", "b", "B"]) or
-                  (elem(token_a, 0) in ["k", "h", "K", "H"] and
-                     elem(token_b, 0) in ["k", "h", "K", "H"])
-
-  defguard same_types(token_a, token_b)
-           when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) in [1, 2]) or
-                  (elem(token_a, 1) > 2 and elem(token_b, 1) > 2)
-
-  defguard different_types(token_a, token_b)
-           when (elem(token_a, 1) in [1, 2] and elem(token_b, 1) > 2) or
-                  (elem(token_a, 1) > 2 and elem(token_b, 1) in [1, 2])
-
-  defp distance_from({token_id, tokens}, skeleton) do
-    sorted_tokens = sort_tokens(tokens)
-
-    distance =
-      Enum.zip_reduce(sorted_tokens, skeleton, 0, fn
-        # Same symbol, both numeric forms so the distance is
-        # just the different in their counts
-        {symbol_a, count_a}, {symbol_a, count_b}, acc
-        when same_types({symbol_a, count_a}, {symbol_a, count_b}) ->
-          acc + abs(count_a - count_b)
-
-        # Same symbol, but one is numeric form, the other
-        # is alpha form. Assgn a difference of 5.
-        {symbol_a, count_a}, {symbol_a, count_b}, acc
-        when different_types({symbol_a, count_a}, {symbol_a, count_b}) ->
-          acc + 10
-
-        # Different but compatible symbols, both of numeric
-        # form.
-        {symbol_a, count_a}, {symbol_b, count_b}, acc
-        when different_but_compatible({symbol_a, count_a}, {symbol_b, count_b}) and
-               same_types({symbol_a, count_a}, {symbol_b, count_b}) ->
-          acc + abs(count_a - count_b) + 5
-
-        # Different but compatible symbols, one numeric
-        # and one alphbetic form.
-        {symbol_a, count_a}, {symbol_b, count_b}, acc
-        when different_but_compatible({symbol_a, count_a}, {symbol_b, count_b}) and
-               different_types({symbol_a, count_a}, {symbol_b, count_b}) ->
-          acc + abs(count_a - count_b) + 10
-
-        _other_a, _other_b, acc ->
-          acc + 10
-      end)
-
-    {token_id, distance}
-  end
-
-  # The time preferences are defined in
-  # https://www.unicode.org/reports/tr35/tr35-dates.html#Time_Data
-
-  defp put_preferred_time_symbols(skeleton, locale) do
-    preferred_time_symbol = preferred_time_symbol(locale)
-    allowed_time_symbol = hd(allowed_time_symbols(locale))
-
-    {:ok, replace_time_symbols(skeleton, preferred_time_symbol, allowed_time_symbol)}
-  end
-
-  defp replace_time_symbols("", _preferred, _allowed) do
-    ""
-  end
-
-  defp replace_time_symbols(<<"j", rest::binary>>, preferred, allowed) do
-    preferred <> replace_time_symbols(rest, preferred, allowed)
-  end
-
-  defp replace_time_symbols(<<"J", rest::binary>>, preferred, allowed) do
-    preferred <> replace_time_symbols(rest, preferred, allowed)
-  end
-
-  defp replace_time_symbols(<<"C", rest::binary>>, preferred, allowed) do
-    allowed <> replace_time_symbols(rest, preferred, allowed)
-  end
-
-  defp replace_time_symbols(<<symbol::utf8, rest::binary>>, preferred, allowed) do
-    <<symbol::utf8>> <> replace_time_symbols(rest, preferred, allowed)
-  end
-
-  @locale_preferred_time_symbol %{
-    h11: "K",
-    h12: "h",
-    h23: "H",
-    h24: "k"
-  }
-
-  # Locale's time preference takes priority
-  defp preferred_time_symbol(%LanguageTag{locale: %{hc: hc}}) when is_atom(hc) do
-    Map.fetch!(@locale_preferred_time_symbol, hc)
-  end
-
-  # The lookup path is:
-  # 1. cldr_locale_name
-  # 2. territory
-  # 3. 001 ("The world")
-
-  defp preferred_time_symbol(%LanguageTag{} = locale) do
-    time_preferences(locale).preferred
-  end
-
-  defp allowed_time_symbols(locale) do
-    time_preferences(locale).allowed
-  end
-
-  defp time_preferences(locale) do
-    time_preferences = Cldr.Time.time_preferences()
-
-    Map.get(time_preferences, locale.cldr_locale_name) ||
-      Map.get(time_preferences, locale.territory) ||
-      Map.fetch!(time_preferences, :"001")
   end
 
   ### Helpers

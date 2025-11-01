@@ -16,6 +16,7 @@ defmodule Cldr.Date do
 
   """
 
+  alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
   alias Cldr.Locale
 
@@ -24,7 +25,7 @@ defmodule Cldr.Date do
 
   @typep options :: Keyword.t() | map()
 
-  @format_types [:short, :medium, :long, :full]
+  @format_types Format.standard_formats()
   @default_format_type :medium
   @default_prefer :unicode
 
@@ -133,7 +134,7 @@ defmodule Cldr.Date do
 
       # A partial date with a derived "best match" format
       iex> Cldr.Date.to_string(%{year: 2024, month: 6}, MyApp.Cldr, locale: "fr")
-      {:ok, "06/2024"}
+      {:ok, "6/2024"}
 
       # A partial date with a best match CLDR-defined format
       iex> Cldr.Date.to_string(%{year: 2024, month: 6}, MyApp.Cldr, format: :yMMM, locale: "fr")
@@ -181,7 +182,7 @@ defmodule Cldr.Date do
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format} <- find_format(date, format, locale, cldr_calendar, backend),
+         {:ok, format} <- find_format(date, format, locale, cldr_calendar, backend, options),
          {:ok, format} <- apply_preference(format, prefer),
          {:ok, format_string} <- resolve_plural_format(format, date, backend, options) do
       format_backend.format(date, format_string, locale, options)
@@ -288,7 +289,7 @@ defmodule Cldr.Date do
 
       # A partial date with a derived "best match" format
       iex> Cldr.Date.to_string!(%{year: 2024, month: 6}, MyApp.Cldr, locale: "fr")
-      "06/2024"
+      "6/2024"
 
       # A partial date with a best match CLDR-defined format
       iex> Cldr.Date.to_string!(%{year: 2024, month: 6}, MyApp.Cldr, format: :yMMM, locale: "fr")
@@ -380,20 +381,22 @@ defmodule Cldr.Date do
   ### Examples:
 
       iex> Cldr.Date.formats(:en, :gregorian, MyApp.Cldr)
-      {:ok, %Cldr.Date.Formats{
-        full: "EEEE, MMMM d, y",
-        long: "MMMM d, y",
-        medium: "MMM d, y",
-        short: "M/d/yy"
-      }}
+      {:ok,
+       %Cldr.Date.Formats{
+         short: :yyMd,
+         medium: :yMMMd,
+         long: :yMMMMd,
+         full: :yMMMMEEEEd
+       }}
 
       iex> Cldr.Date.formats(:en, :buddhist, MyApp.Cldr)
-      {:ok, %Cldr.Date.Formats{
-        full: "EEEE, MMMM d, y G",
-        long: "MMMM d, y G",
-        medium: "MMM d, y G",
-        short: "M/d/y GGGGG"
-      }}
+      {:ok,
+       %Cldr.Date.Formats{
+         short: :GGGGGyMd,
+         medium: :GyMMMd,
+         long: :GyMMMMd,
+         full: :GyMMMMEEEEd
+       }}
 
   """
   @spec formats(
@@ -431,8 +434,8 @@ defmodule Cldr.Date do
       iex> Cldr.Date.available_formats(:en)
       {:ok,
        %{
-         d: "d",
          y: "y",
+         d: "d",
          E: "ccc",
          M: "L",
          MMMEd: "E, MMM d",
@@ -444,7 +447,9 @@ defmodule Cldr.Date do
          GyMMMEd: "E, MMM d, y G",
          MMMd: "MMM d",
          GyMd: "M/d/y G",
+         GyMEd: "E, M/d/y G",
          MMMMd: "MMMM d",
+         GyM: "M/y G",
          MEd: "E, M/d",
          MMM: "LLL",
          yMd: "M/d/y",
@@ -458,14 +463,17 @@ defmodule Cldr.Date do
          yQQQ: "QQQ y",
          yw: %{
            other: "'week' w 'of' Y",
-           pluralize: :week_of_year,
-           one: "'week' w 'of' Y"
+           one: "'week' w 'of' Y",
+           pluralize: :week_of_year
          },
          MMMMW: %{
            other: "'week' W 'of' MMMM",
-           pluralize: :week_of_month,
-           one: "'week' W 'of' MMMM"
-         }
+           one: "'week' W 'of' MMMM",
+           pluralize: :week_of_month
+         },
+         yMMMMd: "MMMM d, y",
+         yMMMMEEEEd: "EEEE, MMMM d, y",
+         yyMd: "M/d/yy"
        }}
 
   """
@@ -488,18 +496,31 @@ defmodule Cldr.Date do
   # and if its a full date and no format is specified then the default :medium will be
   # applied.
   @doc false
-  def find_format(date, format, locale, calendar, backend)
+  def find_format(date, format, locale, calendar, backend, _options)
       when format in @format_types and is_full_date(date) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
-    with {:ok, date_formats} <- formats(locale_name, calendar, backend) do
-      {:ok, Map.fetch!(date_formats, format)}
+    with {:ok, date_formats} <- formats(locale_name, calendar, backend),
+         {:ok, standard_format} <- Map.fetch(date_formats, format),
+         {:ok, available_formats} <- available_formats(locale, calendar, backend) do
+      case Map.fetch(available_formats, standard_format) do
+        {:ok, format} ->
+          {:ok, format}
+
+        :error ->
+          {:error,
+           {
+             Cldr.DateTime.UnresolvedFormat,
+             "Standard format #{inspect(format)} could not be resolved from " <>
+               "#{inspect(standard_format)}"
+           }}
+      end
     end
   end
 
   # If its a partial date and a standard format is requested, its an error
 
-  def find_format(date, format, _locale, _calendar, _backend)
+  def find_format(date, format, _locale, _calendar, _backend, _options)
       when format in @format_types and not is_full_date(date) do
     {:error,
      {
@@ -508,9 +529,9 @@ defmodule Cldr.Date do
      }}
   end
 
-  def find_format(date, %{} = format_map, locale, calendar, backend) do
+  def find_format(date, %{} = format_map, locale, calendar, backend, options) do
     %{number_system: number_system, format: format} = format_map
-    {:ok, format_string} = find_format(date, format, locale, calendar, backend)
+    {:ok, format_string} = find_format(date, format, locale, calendar, backend, options)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
@@ -519,36 +540,16 @@ defmodule Cldr.Date do
   # format is a direct match, use it. If not - try to find the best match between the
   # requested format and available formats.
 
-  def find_format(_date, format, locale, calendar, backend) when is_atom(format) do
-    {:ok, available_formats} = available_formats(locale, calendar, backend)
-
-    if Map.has_key?(available_formats, format) do
-      Map.fetch(available_formats, format)
-    else
-      resolve_format(format, available_formats, locale, calendar, backend)
-    end
+  def find_format(_date, format, locale, calendar, backend, options) when is_atom(format) do
+    Cldr.DateTime.best_match(format, locale, calendar, backend, options)
   end
 
   # If its a binary then its considered a format string so we use
   # it directly.
 
-  def find_format(_date, format_string, _locale, _calendar, _backend)
+  def find_format(_date, format_string, _locale, _calendar, _backend, _options)
       when is_binary(format_string) do
     {:ok, format_string}
-  end
-
-  @doc false
-  def resolve_format(format, available_formats, locale, calendar, backend) do
-    with {:ok, match} <- Cldr.DateTime.Format.best_match(format, locale, calendar, backend),
-         {:ok, format} <- Map.fetch(available_formats, match) do
-      {:ok, format}
-    else
-      :error ->
-        {:error, Cldr.DateTime.Format.no_format_resolved_error(format)}
-
-      other ->
-        other
-    end
   end
 
   defp error_return(map, requirements) do

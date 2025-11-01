@@ -1,9 +1,10 @@
 defmodule Cldr.DateTime.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   doctest Cldr.DateTime.Timezone
   doctest Cldr.DateTime.Relative
   doctest Cldr.DateTime.Format.Compiler
+  doctest Cldr.DateTime.Format.Match
   doctest Cldr.DateTime.Formatter
   doctest Cldr.DateTime.Format
   doctest Cldr.DateTime

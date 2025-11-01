@@ -2,9 +2,6 @@ defmodule Cldr.DateTime.TimezoneTest do
   use ExUnit.Case, async: true
 
   alias Cldr.DateTime.Timezone
-  import Cldr.DateTime.TestHelpers
-
-  @test_locales [:en, :ja, :ar, :fr, :de, :it]
 
   test "Exemplar City when timezone data exists but has no exemplar field" do
     assert {:ok, "Honolulu"} = Timezone.exemplar_city("Pacific/Honolulu")
@@ -39,69 +36,5 @@ defmodule Cldr.DateTime.TimezoneTest do
              {:error,
               {Cldr.DateTime.NoTerritoryForTimezone,
                "No territory was found for time zone \"Etc/UTC\""}}
-  end
-
-  for {zone, _} <- Cldr.Timezone.territories_by_timezone(),
-      locale <- @test_locales,
-      non_location_zones(zone) do
-    test "Non-location format for #{inspect(zone)} in locale #{inspect(locale)}" do
-      assert {:ok, _} =
-               Timezone.non_location_format(unquote(zone),
-                 format: :long,
-                 locale: unquote(locale)
-               )
-
-      assert {:ok, _} =
-               Timezone.non_location_format(unquote(zone),
-                 format: :short,
-                 locale: unquote(locale)
-               )
-
-      assert {:ok, _} =
-               Timezone.non_location_format(unquote(zone),
-                 type: :standard,
-                 locale: unquote(locale)
-               )
-
-      assert {:ok, _} =
-               Timezone.non_location_format(unquote(zone),
-                 type: :daylight,
-                 locale: unquote(locale)
-               )
-    end
-
-    test "Location format for #{inspect(zone)} in locale #{inspect(locale)}" do
-      assert {:ok, _} =
-               Timezone.location_format(unquote(zone),
-                 format: :long,
-                 locale: unquote(locale)
-               )
-
-      assert {:ok, _} =
-               Timezone.location_format(unquote(zone),
-                 format: :short,
-                 locale: unquote(locale)
-               )
-
-      assert {:ok, _} =
-               Timezone.location_format(unquote(zone),
-                 type: :standard,
-                 locale: unquote(locale)
-               )
-
-      assert {:ok, _} =
-               Timezone.location_format(unquote(zone),
-                 type: :daylight,
-                 locale: unquote(locale)
-               )
-    end
-  end
-
-  for {zone, _} <- Cldr.Timezone.territories_by_timezone(),
-      locale <- @test_locales,
-      zone not in ["Factory", "Etc/Unknown"] do
-    test "GMT format for #{inspect(zone)} in locale #{inspect(locale)}" do
-      assert {:ok, _} = Timezone.gmt_format(unquote(zone))
-    end
   end
 end

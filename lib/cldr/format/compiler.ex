@@ -58,6 +58,13 @@ defmodule Cldr.DateTime.Format.Compiler do
     tokenize(format_string)
   end
 
+  def tokenize(format_map) when is_map(format_map) do
+    Enum.map(format_map, fn {style, format} ->
+      {style, tokenize(format)}
+    end)
+    |> Map.new()
+  end
+
   defp maybe_add_decimal_separator({:ok, token_list, other}) do
     {:ok, seconds_followed_by_fraction(token_list), other}
   end
@@ -161,5 +168,11 @@ defmodule Cldr.DateTime.Format.Compiler do
       {:error, {_, :skeleton_tokenizer, {:illegal, content}}, _} ->
         {:error, "Illegal format string content found at: #{inspect(content)}"}
     end
+  end
+
+  def tokenize_format_string(string) do
+    string
+    |> String.graphemes()
+    |> Enum.chunk_by(& &1)
   end
 end

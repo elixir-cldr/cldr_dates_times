@@ -20,13 +20,15 @@ defmodule Cldr.Time do
 
   alias Cldr.LanguageTag
   alias Cldr.Locale
+  alias Cldr.DateTime.Format
+  alias Cldr.DateTime.Format.Match
 
   import Cldr.DateTime,
     only: [resolve_plural_format: 4, apply_preference: 2, has_time: 1]
 
   @typep options :: Keyword.t() | map()
 
-  @format_types [:short, :medium, :long, :full]
+  @format_types Format.standard_formats()
   @default_format_type :medium
   @default_prefer :unicode
   @default_separators :standard
@@ -35,8 +37,7 @@ defmodule Cldr.Time do
     hour: "h",
     minute: "m",
     second: "s",
-    time_zone: "v",
-    zone_abbr: "V"
+    time_zone: "v"
   }
 
   @field_names Map.keys(@field_map)
@@ -193,7 +194,7 @@ defmodule Cldr.Time do
     with {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, cldr_calendar} <- Cldr.DateTime.type_from_calendar(calendar),
          {:ok, _} <- Cldr.Number.validate_number_system(locale, number_system, backend),
-         {:ok, format} <- find_format(time, format, locale, cldr_calendar, backend),
+         {:ok, format} <- find_format(time, format, locale, cldr_calendar, backend, options),
          {:ok, format} <- apply_preference(format, prefer),
          {:ok, format_string} <- resolve_plural_format(format, time, backend, options) do
       format_backend.format(time, format_string, locale, options)
@@ -379,18 +380,21 @@ defmodule Cldr.Time do
   # and if its a full date and no format is specified then the default :medium will be
   # applied.
   @doc false
-  def find_format(time, format, locale, calendar, backend)
+  def find_format(time, format, locale, calendar, backend, _options)
       when format in @format_types and is_full_time(time) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
-    with {:ok, time_formats} <- formats(locale_name, calendar, backend) do
-      {:ok, Map.fetch!(time_formats, format)}
+    with {:ok, time_formats} <- formats(locale_name, calendar, backend),
+         {:ok, standard_format} <- Map.fetch(time_formats, format),
+         {:ok, standard_format} <- remove_tz_if_naive_date_time(time, standard_format),
+         {:ok, skeleton} <- Match.best_match(standard_format, locale, calendar, backend) do
+      format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend)
     end
   end
 
   # If its a partial date and a standard format is requested, its an error
 
-  def find_format(time, format, _locale, _calendar, _backend)
+  def find_format(time, format, _locale, _calendar, _backend, _options)
       when format in @format_types and not is_full_time(time) do
     {:error,
      {
@@ -399,9 +403,9 @@ defmodule Cldr.Time do
      }}
   end
 
-  def find_format(time, %{format: format} = format_map, locale, calendar, backend) do
+  def find_format(time, %{format: format} = format_map, locale, calendar, backend, options) do
     %{number_system: number_system} = format_map
-    {:ok, format_string} = find_format(time, format, locale, calendar, backend)
+    {:ok, format_string} = find_format(time, format, locale, calendar, backend, options)
     {:ok, %{number_system: number_system, format: format_string}}
   end
 
@@ -410,26 +414,46 @@ defmodule Cldr.Time do
   # format is a direct match, use it. If not - try to find the best match between the
   # requested format and available formats.
 
-  def find_format(_time, format, locale, calendar, backend) when is_atom(format) do
-    {:ok, available_formats} = available_formats(locale, calendar, backend)
-
-    if Map.has_key?(available_formats, format) do
-      Map.fetch(available_formats, format)
-    else
-      resolve_format(format, available_formats, locale, calendar, backend)
-    end
+  def find_format(_time, format, locale, calendar, backend, options) when is_atom(format) do
+    Cldr.DateTime.best_match(format, locale, calendar, backend, options)
   end
 
   # If its a binary then its considered a format string so we use
   # it directly.
 
-  def find_format(_time, format_string, _locale, _calendar, _backend)
+  def find_format(_time, format_string, _locale, _calendar, _backend, _options)
       when is_binary(format_string) do
     {:ok, format_string}
   end
 
   @doc false
-  defdelegate resolve_format(format, available_formats, locale, calendar, backend), to: Cldr.Date
+  def remove_tz_if_naive_date_time(time, format) do
+    format = Kernel.to_string(format)
+
+    cond do
+      format_has?(format, ["V", "v"]) and is_map_key(time, :zone_abbr) ->
+        {:ok, format}
+
+      format_has?(format, ["z", "x", "X", "O"]) and is_map_key(time, :std_offset) and
+          is_map_key(time, :utc_offset) ->
+        {:ok, format}
+
+      true ->
+        {:ok, remove_tz_codes(format)}
+    end
+  end
+
+  defp format_has?(format, format_codes) do
+    String.contains?(format, format_codes)
+  end
+
+  defp remove_tz_codes(format) do
+    String.replace(format, ["v", "V", "x", "X", "O", "z"], "")
+  end
+
+  @doc false
+  defdelegate format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend),
+    to: Cldr.DateTime
 
   @doc """
   Returns a map of the standard time formats for a given
@@ -449,26 +473,22 @@ defmodule Cldr.Time do
   ### Examples:
 
       iex> Cldr.Time.formats(:en, :gregorian, MyApp.Cldr)
-      {
-        :ok,
-        %Cldr.Time.Formats{
-          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
-          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
-          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-          short: %{unicode: "h:mm a", ascii: "h:mm a"}
-        }
-      }
+      {:ok,
+       %Cldr.Time.Formats{
+         short: :ahmm,
+         medium: :ahmmss,
+         long: :ahmmssz,
+         full: :ahmmsszzzz
+       }}
 
       iex> Cldr.Time.formats(:en, :buddhist, MyApp.Cldr)
-      {
-        :ok,
-        %Cldr.Time.Formats{
-          full: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
-          long: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
-          medium: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
-          short: %{unicode: "h:mm a", ascii: "h:mm a"}
-        }
-      }
+      {:ok,
+       %Cldr.Time.Formats{
+         short: :ahmm,
+         medium: :ahmmss,
+         long: :ahmmssz,
+         full: :ahmmsszzzz
+       }}
 
   """
   @spec formats(
@@ -507,16 +527,25 @@ defmodule Cldr.Time do
       {:ok,
        %{
          h: %{unicode: "h a", ascii: "h a"},
-         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
          ms: "mm:ss",
+         Bhm: "h:mm B",
          H: "HH",
          Hm: "HH:mm",
+         Bhms: "h:mm:ss B",
          Hms: "HH:mm:ss",
-         Hmsv: "HH:mm:ss v",
-         Hmv: "HH:mm v",
+         hv: %{unicode: "h a v", ascii: "h a v"},
+         Bh: "h B",
+         hms: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
          hm: %{unicode: "h:mm a", ascii: "h:mm a"},
+         Hv: "HH'h' v",
+         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"},
+         Hmv: "HH:mm v",
          hmsv: %{unicode: "h:mm:ss a v", ascii: "h:mm:ss a v"},
-         hmv: %{unicode: "h:mm a v", ascii: "h:mm a v"}
+         Hmsv: "HH:mm:ss v",
+         ahmmsszzzz: %{unicode: "h:mm:ss a zzzz", ascii: "h:mm:ss a zzzz"},
+         ahmmss: %{unicode: "h:mm:ss a", ascii: "h:mm:ss a"},
+         ahmmssz: %{unicode: "h:mm:ss a z", ascii: "h:mm:ss a z"},
+         ahmm: %{unicode: "h:mm a", ascii: "h:mm a"}
        }}
 
   """

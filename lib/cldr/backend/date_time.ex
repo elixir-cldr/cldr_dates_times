@@ -72,18 +72,18 @@ defmodule Cldr.DateAndTime.Backend do
         ## Examples
 
             iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-            iex> #{inspect(__MODULE__)}.to_string datetime
+            iex> #{inspect(__MODULE__)}.to_string(datetime)
             {:ok, "Jan 1, 2000, 11:59:59 PM"}
-            iex> #{inspect(__MODULE__)}.to_string datetime, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string(datetime, locale: "en")
             {:ok, "Jan 1, 2000, 11:59:59 PM"}
-            iex> #{inspect(__MODULE__)}.to_string datetime, format: :long, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string(datetime, format: :long, locale: "en")
             {:ok, "January 1, 2000, 11:59:59 PM UTC"}
-            iex> #{inspect(__MODULE__)}.to_string datetime, format: :hms, locale: "en"
+            iex> #{inspect(__MODULE__)}.to_string(datetime, format: :hms, locale: "en")
             {:ok, "11:59:59 PM"}
-            iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "en"
-            {:ok, "Saturday, January 1, 2000, 11:59:59 PM GMT"}
-            iex> #{inspect(__MODULE__)}.to_string datetime, format: :full, locale: "fr"
-            {:ok, "samedi 1 janvier 2000, 23:59:59 UTC"}
+            iex> #{inspect(__MODULE__)}.to_string(datetime, format: :full, locale: "en")
+            {:ok, "Saturday, January 1, 2000, 11:59:59 PM Coordinated Universal Time"}
+            iex> #{inspect(__MODULE__)}.to_string(datetime, format: :full, locale: "fr")
+            {:ok, "samedi 1 janvier 2000, 23:59:59 temps universel coordonné"}
 
         """
         @spec to_string(Cldr.Calendar.any_date_time(), Keyword.t()) ::
@@ -164,9 +164,9 @@ defmodule Cldr.DateAndTime.Backend do
             iex> #{inspect(__MODULE__)}.to_string!(date_time, format: :long, locale: :en)
             "January 1, 2000, 11:59:59 PM UTC"
             iex> #{inspect(__MODULE__)}.to_string!(date_time, format: :full, locale: :en)
-            "Saturday, January 1, 2000, 11:59:59 PM GMT"
+            "Saturday, January 1, 2000, 11:59:59 PM Coordinated Universal Time"
             iex> #{inspect(__MODULE__)}.to_string!(date_time, format: :full, locale: :fr)
-            "samedi 1 janvier 2000, 23:59:59 UTC"
+            "samedi 1 janvier 2000, 23:59:59 temps universel coordonné"
 
         """
         @spec to_string!(Cldr.Calendar.any_date_time(), Keyword.t()) :: String.t() | no_return
@@ -240,7 +240,7 @@ defmodule Cldr.DateAndTime.Backend do
 
             # A partial date with a derived "best match" format
             iex> #{inspect(__MODULE__)}.to_string(%{year: 2024, month: 6}, locale: "fr")
-            {:ok, "06/2024"}
+            {:ok, "6/2024"}
 
             # A partial date with a best match CLDR-defined format
             iex> #{inspect(__MODULE__)}.to_string(%{year: 2024, month: 6}, format: :yMMM, locale: "fr")
@@ -324,7 +324,7 @@ defmodule Cldr.DateAndTime.Backend do
 
             # A partial date with a derived "best match" format
             iex> #{inspect(__MODULE__)}.to_string!(%{year: 2024, month: 6}, locale: "fr")
-            "06/2024"
+            "6/2024"
 
             # A partial date with a best match CLDR-defined format
             iex> #{inspect(__MODULE__)}.to_string!(%{year: 2024, month: 6}, format: :yMMM, locale: "fr")

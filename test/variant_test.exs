@@ -66,15 +66,15 @@ defmodule Cldr.DateTime.VariantTest do
              Cldr.Date.to_string(~D[2024-03-01], format: :yMd, prefer: :variant, locale: "en-CA")
 
     assert {:ok, "2024-03-01"} =
-             Cldr.Date.to_string(~D[2024-03-01], format: :yMd, prefer: :default, locale: "en-CA")
+             Cldr.Date.to_string(~D[2024-03-01], format: :yMMdd, prefer: :default, locale: "en-CA")
 
     assert {:ok, "1/3/2024"} =
              Cldr.Date.to_string(~D[2024-03-01], format: :yMd, prefer: [:variant], locale: "en-CA")
 
     assert {:ok, "2024-03-01"} =
-             Cldr.Date.to_string(~D[2024-03-01], format: :yMd, prefer: [:default], locale: "en-CA")
+             Cldr.Date.to_string(~D[2024-03-01], format: :yMMdd, prefer: [:default], locale: "en-CA")
 
     assert {:ok, "2024-03-01"} =
-             Cldr.Date.to_string(~D[2024-03-01], format: :yMd, locale: "en-CA")
+             Cldr.Date.to_string(~D[2024-03-01], format: :yMMdd, locale: "en-CA")
   end
 end

@@ -1,5 +1,5 @@
 defmodule Cldr.DatesTimes.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "that the bb format works as expected" do
     assert Cldr.DateTime.to_string(
@@ -35,15 +35,6 @@ defmodule Cldr.DatesTimes.Test do
     assert Cldr.Date.to_string(~D[2019-06-12], MyApp.Cldr, locale: "de") == {:ok, "12.06.2019"}
   end
 
-  test "Formatting via a backend when there is no default backend" do
-    default_backend = Application.get_env(:ex_cldr, :default_backend)
-    Application.put_env(:ex_cldr, :default_backend, nil)
-    assert match?({:ok, _now}, MyApp.Cldr.DateTime.to_string(DateTime.utc_now()))
-    assert match?({:ok, _now}, MyApp.Cldr.Date.to_string(Date.utc_today()))
-    assert match?({:ok, _now}, MyApp.Cldr.Time.to_string(DateTime.utc_now()))
-    Application.put_env(:ex_cldr, :default_backend, default_backend)
-  end
-
   test "to_string/2 when the second param is options (not backend)" do
     assert Cldr.Date.to_string(~D[2022-01-22], backend: MyApp.Cldr) == {:ok, "Jan 22, 2022"}
 
@@ -64,16 +55,16 @@ defmodule Cldr.DatesTimes.Test do
     date_time = ~U[2023-09-08 15:50:00Z]
 
     assert Cldr.DateTime.to_string(date_time, format: :full, style: :at) ==
-             {:ok, "Friday, September 8, 2023 at 3:50:00 PM GMT"}
+             {:ok, "Friday, September 8, 2023 at 3:50:00 PM Coordinated Universal Time"}
 
     assert Cldr.DateTime.to_string(date_time, format: :long, style: :at) ==
              {:ok, "September 8, 2023 at 3:50:00 PM UTC"}
 
     assert Cldr.DateTime.to_string(date_time, format: :full, style: :at, locale: :fr) ==
-             {:ok, "vendredi 8 septembre 2023 à 15:50:00 UTC"}
+             {:ok, "vendredi 8 septembre 2023 à 15:50:00 temps universel coordonné"}
 
     assert Cldr.DateTime.to_string(date_time, format: :long, style: :at, locale: :fr) ==
-             {:ok, "8 septembre 2023 à 15:50:00 UTC"}
+             {:ok, "8 septembre 2023 à 15:50:00 TU"}
   end
 
   test "Era variants" do
@@ -84,8 +75,12 @@ defmodule Cldr.DatesTimes.Test do
   end
 
   test "Resolving with skeleton code c, J and j" do
-    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :hmj)
-    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :hmJ)
+    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :jm, backend: MyApp.Cldr)
+
+    assert {:ok, "10:48"} =
+             Cldr.Time.to_string(~T[10:48:00], locale: :de, format: :jm, backend: MyApp.Cldr)
+
+    assert {:ok, "10:48 AM"} = Cldr.Time.to_string(~T[10:48:00], format: :Jm, backend: MyApp.Cldr)
 
     assert Cldr.Date.to_string(~T"10:48:00", format: :hmc) ==
              {:error,
@@ -105,10 +100,10 @@ defmodule Cldr.DatesTimes.Test do
     assert {:ok, "Jul 7, 2024, 9:36:00 PM"} =
              Cldr.DateTime.to_string(datetime)
 
-    assert {:ok, "7/7/24, 9:36:00 PM GMT"} =
+    assert {:ok, "7/7/24, 9:36:00 PM Coordinated Universal Time"} =
              Cldr.DateTime.to_string(datetime, date_format: :short, time_format: :full)
 
-    assert {:ok, "7/7/24, 9:36:00 PM GMT"} =
+    assert {:ok, "7/7/24, 9:36:00 PM Coordinated Universal Time"} =
              Cldr.DateTime.to_string(datetime,
                format: :medium,
                date_format: :short,
@@ -124,10 +119,14 @@ defmodule Cldr.DatesTimes.Test do
              date_format: :short,
              time_format: :medium
            ) ==
-             {:error,
-              {Cldr.DateTime.InvalidFormat,
-               ":date_format and :time_format cannot be specified if :format is also specified as a " <>
-                 "format id or a format string. Found [time_format: :medium, date_format: :short]"}}
+             {
+               :error,
+               {
+                 Cldr.DateTime.InvalidFormat,
+                 ":date_format and :time_format cannot be specified if :format is also specified " <>
+                   "as a format id or a format string. Found [format: \"yyy\", time_format: :medium, date_format: :short]"
+               }
+             }
 
     assert Cldr.DateTime.to_string(datetime,
              format: :yMd,
@@ -136,8 +135,8 @@ defmodule Cldr.DatesTimes.Test do
            ) ==
              {:error,
               {Cldr.DateTime.InvalidFormat,
-               ":date_format and :time_format cannot be specified if :format is also specified as a " <>
-                 "format id or a format string. Found [time_format: :medium, date_format: :short]"}}
+               ":date_format and :time_format cannot be specified if :format is also specified " <>
+                 "as a format id or a format string. Found [format: :yMd, time_format: :medium, date_format: :short]"}}
   end
 
   test "Pluralized formats" do

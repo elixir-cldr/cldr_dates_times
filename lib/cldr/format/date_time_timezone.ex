@@ -292,7 +292,6 @@ defmodule Cldr.DateTime.Timezone do
   def non_location_format(time_zone, options) when is_binary(time_zone) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
     format = Module.concat(backend, DateTime.Format)
-
     with {:ok, options} <- validate_options(options),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
@@ -487,7 +486,7 @@ defmodule Cldr.DateTime.Timezone do
          {:ok, zone_territory} <- territory_for_zone(canonical_zone) do
       format = zone_format(region_format, options)
 
-      case location_from_territory_and_zone(zone_territory, territories, canonical_zone) do
+      case location_from_territory_and_zone(zone_territory, territories, canonical_zone, locale) do
         {:ok, location} ->
           io_list = Substitution.substitute(location, format)
           {:ok, List.to_string(io_list)}
@@ -496,14 +495,15 @@ defmodule Cldr.DateTime.Timezone do
           error
       end
     end
+
   end
 
-  defp location_from_territory_and_zone(territory, territories, time_zone) do
+  defp location_from_territory_and_zone(territory, territories, time_zone, locale) do
     if territory_has_one_zone?(territory) || primary_zone?(time_zone) do
       territory_names = Map.fetch!(territories, territory)
       {:ok, territory_names[:short] || territory_names[:standard]}
     else
-      exemplar_city(time_zone)
+      exemplar_city(time_zone, locale: locale)
     end
   end
 
@@ -622,7 +622,14 @@ defmodule Cldr.DateTime.Timezone do
     end
   end
 
-  defp format_gmt(%{hour: 0, minute: 0, second: 0}, _formatted_hour, _gmt_format, gmt_zero_format, _backend, _options) do
+  defp format_gmt(
+         %{hour: 0, minute: 0, second: 0},
+         _formatted_hour,
+         _gmt_format,
+         gmt_zero_format,
+         _backend,
+         _options
+       ) do
     gmt_zero_format
   end
 
@@ -725,7 +732,7 @@ defmodule Cldr.DateTime.Timezone do
     with {:ok, options} <- validate_iso_options(options),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
          {:ok, shifted_date_time} <-
-             shift_zone(options.date_time, canonical_zone, options.time_zone_database) do
+           shift_zone(options.date_time, canonical_zone, options.time_zone_database) do
       {hour, minute, second} = time_from_zone_offset(shifted_date_time)
       time = %{hour: hour, minute: abs(minute), second: second}
       {:ok, iso_format_type(time, options.type, options.format, options.z_for_zero)}
@@ -734,7 +741,8 @@ defmodule Cldr.DateTime.Timezone do
 
   # Z format
 
-  def iso_format_type(%{hour: 0, minute: 0, second: 0}, _type, _format, z_for_zero) when z_for_zero do
+  def iso_format_type(%{hour: 0, minute: 0, second: 0}, _type, _format, z_for_zero)
+      when z_for_zero do
     "Z"
   end
 
@@ -756,17 +764,22 @@ defmodule Cldr.DateTime.Timezone do
     sign(hour) <> h23(time, 2) <> minute(time, 2)
   end
 
-  def iso_format_type(%{hour: hour, minute: _minute, second: _second} = time, :basic, :full, _z_for_zero) do
+  def iso_format_type(
+        %{hour: hour, minute: _minute, second: _second} = time,
+        :basic,
+        :full,
+        _z_for_zero
+      ) do
     sign(hour) <> h23(time, 2) <> minute(time, 2) <> second(time, 2)
   end
 
   # Extended format
 
-  def iso_format_type(%{hour: hour, minute: 0} = time, :extended,  :short, _z_for_zero) do
+  def iso_format_type(%{hour: hour, minute: 0} = time, :extended, :short, _z_for_zero) do
     sign(hour) <> h23(time, 2)
   end
 
-  def iso_format_type(%{hour: hour, minute: _minute} = time, :extended,  :short, _z_for_zero) do
+  def iso_format_type(%{hour: hour, minute: _minute} = time, :extended, :short, _z_for_zero) do
     sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2)
   end
 
@@ -774,11 +787,21 @@ defmodule Cldr.DateTime.Timezone do
     sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2)
   end
 
-  def iso_format_type(%{hour: hour, minute: _minute, second: 0} = time, :extended, :full,  _z_for_zero) do
+  def iso_format_type(
+        %{hour: hour, minute: _minute, second: 0} = time,
+        :extended,
+        :full,
+        _z_for_zero
+      ) do
     sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2)
   end
 
-  def iso_format_type(%{hour: hour, minute: _minute, second: _second} = time, :extended, :full,  _z_for_zero) do
+  def iso_format_type(
+        %{hour: hour, minute: _minute, second: _second} = time,
+        :extended,
+        :full,
+        _z_for_zero
+      ) do
     sign(hour) <> h23(time, 2) <> ":" <> minute(time, 2) <> ":" <> second(time, 2)
   end
 
@@ -852,7 +875,7 @@ defmodule Cldr.DateTime.Timezone do
         {:ok, "キーウ"}
 
         iex> Cldr.DateTime.Timezone.exemplar_city("Etc/Unknown")
-        {:ok, "Unknown City"}
+        {:ok, "Unknown Location"}
 
         iex> Cldr.DateTime.Timezone.exemplar_city("Etc/UTC")
         {:error, {Cldr.DateTime.UnknownExemplarCity, "No exemplar city is known for \\"Etc/UTC\\""}}
@@ -915,12 +938,12 @@ defmodule Cldr.DateTime.Timezone do
   end
 
   def time_from_zone_offset(time) do
-    {:error, "Expected a map with :utc_offset and :std_offset fields. Found #{inspect time}"}
+    {:error, "Expected a map with :utc_offset and :std_offset fields. Found #{inspect(time)}"}
   end
 
   @doc false
   def time_map_from_zone_offset(offset) do
-    {hours,  minutes, seconds} = time_from_zone_offset(offset)
+    {hours, minutes, seconds} = time_from_zone_offset(offset)
     %{hour: hours, minute: minutes, second: seconds}
   end
 
@@ -1085,6 +1108,7 @@ defmodule Cldr.DateTime.Timezone do
       case meta_zone(canonical_zone, date_time) do
         nil ->
           {:ok, time_zone}
+
         meta_zone ->
           preferred_zone = preferred_zone_for_meta_zone(meta_zone, locale) || canonical_zone
           {:ok, preferred_zone}
@@ -1312,7 +1336,7 @@ defmodule Cldr.DateTime.Timezone do
               "Invalid format #{inspect(format)}. Valid format are #{inspect(@valid_formats)}"
             }}}
 
-        {:date_time, date_time}, acc when is_date_time(date_time) ->
+        {:date_time, %{time_zone: _}}, acc ->
           {:cont, acc}
 
         {:date_time, datetime}, _acc ->
@@ -1400,7 +1424,7 @@ defmodule Cldr.DateTime.Timezone do
             {
               ArgumentError,
               "Invalid option #{inspect(option)}. Valid options are :date_time, :format, " <>
-              ":type, :z_for_zero, :time_zone_database"
+                ":type, :z_for_zero, :time_zone_database"
             }}}
       end)
 

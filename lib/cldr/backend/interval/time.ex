@@ -98,7 +98,7 @@ defmodule Cldr.Time.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
             ...> format: :long, style: :zone
-            {:ok, "12:00 – 10:00 AM Etc/UTC"}
+            {:ok, "12:00 – 10:00 AM UTC"}
 
             iex> #{inspect(__MODULE__)}.to_string ~T[10:00:00], ~T[10:03:00],
             ...> format: :long, style: :flex, locale: "th"
@@ -208,7 +208,7 @@ defmodule Cldr.Time.Interval.Backend do
 
             iex> #{inspect(__MODULE__)}.to_string! ~U[2020-01-01 00:00:00.0Z], ~U[2020-01-01 10:00:00.0Z],
             ...> format: :long, style: :zone
-            "12:00 – 10:00 AM Etc/UTC"
+            "12:00 – 10:00 AM UTC"
 
             iex> #{inspect(__MODULE__)}.to_string! ~T[10:00:00], ~T[10:03:00],
             ...> format: :long, style: :flex, locale: "th"

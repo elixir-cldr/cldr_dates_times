@@ -17,7 +17,8 @@ defmodule MyApp.Cldr do
       "en-GB",
       "it",
       "ar",
-      "ru"
+      "ru",
+      "ar-SA"
     ],
     providers: [Cldr.Number, Cldr.Calendar, Cldr.DateTime, Cldr.Unit, Cldr.List],
     precompile_number_formats: ["#,##0"],

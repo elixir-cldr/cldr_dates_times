@@ -126,7 +126,7 @@ defmodule Cldr.DateTime.Interval do
 
     ### Examples
 
-        iex> Cldr.DateTime.Interval.to_string ~I"2020-01-01 10:00/12:00", MyApp.Cldr
+        iex> Cldr.DateTime.Interval.to_string(~I"2020-01-01 10:00/12:00", MyApp.Cldr)
         {:ok, "Jan 1, 2020, 10:00:00 AM – 12:00:00 PM"}
 
     """
@@ -314,11 +314,11 @@ defmodule Cldr.DateTime.Interval do
 
   ### Examples
 
-      iex> Cldr.DateTime.Interval.to_string ~U[2020-01-01 00:00:00.0Z],
-      ...> ~U[2020-12-31 10:00:00.0Z], MyApp.Cldr
+      iex> Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z],
+      ...> ~U[2020-12-31 10:00:00.0Z], MyApp.Cldr)
       {:ok, "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"}
 
-      iex> Cldr.DateTime.Interval.to_string ~U[2020-01-01 00:00:00.0Z], nil, MyApp.Cldr
+      iex> Cldr.DateTime.Interval.to_string(~U[2020-01-01 00:00:00.0Z], nil, MyApp.Cldr)
       {:ok, "Jan 1, 2020, 12:00:00 AM –"}
 
   """
@@ -544,7 +544,7 @@ defmodule Cldr.DateTime.Interval do
     ### Examples
 
         iex> use CalendarInterval
-        iex> Cldr.DateTime.Interval.to_string! ~I"2020-01-01 00:00/10:00", MyApp.Cldr
+        iex> Cldr.DateTime.Interval.to_string!(~I"2020-01-01 00:00/10:00", MyApp.Cldr)
         "Jan 1, 2020, 12:00:00 AM – 10:00:59 AM"
 
     """
@@ -652,8 +652,8 @@ defmodule Cldr.DateTime.Interval do
 
   ### Examples
 
-      iex> Cldr.DateTime.Interval.to_string! ~U[2020-01-01 00:00:00.0Z],
-      ...> ~U[2020-12-31 10:00:00.0Z], MyApp.Cldr
+      iex> Cldr.DateTime.Interval.to_string!(~U[2020-01-01 00:00:00.0Z],
+      ...> ~U[2020-12-31 10:00:00.0Z], MyApp.Cldr)
       "Jan 1, 2020, 12:00:00 AM – Dec 31, 2020, 10:00:00 AM"
 
   """
@@ -689,10 +689,10 @@ defmodule Cldr.DateTime.Interval do
 
   ### Example
 
-      iex> Cldr.DateTime.Interval.greatest_difference ~U[2022-04-22 02:00:00.0Z], ~U[2022-04-22 03:00:00.0Z]
+      iex> Cldr.DateTime.Interval.greatest_difference(~U[2022-04-22 02:00:00.0Z], ~U[2022-04-22 03:00:00.0Z])
       {:ok, :H}
 
-      iex> Cldr.DateTime.Interval.greatest_difference ~U[2022-04-22 02:00:00.0Z], ~U[2022-04-22 02:00:01.0Z]
+      iex> Cldr.DateTime.Interval.greatest_difference(~U[2022-04-22 02:00:00.0Z], ~U[2022-04-22 02:00:01.0Z])
       {:error, :no_practical_difference}
 
   """
