@@ -93,4 +93,9 @@ defmodule Cldr.DateTime.Relative.Test do
     assert {:ok, "in 6 hours"} =
              Relative.to_string(@time, relative_to: @relative_time_to)
   end
+
+  test "Relative at time" do
+    assert  {:ok, "tomorrow at 6:11 PM"} =
+      Cldr.DateTime.Relative.to_string(1, style: :at, time: @time, unit: :day, at_format: :long)
+  end
 end
