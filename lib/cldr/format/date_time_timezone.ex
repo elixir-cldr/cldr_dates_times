@@ -562,8 +562,9 @@ defmodule Cldr.DateTime.Timezone do
       iex> Cldr.DateTime.Timezone.gmt_format(summer_time, locale: :fr)
       {:ok, "UTC+11:00"}
 
-      iex> Cldr.DateTime.Timezone.gmt_format "Canada/Newfoundland", locale: :ar
-      {:ok, "غرينتش-02:30"}
+      iex> {:ok, time} = DateTime.new(~D[2025-01-01], ~T[00:00:00], "Canada/Newfoundland")
+      iex> Cldr.DateTime.Timezone.gmt_format(time, locale: :ar)
+      {:ok, "غرينتش-03:30"}
 
       iex> {:ok, summer_time} = DateTime.new(~D[2025-06-01], ~T[00:00:00], "America/Los_Angeles")
       iex> Cldr.DateTime.Timezone.gmt_format(summer_time)

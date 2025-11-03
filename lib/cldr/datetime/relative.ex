@@ -449,22 +449,23 @@ defmodule Cldr.DateTime.Relative do
   * See `Cldr.DateTime.Relative.to_string/3` for example usage.
 
   """
-  @spec to_string!(integer | float | Date.t() | DateTime.t(), Cldr.backend(), Keyword.t()) ::
-          String.t()
+  @spec to_string!(number | Date.t() | DateTime.t(), Cldr.backend() | Keyword.t(), Keyword.t()) ::
+          String.t() | no_return
+
   def to_string!(relative, backend \\ Cldr.Date.default_backend(), options \\ [])
 
   def to_string!(relative, options, []) when is_list(options) do
     to_string!(relative, Cldr.Date.default_backend(), options)
   end
 
-  def to_string!(relative, backend, options) do
+  def to_string!(relative, backend, options) when is_list(options) do
     case to_string(relative, backend, options) do
       {:ok, string} -> string
       {:error, {exception, reason}} -> raise exception, reason
     end
   end
 
-  @spec to_string(integer | float, atom(), Cldr.LanguageTag.t(), Cldr.backend(), Keyword.t()) ::
+  @spec to_string(number, atom(), Cldr.LanguageTag.t(), Cldr.backend(), map()) ::
           String.t()
 
   defp to_string(relative, unit, locale, backend, options)

@@ -77,6 +77,7 @@ defmodule Cldr.DateTime.Format.Match do
   alias Cldr.DateTime.Format.Compiler
   alias Cldr.DateTime.Format
   alias Cldr.LanguageTag
+  alias Cldr.Locale
 
   @locale_preferred_time_symbol %{
     h11: "K",
@@ -134,7 +135,8 @@ defmodule Cldr.DateTime.Format.Match do
           locale :: Locale.locale_reference(),
           calendar :: Cldr.Calendar.calendar(),
           backend :: Cldr.backend()
-        ) :: {:ok, Format.format_id()} | {:error, {module(), String.t()}}
+        ) :: {:ok, Format.format_id()} | {:ok, {Format.format_id(), Format.format_id()}} |
+              {:error, {module(), String.t()}}
 
   def best_match(
         original_skeleton,

@@ -89,10 +89,8 @@ defmodule Cldr.DateTime.Formatter.Backend do
               transforms = apply_transforms(tokens, date, locale, options)
               format_transforms(date, format, transforms, locale, options)
 
-            {:error, {_, :date_time_format_lexer, {_, error}}, _} ->
-              {:error,
-               {Cldr.DateTime.Compiler.ParseError,
-                "Could not tokenize #{inspect(format)}. Error detected at #{inspect(error)}"}}
+            other ->
+              other
           end
         end
 

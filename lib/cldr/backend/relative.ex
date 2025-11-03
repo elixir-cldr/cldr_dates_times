@@ -281,6 +281,7 @@ defmodule Cldr.DateTime.Relative.Backend do
 
         """
         @spec to_string!(number | Elixir.Date.t() | Elixir.DateTime.t(), Keyword.t()) :: String.t()
+
         def to_string!(time, options \\ []) do
           Cldr.DateTime.Relative.to_string!(time, unquote(backend), options)
         end

@@ -14,25 +14,25 @@ defmodule Cldr.DateTime.Format do
   alias Cldr.LanguageTag
 
   @typedoc """
-  The standard formats of `:full`,
-  `:long`, `:medium` and `:short` are used
-  to resolve standard formats in a locale independent
-  way.
-  """
-  @type standard_formats :: %{
-          full: String.t(),
-          long: String.t(),
-          medium: String.t(),
-          short: String.t()
-        }
-
-  @typedoc """
   A format skeleton is a string consisting of [format
   symbols](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
   which is used to find the best match from the list of
   formats returned by `Cldr.DateTime.Format.date_time_available_formats/3`
   """
-  @type format_skeleton :: atom()
+  @type format_skeleton :: atom() | binary()
+
+  @typedoc """
+  The standard formats of `:full`,
+  `:long`, `:medium` and `:short` are used
+  to resolve standard formats in a locale independent
+  way. The resolve to a skeleton ID as an atom.
+  """
+  @type standard_formats :: %{
+          full: format_skeleton(),
+          long: format_skeleton(),
+          medium: format_skeleton(),
+          short: format_skeleton()
+        }
 
   @typedoc """
   A format_id is an atom that indexes into the map returned by

@@ -4031,7 +4031,7 @@ defmodule Cldr.DateTime.Formatter do
   defp number_of_digits(n), do: Enum.count(Integer.digits(n))
 
   @doc false
-  @dialyzer {:nowarn_function, error_return: 3}
+  @dialyzer {:nowarn_function, n_error_return: 2}
   def n_error_return(symbol, n) do
     raise Cldr.DateTime.FormatError,
           "The format symbol '#{symbol}' does not support a format length of #{n}"
@@ -4047,7 +4047,8 @@ defmodule Cldr.DateTime.Formatter do
       |> join_requirements
 
     raise Cldr.DateTime.FormatError,
-          "The format symbol '#{symbol}' requires at map with at least #{requirements}. Found: #{inspect(map)}"
+          "The format symbol '#{symbol}' requires at map with at least #{requirements}. " <>
+          "Found: #{inspect(map)}"
 
     :error
   end

@@ -52,6 +52,7 @@ defmodule Cldr.DateTime.Format.Compiler do
     |> String.to_charlist()
     |> :date_time_format_lexer.string()
     |> maybe_add_decimal_separator()
+    |> maybe_return_error(format_string)
   end
 
   def tokenize(%{number_system: _numbers, format: format_string}) do
@@ -59,10 +60,13 @@ defmodule Cldr.DateTime.Format.Compiler do
   end
 
   def tokenize(format_map) when is_map(format_map) do
-    Enum.map(format_map, fn {style, format} ->
-      {style, tokenize(format)}
-    end)
-    |> Map.new()
+    map =
+      Enum.map(format_map, fn {style, format} ->
+        {style, tokenize(format)}
+      end)
+      |> Map.new()
+
+    {:ok, map}
   end
 
   defp maybe_add_decimal_separator({:ok, token_list, other}) do
@@ -86,6 +90,16 @@ defmodule Cldr.DateTime.Format.Compiler do
 
   defp seconds_followed_by_fraction([first | rest]) do
     [first | seconds_followed_by_fraction(rest)]
+  end
+
+  defp maybe_return_error({:error, {_, :date_time_format_lexer, {_, error}}, _}, format) do
+    {:error,
+      {Cldr.DateTime.Compiler.ParseError,
+       "Could not tokenize #{inspect(format)}. Error detected at #{inspect(error)}"}}
+  end
+
+  defp maybe_return_error(other, _format) do
+    other
   end
 
   @doc """
