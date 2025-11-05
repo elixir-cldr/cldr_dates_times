@@ -2,18 +2,9 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
-<<<<<<< HEAD
-## Cldr_Dates_Times v2.24.2
-
-This is the changelog for Cldr_Dates_Times v2.24.2 released on October 14th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
-
-### Bug Fixes
-
-* Fix generated doc links in generated backend modules. Previously they used implicit links to the projects README file. Since they generate code, the implicit links end up referencing the users project README which is not the intention and which generates `ex_doc` warnings. Thanks to @zorn for the report. Fixes [#63](https://github.com/elixir-cldr/cldr_dates_times/issues/63) for this library.
-=======
 ## Cldr_Dates_Times v2.25.0
 
-This is the changelog for Cldr_Dates_Times v2.25.0 released on _____, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.25.0 released on November 6th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Breaking Changes
 
@@ -38,12 +29,17 @@ This is the changelog for Cldr_Dates_Times v2.25.0 released on _____, 2025.  For
 
 * Adds `style: :at` to `Cldr.DateTime.Relative.to_string/2`. This allows formatting of string like "tomorrow at 3:30 PM". The default is `style: :standard`.
 
-* Significant improvement in support of [date time skeletons](https://www.unicode.org/reports/tr35/dev/tr35-dates.html#availableFormats_appendItems). Skeletons are a flexible way to express desired formatting in a locale-idepdendent way.
+* Significant improvement in support of [date time skeletons](https://www.unicode.org/reports/tr35/dev/tr35-dates.html#availableFormats_appendItems). Skeletons are a flexible way to express desired formatting in a locale-indepdendent way.
 
 * Support is added for the "j", "J" and "C" [input skeleton symbols](https://www.unicode.org/reports/tr35/dev/tr35-dates.html#Date_Field_Symbol_Table) which will be substituted with the locales preferred hour formats.  These changes also improve implicit format generation derived from whatever date and time data is passed to the `Cldr.Date.to_string/3`, `Cldr.Time.to_string/3`, `Cldr.DateTime.to_string/3` functions.
 
-* The [README](readme.html) file is updated with corrections and coverage of new functionality related to time zone formatting and input skeletons.
->>>>>>> cldr48
+## Cldr_Dates_Times v2.24.2
+
+This is the changelog for Cldr_Dates_Times v2.24.2 released on October 14th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix generated doc links in generated backend modules. Previously they used implicit links to the projects README file. Since they generate code, the implicit links end up referencing the users project README which is not the intention and which generates `ex_doc` warnings. Thanks to @zorn for the report. Fixes [#63](https://github.com/elixir-cldr/cldr_dates_times/issues/63) for this library.
 
 ## Cldr_Dates_Times v2.24.1
 
