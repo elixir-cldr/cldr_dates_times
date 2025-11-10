@@ -206,7 +206,7 @@ defmodule Cldr.DateTime.Relative do
   end
 
   def to_string(relative, backend, options) do
-    {locale, _backend} = Cldr.locale_and_backend_from(options)
+    {locale, _backend} = Cldr.locale_and_backend_from(options[:locale], backend)
 
     with {:ok, options} <- normalize_options(options),
          {:ok, unit} <- validate_unit(options.unit),

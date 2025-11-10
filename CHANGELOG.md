@@ -2,6 +2,14 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.25.1
+
+This is the changelog for Cldr_Dates_Times v2.25.1 released on November 10th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Breaking Changes
+
+* Fix a `Cldr.DateTime.Relative.to_string/3` regression when a backend is provided as the second argument. Thanks to @madlep for the report. Closes #64.
+
 ## Cldr_Dates_Times v2.25.0
 
 This is the changelog for Cldr_Dates_Times v2.25.0 released on November 6th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
