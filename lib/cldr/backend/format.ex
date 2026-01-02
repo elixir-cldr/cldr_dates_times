@@ -18,6 +18,9 @@ defmodule Cldr.DateTime.Format.Backend do
           primarily concerned with encapsulating the
           data from CLDR in functions that are used
           during the formatting process.
+
+          For more information see `Cldr.DateTime.Format`.
+
           """
         end
 
@@ -124,7 +127,7 @@ defmodule Cldr.DateTime.Format.Backend do
 
         The value of each format type is itself a key into the map returned by
         `#{inspect(__MODULE__)}.date_time_available_formats/2` which returns the
-        actual format string.
+        actual format string (or map of format strings by variant).
 
         ## Arguments
 
@@ -683,10 +686,13 @@ defmodule Cldr.DateTime.Format.Backend do
              :yMd, :yQQQ, :yQQQQ, :yw]
 
         """
-        @spec common_date_time_format_names() :: [Format.format_id()]
-        def common_date_time_format_names do
-          Cldr.DateTime.Format.common_date_time_format_names(unquote(backend))
+        @spec common_date_time_format_ids() :: [Format.format_id()]
+        def common_date_time_format_ids do
+          Cldr.DateTime.Format.common_date_time_format_ids(unquote(backend))
         end
+
+        @deprecated "Use common_date_time_format_ids/0"
+        defdelegate common_date_time_format_names(), to: __MODULE__, as: :common_date_time_format_ids
 
         @doc """
         Returns the fallback format for a given
@@ -1160,7 +1166,7 @@ defmodule Cldr.DateTime.Format.Backend do
                 remaining =
                   format_id
                   |> to_string()
-                  |> String.replace(Format.date_fields(), "")
+                  |> String.replace(Format.date_symbols(), "")
 
                 remaining == ""
               end)
@@ -1175,7 +1181,7 @@ defmodule Cldr.DateTime.Format.Backend do
                 remaining =
                   format_id
                   |> to_string()
-                  |> String.replace(Format.time_fields(), "")
+                  |> String.replace(Format.time_symbols(), "")
 
                 remaining == ""
               end)

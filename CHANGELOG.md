@@ -2,6 +2,18 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.25.2
+
+This is the changelog for Cldr_Dates_Times v2.25.2 released on _____________.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+
+### Deprecations
+
+* Deprecate `Cldr.DateTime.Format.common_date_time_format_names/1` in favour of `common_date_time_format_ids/1` as part of the effort to make format terminology consistent and clearer.
+
+### Enhancements
+
+* Enhance the documentation describing formats (format pattern, format skeleton, format ID, standard format). Thanks to @tjchambers for the issue. Closes #65.
+
 ## Cldr_Dates_Times v2.25.1
 
 This is the changelog for Cldr_Dates_Times v2.25.1 released on November 10th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)

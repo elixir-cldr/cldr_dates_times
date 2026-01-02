@@ -1,6 +1,6 @@
 defmodule Cldr.Date do
   @moduledoc """
-  Provides localization and formatting of a `t:Date.t/0`
+  Provides localized and formatting of a `t:Date.t/0`
   struct or any map with one or more of the keys `:year`, `:month`,
   `:day` and optionally `:calendar`.
 
@@ -8,11 +8,7 @@ defmodule Cldr.Date do
   `Calendar.ISO` or any calendars defined with
   [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars).
 
-  CLDR provides standard format strings for `t:Date.t/0` which
-  are represented by the formats `:short`, `:medium`, `:long`
-  and `:full`.  This abstraction allows for locale-independent
-  formatting since each locale and calendar may define the underlying
-  format string as appropriate.
+  For information about specifying formats, see `Cldr.DateTime.Format`.
 
   """
 
@@ -25,8 +21,8 @@ defmodule Cldr.Date do
 
   @typep options :: Keyword.t() | map()
 
-  @format_types Format.standard_formats()
-  @default_format_type :medium
+  @standard_formats Format.standard_formats()
+  @default_standard_format :medium
   @default_prefer :unicode
 
   @field_map %{
@@ -42,7 +38,7 @@ defmodule Cldr.Date do
 
   defmodule Formats do
     @moduledoc false
-    defstruct Module.get_attribute(Cldr.Date, :format_types)
+    defstruct Module.get_attribute(Cldr.Date, :standard_formats)
   end
 
   @doc """
@@ -320,7 +316,7 @@ defmodule Cldr.Date do
     {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     prefer = List.wrap(@default_prefer)
-    format = format_from_options(date, nil, @default_format_type, prefer)
+    format = format_from_options(date, nil, @default_standard_format, prefer)
 
     %{locale: locale, number_system: number_system, format: format, prefer: prefer}
   end
@@ -331,7 +327,7 @@ defmodule Cldr.Date do
     number_system = Keyword.get(options, :number_system, locale_number_system)
     prefer = Keyword.get(options, :prefer, @default_prefer) |> List.wrap()
     format_option = options[:date_format] || options[:format] || options[:style]
-    format = format_from_options(date, format_option, @default_format_type, prefer)
+    format = format_from_options(date, format_option, @default_standard_format, prefer)
 
     options
     |> Map.new()
@@ -497,7 +493,7 @@ defmodule Cldr.Date do
   # applied.
   @doc false
   def find_format(date, format, locale, calendar, backend, _options)
-      when format in @format_types and is_full_date(date) do
+      when format in @standard_formats and is_full_date(date) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
     with {:ok, date_formats} <- formats(locale_name, calendar, backend),
@@ -521,7 +517,7 @@ defmodule Cldr.Date do
   # If its a partial date and a standard format is requested, its an error
 
   def find_format(date, format, _locale, _calendar, _backend, _options)
-      when format in @format_types and not is_full_date(date) do
+      when format in @standard_formats and not is_full_date(date) do
     {:error,
      {
        Cldr.DateTime.UnresolvedFormat,

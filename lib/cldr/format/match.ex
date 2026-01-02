@@ -219,8 +219,8 @@ defmodule Cldr.DateTime.Format.Match do
       skeleton
       |> String.graphemes()
       |> Enum.reduce({[], []}, fn char, {date_fields, time_fields} ->
-        date_fields = if char in Format.date_fields(), do: [char | date_fields], else: date_fields
-        time_fields = if char in Format.time_fields(), do: [char | time_fields], else: time_fields
+        date_fields = if char in Format.date_symbols(), do: [char | date_fields], else: date_fields
+        time_fields = if char in Format.time_symbols(), do: [char | time_fields], else: time_fields
         {date_fields, time_fields}
       end)
 
@@ -379,7 +379,7 @@ defmodule Cldr.DateTime.Format.Match do
   def time_skeleton?(skeleton) do
     skeleton
     |> String.graphemes()
-    |> Enum.all?(&(&1 in Format.time_fields()))
+    |> Enum.all?(&(&1 in Format.time_symbols()))
   end
 
   # Replaces the skeleton characters with locale-specific choices signalled

@@ -1,12 +1,135 @@
 defmodule Cldr.DateTime.Format do
   @moduledoc """
-  Manages the Date, Time and DateTime formats
-  defined by CLDR.
+  Manages the Date, Time and DateTime formats defined by CLDR.
 
-  The functions in `Cldr.DateTime.Format` are
-  primarily concerned with encapsulating the
-  data from CLDR in functions that are used
+  The functions in `Cldr.DateTime.Format` are primarily concerned with
+  encapsulating the data from CLDR in functions that are used
   during the formatting process.
+
+  ### Format Definitions
+
+  Formatting a date, time or date_time requires an
+  understanding of an end users expectations, the locale
+  of the end user (cultural expectations) and the
+  use case. Therefore the formatting implementataion needs
+  to be flexible and powerful while at the same time be
+  easy to understand and compose.
+
+  There are three ways to specify a format. They are summarized here
+  from the most concrete and specific to the most high-level and
+  abstract. Further details follow this section.
+
+  * CLDR uses a [format pattern](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns)
+    to represent how a date/time/date_time should be formatted. Ultimately
+    all format specifications are reolved to a format pattern into
+    which a date/time/date_time is interpolated.
+
+  * Since a format pattern represents a *specific* definition
+    of how to format a date/time/date_time, a method of specifying
+    a locale independent format is required. Such
+    formats are called format *skeletons*. A format skeleton is
+    an abstract way to express the contents of the desired format without
+    knowing the concrete format pattern.  Ultimately, a skeleton
+    is resolved to a specific format pattern for a given locale.
+
+  * Format patterns and format skeletons both require an
+    understanding of format fields and format symbols which make up
+    a format pattern. In many cases the formatting requirements are straight
+    forward and can be reduced to the idea of "full", "long", "medium" and
+    "short". Therefore, a format can be expressed using these terms with the
+    reasonable expectation of the resulting formatted date/time/date_time
+    being acceptable. These are termed *standard* formats.
+
+  Formatting with the standard formats is recommended unless specific
+  formatting requirements emerge.
+
+  ### Format Patterns
+
+  [Format patterns](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns)
+  are the foundation for expressing how a date/time/date_time is to
+  be formatted.  A format pattern is a tring consisting of two types of elements:
+
+  * Pattern fields, which repeat a specific pattern character one or more times. These fields
+    are replaced with date and time data from a calendar when formatting. Currently, A..Z and
+    a..z are reserved for use as pattern characters (unless they are quoted, see next item).
+    The pattern characters currently defined, and the meaning of different fields lengths for
+    then, are listed in the Date Field Symbol Table below.
+
+  * Literal text, which is output as-is when formatting, and must closely match when parsing.
+    Literal text can include:
+
+    * Any characters other than `A..Z` and `a..z`, including spaces and punctuation.
+    * Any text between single vertical quotes ('xxxx'), which may include A..Z and a..z as literal text.
+    * Two adjacent single vertical quotes (''), which represent a literal single quote,
+      either inside or outside quoted text.
+
+  The following are examples:
+
+  | Pattern	                        | Result (in a particular locale)         |
+  | :------------------------------ | :-------------------------------------- |
+  | yyyy.MM.dd G 'at' HH:mm:ss zzz	| 1996.07.10 AD at 15:08:56 PDT           |
+  | EEE, MMM d, ''yy	              | Wed, July 10, '96                       |
+  | h:mm a	                        | 12:08 PM                                |
+  | hh 'o''clock' a, zzzz	          | 12 o'clock PM, Pacific Daylight Time    |
+  | K:mm a, z	                      | 0:00 PM, PST.                           |
+  | yyyyy.MMMM.dd GGG hh:mm aaa	    | 01996.July.10 AD 12:08 PM               |
+
+  ### Format Skeletons
+
+  Format patterns are very flexible but they are not locale independent.
+  Format skeletons are therefore used to specify only what format fields
+  are to be formatted. The skeleton is then [best matched](https://www.unicode.org/reports/tr35/tr35-dates.html#Matching_Skeletons)
+  to an entry in the map returned from `Cldr.DateTime.available_formats/3` (and the similar
+  `Cldr.Date.available_formats/3` and `Cldr.Time.available_formats/3`
+  functions.
+
+  > #### Skeletons define what, not how {: .info}
+  >
+  > Standard formats are the best place to start, with
+  > format skeletons the more specific choice when required.
+  > Think of format skeletons as a way to specify *what* is to
+  > be formatted, not *how*. The *how* will be resolved
+  * from best matching against the map returned from
+  > `Cldr.DateTime.available_formats/3`.
+
+  A format skeleton is an atom containing only field information, and in a
+  canonical order. Examples are `:yMMMM` for year + full month, or `:MMMd` for
+  abbreviated month + day. In the examples, `MMM` is a format field and `M` is
+  a format symbol. Therfore a format field consists of one or more format
+  symbols.  In particular:
+
+  * The format fields are composed of format symbols from the [Format Symbol Table](https://hexdocs.pm/ex_cldr_dates_times/Cldr.DateTime.Formatter.html#module-format-symbol-table).
+  * The canonical order is from top to bottom in that table; that is, "yM" not "My".
+  * Only one field of each type is allowed; that is, "Hh" is not valid.
+
+  When specifiying a formal skeleton as the `:format` parameter to
+  `Cldr.DateTime.to_string/3` (and the `Cldr.Date.to_string/3` and
+  `Cldr.Time.to_string/3` equivalents), the skeleton will be put in
+  canonical order. Then the [best match](https://www.unicode.org/reports/tr35/tr35-dates.html#Matching_Skeletons)
+  for that requested skeleton will be found using `Cldr.DateTine.Format.Match.best_match/4`.
+  For example, the full month and year may be needed for a calendar application;
+  the requested format skeleton is `:MMMMyyyy`, but the best match may be
+  `:yMMMM` or even `GyyMMMM`, depending on the locale and calendar.
+
+  This "best match" skeleton is known as a format ID since it is
+  guaranteed to be a key in the map returned by `Cldr.DateTime.available_formats/3`.
+  The value in that map is a format pattern tinto which the given date/time/date_time
+  can be interpolated.
+
+  ### Standard Formats
+
+  Standard date/time/date_time patterns are defined as an abstraction encapsulating
+  a reasonable default choice for any locale. There are four standard formats:
+
+  * `:full` (usually with weekday name),
+  * `:long` (with wide month name),
+  * `:medium`, and
+  * `:short` (usually with numeric month).
+
+  Each of the standard formats resolves to the same a format skeleton which
+  is the same for every locale. The format skeleton is then resolved to the best match
+  skeleton for the desired locale and from there to a format pattern for
+  interpolation.
 
   """
 
@@ -14,10 +137,28 @@ defmodule Cldr.DateTime.Format do
   alias Cldr.LanguageTag
 
   @typedoc """
-  A format skeleton is a string consisting of [format
+  A format pattern is string which is composed of one
+  or more format fields and possibly literal text.
+
+  In the example format pattern `"yy/M/d"`, the
+  format fields are `yy`, `M` and `d` and the two
+  `/` are literals.
+
+  Each of the format fields is composed of one or more
+  [format symbols](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
+  which in this example are `y`, `M` and `d`.
+  """
+  @type format_pattern :: String.t()
+
+  @typedoc """
+  A format skeleton is an atom consisting of one or more
+  format fields that are themselves composed of one or more [format
   symbols](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
-  which is used to find the best match from the list of
-  formats returned by `Cldr.DateTime.Format.date_time_available_formats/3`
+  Format skeletons are used to find the best match format from the list of
+  formats returned by `Cldr.DateTime.Format.date_time_available_formats/3`.
+
+  An example format skeleton is `:yyMd` which has the format fields `yy`,
+  `M` and `d`.  It can can be best-matched to a locale-specific format ID.
   """
   @type format_skeleton :: atom() | binary()
 
@@ -25,7 +166,7 @@ defmodule Cldr.DateTime.Format do
   The standard formats of `:full`,
   `:long`, `:medium` and `:short` are used
   to resolve standard formats in a locale independent
-  way. The resolve to a skeleton ID as an atom.
+  way. They resolve to a skeleton ID.
   """
   @type standard_formats :: %{
           full: format_skeleton(),
@@ -35,15 +176,15 @@ defmodule Cldr.DateTime.Format do
         }
 
   @typedoc """
-  A format_id is an atom that indexes into the map returned by
-  `Cldr.DateTime.Format.date_time_available_formats/3` to
-  resolve a format string.
+  A format ID is a format skeleton that is a key into the map returned by
+  `Cldr.DateTime.available_formats/3` where the value
+  is a format string.
   """
-  @type format_id :: atom()
+  @type format_id :: format_skeleton()
 
   @standard_formats [:short, :medium, :long, :full]
 
-  @date_fields [
+  @date_symbols [
     "G",
     "y",
     "Y",
@@ -65,7 +206,7 @@ defmodule Cldr.DateTime.Format do
     "c"
   ]
 
-  @time_fields [
+  @time_symbols [
     "h",
     "H",
     "k",
@@ -91,13 +232,13 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc false
-  def date_fields do
-    @date_fields
+  def date_symbols do
+    @date_symbols
   end
 
   @doc false
-  def time_fields do
-    @time_fields
+  def time_symbols do
+    @time_symbols
   end
 
   @doc false
@@ -992,15 +1133,15 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns a list of the date_time format types that are
+  Returns a list of the date_time format IDs that are
   available in all known locales.
 
-  The format types returned by `common_date_time_format_names`
+  The format IDs returned by `common_date_time_format_ids/0`
   are guaranteed to be available in all known locales,
 
   ### Example:
 
-      iex> Cldr.DateTime.Format.common_date_time_format_names()
+      iex> Cldr.DateTime.Format.common_date_time_format_ids()
       [:Bh, :Bhm, :Bhms, :E, :EBh, :EBhm, :EBhms, :EHm, :EHms, :Ed, :Eh, :Ehm, :Ehms,
        :Gy, :GyM, :GyMEd, :GyMMM, :GyMMMEd, :GyMMMd, :GyMd, :H, :Hm, :Hms, :Hmsv,
        :Hmv, :Hv, :M, :MEd, :MMM, :MMMEd, :MMMMW, :MMMMd, :MMMd, :Md, :d, :h, :hm,
@@ -1008,8 +1149,8 @@ defmodule Cldr.DateTime.Format do
        :yMd, :yQQQ, :yQQQQ, :yw]
 
   """
-  @spec common_date_time_format_names(backend :: Cldr.backend()) :: [format_id()]
-  def common_date_time_format_names(backend \\ Cldr.Date.default_backend()) do
+  @spec common_date_time_format_ids(backend :: Cldr.backend()) :: [format_id()]
+  def common_date_time_format_ids(backend \\ Cldr.Date.default_backend()) do
     datetime_module = Module.concat(backend, DateTime.Format)
 
     Cldr.known_locale_names(backend)
@@ -1021,6 +1162,12 @@ defmodule Cldr.DateTime.Format do
     |> MapSet.to_list()
     |> Enum.sort()
   end
+
+  @deprecated "Use common_date_time_format_ids/1"
+  defdelegate common_date_time_format_names(backend), to: __MODULE__, as: :common_date_time_format_ids
+
+  @deprecated "Use common_date_time_format_ids/0"
+  defdelegate common_date_time_format_names(), to: __MODULE__, as: :common_date_time_format_ids
 
   defp known_formats(list, locale_names) do
     locale_names

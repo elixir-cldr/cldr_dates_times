@@ -10,11 +10,7 @@ defmodule Cldr.Time do
   `Calendar.ISO` or any calendars defined with
   [ex_cldr_calendars](https://hex.pm/packages/ex_cldr_calendars)
 
-  CLDR provides standard format strings for `Time` which
-  are represented by the names `:short`, `:medium`, `:long`
-  and `:full`.  This allows for locale-independent
-  formatting since each locale may define the underlying
-  format string as appropriate.
+  For information about specifying formats, see `Cldr.DateTime.Format`.
 
   """
 
@@ -28,8 +24,8 @@ defmodule Cldr.Time do
 
   @typep options :: Keyword.t() | map()
 
-  @format_types Format.standard_formats()
-  @default_format_type :medium
+  @standard_formats Format.standard_formats()
+  @default_standard_format :medium
   @default_prefer :unicode
   @default_separators :standard
 
@@ -51,7 +47,7 @@ defmodule Cldr.Time do
 
   defmodule Formats do
     @moduledoc false
-    defstruct Module.get_attribute(Cldr.Time, :format_types)
+    defstruct Module.get_attribute(Cldr.Time, :standard_formats)
   end
 
   @doc """
@@ -329,7 +325,7 @@ defmodule Cldr.Time do
     {locale, _backend} = Cldr.locale_and_backend_from(nil, backend)
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
     default_prefer = List.wrap(@default_prefer)
-    format = format_from_options(time, nil, @default_format_type, default_prefer)
+    format = format_from_options(time, nil, @default_standard_format, default_prefer)
 
     %{locale: locale, number_system: number_system, format: format, prefer: default_prefer}
   end
@@ -343,7 +339,7 @@ defmodule Cldr.Time do
     separators = Keyword.get(options, :separators, @default_separators)
 
     format_option = options[:time_format] || options[:format] || options[:style]
-    format = format_from_options(time, format_option, @default_format_type, prefer)
+    format = format_from_options(time, format_option, @default_standard_format, prefer)
 
     options
     |> Map.new()
@@ -381,7 +377,7 @@ defmodule Cldr.Time do
   # applied.
   @doc false
   def find_format(time, format, locale, calendar, backend, _options)
-      when format in @format_types and is_full_time(time) do
+      when format in @standard_formats and is_full_time(time) do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
     with {:ok, time_formats} <- formats(locale_name, calendar, backend),
@@ -395,7 +391,7 @@ defmodule Cldr.Time do
   # If its a partial date and a standard format is requested, its an error
 
   def find_format(time, format, _locale, _calendar, _backend, _options)
-      when format in @format_types and not is_full_time(time) do
+      when format in @standard_formats and not is_full_time(time) do
     {:error,
      {
        Cldr.DateTime.UnresolvedFormat,

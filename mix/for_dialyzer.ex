@@ -68,7 +68,7 @@ defmodule Cldr.DatesTimes.Dialyzer do
     _ = Cldr.DateTime.Format.interval_formats("en", :gregorian, MyApp.Cldr)
     _ = MyApp.Cldr.DateTime.Format.date_time_interval_formats("en", :gregorian)
 
-    _ = Cldr.DateTime.Format.common_date_time_format_names()
+    _ = Cldr.DateTime.Format.common_date_time_format_ids()
   end
 
   def other_tests do

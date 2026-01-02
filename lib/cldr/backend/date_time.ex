@@ -22,10 +22,9 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Options
 
-        * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format string or
+        * `:format` is one of `:short`, `:medium`, `:long`, `:full` or a format skeleton or
           any of the keys in the map returned by `Cldr.DateTime.Format.date_time_formats/3`.
-          The default is `:medium`. See [here](https://hexdocs.pm/ex_cldr_dates_times/readme.html#date-time-and-datetime-localization-formats)
-          for more information about specifying formats.
+          The default is `:medium`.
 
         * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
           this option is used to format the date part of the date time. This option is
