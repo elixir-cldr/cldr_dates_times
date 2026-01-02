@@ -8,46 +8,48 @@ defmodule Cldr.DateTime.Format do
 
   ### Format Definitions
 
-  Formatting a date, time or date_time requires an
+  Formatting a *date*, *time* or *date_time* requires an
   understanding of an end users expectations, the locale
   of the end user (cultural expectations) and the
   use case. Therefore the formatting implementataion needs
   to be flexible and powerful while at the same time be
-  easy to understand and compose.
+  easy to understand and implement for a developer.
 
   There are three ways to specify a format. They are summarized here
   from the most concrete and specific to the most high-level and
-  abstract. Further details follow this section.
+  abstract. Further details on each approach follow this section.
 
   * CLDR uses a [format pattern](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns)
-    to represent how a date/time/date_time should be formatted. Ultimately
-    all format specifications are reolved to a format pattern into
-    which a date/time/date_time is interpolated.
+    to represent how a *date*, *time* and *date_time* should be formatted. Ultimately
+    all format specifications are resolved to a format pattern into
+    which a *date*, *time* and *date_time* is interpolated.
 
   * Since a format pattern represents a *specific* definition
-    of how to format a date/time/date_time, a method of specifying
+    of how to format a *date*, *time* or *date_time*, a method of specifying
     a locale independent format is required. Such
     formats are called format *skeletons*. A format skeleton is
     an abstract way to express the contents of the desired format without
     knowing the concrete format pattern.  Ultimately, a skeleton
-    is resolved to a specific format pattern for a given locale.
+    is resolved to a specific format pattern for a given locale and calendar.
 
   * Format patterns and format skeletons both require an
     understanding of format fields and format symbols which make up
     a format pattern. In many cases the formatting requirements are straight
     forward and can be reduced to the idea of "full", "long", "medium" and
     "short". Therefore, a format can be expressed using these terms with the
-    reasonable expectation of the resulting formatted date/time/date_time
-    being acceptable. These are termed *standard* formats.
+    reasonable expectation that the resulting formatted date/time/date_time
+    will be acceptable. These are termed *standard* formats.
 
-  Formatting with the standard formats is recommended unless specific
-  formatting requirements emerge.
+  > #### Hint {: .info}
+  >
+  > Formatting with the standard formats is recommended unless specific
+  > formatting requirements emerge.
 
   ### Format Patterns
 
   [Format patterns](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns)
-  are the foundation for expressing how a date/time/date_time is to
-  be formatted.  A format pattern is a tring consisting of two types of elements:
+  are the foundation for expressing how a *date* or *time*  is to
+  be formatted.  A format pattern is a string consisting of two types of elements:
 
   * Pattern fields, which repeat a specific pattern character one or more times. These fields
     are replaced with date and time data from a calendar when formatting. Currently, A..Z and
@@ -74,6 +76,11 @@ defmodule Cldr.DateTime.Format do
   | K:mm a, z	                      | 0:00 PM, PST.                           |
   | yyyyy.MMMM.dd GGG hh:mm aaa	    | 01996.July.10 AD 12:08 PM               |
 
+  Format patterns are also defined for *date_times* however the format of those
+  patterns is different from those for *date* and *time*.  A *date_time* format
+  pattern is a string with two placeholders into which the formatted *date* and
+  formatted *time* are interpolated.
+
   ### Format Skeletons
 
   Format patterns are very flexible but they are not locale independent.
@@ -89,7 +96,7 @@ defmodule Cldr.DateTime.Format do
   > format skeletons the more specific choice when required.
   > Think of format skeletons as a way to specify *what* is to
   > be formatted, not *how*. The *how* will be resolved
-  * from best matching against the map returned from
+  > from best matching against the map returned from
   > `Cldr.DateTime.available_formats/3`.
 
   A format skeleton is an atom containing only field information, and in a
@@ -104,7 +111,7 @@ defmodule Cldr.DateTime.Format do
 
   When specifiying a formal skeleton as the `:format` parameter to
   `Cldr.DateTime.to_string/3` (and the `Cldr.Date.to_string/3` and
-  `Cldr.Time.to_string/3` equivalents), the skeleton will be put in
+  `Cldr.Time.to_string/3` equivalents), the skeleton fields will be sorted into
   canonical order. Then the [best match](https://www.unicode.org/reports/tr35/tr35-dates.html#Matching_Skeletons)
   for that requested skeleton will be found using `Cldr.DateTine.Format.Match.best_match/4`.
   For example, the full month and year may be needed for a calendar application;
@@ -118,7 +125,13 @@ defmodule Cldr.DateTime.Format do
 
   ### Standard Formats
 
-  Standard date/time/date_time patterns are defined as an abstraction encapsulating
+  Standard formats are defined for `date` and `time` which, in both cases,
+  resolves to a format skeleton. For `date_time`, the resolved format is a
+  string including placeholders.
+
+  #### Date and Time Standard Formats
+
+  Standard *date* and *time* formats are defined as an abstraction encapsulating
   a reasonable default choice for any locale. There are four standard formats:
 
   * `:full` (usually with weekday name),
@@ -126,10 +139,22 @@ defmodule Cldr.DateTime.Format do
   * `:medium`, and
   * `:short` (usually with numeric month).
 
-  Each of the standard formats resolves to the same a format skeleton which
+  Each of the *date* and *time* standard formats resolves to a format skeleton which
   is the same for every locale. The format skeleton is then resolved to the best match
-  skeleton for the desired locale and from there to a format pattern for
+  format ID for the desired locale and from there to a format pattern for
   interpolation.
+
+  #### DateTime Standard Formats
+
+  Standard *date_time* formats encapsulate how to combine a formatted
+  *date* and a formatted *time* into a single formatted *date_time*. Like *date*
+  and *time* standard formats, the four standard formats for a *date_time*
+  are `:full`, `:long`, `:medium` and `:short`. However in this case
+  the formats are strings containing placeholders into which the formatted
+  date and formatted time are interpolated.
+
+  An example is "{1} 'at' {0}" where `{1}` will be replaced by the formatted
+  *date* and `{0}` will be replaced by the formatted *time*.
 
   """
 
@@ -137,8 +162,8 @@ defmodule Cldr.DateTime.Format do
   alias Cldr.LanguageTag
 
   @typedoc """
-  A format pattern is string which is composed of one
-  or more format fields and possibly literal text.
+  A format pattern for a *date* or *time* is a string which is
+  composed of one or more format fields and possibly literal text.
 
   In the example format pattern `"yy/M/d"`, the
   format fields are `yy`, `M` and `d` and the two
@@ -147,8 +172,19 @@ defmodule Cldr.DateTime.Format do
   Each of the format fields is composed of one or more
   [format symbols](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)
   which in this example are `y`, `M` and `d`.
+
   """
   @type format_pattern :: String.t()
+
+  @typedoc """
+  A [date_time format pattern](https://unicode.org/reports/tr35/tr35-dates.html#dateTimeFormat)
+  is a string with placeholders for the *date* part and the *time* part
+  in addition to literal text. For example, "{1} 'at' {0}" where
+  `{1}` will be replaced by the formatted *date* and `{0}` will
+  be replaced by the formatted *time*.
+
+  """
+  @type date_time_format_pattern :: String.t()
 
   @typedoc """
   A format skeleton is an atom consisting of one or more
@@ -159,14 +195,17 @@ defmodule Cldr.DateTime.Format do
 
   An example format skeleton is `:yyMd` which has the format fields `yy`,
   `M` and `d`.  It can can be best-matched to a locale-specific format ID.
+
   """
-  @type format_skeleton :: atom() | binary()
+  @type format_skeleton :: atom()
 
   @typedoc """
-  The standard formats of `:full`,
+  The date and time standard formats of `:full`,
   `:long`, `:medium` and `:short` are used
-  to resolve standard formats in a locale independent
-  way. They resolve to a skeleton ID.
+  to resolve date and time standard formats in a
+  locale independent way. They resolve to a format
+  skeleton.
+
   """
   @type standard_formats :: %{
           full: format_skeleton(),
@@ -176,9 +215,28 @@ defmodule Cldr.DateTime.Format do
         }
 
   @typedoc """
-  A format ID is a format skeleton that is a key into the map returned by
-  `Cldr.DateTime.available_formats/3` where the value
-  is a format string.
+  The *date_time* standard formats of `:full`,
+  `:long`, `:medium` and `:short` are used
+  to resolve standard formats for a *date_time*
+  in a locale independent way. They resolve to a
+  string with placeholders into which a formatted
+  date and a formatted time are interpolated.
+
+  """
+  @type date_time_standard_formats :: %{
+          full: String.t(),
+          long: String.t(),
+          medium: String.t(),
+          short: String.t()
+        }
+
+  @typedoc """
+  A format ID is a [format skeleton](#t:format_skeleton/0) that is
+  guaranteed to be a valid key into the map returned by
+  `Cldr.DateTime.available_formats/3` (or
+  `Cldr.Date.available_formats/3` or `Cldr.Time.available_formats/3`
+  as appropriate).
+
   """
   @type format_id :: format_skeleton()
 
@@ -273,7 +331,7 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns a list of calendars defined for a given locale.
+  Returns a list of CLDR calendars defined for a given locale.
 
   ### Arguments
 
@@ -329,7 +387,7 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns the GMT format string for a
+  Returns the localised string for GMT for a
   for a timezone with an offset of zero for
   a given locale.
 
@@ -356,7 +414,7 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns the GMT format string for a for an unkown GMT offset.
+  Returns the localized string for GMT for a for an unkown GMT offset.
 
   ### Arguments
 
@@ -381,8 +439,8 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns the timezone display data for
-  a locale.
+  Returns the [time zone](https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Names)
+  display data for a locale.
 
   ### Arguments
 
@@ -404,8 +462,8 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns the metazone data for
-  a locale.
+  Returns the [metazone](https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names)
+  data for a locale.
 
   ### Arguments
 
@@ -427,8 +485,9 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns the regional format for
-  formatting time zones.
+  Returns the regional format for formatting time zones. This
+  data is used to format time zones such as "France Daylight Time"
+  or "Japan Time".
 
   ### Arguments
 
@@ -462,7 +521,8 @@ defmodule Cldr.DateTime.Format do
 
   @doc """
   Returns the time zone fallback format for
-  formatting time zones.
+  formatting time zones. This format is used to
+  format a time zone such as "Pacific Time (Canada)".
 
   ## Arguments
 
@@ -555,7 +615,7 @@ defmodule Cldr.DateTime.Format do
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
-          {:ok, Cldr.DateTime.Format.standard_formats()} | {:error, {atom, String.t()}}
+          {:ok, standard_formats()} | {:error, {atom, String.t()}}
 
   def date_formats(
         locale \\ Cldr.get_locale(),
@@ -606,7 +666,7 @@ defmodule Cldr.DateTime.Format do
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
-          {:ok, standard_formats} | {:error, {atom, String.t()}}
+          {:ok, standard_formats()} | {:error, {atom, String.t()}}
 
   def time_formats(
         locale \\ Cldr.get_locale(),
@@ -657,7 +717,7 @@ defmodule Cldr.DateTime.Format do
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
-          {:ok, map()} | {:error, {atom, String.t()}}
+          {:ok, date_time_standard_formats()} | {:error, {atom, String.t()}}
 
   def date_time_formats(
         locale \\ Cldr.get_locale(),
@@ -713,7 +773,7 @@ defmodule Cldr.DateTime.Format do
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
-          {:ok, map()} | {:error, {atom, String.t()}}
+          {:ok, date_time_standard_formats()} | {:error, {atom, String.t()}}
 
   def date_time_at_formats(
         locale \\ Cldr.get_locale(),
@@ -725,7 +785,7 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns a map of the standard datetime relative formats for a given
+  Returns a map of the standard *date_time* relative formats for a given
   locale and calendar.
 
   ### Arguments
@@ -765,7 +825,7 @@ defmodule Cldr.DateTime.Format do
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
-          {:ok, map()} | {:error, {atom, String.t()}}
+          {:ok, date_time_standard_formats()} | {:error, {atom, String.t()}}
 
   def date_time_relative_formats(
         locale \\ Cldr.get_locale(),
@@ -777,7 +837,8 @@ defmodule Cldr.DateTime.Format do
   end
 
   @doc """
-  Returns a datetime format for a given locale and format style.
+  Returns a *date_time* format for a given locale and standard
+  format.
 
   ### Arguments
 
@@ -791,12 +852,12 @@ defmodule Cldr.DateTime.Format do
   * `:backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  * `:format` is the format style requested. The valid values are
-    `:short`, `:medium`, `:long` or `:full`. The default is `:medium`.
+  * `:format` is one of the standard formats `:short`, `:medium`, `:long`
+    or `:full`. The default is `:medium`.
 
   ### Returns
 
-  * `{:ok, format_string}` or
+  * `{:ok, date_time_format_pattern}` or
 
   * `{:error, {exception, reason}}`.
 
@@ -818,20 +879,31 @@ defmodule Cldr.DateTime.Format do
   """
   @doc since: "2.23.0"
   @spec date_time_format(options :: Keyword.t()) ::
-          {:ok, String.t()} | {:error, {module(), String.t()}}
+          {:ok, date_time_format_pattern()} | {:error, {module(), String.t()}}
 
   def date_time_format(options \\ []) do
     with {locale, backend} <- Cldr.locale_and_backend_from(options),
          {:ok, calendar} <- Cldr.Calendar.calendar_from_locale(locale),
          {:ok, formats} <- date_time_formats(locale, calendar.cldr_calendar_type(), backend) do
-      prefer = Keyword.get(options, :prefer, :unicode)
-      style = Keyword.get(options, :format, :medium)
-      resolve_format_style_and_preference(formats, style, prefer)
+      format = Keyword.get(options, :format, :medium)
+      get_standard_format(formats, format)
+    end
+  end
+
+  defp get_standard_format(formats, format) do
+    case Map.fetch(formats, format) do
+      {:ok, format} ->
+        {:ok, format}
+
+      :error ->
+        {:error, {Cldr.DateTime.UnresolvedFormat,
+          "Unknown value for option format: #{inspect(format)}"}}
     end
   end
 
   @doc """
-  Returns a date format for a given locale and format style.
+  Returns a format skeleton for a given *date*, locale and standard
+  format.
 
   ### Arguments
 
@@ -845,12 +917,12 @@ defmodule Cldr.DateTime.Format do
   * `:backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  * `:format` is the format style requested. The valid values are
+  * `:format` is the standard format requested. The valid values are
     `:short`, `:medium`, `:long` or `:full`. The default is `:medium`.
 
   ### Returns
 
-  * `{:ok, format_string}` or
+  * `{:ok, format_skeleton}` or
 
   * `{:error, {exception, reason}}`.
 
@@ -872,20 +944,20 @@ defmodule Cldr.DateTime.Format do
   """
   @doc since: "2.23.0"
   @spec date_format(options :: Keyword.t()) ::
-          {:ok, String.t()} | {:error, {module(), String.t()}}
+          {:ok, format_skeleton()} | {:error, {module(), String.t()}}
 
   def date_format(options \\ []) do
     with {locale, backend} <- Cldr.locale_and_backend_from(options),
          {:ok, calendar} <- Cldr.Calendar.calendar_from_locale(locale),
          {:ok, formats} <- date_formats(locale, calendar.cldr_calendar_type(), backend) do
-      prefer = Keyword.get(options, :prefer, :unicode)
-      style = Keyword.get(options, :format, :medium)
-      resolve_format_style_and_preference(formats, style, prefer)
+      format = Keyword.get(options, :format, :medium)
+      get_standard_format(formats, format)
     end
   end
 
   @doc """
-  Returns a date format for a given locale and format style.
+  Returns a format skeleton for a given *time*, locale and standard
+  format.
 
   ### Arguments
 
@@ -899,17 +971,12 @@ defmodule Cldr.DateTime.Format do
   * `:backend` is any module that includes `use Cldr` and therefore
     is a `Cldr` backend module. The default is `Cldr.default_backend/0`.
 
-  * `:format` is the format style requested. The valid values are
+  * `:format` is the standard format requested. The valid values are
     `:short`, `:medium`, `:long` or `:full`. The default is `:medium`.
-
-  * `:prefer` is either `:unicode` (the default) or `:ascii`. When a locale
-    offers both a unicode and ascii variant of the requested format style,
-    the preferred variant is returned if one is available for the given locale.
-    If the preferred variant is not available then the ascii version is returned.
 
   ### Returns
 
-  * `{:ok, format_string}` or
+  * `{:ok, format_skeleton}` or
 
   * `{:error, {exception, reason}}`.
 
@@ -934,39 +1001,15 @@ defmodule Cldr.DateTime.Format do
   """
   @doc since: "2.23.0"
   @spec time_format(options :: Keyword.t()) ::
-          {:ok, String.t()} | {:error, {module(), String.t()}}
+          {:ok, format_skeleton()} | {:error, {module(), String.t()}}
 
   def time_format(options \\ []) do
     with {locale, backend} <- Cldr.locale_and_backend_from(options),
          {:ok, calendar} <- Cldr.Calendar.calendar_from_locale(locale),
          {:ok, formats} <- time_formats(locale, calendar.cldr_calendar_type(), backend) do
-      prefer = Keyword.get(options, :prefer, :unicode)
-      style = Keyword.get(options, :format, :medium)
-      resolve_format_style_and_preference(formats, style, prefer)
+      format = Keyword.get(options, :format, :medium)
+      get_standard_format(formats, format)
     end
-  end
-
-  defp resolve_format_style_and_preference(formats, style, prefer)
-       when is_map_key(formats, style) do
-    style = Map.fetch!(formats, style)
-
-    cond do
-      is_map(style) ->
-        {:ok, Map.get(style, prefer) || Map.get(style, :ascii)}
-
-      is_binary(style) ->
-        {:ok, style}
-
-      is_list(style) ->
-        {:ok, style}
-
-      is_atom(style) ->
-        {:ok, style}
-    end
-  end
-
-  defp resolve_format_style_and_preference(_formats, style, _prefer) do
-    {:error, {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: #{inspect(style)}"}}
   end
 
   @doc """

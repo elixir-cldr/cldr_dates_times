@@ -131,7 +131,7 @@ defmodule Cldr.DateTime.Format.Match do
 
   @doc since: "2.19.0"
   @spec best_match(
-          skeleton :: Format.format_skeleton(),
+          skeleton :: Format.format_skeleton() | String.t(),
           locale :: Locale.locale_reference(),
           calendar :: Cldr.Calendar.calendar(),
           backend :: Cldr.backend()

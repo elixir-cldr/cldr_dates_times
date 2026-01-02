@@ -90,8 +90,8 @@ defmodule Cldr.DateTime do
   end
 
   @doc """
-  Formats a DateTime according to a format string
-  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
+  Formats a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` according to the formats
+  defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
   ### Arguments
 
@@ -110,38 +110,53 @@ defmodule Cldr.DateTime do
   * `:format` is either a [standard format](Cldr.DateTime.Format.html#module-standard-formats)
     (one of `:short`, `:medium`, `:long`, `:full`), a [format skeleton](Cldr.DateTime.Format.html#module-format-skeletons)
     or a [format pattern](Cldr.DateTime.Format.html#module-format-patterns).
-    The default is `:medium` for full date_times (that is, dates_times having `:year`, `:month`,
-    `:day`, `:hour`, `:minutes`, `:second` and `:calendar` fields). The default for partial
-    date_times is to derive a format skeleton from the date_time and find the best match
-    from the formats returned by `Cldr.DateTime.available_formats/3`. See `Cldr.DateTime.Format`
-    for more information about specifying formats.
 
-  * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
-    this option is used to format the date part of the date time. This option is
-    only acceptable if the `:format` option is not specified, or is specified as either
-    `:short`, `:medium`, `:long`, `:full`. If `:date_format` is not specified
-    then the date format is defined by the `:format` option.
+    * The default is `:medium` for full *date_times* (that is, *dates_times* having `:year`,
+      `:month`, `:day`, `:hour`, `:minutes`, `:second` and `:calendar` fields).
 
-  * `:time_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
-    this option is used to format the time part of the date time. This option is
-    only acceptable if the `:format` option is not specified, or is specified as either
-    `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
-    then the time format is defined by the `:format` option.
+    * The default for partial *date_times* is to derive a format skeleton from the
+      *date_time* and find the best match from the formats returned by
+      `Cldr.DateTime.available_formats/3`.
 
-  * `:style` is either `:at` or `:default`. When set to `:at` the date_time may
+    * See `Cldr.DateTime.Format` for more information about specifying formats.
+
+  * `:date_format` is used to format the *date* part of a *date_time* and is either a standard
+    format or a format skeleton.
+
+    * If `:date_format` is not specified then the *date* format is defined by the `:format`
+      option.
+
+    * If `:date_format` is a format skeleton it may only include format fields
+      appropriate for a *date*.
+
+    * :date_format` may only be specified if `:format` is a standard format.
+
+  * `:time_format` is used to format the *time* part of a *date_time* and is either a standard
+    format or a format skeleton.
+
+    * If `:time_format` is not specified then the *time* format is defined by the `:format`
+      option.
+
+    * If `:time_format` is a format skeleton it may only include format fields
+      appropriate for a *time*.
+
+    * :time_format` may only be specified if `:format` is a standard format.
+
+  * `:style` is either `:at` or `:default`. When set to `:at` the *date_time* may
     be formatted with a localised string representing `<date> at <time>` if such
     a format exists. See `Cldr.DateTime.Format.date_time_at_formats/2`.
 
   * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
     formats have two variants - one using Unicode spaces (typically non-breaking space) and
     another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-    use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/3`
-    to see which formats have these variants.
+    use cases and is not recommended. See `Cldr.DateTime.available_formats/3`
+    to see which formats have these variants. See [Variant Preference](#variant-preference)
+    below for more information.
 
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-  * `:number_system` a number system into which the formatted date_time digits should
+  * `:number_system` a number system into which the formatted *date_time* digits should
     be transliterated. See `Cldr.known_number_systems/0`. The default is
     the number system associated with the `:locale`.
 
@@ -155,9 +170,9 @@ defmodule Cldr.DateTime do
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
     will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
-  * `period: :variant` will use a variant for the time period and flexible time period if
-    one is available in the locale.  For example, in the `:en` locale `period: :variant` will
-    return "pm" instead of "PM".
+  * `:period` which, if set to `:variant`, will use a variant for the time period and flexible
+    time period if one is available in the locale.  For example, in the `:en` locale
+    `period: :variant` will return "pm" instead of "PM".
 
   ### Variant Preference
 
@@ -167,7 +182,7 @@ defmodule Cldr.DateTime do
     atoms with one atom being either `:unicode` or `:ascii` and one atom being either
     `:default` or `:variant`.
 
-    * Some formats (at the time of publishng only time formats but that
+    * Some formats (at the time of publishng only *time* formats but that
       may change in the future) have `:unicode` and `:ascii` versions of the format. The
       difference is the use of ascii space (0x20) as a separateor in the `:ascii` verison
       whereas the `:unicode` version may use non-breaking or other space characters. The
@@ -175,7 +190,7 @@ defmodule Cldr.DateTime do
       is primarily to support legacy use cases and is not recommended. See
       `Cldr.Time.available_formats/3` to see which formats have these variants.
 
-    * Some formats (at the time of publishing, only date and date_time formats) have
+    * Some formats (at the time of publishing, only *date* and *date_time* formats) have
       `:default` and `:variant` versions of the format. These variant formats are only
       included in a small number of locales. For example, the `:"en-CA"` locale, which has
       a `:default` format respecting typical Canadian formatting and a `:variant` that is
@@ -183,10 +198,10 @@ defmodule Cldr.DateTime do
 
   ### Notes
 
-  * If the provided `date_time` contains only date fields, the call is delegated to
+  * If the provided `date_time` contains only *date* fields, the call is delegated to
     `Cldr.Date.to_string/2`.
 
-  * If the provided `date_time` contains only time fields, the call is delegated to
+  * If the provided `date_time` contains only *time* fields, the call is delegated to
     `Cldr.Time.to_string/2`.
 
   ### Returns
@@ -218,6 +233,8 @@ defmodule Cldr.DateTime do
       {:ok, "semaine 1 (janvier)"}
       iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :yw, locale: :fr)
       {:ok, "semaine 1 de 2000"}
+      iex> Cldr.DateTime.to_string(date_time, MyApp.Cldr, format: :full, date_format: :yMd, time_format: :hms)
+      {:ok, "1/1/2000, 11:59:59 PM"}
 
   """
   @spec to_string(Cldr.Calendar.any_date_time(), Cldr.backend(), options()) ::
@@ -278,9 +295,9 @@ defmodule Cldr.DateTime do
   end
 
   @doc """
-  Formats a DateTime according to a format string
-  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
-  returning a formatted string or raising on error.
+  Formats a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` according to the formats
+  defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+  or raises on error.
 
   ### Arguments
 
@@ -296,37 +313,72 @@ defmodule Cldr.DateTime do
 
   ## Options
 
-  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format ID
-    or a format string. The default is `:medium` for full date_times (that is,
-    dates having `:year`, `:month`, `:day`, `:hour`, `:minutes`, `:second` and
-    `:calendar` fields). The default for partial date_times is to derive a candidate
-    format ID from the date and find the best match from the formats returned by
-    `Cldr.DateTime.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
-    for more information about specifying formats.
+  * `:format` is either a [standard format](Cldr.DateTime.Format.html#module-standard-formats)
+    (one of `:short`, `:medium`, `:long`, `:full`), a [format skeleton](Cldr.DateTime.Format.html#module-format-skeletons)
+    or a [format pattern](Cldr.DateTime.Format.html#module-format-patterns).
 
-  * `:style` is either `:at` or `:default`. When set to `:at` the date_time may
+    * The default is `:medium` for full *date_times* (that is, *dates_times* having `:year`,
+      `:month`, `:day`, `:hour`, `:minutes`, `:second` and `:calendar` fields).
+
+    * The default for partial *date_times* is to derive a format skeleton from the
+      *date_time* and find the best match from the formats returned by
+      `Cldr.DateTime.available_formats/3`.
+
+    * See `Cldr.DateTime.Format` for more information about specifying formats.
+
+  * `:date_format` is used to format the *date* part of a *date_time* and is either a standard
+    format or a format skeleton.
+
+    * If `:date_format` is not specified then the *date* format is defined by the `:format`
+      option.
+
+    * If `:date_format` is a format skeleton it may only include format fields
+      appropriate for a *date*.
+
+    * :date_format` may only be specified if `:format` is a standard format.
+
+  * `:time_format` is used to format the *time* part of a *date_time* and is either a standard
+    format or a format skeleton.
+
+    * If `:time_format` is not specified then the *time* format is defined by the `:format`
+      option.
+
+    * If `:time_format` is a format skeleton it may only include format fields
+      appropriate for a *time*.
+
+    * :time_format` may only be specified if `:format` is a standard format.
+
+  * `:style` is either `:at` or `:default`. When set to `:at` the *date_time* may
     be formatted with a localised string representing `<date> at <time>` if such
     a format exists. See `Cldr.DateTime.Format.date_time_at_formats/2`.
 
-  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of date_time
+  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of
     formats have two variants - one using Unicode spaces (typically non-breaking space) and
     another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
-    use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/2`
-    to see which formats have these variants.
+    use cases and is not recommended. See `Cldr.DateTime.available_formats/3`
+    to see which formats have these variants. See [Variant Preference](#variant-preference)
+    below for more information.
 
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-  * `:number_system` a number system into which the formatted date_time digits should
-    be transliterated.
+  * `:number_system` a number system into which the formatted *date_time* digits should
+    be transliterated. See `Cldr.known_number_systems/0`. The default is
+    the number system associated with the `:locale`.
+
+  * `:separators` selects which of the available symbol
+    sets should be used when formatting fractional seconds (format
+    character `S`).  The default is `:standard`. Some limited locales have an alternative `:us`
+    variant that can be used. See `Cldr.Number.Symbol.number_symbols_for/3`
+    for the symbols supported for a given locale and number system.
 
   * `:era` which, if set to `:variant`, will use a variant for the era if one
     is available in the requested locale. In the `:en` locale, for example, `era: :variant`
     will return `CE` instead of `AD` and `BCE` instead of `BC`.
 
-  * `period: :variant` will use a variant for the time period and flexible time period if
-    one is available in the locale.  For example, in the `:en` locale `period: :variant` will
-    return "pm" instead of "PM".
+  * `:period` which, if set to `:variant`, will use a variant for the time period and flexible
+    time period if one is available in the locale.  For example, in the `:en` locale
+    `period: :variant` will return "pm" instead of "PM".
 
   ### Variant Preference
 
@@ -336,7 +388,7 @@ defmodule Cldr.DateTime do
     atoms with one atom being either `:unicode` or `:ascii` and one atom being either
     `:default` or `:variant`.
 
-    * Some formats (at the time of publishng only time formats but that
+    * Some formats (at the time of publishng only *time* formats but that
       may change in the future) have `:unicode` and `:ascii` versions of the format. The
       difference is the use of ascii space (0x20) as a separateor in the `:ascii` verison
       whereas the `:unicode` version may use non-breaking or other space characters. The
@@ -344,7 +396,7 @@ defmodule Cldr.DateTime do
       is primarily to support legacy use cases and is not recommended. See
       `Cldr.Time.available_formats/3` to see which formats have these variants.
 
-    * Some formats (at the time of publishing, only date and date_time formats) have
+    * Some formats (at the time of publishing, only *date* and *date_time* formats) have
       `:default` and `:variant` versions of the format. These variant formats are only
       included in a small number of locales. For example, the `:"en-CA"` locale, which has
       a `:default` format respecting typical Canadian formatting and a `:variant` that is
@@ -352,17 +404,17 @@ defmodule Cldr.DateTime do
 
   ### Notes
 
-  * If the provided `date_time` contains only date fields, the call is delegated to
+  * If the provided `date_time` contains only *date* fields, the call is delegated to
     `Cldr.Date.to_string/2`.
 
-  * If the provided `date_time` contains only time fields, the call is delegated to
+  * If the provided `date_time` contains only *time* fields, the call is delegated to
     `Cldr.Time.to_string/2`.
 
   ### Returns
 
   * `formatted_date_time` or
 
-  * raises an exception
+  * raises an exception.
 
   ### Examples
 
@@ -379,6 +431,8 @@ defmodule Cldr.DateTime do
       "semaine 1 (janvier)"
       iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :yw, locale: :fr)
       "semaine 1 de 2000"
+      iex> Cldr.DateTime.to_string!(date_time, MyApp.Cldr, format: :full, date_format: :yMd, time_format: :hms)
+      "1/1/2000, 11:59:59 PM"
 
   """
   @spec to_string!(Cldr.Calendar.any_date_time(), Cldr.backend(), options()) ::
