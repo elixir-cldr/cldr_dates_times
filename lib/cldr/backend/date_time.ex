@@ -13,7 +13,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Arguments
 
-        * `datetime` is a `t:DateTime.t/0` `or t:NaiveDateTime.t/0`struct or any map that contains
+        * `date_time` is a `t:DateTime.t/0` `or t:NaiveDateTime.t/0`struct or any map that contains
           one or more of the keys `:year`, `:month`, `:day`, `:hour`, `:minute` and `:second` or
           `:microsecond` with optional `:time_zone`, `:zone_abbr`, `:utc_offset`, `:std_offset`
           and `:calendar` fields.
@@ -38,7 +38,7 @@ defmodule Cldr.DateAndTime.Backend do
           `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
           then the time format is defined by the `:format` option.
 
-        * `:style` is either `:at` or `:default`. When set to `:at` the datetime may
+        * `:style` is either `:at` or `:default`. When set to `:at` the date_time may
           be formatted with a localised string representing `<date> at <time>` if such
           a format exists. See `Cldr.DateTime.Format.date_time_at_formats/2`.
 
@@ -51,7 +51,7 @@ defmodule Cldr.DateAndTime.Backend do
         * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
           or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-        * `:number_system` a number system into which the formatted datetime digits should
+        * `:number_system` a number system into which the formatted date_time digits should
           be transliterated.
 
         * `:era` which, if set to `:variant`, will use a variant for the era if one
@@ -64,24 +64,24 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Returns
 
-        * `{:ok, formatted_datetime}` or
+        * `{:ok, formatted_date_time}` or
 
         * `{:error, reason}`
 
         ## Examples
 
-            iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-            iex> #{inspect(__MODULE__)}.to_string(datetime)
+            iex> {:ok, date_time} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
+            iex> #{inspect(__MODULE__)}.to_string(date_time)
             {:ok, "Jan 1, 2000, 11:59:59 PM"}
-            iex> #{inspect(__MODULE__)}.to_string(datetime, locale: "en")
+            iex> #{inspect(__MODULE__)}.to_string(date_time, locale: "en")
             {:ok, "Jan 1, 2000, 11:59:59 PM"}
-            iex> #{inspect(__MODULE__)}.to_string(datetime, format: :long, locale: "en")
+            iex> #{inspect(__MODULE__)}.to_string(date_time, format: :long, locale: "en")
             {:ok, "January 1, 2000, 11:59:59 PM UTC"}
-            iex> #{inspect(__MODULE__)}.to_string(datetime, format: :hms, locale: "en")
+            iex> #{inspect(__MODULE__)}.to_string(date_time, format: :hms, locale: "en")
             {:ok, "11:59:59 PM"}
-            iex> #{inspect(__MODULE__)}.to_string(datetime, format: :full, locale: "en")
+            iex> #{inspect(__MODULE__)}.to_string(date_time, format: :full, locale: "en")
             {:ok, "Saturday, January 1, 2000, 11:59:59 PM Coordinated Universal Time"}
-            iex> #{inspect(__MODULE__)}.to_string(datetime, format: :full, locale: "fr")
+            iex> #{inspect(__MODULE__)}.to_string(date_time, format: :full, locale: "fr")
             {:ok, "samedi 1 janvier 2000, 23:59:59 temps universel coordonné"}
 
         """
@@ -99,7 +99,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Arguments
 
-        * `datetime` is a `t:DateTime.t/0` `or t:NaiveDateTime.t/0`struct or any map that contains
+        * `date_time` is a `t:DateTime.t/0` `or t:NaiveDateTime.t/0`struct or any map that contains
           one or more of the keys `:year`, `:month`, `:day`, `:hour`, `:minute` and `:second` or
           `:microsecond` with optional `:time_zone`, `:zone_abbr`, `:utc_offset`, `:std_offset`
           and `:calendar` fields.
@@ -125,7 +125,7 @@ defmodule Cldr.DateAndTime.Backend do
           `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
           then the time format is defined by the `:format` option.
 
-        * `:style` is either `:at` or `:default`. When set to `:at` the datetime may
+        * `:style` is either `:at` or `:default`. When set to `:at` the date_time may
           be formatted with a localised string representing `<date> at <time>` if such
           a format exists. See `Cldr.DateTime.Format.date_time_at_formats/2`.
 
@@ -138,7 +138,7 @@ defmodule Cldr.DateAndTime.Backend do
         * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
           or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-        * `:number_system` a number system into which the formatted datetime digits should
+        * `:number_system` a number system into which the formatted date_time digits should
           be transliterated.
 
         * `:era` which, if set to `:variant`, will use a variant for the era if one
@@ -151,7 +151,7 @@ defmodule Cldr.DateAndTime.Backend do
 
         ## Returns
 
-        * `formatted_datetime` or
+        * `formatted_date_time` or
 
         * raises an exception.
 
@@ -484,8 +484,8 @@ defmodule Cldr.DateAndTime.Backend do
             iex> #{inspect(__MODULE__)}.to_string!(~T[07:35:13.215217], format: :medium)
             "7:35:13 AM"
 
-            iex> {:ok, datetime} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
-            iex> #{inspect(__MODULE__)}.to_string! datetime, format: :long
+            iex> {:ok, date_time} = DateTime.from_naive(~N[2000-01-01 23:59:59.0], "Etc/UTC")
+            iex> #{inspect(__MODULE__)}.to_string! date_time, format: :long
             "11:59:59 PM UTC"
 
             # A partial time with a best match CLDR-defined format

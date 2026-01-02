@@ -57,7 +57,7 @@ defmodule Cldr.DateTime do
            when is_date_time(date_time) or is_naive_date_time(date_time)
 
   @doc """
-  Guards whether the given datetime has components of
+  Guards whether the given date_time has components of
   a date.
   """
   defguard has_date(date_time)
@@ -65,7 +65,7 @@ defmodule Cldr.DateTime do
                   is_map_key(date_time, :day)
 
   @doc """
-  Guards whether the given datetime has components of
+  Guards whether the given date_time has components of
   a time.
   """
   defguard has_time(date_time)
@@ -73,7 +73,7 @@ defmodule Cldr.DateTime do
                   is_map_key(date_time, :second)
 
   @doc """
-  Guard whether the given datetime has components of
+  Guard whether the given date_time has components of
   both a date and a time.
   """
   defguard has_date_and_time(date_time)
@@ -95,7 +95,7 @@ defmodule Cldr.DateTime do
 
   ### Arguments
 
-  * `datetime` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that contains
+  * `date_time` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that contains
     one or more of the keys `:year`, `:month`, `:day`, `:hour`, `:minute` and `:second` or
     `:microsecond` with optional `:time_zone`, `:zone_abbr`, `:utc_offset`, `:std_offset`
     and `:calendar` fields.
@@ -110,7 +110,7 @@ defmodule Cldr.DateTime do
   * `:format` is either a [standard format](Cldr.DateTime.Format.html#module-standard-formats)
     (one of `:short`, `:medium`, `:long`, `:full`), a [format skeleton](Cldr.DateTime.Format.html#module-format-skeletons)
     or a [format pattern](Cldr.DateTime.Format.html#module-format-patterns).
-    The default is `:medium` for full date_times (that is, dates having `:year`, `:month`,
+    The default is `:medium` for full date_times (that is, dates_times having `:year`, `:month`,
     `:day`, `:hour`, `:minutes`, `:second` and `:calendar` fields). The default for partial
     date_times is to derive a format skeleton from the date_time and find the best match
     from the formats returned by `Cldr.DateTime.available_formats/3`. See `Cldr.DateTime.Format`
@@ -128,7 +128,7 @@ defmodule Cldr.DateTime do
     `:short`, `:medium`, `:long`, `:full`. If `:time_format` is not specified
     then the time format is defined by the `:format` option.
 
-  * `:style` is either `:at` or `:default`. When set to `:at` the datetime may
+  * `:style` is either `:at` or `:default`. When set to `:at` the date_time may
     be formatted with a localised string representing `<date> at <time>` if such
     a format exists. See `Cldr.DateTime.Format.date_time_at_formats/2`.
 
@@ -141,7 +141,7 @@ defmodule Cldr.DateTime do
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-  * `:number_system` a number system into which the formatted datetime digits should
+  * `:number_system` a number system into which the formatted date_time digits should
     be transliterated. See `Cldr.known_number_systems/0`. The default is
     the number system associated with the `:locale`.
 
@@ -175,7 +175,7 @@ defmodule Cldr.DateTime do
       is primarily to support legacy use cases and is not recommended. See
       `Cldr.Time.available_formats/3` to see which formats have these variants.
 
-    * Some formats (at the time of publishing, only date and datetime formats) have
+    * Some formats (at the time of publishing, only date and date_time formats) have
       `:default` and `:variant` versions of the format. These variant formats are only
       included in a small number of locales. For example, the `:"en-CA"` locale, which has
       a `:default` format respecting typical Canadian formatting and a `:variant` that is
@@ -183,15 +183,15 @@ defmodule Cldr.DateTime do
 
   ### Notes
 
-  * If the provided `datetime` contains only date fields, the call is delegated to
+  * If the provided `date_time` contains only date fields, the call is delegated to
     `Cldr.Date.to_string/2`.
 
-  * If the provided `datetime` contains only time fields, the call is delegated to
+  * If the provided `date_time` contains only time fields, the call is delegated to
     `Cldr.Time.to_string/2`.
 
   ### Returns
 
-  * `{:ok, formatted_datetime}` or
+  * `{:ok, formatted_date_time}` or
 
   * `{:error, reason}`
 
@@ -284,7 +284,7 @@ defmodule Cldr.DateTime do
 
   ### Arguments
 
-  * `datetime` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that contains
+  * `date_time` is a `t:DateTime.t/0` or `t:NaiveDateTime.t/0` struct or any map that contains
     one or more of the keys `:year`, `:month`, `:day`, `:hour`, `:minute` and `:second` or
     `:microsecond` with optional `:time_zone`, `:zone_abbr`, `:utc_offset`, `:std_offset`
     and `:calendar` fields.
@@ -297,18 +297,18 @@ defmodule Cldr.DateTime do
   ## Options
 
   * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format ID
-    or a format string. The default is `:medium` for full datetimes (that is,
+    or a format string. The default is `:medium` for full date_times (that is,
     dates having `:year`, `:month`, `:day`, `:hour`, `:minutes`, `:second` and
-    `:calendar` fields). The default for partial datetimes is to derive a candidate
+    `:calendar` fields). The default for partial date_times is to derive a candidate
     format ID from the date and find the best match from the formats returned by
     `Cldr.DateTime.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
     for more information about specifying formats.
 
-  * `:style` is either `:at` or `:default`. When set to `:at` the datetime may
+  * `:style` is either `:at` or `:default`. When set to `:at` the date_time may
     be formatted with a localised string representing `<date> at <time>` if such
     a format exists. See `Cldr.DateTime.Format.date_time_at_formats/2`.
 
-  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of datetime
+  * `:prefer` is either `:unicode` (the default) or `:ascii`. A small number of date_time
     formats have two variants - one using Unicode spaces (typically non-breaking space) and
     another using only ASCII whitespace. The `:ascii` format is primarily to support legacy
     use cases and is not recommended. See `Cldr.DateTime.Format.date_time_available_formats/2`
@@ -317,7 +317,7 @@ defmodule Cldr.DateTime do
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
 
-  * `:number_system` a number system into which the formatted datetime digits should
+  * `:number_system` a number system into which the formatted date_time digits should
     be transliterated.
 
   * `:era` which, if set to `:variant`, will use a variant for the era if one
@@ -344,7 +344,7 @@ defmodule Cldr.DateTime do
       is primarily to support legacy use cases and is not recommended. See
       `Cldr.Time.available_formats/3` to see which formats have these variants.
 
-    * Some formats (at the time of publishing, only date and datetime formats) have
+    * Some formats (at the time of publishing, only date and date_time formats) have
       `:default` and `:variant` versions of the format. These variant formats are only
       included in a small number of locales. For example, the `:"en-CA"` locale, which has
       a `:default` format respecting typical Canadian formatting and a `:variant` that is
@@ -352,15 +352,15 @@ defmodule Cldr.DateTime do
 
   ### Notes
 
-  * If the provided `datetime` contains only date fields, the call is delegated to
+  * If the provided `date_time` contains only date fields, the call is delegated to
     `Cldr.Date.to_string/2`.
 
-  * If the provided `datetime` contains only time fields, the call is delegated to
+  * If the provided `date_time` contains only time fields, the call is delegated to
     `Cldr.Time.to_string/2`.
 
   ### Returns
 
-  * `formatted_datetime` or
+  * `formatted_date_time` or
 
   * raises an exception
 
@@ -397,7 +397,7 @@ defmodule Cldr.DateTime do
   end
 
   @doc """
-  Returns a map of the standard datetime formats for a given locale and calendar.
+  Returns a map of the standard date_time formats for a given locale and calendar.
 
   ## Arguments
 
@@ -447,7 +447,7 @@ defmodule Cldr.DateTime do
   end
 
   @doc """
-  Returns a map of the available datetime formats for a
+  Returns a map of the available date_time formats for a
   given locale and calendar.
 
   ## Arguments
@@ -556,7 +556,7 @@ defmodule Cldr.DateTime do
     number_system = Cldr.Number.System.number_system_from_locale(locale, backend)
 
     calendar = Map.get(date_time, :calendar, Cldr.Calendar.Gregorian)
-    datetime = Map.put_new(date_time, :calendar, calendar)
+    date_time = Map.put_new(date_time, :calendar, calendar)
 
     {format, date_format, time_format} =
       formats_from_options(date_time, nil, nil, nil, @default_standard_format)
@@ -573,7 +573,7 @@ defmodule Cldr.DateTime do
         separators: @default_separators
       }
 
-    {:ok, datetime, options}
+    {:ok, date_time, options}
   end
 
   defp normalize_options(date_time, _backend, options) when is_map(options) do
@@ -584,7 +584,7 @@ defmodule Cldr.DateTime do
     {locale, backend} = Cldr.locale_and_backend_from(options[:locale], backend)
 
     calendar = Map.get(date_time, :calendar, Cldr.Calendar.Gregorian)
-    datetime = Map.put_new(date_time, :calendar, calendar)
+    date_time = Map.put_new(date_time, :calendar, calendar)
 
     style = options[:style] || @default_style
     prefer = Keyword.get(options, :prefer, @default_prefer) |> List.wrap()
@@ -613,7 +613,7 @@ defmodule Cldr.DateTime do
         |> Map.put(:number_system, number_system)
         |> Map.put(:separators, separators)
 
-      {:ok, datetime, options}
+      {:ok, date_time, options}
     end
   end
 
@@ -702,53 +702,53 @@ defmodule Cldr.DateTime do
     {@default_standard_format, @default_standard_format, @default_standard_format}
   end
 
-  defp formats_from_options(_datetime, format, nil, nil, _default)
+  defp formats_from_options(_date_time, format, nil, nil, _default)
        when format in @standard_formats do
     {format, format, format}
   end
 
   # When we have a string or atom format then it controls everything and there
   # should be no separate date format or time format
-  defp formats_from_options(_datetime, format, nil, nil, _default)
+  defp formats_from_options(_date_time, format, nil, nil, _default)
        when is_binary(format) do
     {format, nil, nil}
   end
 
-  defp formats_from_options(_datetime, format, nil, nil, _default)
+  defp formats_from_options(_date_time, format, nil, nil, _default)
        when is_atom(format) do
     {format, nil, nil}
   end
 
   # Replace nil date and time formats with the format iff format is
   # one of the standard types.
-  defp formats_from_options(_datetime, format, date_format, nil, _default)
+  defp formats_from_options(_date_time, format, date_format, nil, _default)
        when format in @standard_formats do
     {format, date_format, format}
   end
 
-  defp formats_from_options(_datetime, format, nil, time_format, _default)
+  defp formats_from_options(_date_time, format, nil, time_format, _default)
        when format in @standard_formats do
     {format, format, time_format}
   end
 
-  defp formats_from_options(_datetime, format, nil, time_format, _default)
+  defp formats_from_options(_date_time, format, nil, time_format, _default)
        when time_format in @standard_formats do
     {format, time_format, time_format}
   end
 
-  defp formats_from_options(_datetime, format, date_format, nil, _default)
+  defp formats_from_options(_date_time, format, date_format, nil, _default)
        when date_format in @standard_formats do
     {format, date_format, date_format}
   end
 
   # If standard date and time formats but no format, we'll derive the
   # format later on.
-  defp formats_from_options(_datetime, nil = format, date_format, time_format, _default)
+  defp formats_from_options(_date_time, nil = format, date_format, time_format, _default)
        when date_format in @standard_formats and time_format in @standard_formats do
     {format, date_format, time_format}
   end
 
-  defp formats_from_options(_datetime, format, date_format, time_format, _default) do
+  defp formats_from_options(_date_time, format, date_format, time_format, _default) do
     {format, date_format, time_format}
   end
 
@@ -756,7 +756,7 @@ defmodule Cldr.DateTime do
   # Unless we need to derive the format, this only touches `format`,
   # not `date_format` or `time_format`.
 
-  # If its a partial datetime and a standard format is requested, its an error
+  # If its a partial date_time and a standard format is requested, its an error
   defp find_format(date_time, format, _locale, _calendar, _backend, _options)
        when format in @standard_formats and not is_any_date_time(date_time) do
     {:error,
@@ -767,7 +767,7 @@ defmodule Cldr.DateTime do
   end
 
   # Standard format, at style
-  defp find_format(_datetime, format, locale, calendar, backend, %{style: :at} = options)
+  defp find_format(_date_time, format, locale, calendar, backend, %{style: :at} = options)
        when format in @standard_formats do
     with {:ok, formats} <- Format.date_time_at_formats(locale, calendar, backend),
          {:ok, format} <- preferred_format(formats, format, options.prefer) do
@@ -776,7 +776,7 @@ defmodule Cldr.DateTime do
   end
 
   # Standard format, standard style
-  defp find_format(_datetime, format, locale, calendar, backend, options)
+  defp find_format(_date_time, format, locale, calendar, backend, options)
        when format in @standard_formats do
     with {:ok, formats} <- Format.date_time_formats(locale, calendar, backend),
          {:ok, format} <- preferred_format(formats, format, options.prefer) do
@@ -835,7 +835,7 @@ defmodule Cldr.DateTime do
   end
 
   # Straight up format string
-  defp find_format(_datetime, format, _locale, _calendar, _backend, options)
+  defp find_format(_date_time, format, _locale, _calendar, _backend, options)
        when is_binary(format) do
     {:ok, format, options}
   end
@@ -909,7 +909,7 @@ defmodule Cldr.DateTime do
   end
 
   # We need to derive the date format now since that data
-  # is used to establish what datetime format we derive.
+  # is used to establish what date_time format we derive.
 
   defp date_format(date_time, nil, locale, calendar, backend, options) do
     format_id = Cldr.Date.derive_format_id(date_time)
@@ -966,7 +966,7 @@ defmodule Cldr.DateTime do
       :error ->
         {:error,
          {Cldr.DateTime.InvalidFormat,
-          "Invalid datetime format #{inspect(format)}. " <>
+          "Invalid date_time format #{inspect(format)}. " <>
             "The valid formats are #{inspect(@standard_formats)}."}}
     end
   end
