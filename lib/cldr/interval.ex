@@ -15,12 +15,12 @@ defmodule Cldr.Interval do
 
   ### Interval Formats
 
-  CLDR provides a two-level mapping to a concrete format string.
+  CLDR provides a two-level mapping to a concrete format pattern.
   To simplify the developer experience, `ex_cldr_dates_times` groups these
-  mappings into `styles` and `formats`.
+  mappings into `format styles` and `standard formats`.
 
-  Styles group different CLDR formats into similar types. These
-  styles can be seen by examining the output below:
+  Format styles group different format skeletons by the fields they include.
+  These styles can be seen by examining the output below:
 
   ```elixir
   iex> Cldr.Date.Interval.styles()
@@ -31,6 +31,8 @@ defmodule Cldr.Interval do
     year_and_month: %{long: :yMMMM, medium: :yMMM, short: :yM}
   }
 
+  # The *time* interval styles are also segments by whether 12-hour
+  # or 24-hour time formatting is requested.
   iex> Cldr.Time.Interval.styles()
   %{
     flex: %{h12: %{long: :Bhm, medium: :Bhm, short: :Bh}, h23: %{long: :Bhm, medium: :Bhm, short: :Bh}},
@@ -39,23 +41,24 @@ defmodule Cldr.Interval do
   }
   ```
 
-  Here the style is the key if the map: `:date`, `:month`,
-  `:month_and_day` and `year_and_month`.
-
-  These are then mapped to interval formats `:short`, `:medium` or `:long`.
+  Here the format style is the key of the map. For a *date* they
+  keys are `:date`, `:month`, `:month_and_day` and `year_and_month`.
+  These are then mapped to one of the standard interval formats `:short`,
+  `:medium` or `:long` returning a format skeleton.
 
   ### Interval formats
 
-  In a manner similar to formatting individual dates, times and datetimes, format
-  types are introduced to simplify common usage. For all intervals the following
-  format types are;
+  In a manner similar to formatting discrete *dates*, *times* and *date_times*,
+  standard formats are introduced to simplify common usage. For all intervals the following
+  standard formats are:
 
   * `:short`
   * `:medium` (the default)
   * `:long`
 
-  In each case, the mapping is from a style to a format type and then of
-  resolves to a native CLDR format map.
+  In each case, the mapping is from a format style to a standard format which then
+  resolves to a format skeleton. The format skeleton is then used to resolve
+  a format pattern for the interval.
 
   These maps can be examined as follows where `"en"` is any configured
   locale name and `:gregorian` is the underlying CLDR calendar type. In
@@ -77,13 +80,19 @@ defmodule Cldr.Interval do
   Cldr.DateTime.Format.interval_formats(:en, :gregorian)
   => {:ok,
        %{
-         Bh: %{B: ["h B – ", "h B"], h: ["h – ", "h B"]},
+         Bh: %{
+           B: ["h B – ", "h B"],
+           h: ["h – ", "h B"]
+         },
          Bhm: %{
            B: ["h:mm B – ", "h:mm B"],
            h: ["h:mm – ", "h:mm B"],
            m: ["h:mm – ", "h:mm B"]
          },
-         Gy: %{G: ["y G – ", "y G"], y: ["y – ", "y G"]},
+         Gy: %{
+           G: ["y G – ", "y G"],
+           y: ["y – ", "y G"]
+         },
          GyM: %{
            G: ["M/y G – ", "M/y G"],
            M: ["M/y – ", "M/y G"],
@@ -100,12 +109,14 @@ defmodule Cldr.Interval do
      }
   ```
 
-  At this point we can see that the path to resolving a format is:
+  At this point we can see that the path to resolving a format (using
+  the `:en` locale for this example) is:
 
-  * Apply the format style. For dates, this is `:date`.
-  * Apply the format type. For dates, the default is `:medium`.
-
-  This will then return a map such as:
+  * Apply the format style. For *dates*, this is `:date`, returning
+    `%{long: :yMMMEd, medium: :yMMMd, short: :yMd}`
+  * Apply the standard format. For *dates*, the default is `:medium` returning
+    the format skeleton `:yMMMd`.
+  * Using the returned format skeleton, resolve the interval formats returning:
 
   ```elixir
   %{
@@ -119,9 +130,9 @@ defmodule Cldr.Interval do
 
   There remains one more choice to make - and that choice is made
   based upon the highest order date field that is different between the
-  `from` and `to` dates.
+  `from` and `to` *dates*.
 
-  With two dates `2020-02-02` and `2021-01-01` the highest order
+  With two *dates* `2020-02-02` and `2021-01-01` the highest order
   difference is `:year`. With `2020-02-02` and `2020-01-01` it is `:month`.
 
   ### Formatting the interval
@@ -130,14 +141,15 @@ defmodule Cldr.Interval do
   final format. With the `:year` field being the greatest difference then
   the format is `y: ["MMM d, y – ", "MMM d, y"]`.
 
-  Finally, formatting can proceed for the `from` date being formatted with
-  `"MMM d, y – "` and the `to` date being formatted with `"MMM d, y"` and the
-  two results then being concatenated to form the final string.
+  Finally, formatting can proceed for the `from` *date* being formatted with
+  the `"MMM d, y – "` format pattern and the `to` *date* being formatted with the
+  `"MMM d, y"` format pattern and the two results then being concatenated to
+  form the final string.
 
   ### Other ways to specify an interval format
 
-  So far we have considered formats that a resolved from standard styles
-  and format types. This is the typical usage and they are specified
+  So far we have considered formats that are resolved from standard styles
+  and stamdard formats. This is the typical usage and they are specified
   as parameters to the `to_string/3` function. For example:
 
   ```elixir
@@ -152,18 +164,18 @@ defmodule Cldr.Interval do
   {:ok, "Jan 1 – 12"}
   ```
 
-  ### Direct use of CLDR format types
+  ### Direct use of format skeletons
 
-  It is also possible to directly specify the CLDR format type. For example:
+  It is also possible to directly specify a format skeleton. For example:
   ```elixir
   iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr, format: :GyMMMd
   {:ok, "Jan 1 – 12, 2020 AD"}
   ```
 
-  ### Using format strings
+  ### Using format patterns
 
-  In the unusual situation where one of the standard format styles and types does
-  not meet requirements, a format string can also be specified. For example:
+  In the unusual situation where one of the standard formats and format skeletons does
+  not meet requirements, a format pattern can also be specified. For example:
 
   ```elixir
   iex> Cldr.Date.Interval.to_string ~D[2020-01-01], ~D[2020-01-12], MyApp.Cldr,
@@ -173,18 +185,18 @@ defmodule Cldr.Interval do
 
   In this case, the steps to formatting are:
 
-  1. Split the format string at the point at which the first repeating
-  formatting code is detected. In the pattern above it is where the second `E`
-  is detected. The result in this case will be `["E, M/d/y – ", "E, M/d/y"]`
-  For the purposes of splitting, duplicate are ignored. Therefore
-  "EEE, M/d/y – E, M/d/y" will split into `["EEE, M/d/y – ", "E, M/d/y"]`.
+  1. Split the format pattern at the point at which the first repeating
+     formatting code is detected. In the pattern above it is where the second `E`
+     is detected. The result in this case will be `["E, M/d/y – ", "E, M/d/y"]`
+     For the purposes of splitting, duplicates are ignored. Therefore
+     "EEE, M/d/y – E, M/d/y" will split into `["EEE, M/d/y – ", "E, M/d/y"]`.
 
   2. Each part of the pattern is parsed.
 
-  3. The two dates, times or datetimes are formatted.
+  3. The two *dates*, *times* or *date_times* are formatted.
 
-  This is a more expensive operation than using the predefined styles and
-  format types since the underlying formats for these types are precompiled
+  This is a more expensive operation than using the standard formats and styles
+  since the underlying formats for these types are precompiled
   into an efficient runtime format.
 
   ### Configuring precompiled interval formats
@@ -316,7 +328,7 @@ defmodule Cldr.Interval do
   Returns a `Date.Range` or `CalendarInterval` as
   a localised string.
 
-  ## Arguments
+  ### Arguments
 
   * `range` is either a `Date.Range.t` returned from `Date.range/2`
     or a `CalendarInterval.t`.
@@ -327,28 +339,28 @@ defmodule Cldr.Interval do
   * `options` is a keyword list of options. The default is
     `[format: :medium, style: :date | :time | nil]`.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representing of an interval
+    specific format skeleton of format pattern representing an interval
     format. The default is `:medium`.
 
   * `:style` supports different formatting styles. The valid
-    styles depends on whether formatting is for a date, time or datetime.
+    styles depends on whether formatting is for a *date*, *time* or *date_time*.
     Since the functions in this module will make a determination as
     to which formatter to be used based upon the data passed to them
     it is recommended the style option be omitted. If styling is important
     then call `to_string/3` directly on `Cldr.Date.Interval`, `Cldr.Time.Interval`
     or `Cldr.DateTime.Interval`.
 
-    * For a date the alternatives are `:date`, `:month_and_day`, `:month`
+    * For a *date* the alternatives are `:date`, `:month_and_day`, `:month`
       and `:year_and_month`. The default is `:date`.
 
-    * For a time the alternatives are `:time`, `:zone` and
+    * For a *time* the alternatives are `:time`, `:zone` and
       `:flex`. The default is `:time`.
 
-    * For a datetime there are no style options, the default
-      for each of the date and time part is used.
+    * For a *date_time* there are no style options, the default
+      for each of the *date* and *time* parts is used.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
@@ -356,48 +368,48 @@ defmodule Cldr.Interval do
   * `number_system:` a number system into which the formatted date digits should
     be transliterated.
 
-  ## Returns
+  ### Returns
 
   * `{:ok, string}` or
 
   * `{:error, {exception, reason}}`
 
-  ## Notes
+  ### Notes
 
   * `to_string/3` will decide which formatter to call based upon
     the arguments provided to it.
 
-    * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`.
+    * A `t:Date.Range.t/0` will call `Cldr.Date.Interval.to_string/3`.
 
-    * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
+    * A `t:CalendarInterval.t/0` will call `Cldr.Date.Interval.to_string/3`
       if its `:precision` is `:year`, `:month` or `:day`. Otherwise
       it will call `Cldr.Time.Interval.to_string/3`.
 
-    * If `from` and `to` both conform to the `Calendar.datetime()`
+    * If `from` and `to` both conform to the `t:Calendar.datetime/0`
       type then `Cldr.DateTime.Interval.to_string/3` is called.
 
-    * Otherwise if `from` and `to` conform to the `Calendar.date()`
+    * Otherwise if `from` and `to` conform to the `t:Calendar.date/0`
       type then `Cldr.Date.Interval.to_string/3` is called.
 
-    * Otherwise if `from` and `to` conform to the `Calendar.time()`
+    * Otherwise if `from` and `to` conform to the `t:Calendar.time/0`
       type then `Cldr.Time.Interval.to_string/3` is called.
 
   * `CalendarInterval` support requires adding the
     dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
     to the `deps` configuration in `mix.exs`.
 
-  * For more information on interval format string
+  * For more information on interval format patterns
     see `Cldr.Interval`.
 
-  * The available predefined formats that can be applied are the
+  * The available format skeletons that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying CLDR calendar type.
 
   * In the case where `from` and `to` are equal, a single
-    date, time or datetime is formatted instead of an interval.
+    *date*, *time* or *date_time* is formatted instead of an interval.
 
-  ## Examples
+  ### Examples
 
       iex> Cldr.Interval.to_string(Date.range(~D[2020-01-01], ~D[2020-01-12]), MyApp.Cldr,
       ...> format: :long)
@@ -444,7 +456,7 @@ defmodule Cldr.Interval do
   Returns a string representing the formatted
   interval formed by two dates.
 
-  ## Arguments
+  ### Arguments
 
   * `from` is any map that conforms to the
     any one of the `Calendar` types.
@@ -459,10 +471,10 @@ defmodule Cldr.Interval do
   * `options` is a keyword list of options. The default is
     `[format: :medium, style: :date | :time | nil]`.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representing of an interval
+    specific format skeleton or a format pattern representing of an interval
     format. The default is `:medium`.
 
   * `:style` supports different formatting styles. The valid
@@ -488,20 +500,20 @@ defmodule Cldr.Interval do
   * `number_system:` a number system into which the formatted date digits should
     be transliterated.
 
-  ## Returns
+  ### Returns
 
   * `{:ok, string}` or
 
   * `{:error, {exception, reason}}`
 
-  ## Notes
+  ### Notes
 
   * `to_string/3` will decide which formatter to call based upon
     the arguments provided to it.
 
     * A `t:Date.Range.t/0` will call `Cldr.Date.Interval.to_string/3`.
 
-    * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
+    * A `t:CalendarInterval.t/0` will call `Cldr.Date.Interval.to_string/3`
       if its `:precision` is `:year`, `:month` or `:day`. Otherwise
       it will call `Cldr.Time.Interval.to_string/3`.
 
@@ -522,15 +534,15 @@ defmodule Cldr.Interval do
   * For more information on interval format string
     see `Cldr.Interval`.
 
-  * The available predefined formats that can be applied are the
+  * The available format skeletons that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats(:en, :gregorian)`
     where `:en` can be replaced by any configuration locale name and `:gregorian`
     is the underlying CLDR calendar type.
 
   * In the case where `from` and `to` are considered equal, a single
-    date, time or datetime is formatted instead of an interval.
+    *date*, *time* or *date_time* is formatted instead of an interval.
 
-  ## Examples
+  ### Examples
 
       iex> Cldr.Interval.to_string(~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr)
       {:ok, "Jan 1 – Dec 31, 2020"}
@@ -611,10 +623,10 @@ defmodule Cldr.Interval do
   end
 
   @doc """
-  Returns a `Date.Range` or `CalendarInterval` as
+  Returns a `t:Date.Range.t/0` or `t:CalendarInterval.t/0` as
   a localised string or raises an exception.
 
-  ## Arguments
+  ### Arguments
 
   * `range` is either a `Date.Range.t` returned from `Date.range/2`
     or a `CalendarInterval.t`.
@@ -625,10 +637,10 @@ defmodule Cldr.Interval do
   * `options` is a keyword list of options. The default is
     `[format: :medium, style: :date | :time | nil]`.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representing of an interval
+    specific format skeleton or a format pattern representing an interval
     format. The default is `:medium`.
 
   * `:style` supports different formatting styles. The valid
@@ -639,13 +651,13 @@ defmodule Cldr.Interval do
     then call `to_string/3` directly on `Cldr.Date.Interval`, `Cldr.Time.Interval`
     or `Cldr.DateTime.Interval`.
 
-    * For a date the alternatives are `:date`, `:month_and_day`, `:month`
+    * For a *date* the alternatives are `:date`, `:month_and_day`, `:month`
       and `:year_and_month`. The default is `:date`.
 
-    * For a time the alternatives are `:time`, `:zone` and
+    * For a *time* the alternatives are `:time`, `:zone` and
       `:flex`. The default is `:time`.
 
-    * For a datetime there are no style options, the default
+    * For a *date_time* there are no style options, the default
       for each of the date and time part is used.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
@@ -654,20 +666,20 @@ defmodule Cldr.Interval do
   * `number_system:` a number system into which the formatted date digits should
     be transliterated.
 
-  ## Returns
+  ### Returns
 
-  * `string` or
+  * `formatted_string` or
 
-  * raises an exception
+  * raises an exception.
 
-  ## Notes
+  ### Notes
 
   * `to_string/3` will decide which formatter to call based upon
     the arguments provided to it.
 
-    * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`.
+    * A `t:Date.Range.t/0` will call `Cldr.Date.Interval.to_string/3`.
 
-    * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
+    * A `t:CalendarInterval.t/0` will call `Cldr.Date.Interval.to_string/3`
       if its `:precision` is `:year`, `:month` or `:day`. Otherwise
       it will call `Cldr.Time.Interval.to_string/3`.
 
@@ -688,15 +700,15 @@ defmodule Cldr.Interval do
   * For more information on interval format string
     see `Cldr.Interval`.
 
-  * The available predefined formats that can be applied are the
+  * The available format skeletons that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying CLDR calendar type.
 
   * In the case where `from` and `to` are equal, a single
-    date, time or datetime is formatted instead of an interval.
+    *date*, *time* or *date_time* is formatted instead of an interval.
 
-  ## Examples
+  ### Examples
 
       iex> use CalendarInterval
       iex> Cldr.Interval.to_string!(~I"2020-01-01/12", MyApp.Cldr,
@@ -731,7 +743,7 @@ defmodule Cldr.Interval do
   interval formed by two dates or raises an
   exception.
 
-  ## Arguments
+  ### Arguments
 
   * `from` is any map that conforms to the
     any one of the `Calendar` types.
@@ -746,10 +758,10 @@ defmodule Cldr.Interval do
   * `options` is a keyword list of options. The default is
     `[format: :medium, style: :date | :time | nil]`.
 
-  ## Options
+  ### Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representing an interval
+    specific format skeleton or a format pattern representing an interval
     format. The default is `:medium`.
 
   * `:style` supports different formatting styles. The valid
@@ -760,14 +772,14 @@ defmodule Cldr.Interval do
     then call `to_string/3` directly on `Cldr.Date.Interval`, `Cldr.Time.Interval`
     or `Cldr.DateTime.Interval`.
 
-    * For a date the alternatives are `:date`, `:month_and_day`, `:month`
+    * For a *date* the alternatives are `:date`, `:month_and_day`, `:month`
       and `:year_and_month`. The default is `:date`.
 
-    * For a time the alternatives are `:time`, `:zone` and
+    * For a *time* the alternatives are `:time`, `:zone` and
       `:flex`. The default is `:time`.
 
-    * For a datetime there are no style options, the default
-      for each of the date and time part is used.
+    * For a *date_time* there are no style options, the default
+      for each of the *date* and *time* part is used.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
@@ -775,20 +787,20 @@ defmodule Cldr.Interval do
   * `number_system:` a number system into which the formatted date digits should
     be transliterated.
 
-  ## Returns
+  ### Returns
 
-  * `{:ok, string}` or
+  * `formatted_string` or
 
-  * `{:error, {exception, reason}}`
+  * raises an exception.
 
-  ## Notes
+  ### Notes
 
-  * `to_string/3` will decide which formatter to call based upon
+  * `to_string!/3` will decide which formatter to call based upon
     the arguments provided to it.
 
-    * A `Date.Range.t` will call `Cldr.Date.Interval.to_string/3`
+    * A `t:Date.Range.t/0` will call `Cldr.Date.Interval.to_string/3`
 
-    * A `CalendarInterval` will call `Cldr.Date.Interval.to_string/3`
+    * A `t:CalendarInterval.t/0` will call `Cldr.Date.Interval.to_string/3`
       if its `:precision` is `:year`, `:month` or `:day`. Otherwise
       it will call `Cldr.Time.Interval.to_string/3`.
 
@@ -809,7 +821,7 @@ defmodule Cldr.Interval do
   * For more information on interval format string
     see `Cldr.Interval`.
 
-  * The available predefined formats that can be applied are the
+  * The available format skeletons that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying CLDR calendar type.
@@ -817,7 +829,7 @@ defmodule Cldr.Interval do
   * In the case where `from` and `to` are equal, a single
     date, time or datetime is formatted instead of an interval.
 
-  ## Examples
+  ### Examples
 
       iex> Cldr.Interval.to_string!(~D[2020-01-01], ~D[2020-12-31], MyApp.Cldr)
       "Jan 1 – Dec 31, 2020"

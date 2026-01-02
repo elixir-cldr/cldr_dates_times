@@ -42,8 +42,8 @@ defmodule Cldr.Date do
   end
 
   @doc """
-  Formats a date according to a format string
-  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
+  Formats a *date* according to a format as defined in CLDR and
+  described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
   ### Arguments
 
@@ -57,13 +57,18 @@ defmodule Cldr.Date do
 
   ### Options
 
-  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format ID
-    or a format string. The default is `:medium` for full dates (that is,
-    dates having `:year`, `:month`, `:day` and `:calendar` fields). The
-    default for partial dates is to derive a candidate format ID from the date and
-    find the best match from the formats returned by
-    `Cldr.Date.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
-    for more information about specifying formats.
+  * `:format` is either a [standard format](Cldr.DateTime.Format.html#module-standard-formats)
+    (one of `:short`, `:medium`, `:long`, `:full`), a [format skeleton](Cldr.DateTime.Format.html#module-format-skeletons)
+    or a [format pattern](Cldr.DateTime.Format.html#module-format-patterns).
+
+    * The default is `:medium` for full *dates* (that is, *dates* having `:year`,
+      `:month`, `:day` and `:calendar` fields).
+
+    * The default for partial *dates* is to derive a format skeleton from the
+      *date* and find the best match from the formats returned by
+      `Cldr.Date.available_formats/3`.
+
+    * See `Cldr.DateTime.Format` for more information about specifying formats.
 
   * `:locale` any locale returned by `Cldr.known_locale_names/1`.
     The default is `Cldr.get_locale/0`.
@@ -198,9 +203,9 @@ defmodule Cldr.Date do
   end
 
   @doc """
-  Formats a date according to a format string
-  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
-  or raises an exception.
+  Formats a *date* according to a format as defined in CLDR and
+  described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html) or
+  raises an exception.
 
   ### Arguments
 
@@ -214,13 +219,18 @@ defmodule Cldr.Date do
 
   ### Options
 
-  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format ID
-    or a format string. The default is `:medium` for full dates (that is,
-    dates having `:year`, `:month`, `:day` and `:calendar` fields). The
-    default for partial dates is to derive a candidate format from the date and
-    find the best match from the formats returned by
-    `Cldr.Date.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
-    for more information about specifying formats.
+  * `:format` is either a [standard format](Cldr.DateTime.Format.html#module-standard-formats)
+    (one of `:short`, `:medium`, `:long`, `:full`), a [format skeleton](Cldr.DateTime.Format.html#module-format-skeletons)
+    or a [format pattern](Cldr.DateTime.Format.html#module-format-patterns).
+
+    * The default is `:medium` for full *dates* (that is, *dates* having `:year`,
+      `:month`, `:day` and `:calendar` fields).
+
+    * The default for partial *dates* is to derive a format skeleton from the
+      *date* and find the best match from the formats returned by
+      `Cldr.Date.available_formats/3`.
+
+    * See `Cldr.DateTime.Format` for more information about specifying formats.
 
   * `:locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
@@ -400,14 +410,14 @@ defmodule Cldr.Date do
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
-          {:ok, Cldr.DateTime.Format.standard_formats()} | {:error, {atom, String.t()}}
+          {:ok, Format.standard_formats()} | {:error, {atom, String.t()}}
 
   def formats(
         locale \\ Cldr.get_locale(),
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
         backend \\ Cldr.Date.default_backend()
       ) do
-    Cldr.DateTime.Format.date_formats(locale, calendar, backend)
+    Format.date_formats(locale, calendar, backend)
   end
 
   @doc """

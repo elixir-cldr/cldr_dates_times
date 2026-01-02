@@ -51,8 +51,8 @@ defmodule Cldr.Time do
   end
 
   @doc """
-  Formats a time according to a format string
-  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
+  Formats a *time* according to a format as defined in CLDR and
+  described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
 
   ### Returns
 
@@ -73,13 +73,19 @@ defmodule Cldr.Time do
 
   ### Options
 
-  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
-    or a format string. The default is `:medium` for full times (that is,
-    times having `:hour`, `:minute` and `:second` fields). The
-    default for partial times is to derive a candidate format from the time and
-    find the best match from the formats returned by
-    `Cldr.Time.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
-    for more information about specifying formats.
+  * `:format` is either a [standard format](Cldr.DateTime.Format.html#module-standard-formats)
+    (one of `:short`, `:medium`, `:long`, `:full`), a [format skeleton](Cldr.DateTime.Format.html#module-format-skeletons)
+    or a [format pattern](Cldr.DateTime.Format.html#module-format-patterns).
+
+    * The default is `:medium` for full *times* (that is, *times* having `:hour`,
+      `:minute` and `:second` and optionally `:microsecond`,
+      `:time_zone`, `:zone_abbr`, `:utc_offset` and `:std_offset` fields).
+
+    * The default for partial *times* is to derive a format skeleton from the
+      *time* and find the best match from the formats returned by
+      `Cldr.Date.available_formats/3`.
+
+    * See `Cldr.DateTime.Format` for more information about specifying formats.
 
   * `:locale` any locale returned by `Cldr.known_locale_names/1`.  The default is
     `Cldr.get_locale/0`.
@@ -210,8 +216,9 @@ defmodule Cldr.Time do
   end
 
   @doc """
-  Formats a time according to a format string
-  as defined in CLDR and described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html).
+  Formats a *time* according to a format as defined in CLDR and
+  described in [TR35](http://unicode.org/reports/tr35/tr35-dates.html)
+  or raises an exception.
 
   ### Arguments
 
@@ -226,13 +233,19 @@ defmodule Cldr.Time do
 
   ### Options
 
-  * `:format` is one of `:short`, `:medium`, `:long`, `:full`, or a format id
-    or a format string. The default is `:medium` for full times (that is,
-    times having `:hour`, `:minute` and `:second` fields). The
-    default for partial times is to derive a candidate format from the time and
-    find the best match from the formats returned by
-    `Cldr.Time.available_formats/3`. See [here](README.md#date-time-and-datetime-localization-formats)
-    for more information about specifying formats.
+  * `:format` is either a [standard format](Cldr.DateTime.Format.html#module-standard-formats)
+    (one of `:short`, `:medium`, `:long`, `:full`), a [format skeleton](Cldr.DateTime.Format.html#module-format-skeletons)
+    or a [format pattern](Cldr.DateTime.Format.html#module-format-patterns).
+
+    * The default is `:medium` for full *times* (that is, *times* having `:hour`,
+      `:minute` and `:second` and optionally `:microsecond`,
+      `:time_zone`, `:zone_abbr`, `:utc_offset` and `:std_offset` fields).
+
+    * The default for partial *times* is to derive a format skeleton from the
+      *time* and find the best match from the formats returned by
+      `Cldr.Date.available_formats/3`.
+
+    * See `Cldr.DateTime.Format` for more information about specifying formats.
 
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct.  The default is `Cldr.get_locale/0`.
@@ -492,14 +505,14 @@ defmodule Cldr.Time do
           Cldr.Calendar.calendar(),
           Cldr.backend()
         ) ::
-          {:ok, Cldr.DateTime.Format.standard_formats()} | {:error, {atom, String.t()}}
+          {:ok, Format.standard_formats()} | {:error, {atom, String.t()}}
 
   def formats(
         locale \\ Cldr.get_locale(),
         calendar \\ Cldr.Calendar.default_cldr_calendar(),
         backend \\ Cldr.Date.default_backend()
       ) do
-    Cldr.DateTime.Format.time_formats(locale, calendar, backend)
+    Format.time_formats(locale, calendar, backend)
   end
 
   @doc """
