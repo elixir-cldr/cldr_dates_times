@@ -292,6 +292,7 @@ defmodule Cldr.DateTime.Timezone do
   def non_location_format(time_zone, options) when is_binary(time_zone) do
     {locale, backend} = Cldr.locale_and_backend_from(options)
     format = Module.concat(backend, DateTime.Format)
+
     with {:ok, options} <- validate_options(options),
          {:ok, locale} <- Cldr.validate_locale(locale, backend),
          {:ok, canonical_zone} <- canonical_time_zone(time_zone),
@@ -495,7 +496,6 @@ defmodule Cldr.DateTime.Timezone do
           error
       end
     end
-
   end
 
   defp location_from_territory_and_zone(territory, territories, time_zone, locale) do

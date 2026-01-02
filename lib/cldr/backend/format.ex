@@ -692,7 +692,9 @@ defmodule Cldr.DateTime.Format.Backend do
         end
 
         @deprecated "Use common_date_time_format_ids/0"
-        defdelegate common_date_time_format_names(), to: __MODULE__, as: :common_date_time_format_ids
+        defdelegate common_date_time_format_names(),
+          to: __MODULE__,
+          as: :common_date_time_format_ids
 
         @doc """
         Returns the fallback format for a given

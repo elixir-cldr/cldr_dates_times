@@ -52,7 +52,7 @@ defmodule Cldr.DateTime.TestData do
     field_list =
       skeleton
       |> String.graphemes()
-      |> Enum.chunk_by(&(&1))
+      |> Enum.chunk_by(& &1)
 
     length(field_list) == 1
   end

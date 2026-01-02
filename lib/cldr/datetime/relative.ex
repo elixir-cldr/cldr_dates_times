@@ -215,6 +215,7 @@ defmodule Cldr.DateTime.Relative do
          {:ok, time_difference} <- time_difference(relative, options.relative_to) do
       {relative_scaled, unit} =
         define_unit(relative, options.relative_to, time_difference, unit, options.derive_unit_from)
+
       relative_string = to_string(relative_scaled, unit, locale, backend, options)
 
       if options.style == :at && unit not in [:hour, :minute, :second] do
@@ -226,7 +227,7 @@ defmodule Cldr.DateTime.Relative do
   end
 
   defp format_relative_at(relative, nil, relative_string, locale, backend, options)
-      when is_time(relative) do
+       when is_time(relative) do
     case relative_at_formats(locale, backend) do
       {:ok, formats} ->
         time_format = format(options.time_format, options.format)
@@ -251,7 +252,7 @@ defmodule Cldr.DateTime.Relative do
   end
 
   defp format_relative_at(_relative, time, relative_string, locale, backend, options)
-      when is_time(time) do
+       when is_time(time) do
     format_relative_at(time, nil, relative_string, locale, backend, options)
   end
 

@@ -94,8 +94,8 @@ defmodule Cldr.DateTime.Format.Compiler do
 
   defp maybe_return_error({:error, {_, :date_time_format_lexer, {_, error}}, _}, format) do
     {:error,
-      {Cldr.DateTime.Compiler.ParseError,
-       "Could not tokenize #{inspect(format)}. Error detected at #{inspect(error)}"}}
+     {Cldr.DateTime.Compiler.ParseError,
+      "Could not tokenize #{inspect(format)}. Error detected at #{inspect(error)}"}}
   end
 
   defp maybe_return_error(other, _format) do

@@ -135,8 +135,10 @@ defmodule Cldr.DateTime.Format.Match do
           locale :: Locale.locale_reference(),
           calendar :: Cldr.Calendar.calendar(),
           backend :: Cldr.backend()
-        ) :: {:ok, Format.format_id()} | {:ok, {Format.format_id(), Format.format_id()}} |
-              {:error, {module(), String.t()}}
+        ) ::
+          {:ok, Format.format_id()}
+          | {:ok, {Format.format_id(), Format.format_id()}}
+          | {:error, {module(), String.t()}}
 
   def best_match(
         original_skeleton,
@@ -164,7 +166,8 @@ defmodule Cldr.DateTime.Format.Match do
         |> Enum.filter(&candidates_with_the_same_tokens(&1, skeleton_keys))
         |> Enum.map(&distance_from(&1, skeleton_ordered))
         |> Enum.sort(&compare_counts/2)
-        # |> IO.inspect(label: "Candidates")
+
+      # |> IO.inspect(label: "Candidates")
 
       case candidates do
         [] ->
@@ -174,6 +177,7 @@ defmodule Cldr.DateTime.Format.Match do
           {:ok, format_id}
       end
     end
+
     # |> IO.inspect(label: "Matched to #{inspect original_skeleton}")
   end
 
@@ -190,10 +194,10 @@ defmodule Cldr.DateTime.Format.Match do
 
     case best_match(skeleton, locale, calendar, backend) do
       {:ok, {date_format_id, time_format_id}} ->
-          %{
-            date_format_id => Map.get(formats, date_format_id),
-            time_format_id => Map.get(formats, time_format_id)
-          }
+        %{
+          date_format_id => Map.get(formats, date_format_id),
+          time_format_id => Map.get(formats, time_format_id)
+        }
 
       {:ok, format_id} ->
         %{format_id => Map.get(formats, format_id)}
@@ -571,8 +575,11 @@ defmodule Cldr.DateTime.Format.Match do
   # Substitute back the originally requested zone field and length
   # TODO doing this needs further validation, the spec isn't super clear
   @substitutable_zone_fields ["v", "V", "O", "z", "Z"]
-  def adjust_field_length([char | _rest], acc, skeleton_tokens) when char in @substitutable_zone_fields  do
-    {replacement_char, requested_length} = find_substitutable_field(@substitutable_zone_fields, skeleton_tokens)
+  def adjust_field_length([char | _rest], acc, skeleton_tokens)
+      when char in @substitutable_zone_fields do
+    {replacement_char, requested_length} =
+      find_substitutable_field(@substitutable_zone_fields, skeleton_tokens)
+
     [List.duplicate(replacement_char, requested_length) | acc]
   end
 

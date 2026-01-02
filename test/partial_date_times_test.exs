@@ -27,10 +27,14 @@ defmodule Cldr.DateTime.PartialTest do
              Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"})
 
     assert {:ok, "5:23 GMT+11:00"} =
-             Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"}, format: "h:m V")
+             Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"},
+               format: "h:m V"
+             )
 
     assert {:ok, "5:23 Australia/Sydney"} =
-             Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"}, format: "h:m VV")
+             Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"},
+               format: "h:m VV"
+             )
 
     assert {:ok, "5:23 Sydney Time"} =
              Cldr.Time.to_string(
@@ -38,7 +42,9 @@ defmodule Cldr.DateTime.PartialTest do
                format: "h:m VVVV"
              )
 
-    assert Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"}, format: "h:m VVVV")
+    assert Cldr.Time.to_string(%{hour: 5, minute: 23, time_zone: "Australia/Sydney"},
+             format: "h:m VVVV"
+           )
 
     {:error,
      {Cldr.DateTime.FormatError,

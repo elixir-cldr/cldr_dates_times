@@ -896,8 +896,8 @@ defmodule Cldr.DateTime.Format do
         {:ok, format}
 
       :error ->
-        {:error, {Cldr.DateTime.UnresolvedFormat,
-          "Unknown value for option format: #{inspect(format)}"}}
+        {:error,
+         {Cldr.DateTime.UnresolvedFormat, "Unknown value for option format: #{inspect(format)}"}}
     end
   end
 
@@ -1207,7 +1207,9 @@ defmodule Cldr.DateTime.Format do
   end
 
   @deprecated "Use common_date_time_format_ids/1"
-  defdelegate common_date_time_format_names(backend), to: __MODULE__, as: :common_date_time_format_ids
+  defdelegate common_date_time_format_names(backend),
+    to: __MODULE__,
+    as: :common_date_time_format_ids
 
   @deprecated "Use common_date_time_format_ids/0"
   defdelegate common_date_time_format_names(), to: __MODULE__, as: :common_date_time_format_ids

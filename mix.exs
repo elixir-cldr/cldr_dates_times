@@ -81,7 +81,6 @@ defmodule Cldr.DatesTimes.Mixfile do
       {:ex_cldr_calendars, "~> 2.4"},
       {:ex_cldr_calendars_japanese, "~> 1.1", only: [:dev, :test]},
       {:ex_cldr_units, "~> 3.20", optional: true},
-
       {:calendar_interval, "~> 0.2", optional: true},
       {:ex_doc, "~> 0.25", optional: true, only: [:dev, :release], runtime: false},
       {:jason, "~> 1.0", optional: true},

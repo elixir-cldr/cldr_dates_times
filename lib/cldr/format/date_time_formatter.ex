@@ -3250,7 +3250,9 @@ defmodule Cldr.DateTime.Formatter do
         maybe_wrap(timezone, :specific_non_location, options)
 
       {:error, {Cldr.DateTime.NoTerritoryForTimezone, _reason}} ->
-        {:ok, timezone} = Timezone.gmt_format(time_zone, locale: locale, backend: backend, format: :short)
+        {:ok, timezone} =
+          Timezone.gmt_format(time_zone, locale: locale, backend: backend, format: :short)
+
         maybe_wrap(timezone, :specific_non_location, options)
     end
   end
@@ -3262,7 +3264,7 @@ defmodule Cldr.DateTime.Formatter do
   def specific_non_location(%{time_zone: time_zone}, 3, locale, backend, options) do
     case Timezone.exemplar_city(time_zone, locale: locale, backend: backend, format: :long) do
       {:ok, exemplar_city} ->
-         maybe_wrap(exemplar_city, :specific_non_location, options)
+        maybe_wrap(exemplar_city, :specific_non_location, options)
 
       {:error, {Cldr.DateTime.UnknownExemplarCity, _reason}} ->
         {:ok, unknown} = Timezone.exemplar_city(@unknown_zone, locale: locale, backend: backend)
@@ -4035,6 +4037,7 @@ defmodule Cldr.DateTime.Formatter do
   def n_error_return(symbol, n) do
     raise Cldr.DateTime.FormatError,
           "The format symbol '#{symbol}' does not support a format length of #{n}"
+
     :error
   end
 
@@ -4048,7 +4051,7 @@ defmodule Cldr.DateTime.Formatter do
 
     raise Cldr.DateTime.FormatError,
           "The format symbol '#{symbol}' requires at map with at least #{requirements}. " <>
-          "Found: #{inspect(map)}"
+            "Found: #{inspect(map)}"
 
     :error
   end
