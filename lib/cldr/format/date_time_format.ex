@@ -1206,12 +1206,12 @@ defmodule Cldr.DateTime.Format do
     |> Enum.sort()
   end
 
-  @deprecated "Use common_date_time_format_ids/1"
+  @doc deprecated: "Use common_date_time_format_ids/1"
   defdelegate common_date_time_format_names(backend),
     to: __MODULE__,
     as: :common_date_time_format_ids
 
-  @deprecated "Use common_date_time_format_ids/0"
+  @doc deprecated: "Use common_date_time_format_ids/0"
   defdelegate common_date_time_format_names(), to: __MODULE__, as: :common_date_time_format_ids
 
   defp known_formats(list, locale_names) do

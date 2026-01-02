@@ -4,15 +4,17 @@
 
 ## Cldr_Dates_Times v2.25.2
 
-This is the changelog for Cldr_Dates_Times v2.25.2 released on _____________.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
+This is the changelog for Cldr_Dates_Times v2.25.2 released on January 3rd, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
 
 ### Deprecations
 
-* Deprecate `Cldr.DateTime.Format.common_date_time_format_names/1` in favour of `common_date_time_format_ids/1` as part of the effort to make format terminology consistent and clearer.
+* Soft deprecate `Cldr.DateTime.Format.common_date_time_format_names/1` in favour of `common_date_time_format_ids/1` as part of the effort to make format terminology consistent and clearer.
 
 ### Enhancements
 
 * Enhance the documentation describing formats (format pattern, format skeleton, format ID, standard format). Thanks to @tjchambers for the issue. Closes #65.
+
+* Revised the types associated with format definitions to be clearer and more specific and improve their documentation.
 
 ## Cldr_Dates_Times v2.25.1
 
