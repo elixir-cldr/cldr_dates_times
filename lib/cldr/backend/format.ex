@@ -673,12 +673,12 @@ defmodule Cldr.DateTime.Format.Backend do
         Returns a list of the date_time format IDs that are
         available in all known locales.
 
-        The format IDs returned by `common_date_time_format_names/0`
+        The format IDs returned by `common_date_time_format_ids/0`
         are guaranteed to be available in all known locales,
 
         ## Example:
 
-            iex> #{inspect(__MODULE__)}.common_date_time_format_names()
+            iex> #{inspect(__MODULE__)}.common_date_time_format_ids()
             [:Bh, :Bhm, :Bhms, :E, :EBh, :EBhm, :EBhms, :EHm, :EHms, :Ed, :Eh, :Ehm, :Ehms,
              :Gy, :GyM, :GyMEd, :GyMMM, :GyMMMEd, :GyMMMd, :GyMd, :H, :Hm, :Hms, :Hmsv,
              :Hmv, :Hv, :M, :MEd, :MMM, :MMMEd, :MMMMW, :MMMMd, :MMMd, :Md, :d, :h, :hm,
