@@ -11,16 +11,24 @@ defmodule Cldr.Interval do
 
   For example, the greatest difference in "Jan 10-12, 2008" is the day field, while
   the greatest difference in "Jan 10 - Feb 12, 2008" is the month field. This is used to
-  pick the exact pattern to be used.
+  pick the exact format pattern to be used.
 
   ### Interval Formats
 
-  CLDR provides a two-level mapping to a concrete format pattern.
-  To simplify the developer experience, `ex_cldr_dates_times` groups these
-  mappings into `format styles` and `standard formats`.
+  CLDR provides a three-level mapping to a concrete format pattern.
 
-  Format styles group different format skeletons by the fields they include.
-  These styles can be seen by examining the output below:
+  * The first level determines which fields are included in the
+   interval format. This level is called a *format style*.
+
+  * The second level is grouped by *standard formats* (`:long`, `:medium`, `:short`)
+    which reflect the length of the specified fields - espeially the
+    format length of the `month` field for *dates*.
+
+  * The third level is a format skeleton which can then be resolved to
+    a format pattern.
+
+  Here's an example of the format styles, encapsulating standard formats
+  the resolve to format skeletons.
 
   ```elixir
   iex> Cldr.Date.Interval.styles()
@@ -325,12 +333,12 @@ defmodule Cldr.Interval do
   end
 
   @doc """
-  Returns a `Date.Range` or `CalendarInterval` as
+  Returns a `t:Date.Range.t/0` or `t:CalendarInterval.t/0` as
   a localised string.
 
   ### Arguments
 
-  * `range` is either a `Date.Range.t` returned from `Date.range/2`
+  * `range` is either a `t:Date.Range.t/0` returned from `Date.range/2`
     or a `CalendarInterval.t`.
 
   * `backend` is any module that includes `use Cldr` and
@@ -628,7 +636,7 @@ defmodule Cldr.Interval do
 
   ### Arguments
 
-  * `range` is either a `Date.Range.t` returned from `Date.range/2`
+  * `range` is either a `t:Date.Range.t/0` returned from `Date.range/2`
     or a `CalendarInterval.t`.
 
   * `backend` is any module that includes `use Cldr` and

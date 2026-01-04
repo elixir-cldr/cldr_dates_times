@@ -394,10 +394,10 @@ defmodule Cldr.Time do
     %LanguageTag{cldr_locale_name: locale_name} = locale
 
     with {:ok, time_formats} <- formats(locale_name, calendar, backend),
-         {:ok, standard_format} <- Map.fetch(time_formats, format),
-         {:ok, standard_format} <- remove_tz_if_naive_date_time(time, standard_format),
-         {:ok, skeleton} <- Match.best_match(standard_format, locale, calendar, backend) do
-      format_for_skeleton(format, standard_format, skeleton, locale, calendar, backend)
+         {:ok, requested} <- Map.fetch(time_formats, format),
+         {:ok, adjusted} <- remove_tz_if_naive_date_time(time, requested),
+         {:ok, matched} <- Match.best_match(adjusted, locale, calendar, backend) do
+      format_for_skeleton(format, requested, matched, locale, calendar, backend)
     end
   end
 
@@ -430,9 +430,9 @@ defmodule Cldr.Time do
   # If its a binary then its considered a format string so we use
   # it directly.
 
-  def find_format(_time, format_string, _locale, _calendar, _backend, _options)
-      when is_binary(format_string) do
-    {:ok, format_string}
+  def find_format(_time, format_pattern, _locale, _calendar, _backend, _options)
+      when is_binary(format_pattern) do
+    {:ok, format_pattern}
   end
 
   @doc false

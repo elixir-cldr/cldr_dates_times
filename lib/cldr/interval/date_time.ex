@@ -2,10 +2,10 @@ defmodule Cldr.DateTime.Interval do
   @moduledoc """
   Interval formats allow for software to format intervals like "Jan 10-12, 2008" as a
   shorter and more natural format than "Jan 10, 2008 - Jan 12, 2008". They are designed
-  to take a start and end date, time or datetime plus a formatting pattern
-  and use that information to produce a localized format.
+  to take a start and end *date*, *time* or *date_time* plus a formatting pattern
+  and use that information to produce a localized formatted string.
 
-  See `Cldr.Interval.to_string/3` and `Cldr.DateTime.Interval.to_string/3`
+  See `Cldr.Interval.to_string/3` and `Cldr.DateTime.Interval.to_string/3`.
 
   """
 
@@ -41,21 +41,21 @@ defmodule Cldr.DateTime.Interval do
 
     @doc """
     Returns a localised string representing the formatted
-    `CalendarInterval`.
+    `t:CalendarInterval.t/0`.
 
     ### Arguments
 
-    * `range` is a `CalendarInterval.t`
+    * `range` is a `t:CalendarInterval.t/0`.
 
     * `backend` is any module that includes `use Cldr` and
-      is therefore a `Cldr` backend module
+      is therefore a `Cldr` backend module.
 
-    * `options` is a keyword list of options. The default is `[]`.
+    * `options` is a keyword list of options.
 
     ### Options
 
     * `:format` is one of `:short`, `:medium` or `:long` or a
-      specific format type or a string representation of an interval
+      format skeleton or a format pattern representating an interval
       format. The default is `:medium`.
 
     * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
@@ -113,10 +113,10 @@ defmodule Cldr.DateTime.Interval do
       dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
       to the `deps` configuration in `mix.exs`.
 
-    * For more information on interval format string
+    * For more information on interval format patterns
       see the `Cldr.Interval`.
 
-    * The available predefined formats that can be applied are the
+    * The available format skeletons that can be applied are the
       keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
       where `"en"` can be replaced by any configuration locale name and `:gregorian`
       is the underlying CLDR calendar type.
@@ -247,7 +247,7 @@ defmodule Cldr.DateTime.Interval do
   ### Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representation of an interval
+    format skeleton or a format pattern representating an interval
     format. The default is `:medium`.
 
   * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
@@ -301,10 +301,10 @@ defmodule Cldr.DateTime.Interval do
 
   ### Notes
 
-  * For more information on interval format string
+  * For more information on interval format patterns
     see the `Cldr.Interval`.
 
-  * The available predefined formats that can be applied are the
+  * The available format skeletongs that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying CLDR calendar type.
@@ -476,7 +476,7 @@ defmodule Cldr.DateTime.Interval do
     ### Options
 
     * `:format` is one of `:short`, `:medium` or `:long` or a
-      specific format type or a string representation of an interval
+      format skeleton or a format pattern representating an interval
       format. The default is `:medium`.
 
     * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
@@ -524,13 +524,13 @@ defmodule Cldr.DateTime.Interval do
 
     ### Returns
 
-    * `string` or
+    * `formatted_string` or
 
     * raises an exception
 
     ### Notes
 
-    * For more information on interval format string
+    * For more information on interval format patterns
       see the `Cldr.Interval`.
 
     * The available predefined formats that can be applied are the
@@ -585,7 +585,7 @@ defmodule Cldr.DateTime.Interval do
   ### Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representation of an interval
+    format skeleton or a format pattern representating an interval
     format. The default is `:medium`.
 
   * `:date_format` is any one of `:short`, `:medium`, `:long`, `:full`. If defined,
@@ -633,16 +633,16 @@ defmodule Cldr.DateTime.Interval do
 
   ### Returns
 
-  * `string` or
+  * `formatted_string` or
 
-  * raises an exception
+  * raises an exception.
 
   ### Notes
 
-  * For more information on interval format string
+  * For more information on interval format patterns
     see the `Cldr.Interval`.
 
-  * The available predefined formats that can be applied are the
+  * The available format skeletons that can be applied are the
     keys of the map returned by `Cldr.DateTime.Format.interval_formats("en", :gregorian)`
     where `"en"` can be replaced by any configuration locale name and `:gregorian`
     is the underlying CLDR calendar type.

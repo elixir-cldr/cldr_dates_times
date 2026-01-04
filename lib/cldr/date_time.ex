@@ -676,8 +676,8 @@ defmodule Cldr.DateTime do
     {:ok, available_formats} = available_formats(locale, calendar, backend)
 
     case Map.fetch(available_formats, skeleton) do
-      {:ok, format} ->
-        {:ok, format}
+      {:ok, format_pattern} ->
+        {:ok, format_pattern}
 
       :error ->
         {:error,
@@ -690,7 +690,7 @@ defmodule Cldr.DateTime do
   end
 
   # Only a single format, which is applied to date and time and to
-  # the compisition format.
+  # the composition format.
   defp validate_formats_consistent(format, nil = _date_format, nil = _time_format)
        when is_atom(format) or is_binary(format) do
     :ok
@@ -860,8 +860,8 @@ defmodule Cldr.DateTime do
         with {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(options.format),
              {:ok, formats} <- Format.date_time_available_formats(locale, calendar, backend),
              {:ok, preferred_format} <- preferred_format(formats, format, options.prefer),
-             {:ok, format_string} <- Match.adjust_field_lengths(preferred_format, skeleton_tokens) do
-          {:ok, format_string, options}
+             {:ok, format_pattern} <- Match.adjust_field_lengths(preferred_format, skeleton_tokens) do
+          {:ok, format_pattern, options}
         end
 
       error ->
@@ -878,7 +878,8 @@ defmodule Cldr.DateTime do
            date_format(date_time, date_format, locale, calendar, backend, options),
          {:ok, time_format} <-
            time_format(date_time, time_format, locale, calendar, backend, options),
-         {:ok, format} <- resolve_format(date_format, options.style, locale, calendar, backend) do
+         {:ok, format} <-
+           resolve_format(date_format, options.style, locale, calendar, backend) do
       options =
         options
         |> Map.put(:date_format, date_format)
@@ -888,10 +889,10 @@ defmodule Cldr.DateTime do
     end
   end
 
-  # Straight up format string
-  defp find_format(_date_time, format, _locale, _calendar, _backend, options)
-       when is_binary(format) do
-    {:ok, format, options}
+  # Straight up format pattern
+  defp find_format(_date_time, format_pattern, _locale, _calendar, _backend, options)
+       when is_binary(format_pattern) do
+    {:ok, format_pattern, options}
   end
 
   # Format with a number system
@@ -908,12 +909,11 @@ defmodule Cldr.DateTime do
   def best_match(format, locale, calendar, backend, options) do
     skeleton = options[:requested_skeleton] || format
 
-    with {:ok, available_formats} <-
-           Cldr.DateTime.Format.date_time_available_formats(locale, calendar, backend),
+    with {:ok, formats} <- Format.date_time_available_formats(locale, calendar, backend),
          {:ok, skeleton_tokens} <- Compiler.tokenize_skeleton(skeleton),
-         {:ok, match} <- Match.best_match(format, locale, calendar, backend),
-         {:ok, format_string} <- Map.fetch(available_formats, match) do
-      Match.adjust_field_lengths(format_string, skeleton_tokens)
+         {:ok, matched} <- Match.best_match(format, locale, calendar, backend),
+         {:ok, format_pattern} <- Map.fetch(formats, matched) do
+      Match.adjust_field_lengths(format_pattern, skeleton_tokens)
     else
       :error ->
         {:error, Match.no_format_resolved_error(format)}

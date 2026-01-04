@@ -140,12 +140,12 @@ defmodule Cldr.Date.Interval do
   end
 
   @doc """
-  Returns a `Date.Range` or `CalendarInterval` as
+  Returns a `t:Date.Range.t/0` or `t:CalendarInterval.t/0` as
   a localised string.
 
   ## Arguments
 
-  * `range` is either a `Date.Range.t` returned from `Date.range/2`
+  * `range` is either a `t:Date.Range.t/0` returned from `Date.range/2`
     or a `CalendarInterval.t`
 
   * `backend` is any module that includes `use Cldr` and
@@ -157,7 +157,7 @@ defmodule Cldr.Date.Interval do
   ## Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representing of an interval
+    format skeleton or a format pattern representating an interval
     format. The default is `:medium`.
 
   * `:style` supports different formatting styles. The
@@ -203,7 +203,7 @@ defmodule Cldr.Date.Interval do
 
   ## Notes
 
-  * `CalendarInterval` support requires adding the
+  * `t:CalendarInterval.t/0` support requires adding the
     dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
     to the `deps` configuration in `mix.exs`.
 
@@ -294,7 +294,7 @@ defmodule Cldr.Date.Interval do
   ### Options
 
   * `:format` is one of `:short`, `:medium` or `:long` or a
-    specific format type or a string representing of an interval
+    format skeleton or a format pattern representating an interval
     format. The default is `:medium`.
 
   * `:style` supports different formatting styles. The
@@ -510,12 +510,12 @@ defmodule Cldr.Date.Interval do
   end
 
   @doc """
-  Returns a `Date.Range` or `CalendarInterval` as
+  Returns a `t:Date.Range.t/0` or `t:CalendarInterval.t/0` as
   a localised string or raises an exception.
 
   ### Arguments
 
-  * `range` is either a `Date.Range.t` returned from `Date.range/2`
+  * `range` is either a `t:Date.Range.t/0` returned from `Date.range/2`
     or a `CalendarInterval.t`
 
   * `backend` is any module that includes `use Cldr` and
@@ -573,7 +573,7 @@ defmodule Cldr.Date.Interval do
 
   ### Notes
 
-  * `CalendarInterval` support requires adding the
+  * `t:CalendarInterval.t/0` support requires adding the
     dependency [calendar_interval](https://hex.pm/packages/calendar_interval)
     to the `deps` configuration in `mix.exs`.
 

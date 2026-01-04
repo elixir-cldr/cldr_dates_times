@@ -537,6 +537,25 @@ defmodule Cldr.DateTime.Format.Backend do
           end
         end
 
+        @doc false
+        def date_time_interval_format_tokens(
+              locale \\ unquote(backend).get_locale(),
+              calendar \\ Cldr.Calendar.default_cldr_calendar()
+            )
+
+        def date_time_interval_format_tokens(
+              %LanguageTag{cldr_locale_name: cldr_locale_name},
+              calendar
+            ) do
+          date_time_interval_format_tokens(cldr_locale_name, calendar)
+        end
+
+        def date_time_interval_format_tokens(locale_name, calendar) when is_binary(locale_name) do
+          with {:ok, locale} <- unquote(backend).validate_locale(locale_name) do
+            date_time_interval_format_tokens(locale, calendar)
+          end
+        end
+
         @doc """
         Returns a map of the interval formats for a
         given locale and calendar.
@@ -1231,6 +1250,18 @@ defmodule Cldr.DateTime.Format.Backend do
 
             def date_time_interval_formats(unquote(locale), unquote(calendar)) do
               {:ok, unquote(Macro.escape(interval_formats))}
+            end
+
+            interval_format_tokens =
+              Enum.map(interval_formats, fn {format_id, format} ->
+                {:ok, tokens} = Cldr.DateTime.Format.Compiler.tokenize_skeleton(format_id)
+                tokens = Cldr.DateTime.Format.Match.sort_tokens(tokens)
+                {format_id, tokens}
+              end)
+              |> Map.new()
+
+            def date_time_interval_format_tokens(unquote(locale), unquote(calendar)) do
+              unquote(Macro.escape(interval_format_tokens))
             end
 
             def date_time_interval_fallback(unquote(locale), unquote(calendar)) do

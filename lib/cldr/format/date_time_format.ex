@@ -1133,6 +1133,21 @@ defmodule Cldr.DateTime.Format do
     backend.date_time_available_format_tokens(locale, calendar)
   end
 
+  @doc false
+  @spec date_time_interval_format_tokens(
+          locale :: Locale.locale_reference(),
+          calendar :: Cldr.Calendar.calendar(),
+          backend :: Cldr.backend()
+        ) :: {:ok, map()} | {:error, {atom, String.t()}}
+  def date_time_interval_format_tokens(
+        locale \\ Cldr.get_locale(),
+        calendar \\ Cldr.Calendar.default_cldr_calendar(),
+        backend \\ Cldr.Date.default_backend()
+      ) do
+    backend = Module.concat(backend, DateTime.Format)
+    backend.date_time_available_format_tokens(locale, calendar)
+  end
+
   @doc """
   Returns a map of the interval formats for a
   given locale and calendar.

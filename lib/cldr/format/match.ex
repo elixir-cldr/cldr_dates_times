@@ -101,6 +101,7 @@ defmodule Cldr.DateTime.Format.Match do
   * `locale` is any valid locale name returned by `Cldr.known_locale_names/0`
     or a `t:Cldr.LanguageTag.t/0` struct. The default is `Cldr.get_locale/0`.
     The default is `Cldr.get_locale/0`.
+
   * `calendar` is any CLDR calendar type. The default is `:gregorian`.
     See `Cldr.DateTime.Format.calendars_for/1` for the available calendars.
 
@@ -166,8 +167,7 @@ defmodule Cldr.DateTime.Format.Match do
         |> Enum.filter(&candidates_with_the_same_tokens(&1, skeleton_keys))
         |> Enum.map(&distance_from(&1, skeleton_ordered))
         |> Enum.sort(&compare_counts/2)
-
-      # |> IO.inspect(label: "Candidates")
+        # |> IO.inspect(label: "Candidates")
 
       case candidates do
         [] ->
@@ -177,8 +177,8 @@ defmodule Cldr.DateTime.Format.Match do
           {:ok, format_id}
       end
     end
-
     # |> IO.inspect(label: "Matched to #{inspect original_skeleton}")
+
   end
 
   @doc false
@@ -528,15 +528,15 @@ defmodule Cldr.DateTime.Format.Match do
   end
 
   def adjust_field_lengths(format, skeleton_tokens) do
-    format_tokens = Cldr.DateTime.Format.Compiler.tokenize_format_string(format)
+    format_tokens = Format.Compiler.tokenize_format_string(format)
 
-    revised_format =
+    adjusted_format =
       Enum.reduce(format_tokens, [], &adjust_field_length(&1, &2, skeleton_tokens))
       |> Enum.reverse()
       |> List.flatten()
       |> List.to_string()
 
-    {:ok, revised_format}
+    {:ok, adjusted_format}
   end
 
   @doc false

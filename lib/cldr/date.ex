@@ -542,9 +542,9 @@ defmodule Cldr.Date do
   end
 
   # If its an atom format it means we want to use one of the available formats. Since
-  # these are map keys they can be used in a locale-independent way. If the requested
-  # format is a direct match, use it. If not - try to find the best match between the
-  # requested format and available formats.
+  # these are map keys (skeleton IDs) they can be used in a locale-independent way.
+  # If the requested format is a direct match, use it. If not - try to find the best
+  # match between the requested format skeleton and available formats.
 
   def find_format(_date, format, locale, calendar, backend, options) when is_atom(format) do
     Cldr.DateTime.best_match(format, locale, calendar, backend, options)
@@ -553,9 +553,9 @@ defmodule Cldr.Date do
   # If its a binary then its considered a format string so we use
   # it directly.
 
-  def find_format(_date, format_string, _locale, _calendar, _backend, _options)
-      when is_binary(format_string) do
-    {:ok, format_string}
+  def find_format(_date, format_pattern, _locale, _calendar, _backend, _options)
+      when is_binary(format_pattern) do
+    {:ok, format_pattern}
   end
 
   defp error_return(map, requirements) do
