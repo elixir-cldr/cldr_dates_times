@@ -61,7 +61,7 @@ defmodule Cldr.DateTime.Relative.Backend do
           an "at" string ("tomorrow at 3:00 PM"). The supported values are `:standard` (the default)
           or `:at`.  Note that `style: :at` is only applied when:
 
-          * `:unit` is not a time unit (ie not `:hour`, `:minute` or :second`)
+          * `:unit` is not a time unit (ie not `:hour`, `:minute` or `:second`)
           * *and* when `:relative` is a `t:Calendar.datetime/0` or
           * *or* the `:at` option is set to a `t:Calendar.time/0`
 
@@ -73,7 +73,7 @@ defmodule Cldr.DateTime.Relative.Backend do
         * `:relative_to` is the baseline `date` or `datetime` from which the difference
           from `relative` is calculated when `relative` is a `t:Calendar.date/0` or a
           `t:Calendar.datetime/0`. The default for a `t:Calendar.date/0` is `Date.utc_today/0`;
-          for a `t:Calendar.datetime/0` it is `DateTime.utc_now/0` and for a t:Calendar.time/0` it
+          for a `t:Calendar.datetime/0` it is `DateTime.utc_now/0` and for a `t:Calendar.time/0` it
           is `Time.utc_now/0`.
 
         * `:time` is any `t:Calendar.time/0` that is used when `style: :at` is being applied. The
@@ -84,7 +84,7 @@ defmodule Cldr.DateTime.Relative.Backend do
           The default is `:short`.
 
         * `:at_format` is one of `:short`, `:medium`, `:long` or `:full`. It is used to determine the
-          format joining together the `relative` string and the `:time` string when `:style` is `:at.
+          format joining together the `relative` string and the `:time` string when `:style` is `:at`.
           The default is `:short` if `:format` is either `:short` or `:narrow`. Otherwise the
           default is `:medium`.
 
@@ -213,7 +213,7 @@ defmodule Cldr.DateTime.Relative.Backend do
           an "at" string ("tomorrow at 3:00 PM"). The supported values are `:standard` (the default)
           or `:at`.  Note that `style: :at` is only applied when:
 
-          * `:unit` is not a time unit (ie not `:hour`, `:minute` or :second`)
+          * `:unit` is not a time unit (ie not `:hour`, `:minute` or `:second`)
           * *and* when `:relative` is a `t:Calendar.datetime/0` or
           * *or* the `:at` option is set to a `t:Calendar.time/0`
 
@@ -225,7 +225,7 @@ defmodule Cldr.DateTime.Relative.Backend do
         * `:relative_to` is the baseline `date` or `datetime` from which the difference
           from `relative` is calculated when `relative` is a `t:Calendar.date/0` or a
           `t:Calendar.datetime/0`. The default for a `t:Calendar.date/0` is `Date.utc_today/0`;
-          for a `t:Calendar.datetime/0` it is `DateTime.utc_now/0` and for a t:Calendar.time/0` it
+          for a `t:Calendar.datetime/0` it is `DateTime.utc_now/0` and for a `t:Calendar.time/0` it
           is `Time.utc_now/0`.
 
         * `:time` is any `t:Calendar.time/0` that is used when `style: :at` is being applied. The
@@ -236,7 +236,7 @@ defmodule Cldr.DateTime.Relative.Backend do
           The default is `:short`.
 
         * `:at_format` is one of `:short`, `:medium`, `:long` or `:full`. It is used to determine the
-          format joining together the `relative` string and the `:time` string when `:style` is `:at.
+          format joining together the `relative` string and the `:time` string when `:style` is `:at`.
           The default is `:short` if `:format` is either `:short` or `:narrow`. Otherwise the
           default is `:medium`.
 
@@ -273,7 +273,7 @@ defmodule Cldr.DateTime.Relative.Backend do
 
         * `formatted_string` or
 
-        * `raises an exception.
+        * raises an exception.
 
         ### Examples
 
