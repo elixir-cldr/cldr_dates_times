@@ -1,3 +1,5 @@
+{:module, _} = Code.ensure_compiled(Cldr.DateTime.Backend)
+
 defmodule Cldr.DatesTimes.Dialyzer do
   @moduledoc """
   Functions just here to exercise dialyzer.
@@ -5,7 +7,6 @@ defmodule Cldr.DatesTimes.Dialyzer do
   This module is not included in the hex package.
 
   """
-  require Cldr.DateTime.Backend
 
   def backend_formats do
     {:ok, %{medium: _format_dt}} = MyApp.Cldr.DateTime.Format.date_time_formats("en")

@@ -40,8 +40,19 @@ jobs:
       # Specify the OTP and Elixir versions to use when building
       # and running the workflow steps.
       matrix:
-        otp: ['27.0']       # Define the OTP version [required]
-        elixir: ['1.17.2-otp-27']    # Define the elixi
+        include:
+          # minimum required versions
+          - otp: "27.2.4"
+            elixir: "1.18.4-otp-27"
+          - otp: "28.3.1"
+            elixir: "1.18.4-otp-28"
+          - otp: "27.2.4"
+            elixir: "1.19.5-otp-27"
+          - otp: "28.3.1"
+            elixir: "1.19.5-otp-28"
+          - otp: "28.3.1"
+            elixir: "1.20.0-rc.1-otp-28"
+            lint: true
     steps:
     # Step: Setup Elixir + Erlang image as the base.
     - name: Set up Elixir
@@ -85,12 +96,12 @@ jobs:
     # the cached version.
     - name: Install dependencies
       run: mix deps.get
-      
+
     # Download updated timezone data
     - name: Update Ttimezone data
-      run: mix tz.download  
-    
-    # TZ needs to be recompiled after data download  
+      run: mix tz.download
+
+    # TZ needs to be recompiled after data download
     - name: Recompile TZ
       run: mix deps.compile tz --force
 
