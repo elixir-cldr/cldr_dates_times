@@ -60,6 +60,21 @@ defmodule Cldr.DateTime.Formatting.Test do
              {:error, {Cldr.DateTime.UnresolvedFormat, "No available format resolved for :dhms"}}
   end
 
+  test "Standalone month format (L) does not crash adjust_field_length/3" do
+    date = ~D[2025-03-15]
+
+    # :MMM resolves to standalone month "LLL" in en and de
+    assert {:ok, _} = Cldr.Date.to_string(date, format: :MMM, locale: "en")
+    assert {:ok, _} = Cldr.Date.to_string(date, format: :MMM, locale: "de")
+
+    # :yMMMM and :yMMM resolve to standalone month in pl
+    assert {:ok, _} = Cldr.Date.to_string(date, format: :yMMMM, locale: "pl")
+    assert {:ok, _} = Cldr.Date.to_string(date, format: :yMMM, locale: "pl")
+
+    # Japanese uses "M" not "L", verify it still works
+    assert {:ok, _} = Cldr.Date.to_string(date, format: :yMMMM, locale: "ja")
+  end
+
   test "That tz format codes are removed from the skeleton before best match if the time is naive" do
     assert {:ok, "October 15, 2025, 1:55:00 PM"} =
              Cldr.DateTime.to_string(~N[2025-10-15T13:55:00], format: :long, time_format: :full)
