@@ -10,6 +10,7 @@ defmodule MyApp.Cldr do
       "th",
       "fa",
       "es",
+      "es-US",
       "da",
       "he",
       "en-CA",

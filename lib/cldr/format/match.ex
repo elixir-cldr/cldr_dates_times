@@ -555,12 +555,8 @@ defmodule Cldr.DateTime.Format.Match do
   @numeric_and_alpha_fields ["M", "L", "e", "q", "Q"]
   def adjust_field_length([char | _rest] = field, acc, skeleton_tokens)
       when char in @numeric_and_alpha_fields do
-    requested_length =
-      case :proplists.get_value(char, skeleton_tokens, :not_found) do
-        :not_found -> :proplists.get_value(canonical_key(char), skeleton_tokens, :not_found)
-        length -> length
-      end
-
+    canonical_key = canonical_key(char)
+    requested_length = :proplists.get_value(canonical_key, skeleton_tokens, :not_found)
     field_length = length(field)
 
     cond do
