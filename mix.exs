@@ -50,7 +50,7 @@ defmodule Cldr.DatesTimes.Mixfile do
       main: "readme",
       extras: ["README.md", "CHANGELOG.md", "LICENSE.md"],
       logo: "logo.png",
-      formatters: ["html"],
+      formatters: ["html", "markdown"],
       groups_for_modules: groups_for_modules(),
       skip_undefined_reference_warnings_on: ["changelog", "readme", "CHANGELOG.md"]
     ]
