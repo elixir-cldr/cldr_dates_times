@@ -688,12 +688,6 @@ defmodule Cldr.DateTime.Formatter do
     |> extended_year(n, locale, backend, options)
   end
 
-  def extended_year(%{year: year, calendar: Calendar.ISO}, n, _locale, _backend, options) do
-    year
-    |> pad(n)
-    |> maybe_wrap(:extended_year, options)
-  end
-
   def extended_year(%{year: year}, n, _locale, _backend, options) do
     year
     |> pad(n)

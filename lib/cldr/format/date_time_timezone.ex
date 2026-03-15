@@ -821,14 +821,9 @@ defmodule Cldr.DateTime.Timezone do
     offset = date_time.utc_offset + date_time.std_offset
     format = if offset >= 0, do: positive_format, else: negative_format
 
-    case time_from_zone_offset(date_time) do
-      {hour, minute, second} ->
-        {:ok, time} = Time.new(abs(hour), abs(minute), second)
-        Cldr.Time.to_string(time, format: format)
-
-      error ->
-        error
-    end
+    {hour, minute, second} = time_from_zone_offset(date_time)
+    {:ok, time} = Time.new(abs(hour), abs(minute), second)
+    Cldr.Time.to_string(time, format: format)
   end
 
   @doc """

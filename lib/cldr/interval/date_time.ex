@@ -146,7 +146,7 @@ defmodule Cldr.DateTime.Interval do
     end
 
     def to_string(%CalendarInterval{first: from, last: to, precision: precision}, backend, options)
-        when precision in [:hour, :minute] do
+        when precision in [:second] do
       from = %{from | microsecond: {0, 6}}
       to = %{to | microsecond: {0, 6}}
       to_string(from, to, backend, options)
