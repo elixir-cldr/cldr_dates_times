@@ -22,3 +22,6 @@ src/*.erl
 mise.toml
 
 .iex.exs
+
+# Claude Code session context (local only)
+CLAUDE.local.md
