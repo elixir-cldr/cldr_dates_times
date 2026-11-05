@@ -2,6 +2,14 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.25.7
+
+This is the changelog for Cldr_Dates_Times v2.25.7 released on November 6th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Remove the deprecated `xref: [exclude: [:eprof]]` from `mix.exs`, which warned on Elixir 1.20 when `ex_cldr_dates_times` is compiled as a dependency. Thanks to @obutuz for the report and PR. Closes #76.
+
 ## Cldr_Dates_Times v2.25.6
 
 This is the changelog for Cldr_Dates_Times v2.25.6 released on March 16th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_cldr_dates_times/tags)
