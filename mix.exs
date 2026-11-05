@@ -26,8 +26,7 @@ defmodule Cldr.DatesTimes.Mixfile do
           :extra_return,
           :missing_return
         ]
-      ],
-      xref: [exclude: [:eprof]]
+      ]
     ]
   end
 
