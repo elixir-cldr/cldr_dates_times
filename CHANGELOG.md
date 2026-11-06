@@ -10,6 +10,8 @@ This is the changelog for Cldr_Dates_Times v2.25.8 released on November 7th, 202
 
 * Fix a `BadMapError` when formatting time zone names (`z`, `zzzz`, `v`, `vvvv` and `Cldr.DateTime.Timezone.non_location_format/2`) in the `:und` locale, whose `meta_zones/1` returned `nil` instead of a map. Thanks to @lukaszsamson for the report in #75.
 
+* Update the README examples to match the output with current CLDR data, and fix the links to the `ex_cldr` configuration documentation.
+
 ## Cldr_Dates_Times v2.25.7
 
 This is the changelog for Cldr_Dates_Times v2.25.7 released on November 6th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
