@@ -2,6 +2,14 @@
 
 **Note that `ex_cldr_dates_times` version 2.18.0 and later are supported on Elixir 1.12 and later only.**
 
+## Cldr_Dates_Times v2.25.8
+
+This is the changelog for Cldr_Dates_Times v2.25.8 released on November 7th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)
+
+### Bug Fixes
+
+* Fix a `BadMapError` when formatting time zone names (`z`, `zzzz`, `v`, `vvvv` and `Cldr.DateTime.Timezone.non_location_format/2`) in the `:und` locale, whose `meta_zones/1` returned `nil` instead of a map. Thanks to @lukaszsamson for the report in #75.
+
 ## Cldr_Dates_Times v2.25.7
 
 This is the changelog for Cldr_Dates_Times v2.25.7 released on November 6th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_dates_times/tags)

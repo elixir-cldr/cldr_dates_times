@@ -1050,8 +1050,10 @@ defmodule Cldr.DateTime.Format.Backend do
             get_in(locale_data, [:dates, :time_zone_names, :zone])
             |> Macro.escape()
 
+          # The root locale (`und`) has no metazone names. An empty map keeps
+          # the return a map for every locale, as the spec says.
           meta_zones =
-            get_in(locale_data, [:dates, :time_zone_names, :metazone])
+            (get_in(locale_data, [:dates, :time_zone_names, :metazone]) || %{})
             |> Macro.escape()
 
           zone_fallback_format =

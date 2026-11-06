@@ -37,4 +37,36 @@ defmodule Cldr.DateTime.TimezoneTest do
               {Cldr.DateTime.NoTerritoryForTimezone,
                "No territory was found for time zone \"Etc/UTC\""}}
   end
+
+  # The root locale has no metazone names. These raised a BadMapError
+  # when meta_zones/1 returned nil for it (#75).
+  describe "the :und locale" do
+    test "meta_zones/1 returns an empty map" do
+      assert MyApp.Cldr.DateTime.Format.meta_zones(:und) == {:ok, %{}}
+    end
+
+    test "non_location_format/2 falls back to the exemplar city" do
+      assert {:ok, "New York"} =
+               Timezone.non_location_format("America/New_York", locale: :und)
+
+      assert {:ok, "New York"} =
+               Timezone.non_location_format("America/New_York", locale: :und, type: :generic)
+    end
+
+    test "time zone name formats fall back to GMT and location formats" do
+      date_time = DateTime.new!(~D[2026-11-07], ~T[10:00:00], "America/New_York")
+
+      assert {:ok, "10:00 GMT-05:00"} =
+               Cldr.DateTime.to_string(date_time, format: "HH:mm zzzz", locale: :und)
+
+      assert {:ok, "10:00 GMT-05:00"} =
+               Cldr.DateTime.to_string(date_time, format: "HH:mm z", locale: :und)
+
+      assert {:ok, "10:00 New York"} =
+               Cldr.DateTime.to_string(date_time, format: "HH:mm vvvv", locale: :und)
+
+      assert {:ok, "10:00 New York"} =
+               Cldr.DateTime.to_string(date_time, format: "HH:mm v", locale: :und)
+    end
+  end
 end
